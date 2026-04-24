@@ -1,0 +1,15 @@
+# TODO
+
+This is a list of the different mission statements, goals, and individual things that need to be worked on.
+
+## Mission Statements
+
+## Todo
+
+- [ ] Figure out how individual pannels get their information.
+  - [ ] It doesn't make much sense for individual panels just connect to different points of information, this is an overall issue, however needs to be addressed.
+- [ ] Re-fit to figure out what files are just header files, and what files have header AND c++ files.
+
+## Future Ideas
+
+- [ ] Use EnTT instead of custom ECS

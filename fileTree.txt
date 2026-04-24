@@ -1,0 +1,66 @@
+.
+├── CMakeLists.txt                          # Main build script
+├── assets/                                 # Scenes, models, textures, and HDRI maps
+├── shaders/                                # GPU-Code
+│   ├── compute/                                # Ray-Based Rendering shaders (.comp)
+│   │   ├── path_tracer.comp                        # Uses BVH + Triangles (Physics-based)
+│   │   ├── ray_tracer.comp                         # Standard Whitted-style (Clean, non-noisy)
+│   │   ├── ray_marcher.comp                        # Uses Signed Distance Fields (SDFs)
+│   │   └── voxel_tracer.comp                       # Uses a 3D Texture or SVO (Sparse Voxel Octree)
+│   ├── raster/                                 # Raterized shaders (.vert/frag)
+│   │   ├── viewport.vert/frag                      # Standard shaders for the modeling "grid" & wireframes
+│   │   ├── ui_overlay.vert/frag                    # Shaders for UI elements or gizmos (if not handled by ImGui)
+│   │   └── background.vert/frag                    # For rendering an HDRI skybox in the background
+│   └── include/                                # Shared "library" files (.glsl)
+│       ├── common.glsl                             # Constants (PI, EPSILON) and Utility functions
+│       ├── structures.glsl                         # Struct definitions for Material, Light, Vertex
+│       ├── pbr_brdf.glsl                           # Math for Physically Based Rendering (Fresnel, Smith, etc.)
+│       └── sampling.glsl                           # Random number generation and Blue Noise functions
+├── src/                                    # CPU-Code
+│   ├── main.cpp                                # Entry point
+│   ├── acceleration/                           # Memory Optomization Structures
+│   │   ├── IAccelerationStructure.h                # Base Interface
+│   │   ├── BVHBuilder.cpp/h                        # Surface Area Heuristic (SAH) logic
+│   │   ├── Octree.cpp/h                            # For Ray Marching/SDFs
+│   │   └── UniformGrid.cpp/h                       # For simple/liquid simulations
+│   ├── core/                                   # Engine internals
+│   │   ├── Window.cpp/h                            # GLFW abstraction
+│   │   ├── Input.cpp/h                             # Input polling
+│   │   └── Application.cpp/h                       # Main loop & layer management
+│   ├── renderer/                               # Differing Renderer Logic
+│   │   ├── IRenderer.h                             # Base interface
+│   │   ├── Rasterizer.cpp/h                        # Real-time modeling view
+│   │   ├── PathTracer.cpp/h                        # GPU Path tracing logic
+│   │   └── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
+│   ├── resources/                              # Resource loaders & managers
+│   │   ├── AssetManager.cpp/h                      # The "Central Hub" / Cache logic
+│   │   ├── ModelLoader.cpp/h                       # Geometry parsing
+│   │   ├── TextureLoader.cpp/h                     # Image decoding (stb_image)
+│   │   └── MaterialLoader.cpp/h                    # Material parsing
+│   ├── scene/                                  # Scene and entity logic
+│   │   ├── Campera.cpp/h                           # Camera logig
+│   │   ├── ECS.h                                   # Basic ID types (typedef uint32_t EntityID)
+│   │   ├── Component.h                             # POD Structs: Transform, MeshComponent, LightComponent
+│   │   ├── Scene.h                                 # The "Registry" (manages the list of entities)
+│   │   ├── System.h                                # Base class for logic (PhysicsSystem, etc.)
+│   │   └── Components/                             # Component Logic
+│   │       ├── Transform.h                             # Position, Rotation, Scale
+│   │       ├── MeshComponent.h                         # Reference to a Mesh resource ID
+│   │       ├── MaterialComponent.h                     # Reference to a Material ID
+│   │       └── LightComponent.h                        # Reference to a Light ID
+│   └── ui/                                     # UI/UX Layer
+│       ├── UIController.cpp/h                      # ImGui setup/docking logic
+│       ├── IPanel.cpp/h                            # Real-time modeling view
+│       └── Panels/                                 # Individual windows (Properties, Hierarchy)
+│            ├── ViewportPanel.cpp/h                    # Shows the actual rendered image/texture
+│            ├── SceneHierarchy.cpp/h                   # List of objects in the scene
+│            ├── InspectorPanel.cpp/h                   # Tweaking variables/materials of selected objects
+│            ├── ConsolePanel.cpp/h                     # Logging and engine status
+│            └── SettingsPanel.cpp/h                    # Render settings (Samples per pixel, Ray depth)
+├── vendor/                                 # Libraries
+│   ├── glad/                                   # OpenGL Loader
+│   ├── glfw/                                   # Windowing
+│   ├── glm/                                    # Math (header only)
+│   ├── imgui/                                  # UI
+│   └── tinyobjloader/                          # Mesh loading
+└── build/                                  # Generated build files (gitignored)

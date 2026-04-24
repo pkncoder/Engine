@@ -1,0 +1,110 @@
+```mermaid
+graph TD
+    %% Define Styles
+    classDef core fill:#d4e5ff,stroke:#0052cc,color:#000
+    classDef resource fill:#d1f7d1,stroke:#008000,color:#000
+    classDef scene fill:#fff2cc,stroke:#d6b656,color:#000
+    classDef gpu fill:#f8cecc,stroke:#b85450,color:#000
+    classDef ui fill:#e1d5e7,stroke:#9673a6,color:#000
+
+    subgraph Core_Loop ["Core Application"]
+        App[Application.cpp/h]
+        Win[Window.cpp/h]
+        Inp[Input.cpp/h]
+        Inp -->|Polls/States| App
+        App --> Win
+    end
+
+    subgraph Resource_Layer ["Resource Management"]
+        AM[AssetManager]
+        ML[ModelLoader]
+        MatL[MaterialLoader]
+        TL[TextureLoader]
+        
+        Assets[("/assets")]
+
+        AM <--> ML & MatL & TL
+
+        ML --> Assets
+        MatL --> Assets
+        TL --> Assets
+    end
+
+    subgraph Scene_ECS ["Scene & ECS"]
+        SH[Scene.h]
+        CH[Component.h]
+        ECS[ECS.h]
+        
+        subgraph Components ["Component Data"]
+            Trans[Transform]
+            MeshC[MeshComponent]
+            MatC[MaterialComponent]
+            LightC[LightComponent]
+        end
+        
+        SH --- CH --- ECS
+        CH --- Trans & MeshC & MatC & LightC
+        Accel[Acceleration Structures]
+    end
+
+    subgraph GPU_Renderer ["Rendering Engine"]
+        BM[BufferManager]
+        IR[IRenderer Interface]
+        
+        subgraph Renderers ["Renderer Implementations"]
+            Rast[Rasterizer]
+            PT[PathTracer]
+        end
+
+        subgraph Shader_Files ["Shader Files"]
+            RastShaders[(raster/)]
+            CompShaders[(compute/)]
+        end
+
+        IR --- Rast & PT
+        Rast -->|Dispatch| RastShaders
+        PT -->|Dispatch| CompShaders
+    end
+
+    subgraph UI_Layer ["UI / UX (ImGui)"]
+        UI_Ctrl[UIController]
+        
+        subgraph Panels ["UI Panels"]
+            VPP[Viewport Panel]
+            SHP[Scene Hierarchy]
+            ISP[Inspector Panel]
+            STP[Settings Panel]
+        end
+
+        UI_Ctrl --- VPP & SHP & ISP & STP
+    end
+
+    %% --- Global Connections ---
+
+    %% Data Feeding
+    AM -->|Load Resources| SH
+    SH -->|Flatten Data| BM
+    Accel -->|BVH Data| BM
+    BM -->|Bind Buffers| IR
+    
+    %% Application Logic
+    App --> UI_Ctrl
+    App --> SH
+    App --> IR
+    
+    %% UI Interaction
+    SHP -->|Browse| SH
+    ISP -->|Edit Components| Trans & MeshC & MatC & LightC
+    STP -->|Settings| PT & Rast
+    VPP -->|Display Texture| IR
+    
+    %% Input specialized connection
+    Inp -.->|Camera/Move| App
+
+    %% Apply Classes
+    class App,Win,Inp core
+    class AM,ML,MatL,TL,Assets resource
+    class SH,CH,ECS,Trans,MeshC,MatC,LightC,Accel scene
+    class BM,IR,Rast,PT,RastShaders,CompShaders gpu
+    class UI_Ctrl,VPP,SHP,ISP,STP ui
+```

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+./test 
+./build/bin/engine
