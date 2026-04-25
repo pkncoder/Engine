@@ -2,40 +2,46 @@
 #include <iostream>
 
 namespace Engine {
-    Window::Window(int width, int height, const std::string& title)
-        : m_Width(width), m_Height(height), m_Title(title) {
-        
-        if (!glfwInit()) {
-            std::cerr << "Failed to initialize GLFW" << std::endl;
-            return;
-        }
+Window::Window(int width, int height, const std::string &title)
+    : m_Width(width), m_Height(height), m_Title(title) {
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  if (!glfwInit()) {
+    std::cerr << "Failed to initialize GLFW" << std::endl;
+    return;
+  }
 
-        m_Window = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
-        if (!m_Window) {
-            std::cerr << "Failed to create GLFW window" << std::endl;
-            glfwTerminate();
-            return;
-        }
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        glfwMakeContextCurrent(m_Window);
+  m_Window =
+      glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
+  if (!m_Window) {
+    std::cerr << "Failed to create GLFW window" << std::endl;
+    glfwTerminate();
+    return;
+  }
 
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-            std::cerr << "Failed to initialize GLAD" << std::endl;
-        }
+  glfwMakeContextCurrent(m_Window);
 
-        glViewport(0, 0, m_Width, m_Height);
-    }
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    std::cerr << "Failed to initialize GLAD" << std::endl;
+  }
 
-    Window::~Window() {
-        glfwDestroyWindow(m_Window);
-        glfwTerminate();
-    }
-
-    bool Window::ShouldClose() const { return glfwWindowShouldClose(m_Window); }
-    void Window::PollEvents() { glfwPollEvents(); }
-    void Window::SwapBuffers() { glfwSwapBuffers(m_Window); }
+  glViewport(0, 0, m_Width, m_Height);
 }
+
+Window::~Window() {
+  glfwDestroyWindow(m_Window);
+  glfwTerminate();
+}
+
+void Window::OnUpdate() {
+  this->SwapBuffers();
+  this->PollEvents();
+}
+
+bool Window::ShouldClose() const { return glfwWindowShouldClose(m_Window); }
+void Window::PollEvents() { glfwPollEvents(); }
+void Window::SwapBuffers() { glfwSwapBuffers(m_Window); }
+} // namespace Engine

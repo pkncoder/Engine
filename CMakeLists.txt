@@ -16,8 +16,13 @@ find_package(glm CONFIG REQUIRED)
 # Note: glad.c is now handled by the library, no need to include it manually!
 set(SOURCES
     src/main.cpp
-    src/core/Window.cpp
     src/core/Application.cpp
+    src/core/Window.cpp
+    src/core/Input.cpp
+    src/scene/Camera.cpp          # <--- Check these!
+    src/renderer/Rasterizer.cpp
+    src/renderer/BufferManager.cpp # <--- Check these!
+    src/renderer/Shader.cpp        # <--- Check these!
 )
 
 # --- Executable ---
