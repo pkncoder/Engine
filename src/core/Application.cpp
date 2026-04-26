@@ -1,8 +1,7 @@
 #include "Application.h"
+
 #include "../services/Input.h"
 #include "../services/Timer.h"
-#include "Window.h"
-#include <memory>
 
 namespace Engine {
 

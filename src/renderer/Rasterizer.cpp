@@ -1,6 +1,11 @@
 #include "Rasterizer.h"
+
 #include "BufferManager.h"
-#include <glm/ext/matrix_float4x4.hpp>
+
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
 #include <vector>
 
 // Init the rasterizer

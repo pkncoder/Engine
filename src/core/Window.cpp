@@ -1,6 +1,5 @@
-#include "glad/glad.h"
-
 #include "Window.h"
+
 #include <iostream>
 
 namespace Engine {

@@ -3,10 +3,6 @@
 #include "../scene/Camera.h"
 #include "IRenderer.h"
 #include "Shader.h"
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
-#include <cstdint>
-#include <glm/glm.hpp>
 
 class Rasterizer : IRenderer {
   public:

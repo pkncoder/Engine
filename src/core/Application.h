@@ -1,7 +1,9 @@
 #pragma once
+
 #include "../renderer/Rasterizer.h"
 #include "../scene/Camera.h"
 #include "Window.h"
+
 #include <memory>
 
 namespace Engine {

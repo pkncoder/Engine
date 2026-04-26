@@ -1,5 +1,7 @@
 #include "BufferManager.h"
+
 #include "glad/glad.h"
+
 #include <cstddef>
 
 // Creating a simple mesh - probally temp
