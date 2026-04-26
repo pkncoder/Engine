@@ -45,10 +45,9 @@ class Camera {
     // Processes input received from any keyboard-like input system
     void processMovement(Camera_Movement direction);
 
-    // Processes input received from a mouse input system
-    // TODO: Make better name
-    void processAngleMovement(float xoffset, float yoffset,
-                              bool constrainPitch = true);
+    // Processes the change to where the camera is looking
+    void processLookingDirectionMovement(float xoffset, float yoffset,
+                                         bool constrainPitch = true);
 
   private:
     // Update the front, right, and up camera vectors

@@ -30,6 +30,9 @@ class Application {
 
     // Active renderer
     std::unique_ptr<Rasterizer> rasterizer;
+
+    // Handling inputs
+    void handleInputs();
 };
 
 } // namespace Engine

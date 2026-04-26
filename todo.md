@@ -4,7 +4,7 @@ This is a bit more than JUST todos.
 
 This is my catalogue of todos, mission statements, and checklists across the project. This file also "stores" progress, as the todos that end up in here and stay, get saved at the bottom, going hand-in-hand with the git commit tree.
 
-This file does not store any "// TODO: ~~~" marks I make in code, as those are meant for listing extra context in place
+This file does not store any "// TODO : ~~~" marks I make in code, as those are meant for listing extra context in place
 
 ## TOC
 
@@ -27,7 +27,7 @@ This file does not store any "// TODO: ~~~" marks I make in code, as those are m
 
 ### Todo - Code
 
-- [ ] Move inputs into seperate file
+- [ ] Extend and use Defaults.h more
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Figure out how shader including will work in current code
 - [ ] Make sure everything that should be in the engine namespace, is
@@ -76,3 +76,4 @@ This file does not store any "// TODO: ~~~" marks I make in code, as those are m
 - [x] Fix camera.h name + shader.cpp/h
 - [x] Fix refactor-checklist
 - [x] Add a "PreRender" function to Window
+- [x] Move inputs into seperate thing

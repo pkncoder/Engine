@@ -2,6 +2,7 @@
 
 #include "../services/Input.h"
 #include "../services/Timer.h"
+#include "Defaults.h"
 
 namespace Engine {
 
@@ -13,8 +14,9 @@ Application::~Application() {}
 void Application::init() {
 
     // Create the window
-    window = std::make_unique<Window>(
-        300, 300, "Engine"); // Ensure GLAD is initialized here!
+    window = std::make_unique<Window>(Defaults::Window::START_WIDTH,
+                                      Defaults::Window::START_HEIGHT,
+                                      Defaults::Window::START_TITLE);
 
     // Init the input service
     Input::init(window->getNativeWindow());
@@ -23,8 +25,7 @@ void Application::init() {
     Timer::init();
 
     // Init the camera at a starting pos
-    // TODO: Get starting information elsewhere
-    camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    camera = Camera(Defaults::Camera::START_POSITION);
 
     // Construct the rasterizer and init it
     rasterizer = std::make_unique<Rasterizer>();
@@ -40,28 +41,9 @@ void Application::run() {
         // Update the timer information
         Timer::update();
 
-        // Input poll
+        // Poll inputs, and then handle them
         Input::update();
-
-        // TODO: Move elsewhere?
-        {
-            // Moving camera look at direction
-            if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-                glm::vec2 delta = Input::getMouseDelta();
-                camera.processAngleMovement(delta.x, -delta.y);
-            }
-
-            // Move the camera origin on movement
-            // TODO: Move delta time into camera basic for one source of truth
-            if (Input::isKeyPressed(GLFW_KEY_W))
-                camera.processMovement(FORWARD);
-            if (Input::isKeyPressed(GLFW_KEY_S))
-                camera.processMovement(BACKWARD);
-            if (Input::isKeyPressed(GLFW_KEY_A))
-                camera.processMovement(LEFT);
-            if (Input::isKeyPressed(GLFW_KEY_D))
-                camera.processMovement(RIGHT);
-        }
+        handleInputs();
 
         // Clear Screen
         window->preFrame();
@@ -72,6 +54,26 @@ void Application::run() {
         // Do things like event polling & buffer swapping
         window->postFrame();
     }
+}
+
+// Handle any inputs that come in this frame
+void Application::handleInputs() {
+
+    // Moving camera look at direction
+    if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        glm::vec2 delta = Input::getMouseDelta();
+        camera.processLookingDirectionMovement(delta.x, -delta.y);
+    }
+
+    // Move the camera origin on movement
+    if (Input::isKeyPressed(GLFW_KEY_W))
+        camera.processMovement(FORWARD);
+    if (Input::isKeyPressed(GLFW_KEY_S))
+        camera.processMovement(BACKWARD);
+    if (Input::isKeyPressed(GLFW_KEY_A))
+        camera.processMovement(LEFT);
+    if (Input::isKeyPressed(GLFW_KEY_D))
+        camera.processMovement(RIGHT);
 }
 
 } // namespace Engine

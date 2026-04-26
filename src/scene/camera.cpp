@@ -50,8 +50,8 @@ void Camera::processMovement(Camera_Movement direction) {
 }
 
 // Pitch and yaw modifications
-void Camera::processAngleMovement(float xoffset, float yoffset,
-                                  bool constrainPitch) {
+void Camera::processLookingDirectionMovement(float xoffset, float yoffset,
+                                             bool constrainPitch) {
 
     // Change the x & y offset
     xoffset *= mouseSensitivity;
