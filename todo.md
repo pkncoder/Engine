@@ -29,9 +29,9 @@ This is a list of the different mission statements, goals, and individual things
 
 ## Refactor Checklist
 
-1. [x] Fix warnings (unless related in later step)
-2. [x] Refactor step by step in code
-3. [x] Fix placement of functions
-4. [x] Fix public vs. private
-5. [x] Rename things
-6. [x] Add comments
+1. [ ] Fix warnings (unless related in later step)
+2. [ ] Refactor step by step in code
+3. [ ] Fix placement of functions
+4. [ ] Fix public vs. private
+5. [ ] Rename things
+6. [ ] Add comments
