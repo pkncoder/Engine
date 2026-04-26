@@ -2,7 +2,6 @@
 
 #include <glm/glm.hpp>
 
-// TODO: Expand upon this and actually use it
 namespace Engine {
 namespace Defaults {
 
