@@ -38,3 +38,4 @@ This is a list of the different mission statements, goals, and individual things
 5. [ ] Rename things
 6. [ ] Add comments
 7. [ ] Place the \#includes in the right spots
+8. [ ] Fix file tree
