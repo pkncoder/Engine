@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Defaults.h"
 
 #include <iostream>
 
@@ -80,7 +81,8 @@ void Window::swapBuffers() const { glfwSwapBuffers(window); }
 
 // Pre-frame window steps
 void Window::preFrame() const {
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // TODO: Default value somewhere else?
+    glClearColor(Defaults::Window::CLEAR_RED, Defaults::Window::CLEAR_GREEN,
+                 Defaults::Window::CLEAR_BLUE, Defaults::Window::CLEAR_ALPHA);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
