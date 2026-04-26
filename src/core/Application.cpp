@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Input.h"
 #include "Window.h"
+#include <iostream>
 #include <memory>
 
 namespace Engine {
@@ -25,14 +26,37 @@ void Application::Init() {
 // Main loop
 void Application::Run() {
 
+    // TODO: Move this into a timer class
     float lastFrame = 0.0f; // Frame delta info
+    float deltaTime;
+    int frameNum = 1;
+
+    float lastTime = glfwGetTime();
+    int nbFrames = 0;
 
     while (!m_Window->ShouldClose()) {
 
-        // 1. Calculate DeltaTime
-        float currentFrame = (float)glfwGetTime();
-        float deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        // TODO: Move this into a timer class
+        {
+            // Inside the while loop...
+            double currentTime = glfwGetTime();
+            deltaTime = (float)currentTime - lastFrame;
+            lastFrame = (float)currentTime;
+            nbFrames++;
+
+            // Only print/calculate every 1 second
+            if (currentTime - lastTime >= 1.0) {
+                // Calculate ms/frame
+                float msPerFrame = 1000.0 / double(nbFrames);
+                float fps = double(nbFrames);
+
+                std::cout << fps << " FPS (" << msPerFrame << " ms/frame)"
+                          << std::endl;
+
+                nbFrames = 0;
+                lastTime += 1.0;
+            }
+        }
 
         // Input poll
         Input::Update();

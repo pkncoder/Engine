@@ -17,6 +17,7 @@ This is a list of the different mission statements, goals, and individual things
 - [ ] Fix camera.h name + shader.cpp/h
 - [ ] Add a "PreRender" function to Window
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
+- [ ] Add a temp fps timer in the window name
 
 ## Future Ideas
 

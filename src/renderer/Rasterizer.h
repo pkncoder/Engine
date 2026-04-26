@@ -10,7 +10,6 @@
 
 class Rasterizer : IRenderer {
   public:
-    Shader m_Shader;
     uint32_t m_TestVAO;
 
     void Init();
@@ -18,4 +17,7 @@ class Rasterizer : IRenderer {
     void Render(const Camera &camera, float aspectRatio);
 
     void Shutdown();
+
+  private:
+    Shader m_Shader;
 };

@@ -38,6 +38,7 @@ Window::Window(int width, int height, const std::string &title)
         std::cerr << "Failed to initialize GLAD" << std::endl;
     }
 
+    glfwSwapInterval(0); // TODO: Decide to keep or not
     glEnable(GL_DEPTH_TEST);
 
     glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
