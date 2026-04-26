@@ -5,13 +5,14 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <vector>
 
-void Rasterizer::Render(glm::mat4 view, glm::mat4 proj) {
+void Rasterizer::Render(const Camera &camera, float aspectRatio) {
     m_Shader.Bind();
 
-    // TODO: better asspect ratio fix
-    // Calculate View-Projection matrix
-    glm::mat4 vp = proj * view;
-    m_Shader.SetMat4("u_ViewProjection", vp);
+    // The math happens here, hidden away from the main loop
+    glm::mat4 view = camera.GetViewMatrix();
+    glm::mat4 proj = camera.GetProjectionMatrix(aspectRatio);
+
+    m_Shader.SetMat4("u_ViewProjection", proj * view);
 
     // Hardcoded draw for Phase II test
     glBindVertexArray(m_TestVAO);
@@ -19,6 +20,7 @@ void Rasterizer::Render(glm::mat4 view, glm::mat4 proj) {
 }
 
 void Rasterizer::Init() {
+
     m_Shader =
         Shader("shaders/raster/viewport.vert", "shaders/raster/viewport.frag");
 
@@ -28,3 +30,5 @@ void Rasterizer::Init() {
 
     m_TestVAO = BufferManager::CreateSimpleMesh(triangle);
 }
+
+void Rasterizer::Shutdown() {};

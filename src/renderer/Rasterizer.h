@@ -14,6 +14,8 @@ class Rasterizer : IRenderer {
     uint32_t m_TestVAO;
 
     void Init();
-    // void Shutdown();
-    void Render(glm::mat4 view, glm::mat4 proj);
+
+    void Render(const Camera &camera, float aspectRatio);
+
+    void Shutdown();
 };

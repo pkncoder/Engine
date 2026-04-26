@@ -9,6 +9,7 @@ Application::Application() {}
 
 // Init the window, camera, etc.
 void Application::Init() {
+
     m_Window = std::make_unique<Window>(
         300, 300, "Engine"); // Ensure GLAD is initialized here!
 
@@ -23,9 +24,11 @@ void Application::Init() {
 
 // Main loop
 void Application::Run() {
+
     float lastFrame = 0.0f; // Frame delta info
 
     while (!m_Window->ShouldClose()) {
+
         // 1. Calculate DeltaTime
         float currentFrame = (float)glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
@@ -38,7 +41,6 @@ void Application::Run() {
         if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
             glm::vec2 delta = Input::GetMouseDelta();
             m_Camera.ProcessMouseMovement(delta.x, -delta.y);
-            ;
         }
 
         // 2. Moving camera position
@@ -55,10 +57,8 @@ void Application::Run() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        float aspect = m_Window->GetAspectRatio();
-        glm::mat4 proj = m_Camera.GetProjectionMatrix(aspect);
-        m_Rasterizer->Render(m_Camera.GetViewMatrix(), proj);
         // Render the scene
+        m_Rasterizer->Render(m_Camera, m_Window->GetAspectRatio());
 
         // Do things like event polling & buffer swapping
         m_Window->OnUpdate();

@@ -9,13 +9,15 @@ class Window {
     ~Window();
 
     bool ShouldClose() const;
+
     void PollEvents();
     void SwapBuffers();
-    void GetSize(int &width, int &height) const;
-    float GetAspectRatio();
+    void OnUpdate();
 
     GLFWwindow *GetNativeWindow() const { return m_Window; }
-    void OnUpdate();
+
+    void GetSize(int &width, int &height) const;
+    float GetAspectRatio();
 
   private:
     GLFWwindow *m_Window;

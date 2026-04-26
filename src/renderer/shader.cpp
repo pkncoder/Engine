@@ -6,6 +6,7 @@
 #include <sstream>
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
+
     // 1. Retrieve the source code from file paths
     std::string vertexCode;
     std::string fragmentCode;
@@ -18,11 +19,14 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     try {
         vShaderFile.open(vertexPath);
         fShaderFile.open(fragmentPath);
+
         std::stringstream vShaderStream, fShaderStream;
         vShaderStream << vShaderFile.rdbuf();
         fShaderStream << fShaderFile.rdbuf();
+
         vShaderFile.close();
         fShaderFile.close();
+
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
     } catch (std::ifstream::failure &e) {
@@ -36,20 +40,27 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     uint32_t vertex, fragment;
 
     vertex = glCreateShader(GL_VERTEX_SHADER);
+
     glShaderSource(vertex, 1, &vShaderSource, NULL);
     glCompileShader(vertex);
+
     checkCompileErrors(vertex, "VERTEX");
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
+
     glShaderSource(fragment, 1, &fShaderSource, NULL);
     glCompileShader(fragment);
+
     checkCompileErrors(fragment, "FRAGMENT");
 
     // 3. Shader Program
     ID = glCreateProgram();
+
     glAttachShader(ID, vertex);
     glAttachShader(ID, fragment);
+
     glLinkProgram(ID);
+
     checkCompileErrors(ID, "PROGRAM");
 
     // Delete shaders as they're linked into our program and no longer necessary
@@ -70,6 +81,7 @@ void Shader::SetMat4(const std::string &name, const glm::mat4 &mat) const {
 void Shader::checkCompileErrors(uint32_t shader, std::string type) {
     int success;
     char infoLog[1024];
+
     if (type != "PROGRAM") {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {

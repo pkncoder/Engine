@@ -15,6 +15,14 @@ void Input::Init(GLFWwindow *window) {
     s_LastMousePos = {(float)x, (float)y};
 }
 
+void Input::Update() {
+    glm::vec2 currentPos = GetMousePosition();
+
+    // Calculate how much the mouse moved since the last frame
+    s_MouseDelta = currentPos - s_LastMousePos;
+    s_LastMousePos = currentPos;
+}
+
 bool Input::IsKeyPressed(int keycode) {
     int state = glfwGetKey(s_Window, keycode);
     return state == GLFW_PRESS || state == GLFW_REPEAT;
@@ -26,17 +34,11 @@ bool Input::IsMouseButtonPressed(int button) {
 }
 
 glm::vec2 Input::GetMousePosition() {
+
     double x, y;
     glfwGetCursorPos(s_Window, &x, &y);
+
     return {(float)x, (float)y};
 }
 
 glm::vec2 Input::GetMouseDelta() { return s_MouseDelta; }
-
-void Input::Update() {
-    glm::vec2 currentPos = GetMousePosition();
-
-    // Calculate how much the mouse moved since the last frame
-    s_MouseDelta = currentPos - s_LastMousePos;
-    s_LastMousePos = currentPos;
-}

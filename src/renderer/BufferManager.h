@@ -10,6 +10,5 @@ struct Vertex {
 
 class BufferManager {
   public:
-    // Returns the VAO ID
     static uint32_t CreateSimpleMesh(const std::vector<Vertex> &vertices);
 };

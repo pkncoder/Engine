@@ -15,16 +15,19 @@ This is a list of the different mission statements, goals, and individual things
 - [ ] Move inputs into seperate file?
 - [ ] Fix aspect ratio calculation
 - [ ] Fix camera.h name + shader.cpp/h
-- [ ] Make live aspect ratio drawing
+- [ ] Add a "PreRender" function to Window
+- [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 
 ## Future Ideas
 
 - [ ] Use EnTT instead of custom ECS
+- [ ] Make live aspect ratio drawing
 
 ## Refactor Checklist
 
-1. [ ] Fix warnings (unless related in later step)
-1. [ ] Refactor step by step in code
-1. [ ] Fix placement of functions
-1. [ ] Rename things
-1. [ ] Add comments
+1. [x] Fix warnings (unless related in later step)
+2. [x] Refactor step by step in code
+3. [ ] Fix placement of functions
+4. [ ] Fix public vs. private
+5. [ ] Rename things
+6. [ ] Add comments

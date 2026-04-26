@@ -1,12 +1,14 @@
 #include "Camera.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-    : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED),
-      MouseSensitivity(SENSITIVITY), Zoom(ZOOM) {
+    : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MouseSensitivity(SENSITIVITY),
+      MovementSpeed(SPEED), Zoom(ZOOM) {
+
     Position = position;
     WorldUp = up;
     Yaw = yaw;
     Pitch = pitch;
+
     updateCameraVectors();
 }
 
@@ -19,7 +21,9 @@ glm::mat4 Camera::GetProjectionMatrix(float aspectRatio) const {
 }
 
 void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
+
     float velocity = MovementSpeed * deltaTime;
+
     if (direction == FORWARD)
         Position += Front * velocity;
     if (direction == BACKWARD)
@@ -32,6 +36,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
 
 void Camera::ProcessMouseMovement(float xoffset, float yoffset,
                                   bool constrainPitch) {
+
     xoffset *= MouseSensitivity;
     yoffset *= MouseSensitivity;
 
@@ -51,12 +56,12 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset,
 void Camera::updateCameraVectors() {
     // Calculate the new Front vector
     glm::vec3 front;
+
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
     front.y = sin(glm::radians(Pitch));
     front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    Front = glm::normalize(front);
 
-    // Also re-calculate the Right and Up vector
+    Front = glm::normalize(front);
     Right = glm::normalize(glm::cross(Front, WorldUp));
     Up = glm::normalize(glm::cross(Right, Front));
 }
