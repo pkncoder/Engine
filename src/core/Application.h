@@ -1,6 +1,6 @@
 #pragma once
 #include "../renderer/Rasterizer.h"
-#include "../scene/camera.h"
+#include "../scene/Camera.h"
 #include "Window.h"
 #include <memory>
 
@@ -14,21 +14,20 @@ class Application {
     ~Application();
 
     // Constructing the active render, window, etc.
-    void Init();
+    void init();
 
     // Main loop
-    void Run();
+    void run();
 
   private:
     // Window information
-    std::unique_ptr<Window> m_Window;
-    bool m_Running = true;
+    std::unique_ptr<Window> window;
 
     // Camera object
-    Camera m_Camera;
+    Camera camera;
 
     // Active renderer
-    std::unique_ptr<Rasterizer> m_Rasterizer;
+    std::unique_ptr<Rasterizer> rasterizer;
 };
 
 } // namespace Engine

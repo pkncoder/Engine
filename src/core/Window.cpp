@@ -13,7 +13,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 Window::Window(int width, int height, const std::string &title)
-    : m_Width(width), m_Height(height), m_Title(title) {
+    : width(width), height(height), title(title) {
 
     // Initialize & check for error for glfw
     if (!glfwInit()) {
@@ -27,18 +27,17 @@ Window::Window(int width, int height, const std::string &title)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create the GLFW window and give it to our wrapper
-    m_Window =
-        glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
     // Check to make sure the window actually got made
-    if (!m_Window) {
+    if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return;
     }
 
     // Set the window context to our current window
-    glfwMakeContextCurrent(m_Window);
+    glfwMakeContextCurrent(window);
 
     // Initialize & check GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -54,45 +53,45 @@ Window::Window(int width, int height, const std::string &title)
     glfwSwapInterval(0); // TODO: Decide to keep or not
 
     // Set the size change callback
-    glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Set the intial window size
     int bufferWidth, bufferHeight;
-    glfwGetFramebufferSize(m_Window, &bufferWidth, &bufferHeight);
+    glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
     glViewport(0, 0, bufferWidth, bufferHeight);
 }
 
 // Deconstructor - Kill glfw
 Window::~Window() {
-    glfwDestroyWindow(m_Window);
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
 
 // Checking for closing the window
-bool Window::ShouldClose() const { return glfwWindowShouldClose(m_Window); }
+bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 
 // Polling & swapping buffers
-void Window::PollEvents() { glfwPollEvents(); }
-void Window::SwapBuffers() { glfwSwapBuffers(m_Window); }
+void Window::pollEvents() { glfwPollEvents(); }
+void Window::swapBuffers() { glfwSwapBuffers(window); }
 
 // Window update
-void Window::OnUpdate() {
-    this->SwapBuffers();
-    this->PollEvents();
+void Window::onUpdate() {
+    this->swapBuffers();
+    this->pollEvents();
 }
 
 // Get the framebuffer size
-void Window::GetSize(int &width, int &height) const {
+void Window::getSize(int &width, int &height) const {
     // We use FramebufferSize because on Retina displays,
     // WindowSize != PixelSize. This fixes your "cut off" bug.
-    glfwGetFramebufferSize(m_Window, &width, &height);
+    glfwGetFramebufferSize(window, &width, &height);
 }
 
 // Get the framebuffer aspect ratio
-float Window::GetAspectRatio() {
+float Window::getAspectRatio() {
 
     int width, height;
-    this->GetSize(width,
+    this->getSize(width,
                   height); // Now width and height will actually be updated
 
     if (height == 0)

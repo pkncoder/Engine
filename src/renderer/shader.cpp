@@ -87,11 +87,11 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 }
 
 // Bind and unbind
-void Shader::Bind() const { glUseProgram(ID); }
-void Shader::Unbind() const { glUseProgram(0); }
+void Shader::bind() const { glUseProgram(ID); }
+void Shader::unbind() const { glUseProgram(0); }
 
 // Set Mat4 uniform
-void Shader::SetMat4(const std::string &name, const glm::mat4 &mat) const {
+void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE,
                        glm::value_ptr(mat));
 }

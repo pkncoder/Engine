@@ -33,5 +33,5 @@ This is a list of the different mission statements, goals, and individual things
 2. [x] Refactor step by step in code
 3. [x] Fix placement of functions
 4. [x] Fix public vs. private
-5. [ ] Rename things
+5. [x] Rename things
 6. [x] Add comments

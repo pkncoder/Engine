@@ -11,26 +11,26 @@ Application::Application() {}
 Application::~Application() {}
 
 // Init the window, camera, etc.
-void Application::Init() {
+void Application::init() {
 
     // Create the window
-    m_Window = std::make_unique<Window>(
+    window = std::make_unique<Window>(
         300, 300, "Engine"); // Ensure GLAD is initialized here!
 
     // Init the input "service"
-    Input::Init(m_Window->GetNativeWindow());
+    Input::init(window->getNativeWindow());
 
     // Init the camera at a starting pos
     // TODO: Get starting information elsewhere
-    m_Camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     // Construct the rasterizer and init it
-    m_Rasterizer = std::make_unique<Rasterizer>();
-    m_Rasterizer->Init();
+    rasterizer = std::make_unique<Rasterizer>();
+    rasterizer->init();
 }
 
 // Main loop
-void Application::Run() {
+void Application::run() {
 
     // TODO: Move this into a timer class
     float lastFrame = 0.0f; // Frame delta info
@@ -41,7 +41,7 @@ void Application::Run() {
     int nbFrames = 0;
 
     // Start of main loop, only ends when the window is set to
-    while (!m_Window->ShouldClose()) {
+    while (!window->shouldClose()) {
 
         // TODO: Move this into a timer class
         {
@@ -66,23 +66,23 @@ void Application::Run() {
         }
 
         // Input poll
-        Input::Update();
+        Input::update();
 
         // Moving camera direction
-        if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-            glm::vec2 delta = Input::GetMouseDelta();
-            m_Camera.ProcessMouseMovement(delta.x, -delta.y);
+        if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+            glm::vec2 delta = Input::getMouseDelta();
+            camera.processMouseMovement(delta.x, -delta.y);
         }
 
         // 2. Moving camera position
-        if (Input::IsKeyPressed(GLFW_KEY_W))
-            m_Camera.ProcessKeyboard(FORWARD, deltaTime);
-        if (Input::IsKeyPressed(GLFW_KEY_S))
-            m_Camera.ProcessKeyboard(BACKWARD, deltaTime);
-        if (Input::IsKeyPressed(GLFW_KEY_A))
-            m_Camera.ProcessKeyboard(LEFT, deltaTime);
-        if (Input::IsKeyPressed(GLFW_KEY_D))
-            m_Camera.ProcessKeyboard(RIGHT, deltaTime);
+        if (Input::isKeyPressed(GLFW_KEY_W))
+            camera.processKeyboard(FORWARD, deltaTime);
+        if (Input::isKeyPressed(GLFW_KEY_S))
+            camera.processKeyboard(BACKWARD, deltaTime);
+        if (Input::isKeyPressed(GLFW_KEY_A))
+            camera.processKeyboard(LEFT, deltaTime);
+        if (Input::isKeyPressed(GLFW_KEY_D))
+            camera.processKeyboard(RIGHT, deltaTime);
 
         // Clear Screen
         // TODO: Add a WindowPreFrame thing
@@ -90,10 +90,10 @@ void Application::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render the scene
-        m_Rasterizer->Render(m_Camera, m_Window->GetAspectRatio());
+        rasterizer->render(camera, window->getAspectRatio());
 
         // Do things like event polling & buffer swapping
-        m_Window->OnUpdate();
+        window->onUpdate();
     }
 }
 

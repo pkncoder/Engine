@@ -6,26 +6,26 @@
 class Input {
   public:
     // Initialize the input "serivce"
-    static void Init(GLFWwindow *window);
+    static void init(GLFWwindow *window);
 
     // Polling input
-    static void Update();
+    static void update();
 
     // Check for a keypress
-    static bool IsKeyPressed(int keycode);
+    static bool isKeyPressed(int keycode);
 
     // Check for a button press
-    static bool IsMouseButtonPressed(int button);
+    static bool isMouseButtonPressed(int button);
 
     // Getting mouse movement
-    static glm::vec2 GetMousePosition();
-    static glm::vec2 GetMouseDelta();
+    static glm::vec2 getMousePosition();
+    static glm::vec2 getMouseDelta();
 
   private:
     // Window pointer
-    static GLFWwindow *s_Window;
+    static GLFWwindow *window;
 
     // Mouse movement
-    static glm::vec2 s_LastMousePos;
-    static glm::vec2 s_MouseDelta;
+    static glm::vec2 lastMousePos;
+    static glm::vec2 mouseDelta;
 };

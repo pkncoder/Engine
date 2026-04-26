@@ -3,7 +3,7 @@
 #include <cstddef>
 
 // Creating a simple mesh - probally temp
-uint32_t BufferManager::CreateSimpleMesh(const std::vector<Vertex> &vertices) {
+uint32_t BufferManager::createSimpleMesh(const std::vector<Vertex> &vertices) {
     uint32_t vao, vbo; // Set spots for buffers
 
     // Generate the buffers
@@ -21,12 +21,12 @@ uint32_t BufferManager::CreateSimpleMesh(const std::vector<Vertex> &vertices) {
     // Enabling attributes & setting pointers
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, Position));
+                          (void *)offsetof(Vertex, position));
 
     // Enabling attributes & setting pointers
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, Color));
+                          (void *)offsetof(Vertex, color));
 
     // Empty the binds for mem safety
     glBindVertexArray(0);

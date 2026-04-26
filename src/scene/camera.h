@@ -17,20 +17,20 @@ const float ZOOM = 45.0f;
 class Camera {
   public:
     // Camera Attributes
-    glm::vec3 Position;
-    glm::vec3 Front;
-    glm::vec3 Up;
-    glm::vec3 Right;
-    glm::vec3 WorldUp;
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
+    glm::vec3 right;
+    glm::vec3 worldUp;
 
     // Euler Angles
-    float Yaw;
-    float Pitch;
+    float yaw;
+    float pitch;
 
     // Camera options
-    float MouseSensitivity;
-    float MovementSpeed;
-    float Zoom;
+    float mouseSensitivity;
+    float movementSpeed;
+    float zoom;
 
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -38,16 +38,16 @@ class Camera {
            float pitch = PITCH);
 
     // Calculates and returns the view matrix
-    glm::mat4 GetViewMatrix() const;
+    glm::mat4 getViewMatrix() const;
 
     // Calculates and returns the projection matrix based on aspect ratio
-    glm::mat4 GetProjectionMatrix(float aspectRatio) const;
+    glm::mat4 getProjectionMatrix(float aspectRatio) const;
 
     // Processes input received from any keyboard-like input system
-    void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+    void processKeyboard(Camera_Movement direction, float deltaTime);
 
     // Processes input received from a mouse input system
-    void ProcessMouseMovement(float xoffset, float yoffset,
+    void processMouseMovement(float xoffset, float yoffset,
                               bool constrainPitch = true);
 
   private:

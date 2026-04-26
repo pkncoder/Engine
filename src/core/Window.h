@@ -10,28 +10,28 @@ class Window {
     ~Window();
 
     // Check to see if the window is marked for death
-    bool ShouldClose() const;
+    bool shouldClose() const;
 
     // Polling, swapping, and updating
-    void PollEvents();
-    void SwapBuffers();
-    void OnUpdate();
+    void pollEvents();
+    void swapBuffers();
+    void onUpdate();
 
     // Return the GLFW window (not our wrapper)
-    GLFWwindow *GetNativeWindow() const { return m_Window; }
+    GLFWwindow *getNativeWindow() const { return window; }
 
     // Size & aspect ratio
-    void GetSize(int &width, int &height) const;
-    float GetAspectRatio();
+    void getSize(int &width, int &height) const;
+    float getAspectRatio();
 
   private:
     // GLFW Window
-    GLFWwindow *m_Window;
+    GLFWwindow *window;
 
     // Width & height of window
-    int m_Width, m_Height;
+    int width, height;
 
     // Title of window
-    std::string m_Title;
+    std::string title;
 };
 } // namespace Engine

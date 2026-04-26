@@ -5,11 +5,11 @@
 
 // TODO: Here?
 struct Vertex {
-    glm::vec3 Position;
-    glm::vec3 Color;
+    glm::vec3 position;
+    glm::vec3 color;
 };
 
 class BufferManager {
   public:
-    static uint32_t CreateSimpleMesh(const std::vector<Vertex> &vertices);
+    static uint32_t createSimpleMesh(const std::vector<Vertex> &vertices);
 };
