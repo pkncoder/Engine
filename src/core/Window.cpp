@@ -44,13 +44,8 @@ Window::Window(int width, int height, const std::string &title)
         std::cerr << "Failed to initialize GLAD" << std::endl;
     }
 
-    // TODO: Where should I put settings
-
-    // Turn on the OpenGL depth test
-    glEnable(GL_DEPTH_TEST);
-
-    // Turn off VSCNC
-    glfwSwapInterval(0); // TODO: Decide to keep or not
+    // Set other settings
+    setSettings();
 
     // Set the size change callback
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -67,6 +62,16 @@ Window::~Window() {
     glfwTerminate();
 }
 
+// Wrapper to clean up constructor, sets the settings
+void Window::setSettings() {
+
+    // Turn off VSCNC
+    glfwSwapInterval(0);
+
+    // Turn on the OpenGL depth test
+    glEnable(GL_DEPTH_TEST);
+}
+
 // Checking for closing the window
 bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 
@@ -74,8 +79,14 @@ bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 void Window::pollEvents() { glfwPollEvents(); }
 void Window::swapBuffers() { glfwSwapBuffers(window); }
 
+// Pre-frame window steps
+void Window::preFrame() {
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // TODO: Default value somewhere else?
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 // Window update
-void Window::onUpdate() {
+void Window::postFrame() {
     this->swapBuffers();
     this->pollEvents();
 }

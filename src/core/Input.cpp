@@ -17,8 +17,7 @@ void Input::init(GLFWwindow *window_ptr) {
     lastMousePos = {(float)x, (float)y};
 }
 
-// Update polling
-// TODO: Name Change?
+// Update information per-frame
 void Input::update() {
 
     // Get current position

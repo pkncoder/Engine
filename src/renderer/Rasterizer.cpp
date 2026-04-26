@@ -36,5 +36,4 @@ void Rasterizer::render(const Camera &camera, float aspectRatio) {
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-// TODO: Fillout
 void Rasterizer::shutdown() {};

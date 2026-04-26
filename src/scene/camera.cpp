@@ -26,8 +26,7 @@ glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
 }
 
 // Camera movement
-// TODO: Change name for simply moving the camera
-void Camera::processKeyboard(Camera_Movement direction, float deltaTime) {
+void Camera::processMovement(Camera_Movement direction, float deltaTime) {
 
     // Calculate the velocity of the camera
     float velocity = movementSpeed * deltaTime;
@@ -43,9 +42,8 @@ void Camera::processKeyboard(Camera_Movement direction, float deltaTime) {
         position += right * velocity;
 }
 
-// Mouse movement
-// TODO: Change name to abstract the looking direction
-void Camera::processMouseMovement(float xoffset, float yoffset,
+// Pitch and yaw modifications
+void Camera::processAngleMovement(float xoffset, float yoffset,
                                   bool constrainPitch) {
 
     // Change the x & y offset

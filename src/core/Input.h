@@ -8,7 +8,7 @@ class Input {
     // Initialize the input "serivce"
     static void init(GLFWwindow *window);
 
-    // Polling input
+    // Update information per-frame
     static void update();
 
     // Check for a keypress

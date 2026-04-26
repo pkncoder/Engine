@@ -96,8 +96,6 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
                        glm::value_ptr(mat));
 }
 
-// TODO: Implement SetInt, SetFloat, etc., similarly using glUniform...
-
 // Custom compilation error checking script
 void Shader::checkCompileErrors(uint32_t shader, std::string type) {
     // Satus code and info log

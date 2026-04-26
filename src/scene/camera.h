@@ -44,10 +44,11 @@ class Camera {
     glm::mat4 getProjectionMatrix(float aspectRatio) const;
 
     // Processes input received from any keyboard-like input system
-    void processKeyboard(Camera_Movement direction, float deltaTime);
+    void processMovement(Camera_Movement direction, float deltaTime);
 
     // Processes input received from a mouse input system
-    void processMouseMovement(float xoffset, float yoffset,
+    // TODO: Make better name
+    void processAngleMovement(float xoffset, float yoffset,
                               bool constrainPitch = true);
 
   private:

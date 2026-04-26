@@ -71,29 +71,27 @@ void Application::run() {
         // Moving camera direction
         if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
             glm::vec2 delta = Input::getMouseDelta();
-            camera.processMouseMovement(delta.x, -delta.y);
+            camera.processAngleMovement(delta.x, -delta.y);
         }
 
         // 2. Moving camera position
         if (Input::isKeyPressed(GLFW_KEY_W))
-            camera.processKeyboard(FORWARD, deltaTime);
+            camera.processMovement(FORWARD, deltaTime);
         if (Input::isKeyPressed(GLFW_KEY_S))
-            camera.processKeyboard(BACKWARD, deltaTime);
+            camera.processMovement(BACKWARD, deltaTime);
         if (Input::isKeyPressed(GLFW_KEY_A))
-            camera.processKeyboard(LEFT, deltaTime);
+            camera.processMovement(LEFT, deltaTime);
         if (Input::isKeyPressed(GLFW_KEY_D))
-            camera.processKeyboard(RIGHT, deltaTime);
+            camera.processMovement(RIGHT, deltaTime);
 
         // Clear Screen
-        // TODO: Add a WindowPreFrame thing
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey background
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        window->preFrame();
 
         // Render the scene
         rasterizer->render(camera, window->getAspectRatio());
 
         // Do things like event polling & buffer swapping
-        window->onUpdate();
+        window->postFrame();
     }
 }
 

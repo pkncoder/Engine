@@ -9,13 +9,19 @@ class Window {
     Window(int width, int height, const std::string &title);
     ~Window();
 
+    // OpenGL settings function
+    void setSettings();
+
     // Check to see if the window is marked for death
     bool shouldClose() const;
 
-    // Polling, swapping, and updating
+    // Polling, and swapping
     void pollEvents();
     void swapBuffers();
-    void onUpdate();
+
+    // Pre and post frame actions
+    void preFrame();
+    void postFrame();
 
     // Return the GLFW window (not our wrapper)
     GLFWwindow *getNativeWindow() const { return window; }
