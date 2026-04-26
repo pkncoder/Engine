@@ -31,6 +31,7 @@ This file does not store any "// TODO: ~~~" marks I make in code, as those are m
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Figure out how shader including will work in current code
 - [ ] Make sure everything that should be in the engine namespace, is
+- [ ] Extend the timer class
 
 ### Todo - Not Code
 
@@ -57,12 +58,13 @@ This file does not store any "// TODO: ~~~" marks I make in code, as those are m
 
 1. [ ] Fix warnings
 2. [ ] Fix public vs. private
-3. [ ] Fix placement of functions
-4. [ ] Refactor step by step in code
-5. [ ] Rename things
-6. [ ] Add comments
-7. [ ] Place the \#includes in the right spots
-8. [ ] Fix file tree
+3. [ ] Make variables & functions const when needed
+4. [ ] Fix placement of functions
+5. [ ] Refactor step by step in code
+6. [ ] Rename things
+7. [ ] Add comments
+8. [ ] Place the \#includes in the right spots
+9. [ ] Fix file tree
 
 ## Finished Todos
 

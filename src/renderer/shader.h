@@ -7,7 +7,6 @@ class Shader {
   public:
     uint32_t ID; // The OpenGL Program ID
 
-    // TODO: What mean
     Shader() : ID(0) {}
     Shader(const char *vertexPath, const char *fragmentPath);
 
