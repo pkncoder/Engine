@@ -16,6 +16,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
     - [Todo - Not Code](#todo---not-code)
     - [Todo - Future Todos](#todo---future-todos)
     - [Todo - Editor](#todo---editor)
+  - [Ideas](#ideas)
   - [Steps](#steps)
     - [Refactor Checklist](#refactor-checklist)
   - [Finished Todos](#finished-todos)
@@ -50,6 +51,10 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] MD - Get rid of the line length warning
 - [ ] TMUX - Make keybinds to run launch, run, and test bash scripts
 - [ ] TMUX - Change to catpuccin Moccioto or something like that
+
+## Ideas
+
+- [ ] Add the ability for multiple render methods together (like a path traced scene + ray marched clouds)
 
 ## Steps
 
