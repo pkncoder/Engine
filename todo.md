@@ -6,20 +6,20 @@ This is a list of the different mission statements, goals, and individual things
 
 ## Todo
 
-- [ ] Figure out how individual pannels get their information.
-  - [ ] It doesn't make much sense for individual panels just connect to different points of information, this is an overall issue, however needs to be addressed.
-- [ ] Re-fit to figure out what files are just header files, and what files have header AND c++ files.
-- [ ] Fix indent size
+- [x] Figure out how individual pannels get their information.
+  - It doesn't make much sense for individual panels just connect to different points of information, this is an overall issue, however needs to be addressed.
+- [ ] Re-fit file tree to figure out what files are just header files, and what files have header AND c++ files.
+- [x] Fix indent size
 - [ ] Change OpenGL version
-- [ ] Fix naming conventions
+- [x] Fix naming conventions
 - [ ] Move inputs into seperate file?
-- [ ] Fix aspect ratio calculation
-- [ ] Fix camera.h name + shader.cpp/h
+- [x] Fix aspect ratio calculation
+- [x] Fix camera.h name + shader.cpp/h
 - [ ] Add a "PreRender" function to Window
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Add a temp fps timer in the window name
 - [ ] Figure out how shader including will work in current code
-- [ ] Change the camera movement to be worldpos instead of camera relative
+- [ ] Add a worldpos camere movement overload
 
 ## Future Ideas
 
