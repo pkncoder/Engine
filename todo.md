@@ -12,6 +12,10 @@ This is a list of the different mission statements, goals, and individual things
 - [ ] Fix indent size
 - [ ] Change OpenGL version
 - [ ] Fix naming conventions
+- [ ] Move inputs into seperate file?
+- [ ] Fix aspect ratio calculation
+- [ ] Fix camera.h name + shader.cpp/h
+- [ ] Make live aspect ratio drawing
 
 ## Future Ideas
 

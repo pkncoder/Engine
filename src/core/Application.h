@@ -6,17 +6,28 @@
 
 namespace Engine {
 class Application {
+
 public:
+  // Constructor & Deconstructor
   Application();
   ~Application();
 
-  void Run();
+  // Constructing the active render, window, etc.
   void Init();
 
+  // Main loop
+  void Run();
+
 private:
+  // Window information
   std::unique_ptr<Window> m_Window;
-  Camera m_Camera;
-  std::unique_ptr<Rasterizer> m_Rasterizer;
   bool m_Running = true;
+
+  // Camera object
+  Camera m_Camera;
+
+  // Active renderer
+  std::unique_ptr<Rasterizer> m_Rasterizer;
 };
+
 } // namespace Engine

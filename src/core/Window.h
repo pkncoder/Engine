@@ -1,5 +1,4 @@
 #pragma once
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -12,6 +11,8 @@ public:
   bool ShouldClose() const;
   void PollEvents();
   void SwapBuffers();
+  void GetSize(int &width, int &height) const;
+  float GetAspectRatio();
 
   GLFWwindow *GetNativeWindow() const { return m_Window; }
   void OnUpdate();

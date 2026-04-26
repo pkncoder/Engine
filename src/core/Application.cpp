@@ -4,9 +4,17 @@
 #include <memory>
 
 namespace Engine {
+
+Application::Application() {}
+
+// Init the window, camera, etc.
 void Application::Init() {
   m_Window = std::make_unique<Window>(
       300, 300, "Engine"); // Ensure GLAD is initialized here!
+
+  // Get the aspect ratio
+  int width, height;
+  m_Window->GetSize(width, height);
 
   // Position camera at (0,0,3) looking at (0,0,0)
   m_Camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -19,11 +27,9 @@ void Application::Init() {
   glEnable(GL_DEPTH_TEST);
 }
 
-Application::Application() {}
-Application::~Application() {}
-
+// Main loop
 void Application::Run() {
-  float lastFrame = 0.0f;
+  float lastFrame = 0.0f; // Frame delta info
 
   while (!m_Window->ShouldClose()) {
     // 1. Calculate DeltaTime
@@ -31,17 +37,17 @@ void Application::Run() {
     float deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
+    // Input poll
     Input::Update();
 
-    // Now you can use it for your camera!
+    // Moving camera direction
     if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
       glm::vec2 delta = Input::GetMouseDelta();
-      m_Camera.ProcessMouseMovement(
-          delta.x, -delta.y); // Y is usually inverted in screen space
+      m_Camera.ProcessMouseMovement(delta.x, -delta.y);
       ;
     }
 
-    // 2. Process Input -> Camera (SRP in action)
+    // 2. Moving camera position
     if (Input::IsKeyPressed(GLFW_KEY_W))
       m_Camera.ProcessKeyboard(FORWARD, deltaTime);
     if (Input::IsKeyPressed(GLFW_KEY_S))
@@ -51,17 +57,20 @@ void Application::Run() {
     if (Input::IsKeyPressed(GLFW_KEY_D))
       m_Camera.ProcessKeyboard(RIGHT, deltaTime);
 
-    // 3. Clear Screen
+    // Screen clearing
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // 4. Render Scene
-    // Inside Render(), use m_Camera.GetProjectionMatrix(aspect) *
-    // m_Camera.GetViewMatrix()
-    m_Rasterizer->Render(m_Camera);
+    float aspect = m_Window->GetAspectRatio();
+    glm::mat4 proj = m_Camera.GetProjectionMatrix(aspect);
+    m_Rasterizer->Render(m_Camera.GetViewMatrix(), proj);
+    // Render the scene
 
-    // 5. Update Window (Swap buffers/Poll events)
+    // Do things like event polling & buffer swapping
     m_Window->OnUpdate();
   }
 }
+
+Application::~Application() {}
+
 } // namespace Engine

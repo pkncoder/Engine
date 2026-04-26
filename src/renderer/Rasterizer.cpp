@@ -2,14 +2,15 @@
 
 #include "Rasterizer.h"
 #include "BufferManager.h"
+#include <glm/ext/matrix_float4x4.hpp>
 #include <vector>
 
-void Rasterizer::Render(const Camera &camera) {
+void Rasterizer::Render(glm::mat4 view, glm::mat4 proj) {
   m_Shader.Bind();
 
   // TODO: better asspect ratio fix
   // Calculate View-Projection matrix
-  glm::mat4 vp = camera.GetProjectionMatrix(1) * camera.GetViewMatrix();
+  glm::mat4 vp = proj * view;
   m_Shader.SetMat4("u_ViewProjection", vp);
 
   // Hardcoded draw for Phase II test

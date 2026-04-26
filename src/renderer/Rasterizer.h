@@ -15,5 +15,5 @@ public:
 
   void Init();
   // void Shutdown();
-  void Render(const Camera &camera);
+  void Render(glm::mat4 view, glm::mat4 proj);
 };
