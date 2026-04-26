@@ -9,11 +9,11 @@
 #include <glm/glm.hpp>
 
 class Rasterizer : IRenderer {
-public:
-  Shader m_Shader;
-  uint32_t m_TestVAO;
+  public:
+    Shader m_Shader;
+    uint32_t m_TestVAO;
 
-  void Init();
-  // void Shutdown();
-  void Render(glm::mat4 view, glm::mat4 proj);
+    void Init();
+    // void Shutdown();
+    void Render(glm::mat4 view, glm::mat4 proj);
 };

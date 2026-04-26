@@ -1,0 +1,5 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never # Use 'Always' to use actual tab characters
+TabWidth: 4
+

@@ -20,3 +20,11 @@ This is a list of the different mission statements, goals, and individual things
 ## Future Ideas
 
 - [ ] Use EnTT instead of custom ECS
+
+## Refactor Checklist
+
+1. [ ] Fix warnings (unless related in later step)
+1. [ ] Refactor step by step in code
+1. [ ] Fix placement of functions
+1. [ ] Rename things
+1. [ ] Add comments
