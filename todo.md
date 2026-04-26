@@ -34,8 +34,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ### Todo - Not Code
 
-- [ ] Make github repo
-
 ### Todo - Future Todos
 
 - [ ] Use EnTT instead of custom ECS
@@ -84,3 +82,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - Currently, logging means run it every frame and maybe log
 - [x] Re-fit file tree to figure out what files are just header files, and what files have header AND c++ files.
 - [x] Make sure everything that should be in the engine namespace, is
+- [x] Make github repo
