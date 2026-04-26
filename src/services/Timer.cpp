@@ -23,6 +23,7 @@ float Timer::lastLogTime = 0.0f;
 
 // Profiling
 std::map<std::string, double> Timer::profileResults;
+std::unordered_map<std::string, double> Timer::activeProfiles;
 
 // Initalize the starting log values
 void Timer::init() { lastFrameTime = glfwGetTime(); }
@@ -43,6 +44,21 @@ void Timer::update() {
     if (currentTime - lastLogTime >= 1.0) {
         fps = (float)totalFrames / (float)totalTime; // Simple average
         ms = deltaTime * 1000.0f;
+    }
+}
+
+// Start profile
+void Timer::beginProfile(const std::string &name) {
+    activeProfiles[name] = glfwGetTime();
+}
+
+// Stop profile
+void Timer::endProfile(const std::string &name) {
+    auto it = activeProfiles.find(name);
+    if (it != activeProfiles.end()) {
+        double duration = (glfwGetTime() - it->second) * 1000.0; // to ms
+        profileResults[name] = duration;
+        activeProfiles.erase(it);
     }
 }
 
@@ -67,22 +83,6 @@ void Timer::logPerformance(bool clearTerminal) {
     }
 
     lastLogTime = (float)glfwGetTime();
-}
-
-// Start profile
-ScopedTimer::ScopedTimer(const std::string &name) : name(name) {
-    start = glfwGetTime();
-}
-
-// Stop profile
-void Timer::stopProfiling(const std::string &name, double duration) {
-    profileResults[name] = duration;
-}
-
-// Scoped timer deconstructor
-ScopedTimer::~ScopedTimer() {
-    double duration = (glfwGetTime() - start) * 1000.0; // Convert to ms
-    Timer::stopProfiling(name, duration);
 }
 
 } // namespace Engine

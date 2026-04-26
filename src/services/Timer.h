@@ -18,19 +18,17 @@ class Timer {
     // Updating timer tracking data
     static void update();
 
-    // Output relevant data to console
-    static void logPerformance(bool clearTerminal = true);
-
     // Getters
     static float getDeltaTime() { return deltaTime; }
     static double getTotalTime() { return totalTime; }
     static uint32_t getTotalFrames() { return totalFrames; }
 
     // Profiling logic
-    static void stopProfiling(const std::string &name, double duration);
-    static const std::map<std::string, double> &getProfileResults() {
-        return profileResults;
-    }
+    static void beginProfile(const std::string &name);
+    static void endProfile(const std::string &name);
+
+    // Output relevant data to console
+    static void logPerformance(bool clearTerminal = true);
 
   private:
     // Delta time and delta time math
@@ -48,21 +46,25 @@ class Timer {
 
     // Profile results
     static std::map<std::string, double> profileResults;
+    static std::unordered_map<std::string, double> activeProfiles;
 };
 
-// Timer that is based on scope
-struct ScopedTimer {
-
-    // Names
+// Timer that can either start and stop on const & scope, or manually keyed
+struct ScopedProfiler {
+    // Key / id for the timer
     std::string name;
-    double start;
 
-    // Constructor & deconstructor
-    ScopedTimer(const std::string &name); // Starts timer
-    ~ScopedTimer();                       // Ends timer
+    ScopedProfiler(const std::string &name) : name(name) {
+        Timer::beginProfile(name);
+    } // Constructor - Starts timer
+    ~ScopedProfiler() { Timer::endProfile(name); } // Deconstructor - Ends timer
 };
 
-// Timer that stops at the end of a scope
-#define TIMER_SCOPE(name) Engine::ScopedTimer timer##__LINE__(name)
+// Macro to create a scoped profiler
+#define SCOPED_PROFILE(name) Engine::ScopedProfiler timer##__LINE__(name)
+
+// Macro to start and stop profilers
+#define START_PROFILE(name) Engine::Timer::beginProfile(name)
+#define END_PROFILE(name) Engine::Timer::endProfile(name)
 
 } // namespace Engine

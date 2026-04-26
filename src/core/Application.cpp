@@ -41,6 +41,8 @@ void Application::run() {
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
 
+        SCOPED_PROFILE("Run Loop"); // Setup timer for run loop
+
         // Update the timer service and run the log function
         Timer::update();
 
@@ -52,12 +54,14 @@ void Application::run() {
         window->preFrame();
 
         // Render the scene
+        START_PROFILE("Render"); // Start timer for renderer
         rasterizer->render(camera, window->getAspectRatio());
+        END_PROFILE("Render"); // End Timer for renderer
 
         // Do things like event polling & buffer swapping
         window->postFrame();
 
-        // Log performance
+        // Log performance every second
         logCounter += Timer::getDeltaTime();
         if (logCounter >= 1.0f) {
             Timer::logPerformance();
