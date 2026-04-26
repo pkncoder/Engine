@@ -27,7 +27,7 @@ This is a list of the different mission statements, goals, and individual things
 
 1. [x] Fix warnings (unless related in later step)
 2. [x] Refactor step by step in code
-3. [ ] Fix placement of functions
+3. [x] Fix placement of functions
 4. [ ] Fix public vs. private
 5. [ ] Rename things
 6. [ ] Add comments
