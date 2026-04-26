@@ -21,7 +21,7 @@ This is a list of the different mission statements, goals, and individual things
 - [ ] Figure out how shader including will work in current code
 - [ ] Add a worldpos camere movement overload
 - [ ] Make sure everything that should be in the engine namespace, is
-- [ ] Fix refactor-checklist
+- [x] Fix refactor-checklist
 
 ## Future Ideas
 
@@ -31,10 +31,10 @@ This is a list of the different mission statements, goals, and individual things
 
 ## Refactor Checklist
 
-1. [ ] Fix warnings (unless related in later step)
-2. [ ] Refactor step by step in code
+1. [ ] Fix warnings
+2. [ ] Fix public vs. private
 3. [ ] Fix placement of functions
-4. [ ] Fix public vs. private
+4. [ ] Refactor step by step in code
 5. [ ] Rename things
 6. [ ] Add comments
 7. [ ] Place the \#includes in the right spots
