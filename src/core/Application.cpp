@@ -38,8 +38,9 @@ void Application::run() {
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
 
-        // Update the timer information
+        // Update the timer service and run the log function
         Timer::update();
+        Timer::log();
 
         // Poll inputs, and then handle them
         Input::update();
