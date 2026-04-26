@@ -20,6 +20,8 @@ This is a list of the different mission statements, goals, and individual things
 - [ ] Add a temp fps timer in the window name
 - [ ] Figure out how shader including will work in current code
 - [ ] Add a worldpos camere movement overload
+- [ ] Make sure everything that should be in the engine namespace, is
+- [ ] Fix refactor-checklist
 
 ## Future Ideas
 
@@ -35,3 +37,4 @@ This is a list of the different mission statements, goals, and individual things
 4. [ ] Fix public vs. private
 5. [ ] Rename things
 6. [ ] Add comments
+7. [ ] Place the \#includes in the right spots
