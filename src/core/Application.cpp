@@ -17,10 +17,11 @@ void Application::init() {
     window = std::make_unique<Window>(
         300, 300, "Engine"); // Ensure GLAD is initialized here!
 
-    Timer::init();
-
-    // Init the input "service"
+    // Init the input service
     Input::init(window->getNativeWindow());
+
+    // Init the timer service
+    Timer::init();
 
     // Init the camera at a starting pos
     // TODO: Get starting information elsewhere
@@ -37,6 +38,7 @@ void Application::run() {
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
 
+        // Update the timer information
         Timer::update();
 
         // Input poll
