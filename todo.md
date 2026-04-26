@@ -31,7 +31,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Extend and use Defaults.h more
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Figure out how shader including will work in current code
-- [ ] Make sure everything that should be in the engine namespace, is
 
 ### Todo - Not Code
 
@@ -84,3 +83,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Fix the Timer::Log discrepancy
   - Currently, logging means run it every frame and maybe log
 - [x] Re-fit file tree to figure out what files are just header files, and what files have header AND c++ files.
+- [x] Make sure everything that should be in the engine namespace, is

@@ -6,6 +6,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace Engine {
+
 // On construction - compile source code & program
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
@@ -148,3 +150,5 @@ void Shader::checkCompileErrors(uint32_t shader, std::string type) const {
         }
     }
 }
+
+} // namespace Engine

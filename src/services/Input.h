@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+namespace Engine {
+
 class Input {
   public:
     // Initialize the input "serivce"
@@ -29,3 +31,5 @@ class Input {
     static glm::vec2 lastMousePos;
     static glm::vec2 mouseDelta;
 };
+
+} // namespace Engine

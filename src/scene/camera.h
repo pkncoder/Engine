@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+namespace Engine {
+
 // Defines several possible options for camera movement.
 // Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT };
@@ -53,3 +55,5 @@ class Camera {
     // Update the front, right, and up camera vectors
     void updateCameraVectors();
 };
+
+} // namespace Engine

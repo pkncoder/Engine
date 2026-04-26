@@ -1,5 +1,7 @@
 #pragma once
 
+namespace Engine {
+
 class IRenderer {
   public:
     virtual ~IRenderer() = default; // Deconstructor
@@ -11,3 +13,5 @@ class IRenderer {
 
     virtual void shutdown() = 0; // Shutting down a renderer
 };
+
+}; // namespace Engine

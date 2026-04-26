@@ -1,5 +1,7 @@
 #include "Input.h"
 
+namespace Engine {
+
 // Initialize static members w/ dud values
 GLFWwindow *Input::window = nullptr;
 glm::vec2 Input::lastMousePos = {0.0f, 0.0f};
@@ -47,3 +49,5 @@ glm::vec2 Input::getMousePosition() {
 }
 
 glm::vec2 Input::getMouseDelta() { return mouseDelta; }
+
+} // namespace Engine

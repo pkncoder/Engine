@@ -4,6 +4,8 @@
 
 #include <cstddef>
 
+namespace Engine {
+
 // Creating a simple mesh - probally temp
 uint32_t BufferManager::createSimpleMesh(const std::vector<Vertex> &vertices) {
     uint32_t vao, vbo; // Set spots for buffers
@@ -37,3 +39,5 @@ uint32_t BufferManager::createSimpleMesh(const std::vector<Vertex> &vertices) {
     // Returning the vao
     return vao;
 }
+
+} // namespace Engine

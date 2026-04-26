@@ -4,6 +4,8 @@
 #include "IRenderer.h"
 #include "Shader.h"
 
+namespace Engine {
+
 class Rasterizer : IRenderer {
   public:
     uint32_t testVAO; // TODO: temp
@@ -18,3 +20,5 @@ class Rasterizer : IRenderer {
     // Shader code
     Shader shader;
 };
+
+} // namespace Engine

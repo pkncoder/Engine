@@ -8,6 +8,8 @@
 
 #include <vector>
 
+namespace Engine {
+
 // Init the rasterizer
 void Rasterizer::init() {
 
@@ -42,3 +44,5 @@ void Rasterizer::render(const Camera &camera, float aspectRatio) {
 }
 
 void Rasterizer::shutdown() {};
+
+} // namespace Engine

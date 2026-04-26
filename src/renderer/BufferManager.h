@@ -4,6 +4,8 @@
 
 #include <vector>
 
+namespace Engine {
+
 // TODO: Here?
 struct Vertex {
     glm::vec3 position;
@@ -15,3 +17,5 @@ class BufferManager {
     static uint32_t
     createSimpleMesh(const std::vector<Vertex> &vertices); // TODO: temp
 };
+
+} // namespace Engine

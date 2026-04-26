@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
+namespace Engine {
+
 class Shader {
   public:
     uint32_t ID; // The OpenGL Program ID
@@ -26,3 +28,5 @@ class Shader {
     // Used to check errors on shader & program compilations
     void checkCompileErrors(uint32_t shader, std::string type) const;
 };
+
+} // namespace Engine
