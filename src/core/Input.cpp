@@ -1,12 +1,14 @@
 #include "Input.h"
-#include <GLFW/glfw3.h>
 
-// Initialize static members
+// Initialize static members w/ dud values
 GLFWwindow *Input::s_Window = nullptr;
 glm::vec2 Input::s_LastMousePos = {0.0f, 0.0f};
 glm::vec2 Input::s_MouseDelta = {0.0f, 0.0f};
 
+// Input "service" init
 void Input::Init(GLFWwindow *window) {
+
+    // Save the window pointer
     s_Window = window;
 
     // Initialize mouse position so the first delta isn't a massive jump
@@ -15,10 +17,14 @@ void Input::Init(GLFWwindow *window) {
     s_LastMousePos = {(float)x, (float)y};
 }
 
+// Update polling
+// TODO: Name Change?
 void Input::Update() {
+
+    // Get current position
     glm::vec2 currentPos = GetMousePosition();
 
-    // Calculate how much the mouse moved since the last frame
+    // Calculate how much the mouse moved since the last frame & save
     s_MouseDelta = currentPos - s_LastMousePos;
     s_LastMousePos = currentPos;
 }

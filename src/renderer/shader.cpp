@@ -5,62 +5,80 @@
 #include <iostream>
 #include <sstream>
 
+// On construction - compile source code & program
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
-    // 1. Retrieve the source code from file paths
-    std::string vertexCode;
-    std::string fragmentCode;
+    // Set spots for the code & open file streams
     std::ifstream vShaderFile;
     std::ifstream fShaderFile;
+    std::string vertexCode;
+    std::string fragmentCode;
 
+    // Set for file exceptions
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
+    // Try-catch loop for shader file opening and parsing
     try {
+
+        // Open the shader files
         vShaderFile.open(vertexPath);
         fShaderFile.open(fragmentPath);
 
+        // Create and fill file reading streams
         std::stringstream vShaderStream, fShaderStream;
         vShaderStream << vShaderFile.rdbuf();
         fShaderStream << fShaderFile.rdbuf();
 
+        // Close code files
         vShaderFile.close();
         fShaderFile.close();
 
+        // Turn the streams to strings and set the code
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
     } catch (std::ifstream::failure &e) {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
     }
 
+    // Get char pointers for the strings
     const char *vShaderSource = vertexCode.c_str();
     const char *fShaderSource = fragmentCode.c_str();
 
-    // 2. Compile shaders
+    // Compile the shaders
     uint32_t vertex, fragment;
 
+    // Create a vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
 
+    // Set the shader code and compile it
     glShaderSource(vertex, 1, &vShaderSource, NULL);
     glCompileShader(vertex);
 
+    // Check for compilation errors
     checkCompileErrors(vertex, "VERTEX");
 
+    // Create a fragment shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
+    // Set the shader code and compile it
     glShaderSource(fragment, 1, &fShaderSource, NULL);
     glCompileShader(fragment);
 
+    // Check for compilation errors
     checkCompileErrors(fragment, "FRAGMENT");
 
-    // 3. Shader Program
+    // Create an OpenGL program
     ID = glCreateProgram();
 
+    // Attatch the vert & fragment shaders
     glAttachShader(ID, vertex);
     glAttachShader(ID, fragment);
 
+    // Link the program to OpenGL
     glLinkProgram(ID);
 
+    // Check for projgram creation errors
     checkCompileErrors(ID, "PROGRAM");
 
     // Delete shaders as they're linked into our program and no longer necessary
@@ -68,17 +86,21 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     glDeleteShader(fragment);
 }
 
+// Bind and unbind
 void Shader::Bind() const { glUseProgram(ID); }
 void Shader::Unbind() const { glUseProgram(0); }
 
+// Set Mat4 uniform
 void Shader::SetMat4(const std::string &name, const glm::mat4 &mat) const {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE,
                        glm::value_ptr(mat));
 }
 
-// Implement SetInt, SetFloat, etc., similarly using glUniform...
+// TODO: Implement SetInt, SetFloat, etc., similarly using glUniform...
 
+// Custom compilation error checking script
 void Shader::checkCompileErrors(uint32_t shader, std::string type) {
+    // Satus code and info log
     int success;
     char infoLog[1024];
 

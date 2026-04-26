@@ -9,5 +9,6 @@ int main() {
     app->Init();
     app->Run();
 
+    // Return all is good if got this far
     return 0;
 }

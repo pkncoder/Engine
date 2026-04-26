@@ -10,14 +10,15 @@
 
 class Rasterizer : IRenderer {
   public:
-    uint32_t m_TestVAO;
+    uint32_t m_TestVAO; // TODO: temp
 
-    void Init();
+    void Init(); // Init the renderer
 
-    void Render(const Camera &camera, float aspectRatio);
+    void Render(const Camera &camera, float aspectRatio); // Render frame
 
-    void Shutdown();
+    void Shutdown(); // Shut down the renderer
 
   private:
+    // Shader code
     Shader m_Shader;
 };

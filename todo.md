@@ -18,17 +18,20 @@ This is a list of the different mission statements, goals, and individual things
 - [ ] Add a "PreRender" function to Window
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Add a temp fps timer in the window name
+- [ ] Figure out how shader including will work in current code
+- [ ] Change the camera movement to be worldpos instead of camera relative
 
 ## Future Ideas
 
 - [ ] Use EnTT instead of custom ECS
 - [ ] Make live aspect ratio drawing
+- [ ] Orbital camera
 
 ## Refactor Checklist
 
 1. [x] Fix warnings (unless related in later step)
 2. [x] Refactor step by step in code
 3. [x] Fix placement of functions
-4. [ ] Fix public vs. private
+4. [x] Fix public vs. private
 5. [ ] Rename things
-6. [ ] Add comments
+6. [x] Add comments

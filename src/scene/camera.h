@@ -37,11 +37,10 @@ class Camera {
            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW,
            float pitch = PITCH);
 
-    // Returns the view matrix calculated using Euler Angles and the LookAt
-    // Matrix
+    // Calculates and returns the view matrix
     glm::mat4 GetViewMatrix() const;
 
-    // Returns the projection matrix based on aspect ratio
+    // Calculates and returns the projection matrix based on aspect ratio
     glm::mat4 GetProjectionMatrix(float aspectRatio) const;
 
     // Processes input received from any keyboard-like input system
@@ -52,6 +51,6 @@ class Camera {
                               bool constrainPitch = true);
 
   private:
-    // Calculates the front vector from the Camera's (updated) Euler Angles
+    // Update the front, right, and up camera vectors
     void updateCameraVectors();
 };

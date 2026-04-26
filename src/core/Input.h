@@ -1,28 +1,31 @@
 #pragma once
 
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-
-struct GLFWwindow; // Forward declaration
 
 class Input {
   public:
-    // Initialize with the window context
+    // Initialize the input "serivce"
     static void Init(GLFWwindow *window);
 
-    // Called once per frame at the start of the loop
+    // Polling input
     static void Update();
 
-    // Keyboard polling
+    // Check for a keypress
     static bool IsKeyPressed(int keycode);
 
-    // Mouse polling
+    // Check for a button press
     static bool IsMouseButtonPressed(int button);
 
+    // Getting mouse movement
     static glm::vec2 GetMousePosition();
     static glm::vec2 GetMouseDelta();
 
   private:
+    // Window pointer
     static GLFWwindow *s_Window;
+
+    // Mouse movement
     static glm::vec2 s_LastMousePos;
     static glm::vec2 s_MouseDelta;
 };

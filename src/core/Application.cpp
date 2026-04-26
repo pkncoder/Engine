@@ -6,19 +6,25 @@
 
 namespace Engine {
 
+// Constructor & Deconstructor
 Application::Application() {}
+Application::~Application() {}
 
 // Init the window, camera, etc.
 void Application::Init() {
 
+    // Create the window
     m_Window = std::make_unique<Window>(
         300, 300, "Engine"); // Ensure GLAD is initialized here!
 
+    // Init the input "service"
     Input::Init(m_Window->GetNativeWindow());
 
-    // Position camera at (0,0,3) looking at (0,0,0)
+    // Init the camera at a starting pos
+    // TODO: Get starting information elsewhere
     m_Camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
+    // Construct the rasterizer and init it
     m_Rasterizer = std::make_unique<Rasterizer>();
     m_Rasterizer->Init();
 }
@@ -34,6 +40,7 @@ void Application::Run() {
     float lastTime = glfwGetTime();
     int nbFrames = 0;
 
+    // Start of main loop, only ends when the window is set to
     while (!m_Window->ShouldClose()) {
 
         // TODO: Move this into a timer class
@@ -77,7 +84,8 @@ void Application::Run() {
         if (Input::IsKeyPressed(GLFW_KEY_D))
             m_Camera.ProcessKeyboard(RIGHT, deltaTime);
 
-        // Screen clearing
+        // Clear Screen
+        // TODO: Add a WindowPreFrame thing
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -88,7 +96,5 @@ void Application::Run() {
         m_Window->OnUpdate();
     }
 }
-
-Application::~Application() {}
 
 } // namespace Engine

@@ -5,6 +5,7 @@
 #include <memory>
 
 namespace Engine {
+
 class Application {
 
   public:
