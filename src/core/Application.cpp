@@ -1,6 +1,6 @@
 #include "Application.h"
+#include "../services/Input.h"
 #include "../services/Timer.h"
-#include "Input.h"
 #include "Window.h"
 #include <memory>
 
@@ -38,7 +38,6 @@ void Application::run() {
     while (!window->shouldClose()) {
 
         Timer::update();
-        float deltaTime = Timer::getDeltaTime();
 
         // Input poll
         Input::update();
@@ -54,13 +53,13 @@ void Application::run() {
             // Move the camera origin on movement
             // TODO: Move delta time into camera basic for one source of truth
             if (Input::isKeyPressed(GLFW_KEY_W))
-                camera.processMovement(FORWARD, deltaTime);
+                camera.processMovement(FORWARD);
             if (Input::isKeyPressed(GLFW_KEY_S))
-                camera.processMovement(BACKWARD, deltaTime);
+                camera.processMovement(BACKWARD);
             if (Input::isKeyPressed(GLFW_KEY_A))
-                camera.processMovement(LEFT, deltaTime);
+                camera.processMovement(LEFT);
             if (Input::isKeyPressed(GLFW_KEY_D))
-                camera.processMovement(RIGHT, deltaTime);
+                camera.processMovement(RIGHT);
         }
 
         // Clear Screen

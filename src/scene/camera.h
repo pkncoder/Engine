@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../services/Timer.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 // Defines several possible options for camera movement.
 // Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT };
@@ -44,7 +44,7 @@ class Camera {
     glm::mat4 getProjectionMatrix(float aspectRatio) const;
 
     // Processes input received from any keyboard-like input system
-    void processMovement(Camera_Movement direction, float deltaTime);
+    void processMovement(Camera_Movement direction);
 
     // Processes input received from a mouse input system
     // TODO: Make better name

@@ -26,7 +26,9 @@ glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
 }
 
 // Camera movement
-void Camera::processMovement(Camera_Movement direction, float deltaTime) {
+void Camera::processMovement(Camera_Movement direction) {
+
+    float deltaTime = Engine::Timer::getDeltaTime();
 
     // Calculate the velocity of the camera
     float velocity = movementSpeed * deltaTime;

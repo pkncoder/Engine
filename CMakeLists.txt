@@ -18,7 +18,7 @@ set(SOURCES
     src/main.cpp
     src/core/Application.cpp
     src/core/Window.cpp
-    src/core/Input.cpp
+    src/services/Input.cpp
     src/services/Timer.cpp
     src/scene/Camera.cpp          # <--- Check these!
     src/renderer/Rasterizer.cpp
