@@ -19,7 +19,7 @@ class Timer {
     static void update();
 
     // Output relevant data to console
-    static void log();
+    static void logPerformance(bool clearTerminal = true);
 
     // Getters
     static float getDeltaTime() { return deltaTime; }

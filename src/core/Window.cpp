@@ -6,7 +6,6 @@
 namespace Engine {
 
 // Code ran when window size is changed
-// TODO: Here?
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     // Change the viewport size
     glViewport(0, 0, width, height);

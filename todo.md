@@ -31,8 +31,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Figure out how shader including will work in current code
 - [ ] Make sure everything that should be in the engine namespace, is
-- [ ] Fix the Timer::Log discrepancy
-  - Currently, logging means run it every frame and maybe log
 
 ### Todo - Not Code
 
@@ -79,3 +77,5 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Add a "PreRender" function to Window
 - [x] Move inputs into seperate thing
 - [x] Extend the timer class
+- [x] Fix the Timer::Log discrepancy
+  - Currently, logging means run it every frame and maybe log

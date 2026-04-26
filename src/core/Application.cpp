@@ -35,12 +35,14 @@ void Application::init() {
 // Main loop
 void Application::run() {
 
+    // Save a value to keep track of when to log
+    double logCounter = 0.0f;
+
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
 
         // Update the timer service and run the log function
         Timer::update();
-        Timer::log();
 
         // Poll inputs, and then handle them
         Input::update();
@@ -54,6 +56,13 @@ void Application::run() {
 
         // Do things like event polling & buffer swapping
         window->postFrame();
+
+        // Log performance
+        logCounter += Timer::getDeltaTime();
+        if (logCounter >= 1.0f) {
+            Timer::logPerformance();
+            logCounter = 0.0;
+        }
     }
 }
 

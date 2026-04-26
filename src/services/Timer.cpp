@@ -25,10 +25,7 @@ float Timer::lastLogTime = 0.0f;
 std::map<std::string, double> Timer::profileResults;
 
 // Initalize the starting log values
-void Timer::init() {
-    lastFrameTime = glfwGetTime();
-    lastLogTime = (float)lastFrameTime;
-}
+void Timer::init() { lastFrameTime = glfwGetTime(); }
 
 // Update the tracked times
 void Timer::update() {
@@ -46,30 +43,30 @@ void Timer::update() {
     if (currentTime - lastLogTime >= 1.0) {
         fps = (float)totalFrames / (float)totalTime; // Simple average
         ms = deltaTime * 1000.0f;
-        // Note: We don't print here anymore, we wait for log()
     }
 }
 
 // Log time data
-void Timer::log() {
+void Timer::logPerformance(bool clearTerminal) {
 
-    // Log once a second
-    double currentTime = glfwGetTime();
-    if (currentTime - lastLogTime >= 1.0) {
-        std::cout << "\n--- ENGINE PERFORMANCE LOG ---" << std::endl;
-        std::cout << "FPS: " << (int)(1.0f / deltaTime)
-                  << " | Avg: " << (int)fps << std::endl;
-        std::cout << "Total Frames: " << totalFrames
-                  << " | Total Time: " << (int)totalTime << "s" << std::endl;
+    // Clear terminal (ansi)
+    if (clearTerminal)
+        std::cout << "\x1B[2J\x1B[H";
 
-        // Log scoped profiles
-        for (auto const &[name, duration] : profileResults) {
-            std::cout << "  " << name << ": " << std::fixed
-                      << std::setprecision(4) << duration << "ms" << std::endl;
-        }
+    // Log performance
+    std::cout << "\n--- ENGINE PERFORMANCE LOG ---" << std::endl;
+    std::cout << "FPS: " << (int)(1.0f / deltaTime) << " | Avg: " << (int)fps
+              << std::endl;
+    std::cout << "Total Frames: " << totalFrames
+              << " | Total Time: " << (int)totalTime << "s" << std::endl;
 
-        lastLogTime = (float)currentTime;
+    // Log scoped profiles
+    for (auto const &[name, duration] : profileResults) {
+        std::cout << "  " << name << ": " << std::fixed << std::setprecision(4)
+                  << duration << "ms" << std::endl;
     }
+
+    lastLogTime = (float)glfwGetTime();
 }
 
 // Start profile
