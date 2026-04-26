@@ -1,6 +1,6 @@
 .
-├── CMakeLists.txt                          # Main build script
 ├── assets/                                 # Scenes, models, textures, and HDRI maps
+├── build/                                  # Generated build files (gitignored)
 ├── shaders/                                # GPU-Code
 │   ├── compute/                                # Ray-Based Rendering shaders (.comp)
 │   │   ├── path_tracer.comp                        # Uses BVH + Triangles (Physics-based)
@@ -17,50 +17,55 @@
 │       ├── pbr_brdf.glsl                           # Math for Physically Based Rendering (Fresnel, Smith, etc.)
 │       └── sampling.glsl                           # Random number generation and Blue Noise functions
 ├── src/                                    # CPU-Code
-│   ├── main.cpp                                # Entry point
 │   ├── acceleration/                           # Memory Optomization Structures
 │   │   ├── IAccelerationStructure.h                # Base Interface
 │   │   ├── BVHBuilder.cpp/h                        # Surface Area Heuristic (SAH) logic
 │   │   ├── Octree.cpp/h                            # For Ray Marching/SDFs
 │   │   └── UniformGrid.cpp/h                       # For simple/liquid simulations
 │   ├── core/                                   # Engine internals
-│   │   ├── Window.cpp/h                            # GLFW abstraction
-│   │   ├── Input.cpp/h                             # Input polling
-│   │   └── Application.cpp/h                       # Main loop & layer management
+│   │   ├── Application.cpp/h                       # Main loop & layer management
+│   │   ├── Defaults.h                              # Default values
+│   │   └── Window.cpp/h                            # GLFW abstraction
 │   ├── renderer/                               # Differing Renderer Logic
+│   │   ├── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
 │   │   ├── IRenderer.h                             # Base interface
-│   │   ├── Rasterizer.cpp/h                        # Real-time modeling view
 │   │   ├── PathTracer.cpp/h                        # GPU Path tracing logic
-│   │   └── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
+│   │   ├── Rasterizer.cpp/h                        # Real-time modeling view
+│   │   └── Shader.cpp/h                            # OpenGL shader and program compilation and usage
 │   ├── resources/                              # Resource loaders & managers
 │   │   ├── AssetManager.cpp/h                      # The "Central Hub" / Cache logic
+│   │   ├── MaterialLoader.cpp/h                    # Material parsing
 │   │   ├── ModelLoader.cpp/h                       # Geometry parsing
-│   │   ├── TextureLoader.cpp/h                     # Image decoding (stb_image)
-│   │   └── MaterialLoader.cpp/h                    # Material parsing
+│   │   └── TextureLoader.cpp/h                     # Image decoding (stb_image)
 │   ├── scene/                                  # Scene and entity logic
-│   │   ├── Campera.cpp/h                           # Camera logig
-│   │   ├── ECS.h                                   # Basic ID types (typedef uint32_t EntityID)
+│   │   ├── Components/                             # Component Logic
+│   │   │   ├── Transform.h                             # Position, Rotation, Scale
+│   │   │   ├── MeshComponent.h                         # Reference to a Mesh resource ID
+│   │   │   ├── MaterialComponent.h                     # Reference to a Material ID
+│   │   │   └── LightComponent.h                        # Reference to a Light ID
+│   │   ├── Campera.cpp/h                           # Camera logic
 │   │   ├── Component.h                             # POD Structs: Transform, MeshComponent, LightComponent
+│   │   ├── ECS.h                                   # Basic ID types (typedef uint32_t EntityID)
 │   │   ├── Scene.h                                 # The "Registry" (manages the list of entities)
-│   │   ├── System.h                                # Base class for logic (PhysicsSystem, etc.)
-│   │   └── Components/                             # Component Logic
-│   │       ├── Transform.h                             # Position, Rotation, Scale
-│   │       ├── MeshComponent.h                         # Reference to a Mesh resource ID
-│   │       ├── MaterialComponent.h                     # Reference to a Material ID
-│   │       └── LightComponent.h                        # Reference to a Light ID
-│   └── ui/                                     # UI/UX Layer
-│       ├── UIController.cpp/h                      # ImGui setup/docking logic
-│       ├── IPanel.cpp/h                            # Real-time modeling view
-│       └── Panels/                                 # Individual windows (Properties, Hierarchy)
-│            ├── ViewportPanel.cpp/h                    # Shows the actual rendered image/texture
-│            ├── SceneHierarchy.cpp/h                   # List of objects in the scene
-│            ├── InspectorPanel.cpp/h                   # Tweaking variables/materials of selected objects
-│            ├── ConsolePanel.cpp/h                     # Logging and engine status
-│            └── SettingsPanel.cpp/h                    # Render settings (Samples per pixel, Ray depth)
-├── vendor/                                 # Libraries
+│   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.)
+│   ├── services/                               # Static classes that provide services
+│   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling
+│   │   └── Timer.ccp/h                             # FPS and profiling services
+│   ├── ui/                                     # UI/UX Layer
+│   │   ├── Panels/                                 # Individual windows (Properties, Hierarchy)
+│   │   │    ├── ViewportPanel.cpp/h                    # Shows the actual rendered image/texture
+│   │   │    ├── SceneHierarchy.cpp/h                   # List of objects in the scene
+│   │   │    ├── InspectorPanel.cpp/h                   # Tweaking variables/materials of selected objects
+│   │   │    ├── ConsolePanel.cpp/h                     # Logging and engine status
+│   │   │    └── SettingsPanel.cpp/h                    # Render settings (Samples per pixel, Ray depth)
+│   │   ├── IPanel.h                                    # Real-time modeling view
+│   │   └── UIController.cpp/h                      # ImGui setup/docking logic
+│   └── main.cpp                                # Entry point
+├── vendor/                                 # Libraries, some are handled by vcpkg.json
 │   ├── glad/                                   # OpenGL Loader
 │   ├── glfw/                                   # Windowing
 │   ├── glm/                                    # Math (header only)
 │   ├── imgui/                                  # UI
 │   └── tinyobjloader/                          # Mesh loading
-└── build/                                  # Generated build files (gitignored)
+├── CMakeLists.txt                          # Main build script
+└── vcpkg.json                              # Package stuff for helping CMakeLists
