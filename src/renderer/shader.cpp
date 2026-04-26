@@ -98,7 +98,7 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
 }
 
 // Custom compilation error checking script
-void Shader::checkCompileErrors(uint32_t shader, std::string type) {
+void Shader::checkCompileErrors(uint32_t shader, std::string type) const {
     // Satus code and info log
     int success;
     char infoLog[1024];

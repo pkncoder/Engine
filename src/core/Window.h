@@ -13,25 +13,25 @@ class Window {
     ~Window();
 
     // OpenGL settings function
-    void setSettings();
+    void setSettings() const;
 
     // Check to see if the window is marked for death
     bool shouldClose() const;
 
     // Polling, and swapping
-    void pollEvents();
-    void swapBuffers();
+    void pollEvents() const;
+    void swapBuffers() const;
 
     // Pre and post frame actions
-    void preFrame();
-    void postFrame();
+    void preFrame() const;
+    void postFrame() const;
 
     // Return the GLFW window (not our wrapper)
     GLFWwindow *getNativeWindow() const { return window; }
 
     // Size & aspect ratio
     void getSize(int &width, int &height) const;
-    float getAspectRatio();
+    float getAspectRatio() const;
 
   private:
     // GLFW Window

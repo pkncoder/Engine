@@ -12,5 +12,6 @@ struct Vertex {
 
 class BufferManager {
   public:
-    static uint32_t createSimpleMesh(const std::vector<Vertex> &vertices);
+    static uint32_t
+    createSimpleMesh(const std::vector<Vertex> &vertices); // TODO: temp
 };

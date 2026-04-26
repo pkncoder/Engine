@@ -62,7 +62,7 @@ Window::~Window() {
 }
 
 // Wrapper to clean up constructor, sets the settings
-void Window::setSettings() {
+void Window::setSettings() const {
 
     // Turn off VSCNC
     glfwSwapInterval(0);
@@ -75,17 +75,17 @@ void Window::setSettings() {
 bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 
 // Polling & swapping buffers
-void Window::pollEvents() { glfwPollEvents(); }
-void Window::swapBuffers() { glfwSwapBuffers(window); }
+void Window::pollEvents() const { glfwPollEvents(); }
+void Window::swapBuffers() const { glfwSwapBuffers(window); }
 
 // Pre-frame window steps
-void Window::preFrame() {
+void Window::preFrame() const {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // TODO: Default value somewhere else?
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 // Window update
-void Window::postFrame() {
+void Window::postFrame() const {
     this->swapBuffers();
     this->pollEvents();
 }
@@ -98,7 +98,7 @@ void Window::getSize(int &width, int &height) const {
 }
 
 // Get the framebuffer aspect ratio
-float Window::getAspectRatio() {
+float Window::getAspectRatio() const {
 
     int width, height;
     this->getSize(width,
