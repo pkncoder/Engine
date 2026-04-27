@@ -11,6 +11,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(tinyobjloader CONFIG REQUIRED)
 
 # --- Source Files ---
 # Note: glad.c is now handled by the library, no need to include it manually!
@@ -20,10 +21,13 @@ set(SOURCES
     src/core/Window.cpp
     src/services/Input.cpp
     src/services/Timer.cpp
-    src/scene/Camera.cpp          # <--- Check these!
+    src/scene/Camera.cpp
     src/renderer/Rasterizer.cpp
-    src/renderer/BufferManager.cpp # <--- Check these!
-    src/renderer/Shader.cpp        # <--- Check these!
+    src/renderer/BufferManager.cpp
+    src/renderer/Shader.cpp
+    src/resources/AssetManager.cpp
+    src/resources/ModelLoader.cpp
+    src/scene/Scene.cpp
 )
 
 # --- Executable ---
@@ -35,4 +39,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw 
     glad::glad 
     glm::glm
+    tinyobjloader::tinyobjloader
 )

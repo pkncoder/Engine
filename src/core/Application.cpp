@@ -1,8 +1,10 @@
 #include "Application.h"
 
+#include "../resources/AssetManager.h"
 #include "../services/Input.h"
 #include "../services/Timer.h"
 #include "Defaults.h"
+#include <iostream>
 
 namespace Engine {
 
@@ -26,6 +28,22 @@ void Application::init() {
 
     // Init the camera at a starting pos
     camera = Camera(Defaults::Camera::START_POSITION);
+
+    scene = Scene();
+
+    // Initialize the asset manager
+    AssetManager::init();
+
+    // TODO: temp
+
+    auto modelData = AssetManager::loadMesh("assets/models/cube.obj");
+
+    if (modelData.has_value()) {
+        scene.addDebugMesh(modelData.value());
+    }
+
+    // Prove that it worked!
+    scene.printDebugInfo();
 
     // Construct the rasterizer and init it
     rasterizer = std::make_unique<Rasterizer>();

@@ -47,6 +47,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] MD - Get rid of the line length warning
 - [ ] TMUX - Make keybinds to run launch, run, and test bash scripts
 - [ ] TMUX - Change to catpuccin Moccioto or something like that
+- [ ] CPP - gcc (compent) keybind not working on single lines (sometimes)
 
 ## Ideas
 

@@ -6,7 +6,8 @@
 
 namespace Engine {
 
-struct Vertex {
+// TODO: temp
+struct TempVertex {
     glm::vec3 position;
     glm::vec3 color;
 };
@@ -14,7 +15,7 @@ struct Vertex {
 class BufferManager {
   public:
     static uint32_t
-    createSimpleMesh(const std::vector<Vertex> &vertices); // TODO: temp
+    createSimpleMesh(const std::vector<TempVertex> &vertices); // TODO: temp
 };
 
 } // namespace Engine

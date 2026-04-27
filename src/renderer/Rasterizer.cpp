@@ -18,9 +18,10 @@ void Rasterizer::init() {
         Shader("shaders/raster/viewport.vert", "shaders/raster/viewport.frag");
 
     // TODO: temp
-    std::vector<Vertex> triangle = {{{0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-                                    {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-                                    {{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
+    std::vector<TempVertex> triangle = {
+        {{0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
 
     // TODO: temp
     testVAO = BufferManager::createSimpleMesh(triangle);

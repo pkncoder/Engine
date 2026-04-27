@@ -2,6 +2,7 @@
 
 #include "../renderer/Rasterizer.h"
 #include "../scene/Camera.h"
+#include "../scene/Scene.h"
 #include "Window.h"
 
 #include <memory>
@@ -24,6 +25,9 @@ class Application {
   private:
     // Window information
     std::unique_ptr<Window> window;
+
+    // Scene information
+    Scene scene;
 
     // Camera object
     Camera camera;

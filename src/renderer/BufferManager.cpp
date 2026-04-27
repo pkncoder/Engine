@@ -7,7 +7,8 @@
 namespace Engine {
 
 // Creating a simple mesh - probally temp
-uint32_t BufferManager::createSimpleMesh(const std::vector<Vertex> &vertices) {
+uint32_t
+BufferManager::createSimpleMesh(const std::vector<TempVertex> &vertices) {
     uint32_t vao, vbo; // Set spots for buffers
 
     // Generate the buffers
@@ -19,18 +20,18 @@ uint32_t BufferManager::createSimpleMesh(const std::vector<Vertex> &vertices) {
 
     // Binding and setting buffer data
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(TempVertex),
                  vertices.data(), GL_STATIC_DRAW);
 
     // Enabling attributes & setting pointers
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, position));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TempVertex),
+                          (void *)offsetof(TempVertex, position));
 
     // Enabling attributes & setting pointers
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, color));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(TempVertex),
+                          (void *)offsetof(TempVertex, color));
 
     // Empty the binds for mem safety
     glBindVertexArray(0);
