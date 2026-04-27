@@ -1,5 +1,7 @@
 #pragma once
+
 #include "AssetTypes.h"
+
 #include <optional>
 #include <string>
 

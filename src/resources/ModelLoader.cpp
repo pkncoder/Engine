@@ -1,9 +1,8 @@
 #include "ModelLoader.h"
-#include <iostream>
 
-// Note: Do NOT define TINYOBJLOADER_IMPLEMENTATION if using vcpkg's library
-// version
 #include <tiny_obj_loader.h>
+
+#include <iostream>
 
 namespace Engine {
 

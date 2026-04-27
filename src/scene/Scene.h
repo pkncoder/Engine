@@ -1,5 +1,7 @@
 #pragma once
+
 #include "../resources/AssetTypes.h"
+
 #include <vector>
 
 namespace Engine {
