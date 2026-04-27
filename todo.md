@@ -31,6 +31,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Extend and use Defaults.h more
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Figure out how shader including will work in current code
+- [ ] Create a full Logger class that can then be used later in UI
 
 ### Todo - Not Code
 

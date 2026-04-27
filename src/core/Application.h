@@ -26,7 +26,7 @@ class Application {
     // Window information
     std::unique_ptr<Window> window;
 
-    // Scene information
+    // Scene object
     Scene scene;
 
     // Camera object

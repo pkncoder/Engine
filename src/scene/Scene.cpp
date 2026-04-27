@@ -3,11 +3,16 @@
 
 namespace Engine {
 
+// Constructor & Deconstructor
 Scene::Scene() {}
 Scene::~Scene() {}
 
+// Add a mesh to the debug mesh
+// TODO: temp
 void Scene::addDebugMesh(const MeshData &mesh) { debugMeshes.push_back(mesh); }
 
+// Print out the debug mesh information
+// TODO: temp
 void Scene::printDebugInfo() const {
     std::cout << "\n--- SCENE DEBUG INFO ---" << std::endl;
     std::cout << "Total Meshes: " << debugMeshes.size() << std::endl;

@@ -6,7 +6,7 @@ namespace Engine {
 
 class ModelLoader {
   public:
-    // Returns true if successful, populates outMesh
+    // Load a mesh, return true for sucess, false for error
     static bool loadOBJ(const std::string &filepath, MeshData &outMesh);
 };
 

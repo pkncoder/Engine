@@ -7,38 +7,41 @@
 
 namespace Engine {
 
+// Loading an obj mesh
 bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
-    tinyobj::ObjReaderConfig reader_config;
-    reader_config.triangulate =
-        true; // CRITICAL: Converts Blender Quads to Triangles
 
+    // tinyobjloader obj file reading configuration
+    tinyobj::ObjReaderConfig reader_config;
+    reader_config.triangulate = true; // For converting quads to triangles
+
+    // Get a tinyobjloader reader
     tinyobj::ObjReader reader;
 
-    if (!reader.ParseFromFile(filepath, reader_config)) {
-        if (!reader.Error().empty()) {
+    // Try to read from the file, and parse information if error
+    if (!reader.ParseFromFile(filepath, reader_config)) { // Error
+        if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
             std::cerr << "TinyObj Error: " << reader.Error() << std::endl;
         }
         return false;
     }
 
+    // Get the attributes and shapes from the reader
     const auto &attrib = reader.GetAttrib();
     const auto &shapes = reader.GetShapes();
 
-    // --- DIAGNOSTIC LOGS ---
-    std::cout << "[Diagnostic] File: " << filepath << std::endl;
-    std::cout << "[Diagnostic] Shapes found: " << shapes.size() << std::endl;
-    std::cout << "[Diagnostic] Raw Vertices in attrib: "
-              << (attrib.vertices.size() / 3) << std::endl;
-
+    // Set the outMesh information
     outMesh.name = filepath;
     outMesh.vertices.clear();
     outMesh.indices.clear();
 
+    // Loop each shape
+    // TODO: Is better way?
     for (const auto &shape : shapes) {
-        std::cout << "[Diagnostic] Shape '" << shape.name << "' has "
-                  << shape.mesh.indices.size() << " indices." << std::endl;
 
+        // Loop each index in the shape
         for (const auto &index : shape.mesh.indices) {
+
+            // Initialize a temp vertex
             Vertex vertex{};
 
             // Pull position
@@ -60,11 +63,21 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
                     attrib.texcoords[2 * index.texcoord_index + 1]};
             }
 
+            // Push the new vertex and indecies into the outMesh
             outMesh.vertices.push_back(vertex);
             outMesh.indices.push_back((uint32_t)outMesh.indices.size());
         }
     }
 
+    // No errors
     return true;
 }
+
 } // namespace Engine
+
+// // --- DIAGNOSTIC LOGS ---
+// std::cout << "[Diagnostic] File: " << filepath << std::endl;
+// std::cout << "[Diagnostic] Shapes found: " << shapes.size() << std::endl;
+// std::cout << "[Diagnostic] Raw Vertices in attrib: "
+//           << (attrib.vertices.size() / 3) << std::endl;
+// TODO: Add to a logger ^^^^^^^^^

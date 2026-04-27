@@ -5,14 +5,14 @@
 
 namespace Engine {
 
-// A single vertex containing all necessary attributes
+// Vertex w/ attributes
 struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
 };
 
-// The raw data of a 3D model
+// Mesh information
 struct MeshData {
     std::string name;
     std::vector<Vertex> vertices;

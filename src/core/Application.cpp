@@ -29,21 +29,25 @@ void Application::init() {
     // Init the camera at a starting pos
     camera = Camera(Defaults::Camera::START_POSITION);
 
-    scene = Scene();
-
     // Initialize the asset manager
     AssetManager::init();
 
+    // Initialize the scene
+    scene = Scene();
+
     // TODO: temp
+    {
+        // Load the model data
+        // TODO: Figure out about the auto type and when to use it
+        auto modelData = AssetManager::loadMesh("assets/models/cube.obj");
 
-    auto modelData = AssetManager::loadMesh("assets/models/cube.obj");
+        // Check to make sure the model has data in it
+        if (modelData.has_value())
+            scene.addDebugMesh(modelData.value());
 
-    if (modelData.has_value()) {
-        scene.addDebugMesh(modelData.value());
+        // Print out the information about the model
+        scene.printDebugInfo();
     }
-
-    // Prove that it worked!
-    scene.printDebugInfo();
 
     // Construct the rasterizer and init it
     rasterizer = std::make_unique<Rasterizer>();
