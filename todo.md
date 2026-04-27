@@ -35,6 +35,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ### Todo - Not Code
 
+- [ ] Change how .mtl and .obj files are stored
+
 ### Todo - Future Todos
 
 - [ ] Use EnTT instead of custom ECS
