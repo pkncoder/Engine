@@ -1,9 +1,12 @@
 #include "Application.h"
 
 #include "../resources/AssetManager.h"
+#include "../scene/Entity.h"
+#include "../scene/components/TransformComponent.h"
 #include "../services/Input.h"
 #include "../services/Timer.h"
 #include "Defaults.h"
+
 #include <iostream>
 
 namespace Engine {
@@ -33,20 +36,26 @@ void Application::init() {
     AssetManager::init();
 
     // Initialize the scene
-    scene = Scene();
+    activeScene = Scene();
 
     // TODO: temp
     {
-        // Load the model data
-        // TODO: Figure out about the auto type and when to use it
-        auto modelData = AssetManager::loadMesh("assets/models/cube.obj");
+        activeScene
+            .registerComponent<Transform>(); // Tell the scene about this type
 
-        // Check to make sure the model has data in it
-        if (modelData.has_value())
-            scene.addDebugMesh(modelData.value());
+        // 2. Create an Entity wrapper
+        Entity myCube(activeScene.createEntity(), &activeScene);
 
-        // Print out the information about the model
-        scene.printDebugInfo();
+        // 3. Add data
+        myCube.addComponent<Transform>({
+            glm::vec3(0.0f, 5.0f, 0.0f),       // Position
+            glm::quat(1.0f, 0.0f, 0.0f, 0.0f), // Rotation
+            glm::vec3(1.0f, 1.0f, 1.0f)        // Scale
+        });
+
+        // 4. Retrieve data to prove it worked
+        Transform &t = myCube.getComponent<Transform>();
+        std::cout << "Cube Y Position: " << t.Position.y << std::endl;
     }
 
     // Construct the rasterizer and init it

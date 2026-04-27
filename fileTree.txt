@@ -47,6 +47,7 @@
 │   │   ├── Campera.cpp/h                           # Camera logic
 │   │   ├── Component.h                             # POD Structs: Transform, MeshComponent, LightComponent
 │   │   ├── ECS.h                                   # Basic ID types (typedef uint32_t EntityID)
+│   │   ├── IComponent.h                            # Component template
 │   │   ├── Scene.cpp/h                             # The "Registry" (manages the list of entities)
 │   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.)
 │   ├── services/                               # Static classes that provide services

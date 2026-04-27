@@ -1,37 +1,30 @@
 #include "Scene.h"
 
-#include <iostream>
-
 namespace Engine {
 
-// Constructor & Deconstructor
-Scene::Scene() {}
-Scene::~Scene() {}
-
-// Add a mesh to the debug mesh
-// TODO: temp
-void Scene::addDebugMesh(const MeshData &mesh) { debugMeshes.push_back(mesh); }
-
-// Print out the debug mesh information
-// TODO: temp
-void Scene::printDebugInfo() const {
-    std::cout << "\n--- SCENE DEBUG INFO ---" << std::endl;
-    std::cout << "Total Meshes: " << debugMeshes.size() << std::endl;
-
-    for (size_t i = 0; i < debugMeshes.size(); ++i) {
-        const auto &mesh = debugMeshes[i];
-        std::cout << "Mesh [" << i << "]: " << mesh.name << "\n";
-        std::cout << "  Vertices: " << mesh.vertices.size() << "\n";
-        std::cout << "  Indices: " << mesh.indices.size() << "\n";
-
-        // Print the very first vertex position just to prove data is real
-        if (!mesh.vertices.empty()) {
-            const auto &v = mesh.vertices[0].position;
-            std::cout << "  First Vertex Pos: (" << v.x << ", " << v.y << ", "
-                      << v.z << ")\n";
-        }
+Scene::Scene() {
+    // Initialize signatures to 0 (no components)
+    for (auto &sig : m_Signatures) {
+        sig.reset();
     }
-    std::cout << "------------------------\n\n";
+}
+
+Scene::~Scene() {
+    // Shared pointers in the unordered_map will automatically delete
+    // the ComponentPools, safely firing the ~IPool destructor.
+}
+
+EntityID Scene::createEntity() {
+    assert(m_LivingEntityCount < MAX_ENTITIES &&
+           "Too many entities in existence.");
+
+    // Grab the next available ID
+    EntityID id = m_LivingEntityCount++;
+
+    // Ensure its signature is clean
+    m_Signatures[id].reset();
+
+    return id;
 }
 
 } // namespace Engine

@@ -27,7 +27,7 @@ class Application {
     std::unique_ptr<Window> window;
 
     // Scene object
-    Scene scene;
+    Scene activeScene;
 
     // Camera object
     Camera camera;
