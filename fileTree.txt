@@ -34,6 +34,7 @@
 │   │   └── Shader.cpp/h                            # OpenGL shader and program compilation and usage
 │   ├── resources/                              # Resource loaders & managers
 │   │   ├── AssetManager.cpp/h                      # The "Central Hub" / Cache logic
+│   │   ├── AssetTypes.h                            # Struct declarations for the AssetManager & co.
 │   │   ├── MaterialLoader.cpp/h                    # Material parsing
 │   │   ├── ModelLoader.cpp/h                       # Geometry parsing
 │   │   └── TextureLoader.cpp/h                     # Image decoding (stb_image)
@@ -46,7 +47,7 @@
 │   │   ├── Campera.cpp/h                           # Camera logic
 │   │   ├── Component.h                             # POD Structs: Transform, MeshComponent, LightComponent
 │   │   ├── ECS.h                                   # Basic ID types (typedef uint32_t EntityID)
-│   │   ├── Scene.h                                 # The "Registry" (manages the list of entities)
+│   │   ├── Scene.cpp/h                             # The "Registry" (manages the list of entities)
 │   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.)
 │   ├── services/                               # Static classes that provide services
 │   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling

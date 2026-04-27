@@ -32,6 +32,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Figure out how shader including will work in current code
 - [ ] Create a full Logger class that can then be used later in UI
+- [ ] Should AssetTypes really be called & used like that?
 
 ### Todo - Not Code
 
