@@ -3,6 +3,8 @@
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 
+#include <iostream>
+
 namespace Engine {
 
 // Init the rasterizer
@@ -22,7 +24,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
     shader.setMat4("u_ViewProjection", proj * view);
 
-    shader.setVec3("lookingDir", camera.position);
+    shader.setVec3("u_ViewPos", camera.position);
 
     // 1. Ask ECS for all entities that have both a Transform and a Mesh
     auto renderables = activeScene.getView<Transform, MeshComponent>();

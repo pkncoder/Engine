@@ -44,6 +44,7 @@ void Application::init() {
 
     // 1. Load data from disk to CPU memory
     auto optionalMeshData = AssetManager::loadMesh("assets/models/bunny.obj");
+    auto dragonMeshData = AssetManager::loadMesh("assets/models/dragon.obj");
 
     if (optionalMeshData.has_value()) {
         // 2. Upload CPU data to GPU memory (VRAM) via BufferManager
@@ -54,11 +55,25 @@ void Application::init() {
         Entity myCube(activeScene.createEntity(), &activeScene);
 
         myCube.addComponent<Transform>(
-            {glm::vec3(0.0f, 0.0f, -5.0f), // Positioned in front of camera
+            {glm::vec3(-2.0f, 0.0f, -3.0f), // Positioned in front of camera
              glm::quat(1.0f, 0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
 
         // 4. Give the entity the GPU handles
         myCube.addComponent<MeshComponent>(cubeMeshHandles);
+
+        // 2. Upload CPU data to GPU memory (VRAM) via BufferManager
+        MeshComponent dragonMesh =
+            BufferManager::uploadMesh(dragonMeshData.value());
+
+        // 3. Create Entity and attach components
+        Entity dragon(activeScene.createEntity(), &activeScene);
+
+        dragon.addComponent<Transform>(
+            {glm::vec3(2.0f, 0.8f, -3.0f), // Positioned in front of camera
+             glm::quat(1.0f, 0.0f, 0.0f, 0.0f), glm::vec3(2.5f, 2.5f, 2.5f)});
+
+        // 4. Give the entity the GPU handles
+        dragon.addComponent<MeshComponent>(dragonMesh);
     }
 
     // Construct the rasterizer and init it
