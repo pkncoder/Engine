@@ -22,6 +22,8 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
     shader.setMat4("u_ViewProjection", proj * view);
 
+    shader.setVec3("lookingDir", camera.position);
+
     // 1. Ask ECS for all entities that have both a Transform and a Mesh
     auto renderables = activeScene.getView<Transform, MeshComponent>();
 

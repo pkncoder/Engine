@@ -8,6 +8,7 @@
 #include "../services/Input.h"
 #include "../services/Timer.h"
 #include "Defaults.h"
+#include <GLFW/glfw3.h>
 
 namespace Engine {
 
@@ -42,7 +43,7 @@ void Application::init() {
         .registerComponent<MeshComponent>(); // Register our new component
 
     // 1. Load data from disk to CPU memory
-    auto optionalMeshData = AssetManager::loadMesh("assets/models/dragon.obj");
+    auto optionalMeshData = AssetManager::loadMesh("assets/models/bunny.obj");
 
     if (optionalMeshData.has_value()) {
         // 2. Upload CPU data to GPU memory (VRAM) via BufferManager
@@ -121,6 +122,10 @@ void Application::handleInputs() {
         camera.processMovement(LEFT);
     if (Input::isKeyPressed(GLFW_KEY_D))
         camera.processMovement(RIGHT);
+    if (Input::isKeyPressed(GLFW_KEY_SPACE))
+        camera.processMovement(UP);
+    if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+        camera.processMovement(DOWN);
 }
 
 } // namespace Engine

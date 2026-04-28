@@ -49,6 +49,10 @@ void Camera::processMovement(Camera_Movement direction) {
         position -= right * velocity;
     if (direction == RIGHT)
         position += right * velocity;
+    if (direction == UP)
+        position += up * velocity;
+    if (direction == DOWN)
+        position -= up * velocity;
 }
 
 // Pitch and yaw modifications

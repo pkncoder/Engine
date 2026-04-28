@@ -36,10 +36,10 @@ MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, position));
 
-    // // Enabling attributes & setting pointers
-    // glEnableVertexAttribArray(1);
-    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-    //                       (void *)offsetof(Vertex, color));
+    // Enabling attributes & setting pointers
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void *)offsetof(Vertex, normal));
 
     // 4. Unbind VAO to prevent accidental modification
     glBindVertexArray(0);
