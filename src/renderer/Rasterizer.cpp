@@ -3,8 +3,6 @@
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 
-#include <iostream>
-
 namespace Engine {
 
 // Init the rasterizer
