@@ -1,13 +1,13 @@
 #include "Application.h"
 
+#include "../renderer/BufferManager.h"
 #include "../resources/AssetManager.h"
 #include "../scene/Entity.h"
+#include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Input.h"
 #include "../services/Timer.h"
 #include "Defaults.h"
-
-#include <iostream>
 
 namespace Engine {
 
@@ -37,25 +37,27 @@ void Application::init() {
 
     // Initialize the scene
     activeScene = Scene();
+    activeScene.registerComponent<Transform>();
+    activeScene
+        .registerComponent<MeshComponent>(); // Register our new component
 
-    // TODO: temp
-    {
-        activeScene
-            .registerComponent<Transform>(); // Tell the scene about this type
+    // 1. Load data from disk to CPU memory
+    auto optionalMeshData = AssetManager::loadMesh("assets/models/dragon.obj");
 
-        // 2. Create an Entity wrapper
+    if (optionalMeshData.has_value()) {
+        // 2. Upload CPU data to GPU memory (VRAM) via BufferManager
+        MeshComponent cubeMeshHandles =
+            BufferManager::uploadMesh(optionalMeshData.value());
+
+        // 3. Create Entity and attach components
         Entity myCube(activeScene.createEntity(), &activeScene);
 
-        // 3. Add data
-        myCube.addComponent<Transform>({
-            glm::vec3(0.0f, 5.0f, 0.0f),       // Position
-            glm::quat(1.0f, 0.0f, 0.0f, 0.0f), // Rotation
-            glm::vec3(1.0f, 1.0f, 1.0f)        // Scale
-        });
+        myCube.addComponent<Transform>(
+            {glm::vec3(0.0f, 0.0f, -5.0f), // Positioned in front of camera
+             glm::quat(1.0f, 0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
 
-        // 4. Retrieve data to prove it worked
-        Transform &t = myCube.getComponent<Transform>();
-        std::cout << "Cube Y Position: " << t.Position.y << std::endl;
+        // 4. Give the entity the GPU handles
+        myCube.addComponent<MeshComponent>(cubeMeshHandles);
     }
 
     // Construct the rasterizer and init it
@@ -86,7 +88,7 @@ void Application::run() {
 
         // Render the scene
         START_PROFILE("Render"); // Start timer for renderer
-        rasterizer->render(camera, window->getAspectRatio());
+        rasterizer->render(camera, activeScene, window->getAspectRatio());
         END_PROFILE("Render"); // End Timer for renderer
 
         // Do things like event polling & buffer swapping

@@ -1,12 +1,7 @@
 #include "Rasterizer.h"
 
-#include "BufferManager.h"
-
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-
-#include <vector>
+#include "../scene/components/MeshComponent.h"
+#include "../scene/components/TransformComponent.h"
 
 namespace Engine {
 
@@ -16,34 +11,50 @@ void Rasterizer::init() {
     // Compile the shader code
     shader =
         Shader("shaders/raster/viewport.vert", "shaders/raster/viewport.frag");
-
-    // TODO: temp
-    std::vector<TempVertex> triangle = {
-        {{0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
-
-    // TODO: temp
-    testVAO = BufferManager::createSimpleMesh(triangle);
 }
 
 // Render a frame
-void Rasterizer::render(const Camera &camera, float aspectRatio) {
-    shader.bind(); // Bind the shader code
+void Rasterizer::render(const Camera &camera, Scene &activeScene,
+                        float aspectRatio) {
+    shader.bind(); // glUseProgram under the hood
 
-    // Get the view & projection matricies from the camera
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
-
-    // Set the view projection matrix as a uniform
     shader.setMat4("u_ViewProjection", proj * view);
 
-    // Hardcoded draw for Phase II test
-    // TODO: temp
-    glBindVertexArray(testVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // 1. Ask ECS for all entities that have both a Transform and a Mesh
+    auto renderables = activeScene.getView<Transform, MeshComponent>();
+
+    // 2. Loop through and draw them
+    for (EntityID id : renderables) {
+        // Grab the data components
+        auto &transform = activeScene.getComponent<Transform>(id);
+        auto &mesh = activeScene.getComponent<MeshComponent>(id);
+
+        // 3. Calculate Model Matrix (Rasterizer handles the math)
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, transform.Position);
+        model *= glm::mat4_cast(transform.Rotation);
+        model = glm::scale(model, transform.Scale);
+
+        // 4. Set Uniforms specific to this entity
+        shader.setMat4("u_Model", model);
+
+        // 5. OpenGL Execution
+        glBindVertexArray(mesh.VAO);
+
+        // We use glDrawElements because we are using Indices (EBO)
+        glDrawElements(GL_TRIANGLES, mesh.IndexCount, GL_UNSIGNED_INT, 0);
+    }
+
+    // Unbind when done
+    glBindVertexArray(0);
 }
 
 void Rasterizer::shutdown() {};
 
 } // namespace Engine
+
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>

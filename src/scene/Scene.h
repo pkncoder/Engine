@@ -4,6 +4,7 @@
 #include <cassert>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace Engine {
 
@@ -59,6 +60,28 @@ class Scene {
         auto pool =
             std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[type]);
         return pool->m_Data[entity];
+    }
+
+    // --- The View System ---
+    // Usage: auto view = scene.getView<Transform, MeshComponent>();
+    template <typename... ComponentTypes> std::vector<EntityID> getView() {
+        Signature requiredSignature;
+
+        // C++17 Fold Expression: Sets the bit for every type passed in
+        (requiredSignature.set(GetComponentTypeID<ComponentTypes>()), ...);
+
+        std::vector<EntityID> matchingEntities;
+
+        // Loop through all living entities (skipping 0, which is NULL_ENTITY)
+        for (EntityID i = 1; i < m_LivingEntityCount; ++i) {
+            // Bitwise AND: Does the entity's signature contain all required
+            // bits?
+            if ((m_Signatures[i] & requiredSignature) == requiredSignature) {
+                matchingEntities.push_back(i);
+            }
+        }
+
+        return matchingEntities;
     }
 
   private:

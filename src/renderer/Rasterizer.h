@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../scene/Camera.h"
+#include "../scene/Scene.h"
 #include "IRenderer.h"
 #include "Shader.h"
 
@@ -12,7 +13,8 @@ class Rasterizer : IRenderer {
 
     void init(); // Init the renderer
 
-    void render(const Camera &camera, float aspectRatio); // Render frame
+    void render(const Camera &camera, Scene &scene,
+                float aspectRatio); // Render frame
 
     void shutdown(); // Shut down the renderer
 
