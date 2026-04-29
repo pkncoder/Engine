@@ -64,7 +64,8 @@ class Scene {
 
     // --- The View System ---
     // Usage: auto view = scene.getView<Transform, MeshComponent>();
-    template <typename... ComponentTypes> std::vector<EntityID> getView() {
+    template <typename... ComponentTypes>
+    std::vector<EntityID> getView() const {
         Signature requiredSignature;
 
         // C++17 Fold Expression: Sets the bit for every type passed in
