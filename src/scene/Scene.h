@@ -27,9 +27,6 @@ class Scene {
     Scene();
     ~Scene();
 
-    // Entity Management
-    EntityID createEntity();
-
     // Component Management
     template <typename T> void registerComponent() {
         ComponentType type = GetComponentTypeID<T>();
@@ -84,6 +81,9 @@ class Scene {
 
         return matchingEntities;
     }
+
+    // Entity Management
+    EntityID createEntity();
 
   private:
     std::array<Signature, MAX_ENTITIES> m_Signatures;

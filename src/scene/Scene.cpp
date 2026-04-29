@@ -2,6 +2,7 @@
 
 namespace Engine {
 
+// Constructor & deconstructor
 Scene::Scene() {
     // Initialize signatures to 0 (no components)
     for (auto &sig : m_Signatures) {
@@ -9,10 +10,7 @@ Scene::Scene() {
     }
 }
 
-Scene::~Scene() {
-    // Shared pointers in the unordered_map will automatically delete
-    // the ComponentPools, safely firing the ~IPool destructor.
-}
+Scene::~Scene() {}
 
 EntityID Scene::createEntity() {
     assert(m_LivingEntityCount < MAX_ENTITIES &&

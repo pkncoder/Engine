@@ -9,8 +9,8 @@ class Entity {
     Entity() = default;
     Entity(EntityID id, Scene *scene) : m_ID(id), m_Scene(scene) {}
 
-    bool isValid() const { return m_ID != NULL_ENTITY && m_Scene != nullptr; }
     EntityID getID() const { return m_ID; }
+    bool isValid() const { return m_ID != NULL_ENTITY && m_Scene != nullptr; }
 
     // Wrapper methods that talk to the Scene
     template <typename T> void addComponent(T component) {
