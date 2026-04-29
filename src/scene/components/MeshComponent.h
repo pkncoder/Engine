@@ -2,14 +2,17 @@
 #include <glad/glad.h>
 
 namespace Engine {
+
+// Mesh component struct
 struct MeshComponent {
-    GLuint VAO = 0; // Rasterizer needs this
+
+    // Opengl buffers / arrays
+    GLuint VAO = 0;
     GLuint VBO = 0;
     GLuint EBO = 0;
-    unsigned int IndexCount = 0; // Needed for glDrawElements
 
-    // Future Path Tracer Data:
-    // GLuint SSBO_Offset = 0;
-    // GLuint MaterialID = 0;
+    // Required information in glDrawElements
+    unsigned int IndexCount = 0;
 };
+
 } // namespace Engine

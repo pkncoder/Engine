@@ -12,7 +12,7 @@ class AssetManager {
     // Initialize the manager
     static void init();
 
-    // Load and return a mesh. Using std::optional in case loading fails.
+    // Load and return a std::optional in case of failed loading
     static std::optional<MeshData> loadMesh(const std::string &filepath);
 };
 

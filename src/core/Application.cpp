@@ -38,44 +38,51 @@ void Application::init() {
 
     // Initialize the scene
     activeScene = Scene();
-    activeScene.registerComponent<Transform>();
-    activeScene
-        .registerComponent<MeshComponent>(); // Register our new component
 
-    // 1. Load data from disk to CPU memory
-    auto optionalBunnyMesh = AssetManager::loadMesh("assets/models/bunny.obj");
-    auto optionalDragonMesh =
-        AssetManager::loadMesh("assets/models/dragon.obj");
-    auto optionalCatMesh = AssetManager::loadMesh("assets/models/cat.obj");
+    // TODO: temp (move it somewhere)
+    {
+        // Register components
+        activeScene.registerComponent<Transform>();
+        activeScene.registerComponent<MeshComponent>();
 
-    // 2. Upload CPU data to GPU memory (VRAM) via BufferManager
-    MeshComponent bunnyMesh =
-        BufferManager::uploadMesh(optionalBunnyMesh.value());
-    MeshComponent dragonMesh =
-        BufferManager::uploadMesh(optionalDragonMesh.value());
-    MeshComponent catMesh = BufferManager::uploadMesh(optionalCatMesh.value());
+        // Load the meshes to CPU from disk
+        auto optionalBunnyMesh =
+            AssetManager::loadMesh("assets/models/bunny.obj");
+        auto optionalDragonMesh =
+            AssetManager::loadMesh("assets/models/dragon.obj");
+        auto optionalCatMesh = AssetManager::loadMesh("assets/models/cat.obj");
 
-    // 3. Create Entity and attach components
-    Entity bunny(activeScene.createEntity(), &activeScene);
-    Entity dragon(activeScene.createEntity(), &activeScene);
-    Entity cat(activeScene.createEntity(), &activeScene);
+        // Upload the CPU mesh data to the GPU (VRAM)
+        MeshComponent bunnyMesh =
+            BufferManager::uploadMesh(optionalBunnyMesh.value());
+        MeshComponent dragonMesh =
+            BufferManager::uploadMesh(optionalDragonMesh.value());
+        MeshComponent catMesh =
+            BufferManager::uploadMesh(optionalCatMesh.value());
 
-    bunny.addComponent<MeshComponent>(bunnyMesh);
-    bunny.addComponent<Transform>(
-        {glm::vec3(-1.0f, -0.6f, -4.0f), // Positioned in front of camera
-         glm::quat(1.0f, 0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+        // Create entity wrappers & instiate entity ids in the ECS (Scene.h)
+        Entity bunny(activeScene.createEntity(), &activeScene);
+        Entity dragon(activeScene.createEntity(), &activeScene);
+        Entity cat(activeScene.createEntity(), &activeScene);
 
-    dragon.addComponent<MeshComponent>(dragonMesh);
-    dragon.addComponent<Transform>(
-        {glm::vec3(1.0f, -0.0f, -3.5f), // Positioned in front of camera
-         glm::quat(1.0f, 0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+        // Add mesh #1 components
+        bunny.addComponent<MeshComponent>(bunnyMesh);
+        bunny.addComponent<Transform>({glm::vec3(-1.0f, -0.6f, -4.0f),
+                                       glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                       glm::vec3(1.0f, 1.0f, 1.0f)});
 
-    cat.addComponent<MeshComponent>(catMesh);
-    cat.addComponent<Transform>(
-        {glm::vec3(0.0f, 0.0f, -4.0f), // Positioned in front of camera
-         glm::quat(1.0f, 0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+        // Add mesh #2 components
+        dragon.addComponent<MeshComponent>(dragonMesh);
+        dragon.addComponent<Transform>({glm::vec3(1.0f, -0.0f, -3.5f),
+                                        glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                        glm::vec3(1.0f, 1.0f, 1.0f)});
 
-    // 4. Give the entity the GPU handles
+        // Add mesh #3 components
+        cat.addComponent<MeshComponent>(catMesh);
+        cat.addComponent<Transform>({glm::vec3(0.0f, 0.0f, -4.0f),
+                                     glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                     glm::vec3(1.0f, 1.0f, 1.0f)});
+    }
 
     // Construct the rasterizer and init it
     rasterizer = std::make_unique<Rasterizer>();

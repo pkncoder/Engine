@@ -5,24 +5,28 @@
 
 namespace Engine {
 
-// Identifiers and Limits
+// Entity ID typedef and settings
 using EntityID = uint32_t;
 const EntityID NULL_ENTITY = 0;
 const EntityID MAX_ENTITIES = 10000;
+
+// Components max num
 const uint8_t MAX_COMPONENTS = 32;
 
+// Signature typedef (bitset)
 using Signature = std::bitset<MAX_COMPONENTS>;
 using ComponentType = uint8_t;
 
-// --- The Type ID Generator ---
-// Every time we call GetComponentTypeID<NewType>(), it assigns a new integer
-// (0, 1, 2...)
+// Getting a unique component id
 inline ComponentType GetUniqueComponentTypeID() {
-    static ComponentType lastID = 0;
-    return lastID++;
+    static ComponentType lastID = 0; // Static, shared value that increases
+    return lastID++; // Increase the static lastID, and return the new value
 }
 
+// Get the component type id for a specific component type
+// TODO: is this right? how does it return the old one if it already exists
 template <typename T> inline ComponentType GetComponentTypeID() {
+    // Wrapper function for getting the component type id
     static const ComponentType typeID = GetUniqueComponentTypeID();
     return typeID;
 }

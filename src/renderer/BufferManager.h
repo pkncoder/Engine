@@ -9,6 +9,7 @@ namespace Engine {
 
 class BufferManager {
   public:
+    // Getting the mesh component from mesh data & uploading the information
     static MeshComponent uploadMesh(const MeshData &meshData);
 };
 

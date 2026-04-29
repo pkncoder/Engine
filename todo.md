@@ -49,6 +49,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Todo - Editor
 
 - [ ] MD - Try to get checkboxes rendering
+    bool isValid() const { return m_ID != NULL_ENTITY && m_Scene != nullptr; }
 - [ ] MD - Get rid of the line length warning
 - [ ] TMUX - Make keybinds to run launch, run, and test bash scripts
 - [ ] TMUX - Change to catpuccin Moccioto or something like that
@@ -57,6 +58,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ## Ideas
 
 - [ ] Add the ability for multiple render methods together (like a path traced scene + ray marched clouds)
+- [ ] Make the engine launch while loading, but show that it is "working" on it
 
 ## Steps
 
@@ -66,7 +68,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 2. [x] Fix public vs. private
 3. [x] Make variables & functions const when needed
 4. [x] Fix placement of functions
-5. [ ] Refactor step by step in code
+5. [x] Refactor step by step in code
 6. [ ] Rename things
 7. [ ] Add comments
 8. [ ] Place the \#includes in the right spots
