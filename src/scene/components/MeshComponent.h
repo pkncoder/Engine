@@ -12,7 +12,7 @@ struct MeshComponent {
     GLuint EBO = 0;
 
     // Required information in glDrawElements
-    unsigned int IndexCount = 0;
+    unsigned int indexCount = 0;
 };
 
 } // namespace Engine

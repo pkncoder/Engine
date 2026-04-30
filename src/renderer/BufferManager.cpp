@@ -1,5 +1,3 @@
-#pragma once
-
 #include "BufferManager.h"
 
 #include "../resources/AssetTypes.h"
@@ -12,7 +10,7 @@ MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
 
     // Create the new mesh component and set the index count
     MeshComponent comp;
-    comp.IndexCount = meshData.indices.size();
+    comp.indexCount = meshData.indices.size();
 
     // Generating arrays and buffers
     glGenVertexArrays(1, &comp.VAO);

@@ -34,6 +34,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Create a full Logger class that can then be used later in UI
 - [ ] Should AssetTypes really be called & used like that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
+- [ ] Check for not foo_bar, and repladce with fooBar
 
 ### Todo - Not Code
 
@@ -69,7 +70,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 3. [x] Make variables & functions const when needed
 4. [x] Fix placement of functions
 5. [x] Refactor step by step in code
-6. [ ] Rename things
+6. [x] Rename things
 7. [ ] Add comments
 8. [ ] Place the \#includes in the right spots
 9. [ ] Fix file tree

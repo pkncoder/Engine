@@ -10,14 +10,14 @@ namespace Engine {
 bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
 
     // tinyobjloader obj file reading configuration
-    tinyobj::ObjReaderConfig reader_config;
-    reader_config.triangulate = true; // For converting quads to triangles
+    tinyobj::ObjReaderConfig readerConfig;
+    readerConfig.triangulate = true; // For converting quads to triangles
 
     // Get a tinyobjloader reader
     tinyobj::ObjReader reader;
 
     // Try to read from the file, and parse information if error
-    if (!reader.ParseFromFile(filepath, reader_config)) { // Error
+    if (!reader.ParseFromFile(filepath, readerConfig)) { // Error
         if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
             std::cerr << "TinyObj Error: " << reader.Error() << std::endl;
         }

@@ -8,26 +8,28 @@ class Entity {
   public:
     // Constructors
     Entity() = default;
-    Entity(EntityID id, Scene *scene) : m_ID(id), m_Scene(scene) {}
+    Entity(EntityID id, Scene *scene) : ID(id), attachedScene(scene) {}
 
     // Getter for the id
-    EntityID getID() const { return m_ID; }
+    EntityID getID() const { return ID; }
 
     // Checking if the id is valid (not NULL_ENTITY id & scene is added)
-    bool isValid() const { return m_ID != NULL_ENTITY && m_Scene != nullptr; }
+    bool isValid() const {
+        return ID != NULL_ENTITY && attachedScene != nullptr;
+    }
 
     // Wrapper methods that talk to the Scene
     template <typename T> void addComponent(T component) {
-        m_Scene->addComponent<T>(m_ID, component);
+        attachedScene->addComponent<T>(ID, component);
     }
     template <typename T> T &getComponent() {
-        return m_Scene->getComponent<T>(m_ID);
+        return attachedScene->getComponent<T>(ID);
     }
 
   private:
     // ID information and scene information
-    EntityID m_ID = NULL_ENTITY;
-    Scene *m_Scene = nullptr;
+    EntityID ID = NULL_ENTITY;
+    Scene *attachedScene = nullptr;
 };
 
 } // namespace Engine

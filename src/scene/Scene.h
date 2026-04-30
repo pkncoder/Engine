@@ -37,11 +37,11 @@ class Scene {
 
         // Get the id of this component type
         ComponentType type = GetComponentTypeID<T>();
-        assert(m_ComponentPools.find(type) == m_ComponentPools.end() &&
+        assert(componentPools.find(type) == componentPools.end() &&
                "Registering component type more than once."); // Error checking
 
         // Create a new pool & add it to the list/map
-        m_ComponentPools[type] = std::make_shared<ComponentPool<T>>();
+        componentPools[type] = std::make_shared<ComponentPool<T>>();
     }
 
     // Adding a component to an entity id
@@ -51,11 +51,11 @@ class Scene {
         ComponentType type = GetComponentTypeID<T>();
 
         // Flip the bit at the component id on the signature of the entity
-        m_Signatures[entity].set(type, true);
+        signatures[entity].set(type, true);
 
         // Set the component at that id
         auto pool =
-            std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[type]);
+            std::static_pointer_cast<ComponentPool<T>>(componentPools[type]);
         pool->m_Data[entity] = component;
     }
 
@@ -64,12 +64,12 @@ class Scene {
 
         // Get the component type id
         ComponentType type = GetComponentTypeID<T>();
-        assert(m_Signatures[entity].test(type) &&
+        assert(signatures[entity].test(type) &&
                "Entity does not have this component."); // Error checking
 
         // Get the component at that id and return it
         auto pool =
-            std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[type]);
+            std::static_pointer_cast<ComponentPool<T>>(componentPools[type]);
         return pool->m_Data[entity];
     }
 
@@ -89,7 +89,7 @@ class Scene {
         for (EntityID i = 1; i < m_LivingEntityCount; ++i) {
             // Compare signatures with a bitwise and, if they are the same, then
             // add it to the list
-            if ((m_Signatures[i] & requiredSignature) == requiredSignature) {
+            if ((signatures[i] & requiredSignature) == requiredSignature) {
                 matchingEntities.push_back(i);
             }
         }
@@ -109,8 +109,8 @@ class Scene {
     EntityID m_LivingEntityCount = 1; // Start at 1, so 0 remains NULL_ENTITY
 
     // Component and signature pool
-    std::array<Signature, MAX_ENTITIES> m_Signatures;
-    std::unordered_map<ComponentType, std::shared_ptr<IPool>> m_ComponentPools;
+    std::array<Signature, MAX_ENTITIES> signatures;
+    std::unordered_map<ComponentType, std::shared_ptr<IPool>> componentPools;
 };
 
 } // namespace Engine

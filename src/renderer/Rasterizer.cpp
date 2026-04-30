@@ -35,9 +35,9 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
         // 3. Calculate Model Matrix (Rasterizer handles the math)
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, transform.Position);
-        model *= glm::mat4_cast(transform.Rotation);
-        model = glm::scale(model, transform.Scale);
+        model = glm::translate(model, transform.position);
+        model *= glm::mat4_cast(transform.rotation);
+        model = glm::scale(model, transform.scale);
 
         // 4. Set Uniforms specific to this entity
         shader.setMat4("u_Model", model);
@@ -46,7 +46,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         glBindVertexArray(mesh.VAO);
 
         // We use glDrawElements because we are using Indices (EBO)
-        glDrawElements(GL_TRIANGLES, mesh.IndexCount, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
     }
 
     // Unbind when done

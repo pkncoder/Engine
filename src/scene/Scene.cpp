@@ -5,7 +5,7 @@ namespace Engine {
 // Constructor & deconstructor
 Scene::Scene() {
     // Initialize signatures to 0 (no components)
-    for (auto &sig : m_Signatures) {
+    for (auto &sig : signatures) {
         sig.reset();
     }
 }
@@ -21,7 +21,7 @@ EntityID Scene::createEntity() {
     EntityID id = m_LivingEntityCount++;
 
     // Ensure its signature is clean
-    m_Signatures[id].reset();
+    signatures[id].reset();
 
     // Return the id
     // TODO: Return entity not entity id?
