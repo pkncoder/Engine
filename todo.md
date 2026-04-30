@@ -35,6 +35,9 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Should AssetTypes really be called & used like that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
 - [ ] Check for not foo_bar, and repladce with fooBar
+- [ ] Figure out how getting all of the "renderables" will work
+  - Some maynot have materials, some may not be lights
+  - Force them to have these, exclude lights?
 
 ### Todo - Not Code
 

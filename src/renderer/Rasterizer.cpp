@@ -25,7 +25,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     shader.setVec3("u_ViewPos", camera.position);
 
     // Get all of the renderables from the scene
-    // TODO: How handle ones without transforms/materials?
     auto renderables =
         activeScene.getMatchingEntities<Transform, MeshComponent>();
 
