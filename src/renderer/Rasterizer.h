@@ -9,8 +9,6 @@ namespace Engine {
 
 class Rasterizer : IRenderer {
   public:
-    uint32_t testVAO; // TODO: temp
-
     void init(); // Init the renderer
 
     void render(const Camera &camera, Scene &scene,

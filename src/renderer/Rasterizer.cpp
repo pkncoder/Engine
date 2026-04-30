@@ -24,28 +24,31 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
     shader.setVec3("u_ViewPos", camera.position);
 
-    // 1. Ask ECS for all entities that have both a Transform and a Mesh
-    auto renderables = activeScene.getView<Transform, MeshComponent>();
+    // Get all of the renderables from the scene
+    // TODO: How handle ones without transforms/materials?
+    auto renderables =
+        activeScene.getMatchingEntities<Transform, MeshComponent>();
 
-    // 2. Loop through and draw them
+    // Loop every one to draw
     for (EntityID id : renderables) {
-        // Grab the data components
-        auto &transform = activeScene.getComponent<Transform>(id);
+        // Get the components from the entity that are used in rendering
         auto &mesh = activeScene.getComponent<MeshComponent>(id);
+        auto &transform = activeScene.getComponent<Transform>(id);
 
-        // 3. Calculate Model Matrix (Rasterizer handles the math)
+        // Calculate Model Matrix (Rasterizer handles the math)
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform.position);
-        model *= glm::mat4_cast(transform.rotation);
+        model *=
+            glm::mat4_cast(transform.rotation); // TODO: either fix or how use
         model = glm::scale(model, transform.scale);
 
-        // 4. Set Uniforms specific to this entity
+        // Pass the model matrix to the shader
         shader.setMat4("u_Model", model);
 
-        // 5. OpenGL Execution
+        // Give the vertex array
         glBindVertexArray(mesh.VAO);
 
-        // We use glDrawElements because we are using Indices (EBO)
+        // Draw this with GL_TRIANGLES + the index count
         glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
     }
 

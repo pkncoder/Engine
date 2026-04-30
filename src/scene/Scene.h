@@ -74,9 +74,8 @@ class Scene {
     }
 
     // Get a list of all component ids that match a list of component types
-    // TODO: Fix name
     template <typename... ComponentTypes>
-    std::vector<EntityID> getView() const {
+    std::vector<EntityID> getMatchingEntities() const {
         Signature requiredSignature; // Wanted signature
 
         // Set the bit for each component type's id (C++ fold)
