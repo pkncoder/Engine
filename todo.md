@@ -76,7 +76,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 6. [x] Rename things
 7. [x] Add comments
 8. [x] Place the \#includes in the right spots
-9. [ ] Fix file tree
+9. [x] Fix file tree
 
 ## Finished Todos
 

@@ -40,14 +40,13 @@
 │   │   └── TextureLoader.cpp/h                     # Image decoding (stb_image)
 │   ├── scene/                                  # Scene and entity logic
 │   │   ├── Components/                             # Component Logic
-│   │   │   ├── Transform.h                             # Position, Rotation, Scale
-│   │   │   ├── MeshComponent.h                         # Reference to a Mesh resource ID
+│   │   │   ├── LightComponent.h                        # Reference to a Light ID
 │   │   │   ├── MaterialComponent.h                     # Reference to a Material ID
-│   │   │   └── LightComponent.h                        # Reference to a Light ID
+│   │   │   ├── MeshComponent.h                         # Reference to a Mesh resource ID
+│   │   │   └── TransformComponent.h                    # Position, Rotation, Scale
 │   │   ├── Campera.cpp/h                           # Camera logic
-│   │   ├── Component.h                             # POD Structs: Transform, MeshComponent, LightComponent
 │   │   ├── ECS.h                                   # Basic ID types (typedef uint32_t EntityID)
-│   │   ├── IComponent.h                            # Component template
+│   │   ├── Entity.h                                # Entity wrapper for ease of use
 │   │   ├── Scene.cpp/h                             # The "Registry" (manages the list of entities)
 │   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.)
 │   ├── services/                               # Static classes that provide services
