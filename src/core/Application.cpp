@@ -8,6 +8,7 @@
 #include "../services/Input.h"
 #include "../services/Timer.h"
 #include "Defaults.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Engine {
