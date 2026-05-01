@@ -3,6 +3,10 @@
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
 namespace Engine {
 
 // Init the rasterizer
@@ -58,7 +62,3 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 void Rasterizer::shutdown() {};
 
 } // namespace Engine
-
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>

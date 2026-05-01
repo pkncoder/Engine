@@ -1,8 +1,5 @@
 #include "BufferManager.h"
 
-#include "../resources/AssetTypes.h"
-#include "../scene/components/MeshComponent.h"
-
 namespace Engine {
 
 // Takes CPU data, pushes to VRAM, returns ECS-ready component
