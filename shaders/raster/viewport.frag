@@ -29,10 +29,13 @@ void main() {
     // Blinn-Phong uses the "Halfway Vector" between light and view
     vec3 viewDir = normalize(u_ViewPos - vWorldPos);
     vec3 halfwayDir = normalize(lightDir + viewDir); 
-    
+
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 16.0); // 32 is shininess
     vec3 specular = spec * lightColor * 0.5; // 0.5 is specular strength
 
     vec3 result = ambient + diffuse + specular;
+
+    // FragColor = vec4(vec3(vNormal), 1.0);
     FragColor = vec4(result, 1.0);
+
 }
