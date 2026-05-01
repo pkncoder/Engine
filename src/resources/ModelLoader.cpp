@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unordered_map>
 
+// TODO: Here? Can be moved by vertex definition?
 namespace std {
 template <> struct hash<Engine::Vertex> {
     size_t operator()(Engine::Vertex const &vertex) const {
