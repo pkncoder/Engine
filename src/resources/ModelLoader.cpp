@@ -1,8 +1,30 @@
 #include "ModelLoader.h"
 
 #include <tiny_obj_loader.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 #include <iostream>
+#include <unordered_map>
+
+namespace std {
+template <> struct hash<Engine::Vertex> {
+    size_t operator()(Engine::Vertex const &vertex) const {
+        // Using a simple bit-shifting combine method
+        size_t res = 0;
+
+        // GLM's gtx/hash.hpp provides these:
+        res ^= hash<glm::vec3>()(vertex.position) + 0x9e3779b9 + (res << 6) +
+               (res >> 2);
+        res ^= hash<glm::vec3>()(vertex.normal) + 0x9e3779b9 + (res << 6) +
+               (res >> 2);
+        res ^= hash<glm::vec2>()(vertex.texCoords) + 0x9e3779b9 + (res << 6) +
+               (res >> 2);
+
+        return res;
+    }
+};
+} // namespace std
 
 namespace Engine {
 
@@ -33,6 +55,9 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
     outMesh.vertices.clear();
     outMesh.indices.clear();
 
+    // Push the new vertex and indecies into the outMesh
+    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
     // Loop each shape
     for (const auto &shape : shapes) {
 
@@ -61,9 +86,15 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
                     attrib.texcoords[2 * index.texcoord_index + 1]};
             }
 
-            // Push the new vertex and indecies into the outMesh
-            outMesh.vertices.push_back(vertex);
-            outMesh.indices.push_back((uint32_t)outMesh.indices.size());
+            // CHECK IF WE ALREADY LOADED THIS EXACT VERTEX
+            if (uniqueVertices.count(vertex) == 0) {
+                uniqueVertices[vertex] =
+                    static_cast<uint32_t>(outMesh.vertices.size());
+                outMesh.vertices.push_back(vertex);
+            }
+
+            // Always push the index pointing to the unique vertex
+            outMesh.indices.push_back(uniqueVertices[vertex]);
         }
     }
 
