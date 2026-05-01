@@ -31,8 +31,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 - [ ] Extend and use Defaults.h more
 - [ ] Create a full Logger class that can then be used later in UI
-- [ ] Should AssetTypes really be called & used like that?
-- [ ] BufferManger.cpp/h inside of renderer, or resources?
 - [ ] Figure out how getting all of the "renderables" will work
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
@@ -43,6 +41,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 - [ ] Change how .mtl and .obj files are stored
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
+- [ ] Should AssetTypes really be called that?
+- [ ] BufferManger.cpp/h inside of renderer, or resources?
 
 ### Todo - Future Todos
 
