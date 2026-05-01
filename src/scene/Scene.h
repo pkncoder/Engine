@@ -21,11 +21,11 @@ class IPool {
 template <typename T> class ComponentPool : public IPool {
   public:
     // Constructor & deconstructor
-    ComponentPool() { m_Data = new T[MAX_ENTITIES]; }
-    ~ComponentPool() override { delete[] m_Data; }
+    ComponentPool() { data = new T[MAX_ENTITIES]; }
+    ~ComponentPool() override { delete[] data; }
 
     // Data
-    T *m_Data;
+    T *data;
 };
 
 // --- The Scene (Registry) ---
@@ -58,7 +58,7 @@ class Scene {
         // Set the component at that id
         auto pool =
             std::static_pointer_cast<ComponentPool<T>>(componentPools[type]);
-        pool->m_Data[entity] = component;
+        pool->data[entity] = component;
     }
 
     // Returns a referance to a component type with the entity id
@@ -72,7 +72,7 @@ class Scene {
         // Get the component at that id and return it
         auto pool =
             std::static_pointer_cast<ComponentPool<T>>(componentPools[type]);
-        return pool->m_Data[entity];
+        return pool->data[entity];
     }
 
     // Get a list of all component ids that match a list of component types

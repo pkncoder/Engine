@@ -43,6 +43,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Should AssetTypes really be called that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
+- [ ] Decide how AssetTypes.h should be layed out, and if I should split up the file.
 
 ### Todo - Future Todos
 
@@ -64,13 +65,14 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 - [ ] Add the ability for multiple render methods together (like a path traced scene + ray marched clouds)
 - [ ] Make the engine launch while loading, but show that it is "working" on it
+- [ ] Optomization [Small, Tiny unless on HUGE models] -> merge normals together if they are really similar to try and reduce the total vertex count
 
 ## Steps
 
 ### Refactor Checklist
 
-1. [ ] Fix warnings
-2. [ ] Fix public vs. private
+1. [x] Fix warnings
+2. [x] Fix public vs. private
 3. [ ] Make variables & functions const when needed
 4. [ ] Fix placement of functions
 5. [ ] Refactor step by step in code
