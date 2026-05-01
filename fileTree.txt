@@ -51,6 +51,7 @@
 │   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.)
 │   ├── services/                               # Static classes that provide services
 │   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling
+│   │   ├── Logger.cpp/h                            # Engine-wide static logger for anything required
 │   │   └── Timer.ccp/h                             # FPS and profiling services
 │   ├── ui/                                     # UI/UX Layer
 │   │   ├── Panels/                                 # Individual windows (Properties, Hierarchy)
