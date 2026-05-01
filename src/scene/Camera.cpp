@@ -84,10 +84,12 @@ void Camera::updateCameraVectors() {
     // Calculate the new Front vector
     glm::vec3 front;
 
+    // Do the math for the new front direction w/ yaw&pitch
     front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     front.y = sin(glm::radians(pitch));
     front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
+    // Update the front, right, and up vectors
     this->front = glm::normalize(front);
     right = glm::normalize(glm::cross(front, worldUp));
     up = glm::normalize(glm::cross(right, front));

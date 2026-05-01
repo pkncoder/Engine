@@ -47,42 +47,43 @@ void Application::init() {
         activeScene.registerComponent<MeshComponent>();
 
         // Load the meshes to CPU from disk
-        auto optionalBunnyMesh =
+        auto optionalMeshOne =
             AssetManager::loadMesh("assets/models/bunny.obj");
-        auto optionalDragonMesh =
+        auto optionalMeshTwo =
             AssetManager::loadMesh("assets/models/dragon.obj");
-        auto optionalCatMesh = AssetManager::loadMesh("assets/models/cat.obj");
+        auto optionalMeshThree =
+            AssetManager::loadMesh("assets/models/cat.obj");
 
         // Upload the CPU mesh data to the GPU (VRAM)
-        MeshComponent bunnyMesh =
-            BufferManager::uploadMesh(optionalBunnyMesh.value());
-        MeshComponent dragonMesh =
-            BufferManager::uploadMesh(optionalDragonMesh.value());
-        MeshComponent catMesh =
-            BufferManager::uploadMesh(optionalCatMesh.value());
+        MeshComponent meshComponentOne =
+            BufferManager::uploadMesh(optionalMeshOne.value());
+        MeshComponent meshComponentTwo =
+            BufferManager::uploadMesh(optionalMeshTwo.value());
+        MeshComponent meshComponentThree =
+            BufferManager::uploadMesh(optionalMeshThree.value());
 
         // Create entity wrappers & instiate entity ids in the ECS (Scene.h)
-        Entity bunny(activeScene.createEntity(), &activeScene);
-        Entity dragon(activeScene.createEntity(), &activeScene);
-        Entity cat(activeScene.createEntity(), &activeScene);
+        Entity entityOne(activeScene.createEntity(), &activeScene);
+        Entity entityTwo(activeScene.createEntity(), &activeScene);
+        Entity entityThree(activeScene.createEntity(), &activeScene);
 
         // Add mesh #1 components
-        bunny.addComponent<MeshComponent>(bunnyMesh);
-        bunny.addComponent<Transform>({glm::vec3(-1.0f, -0.6f, -4.0f),
-                                       glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                       glm::vec3(1.0f, 1.0f, 1.0f)});
+        entityOne.addComponent<MeshComponent>(meshComponentOne);
+        entityOne.addComponent<Transform>({glm::vec3(-1.0f, -0.6f, -4.0f),
+                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                           glm::vec3(1.0f, 1.0f, 1.0f)});
 
         // Add mesh #2 components
-        dragon.addComponent<MeshComponent>(dragonMesh);
-        dragon.addComponent<Transform>({glm::vec3(1.0f, -0.0f, -3.5f),
-                                        glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                        glm::vec3(1.0f, 1.0f, 1.0f)});
+        entityTwo.addComponent<MeshComponent>(meshComponentTwo);
+        entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.0f, -3.5f),
+                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                           glm::vec3(1.0f, 1.0f, 1.0f)});
 
         // Add mesh #3 components
-        cat.addComponent<MeshComponent>(catMesh);
-        cat.addComponent<Transform>({glm::vec3(0.0f, 0.0f, -4.0f),
-                                     glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                     glm::vec3(1.0f, 1.0f, 1.0f)});
+        entityThree.addComponent<MeshComponent>(meshComponentThree);
+        entityThree.addComponent<Transform>({glm::vec3(0.0f, 0.0f, -4.0f),
+                                             glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                             glm::vec3(1.0f, 1.0f, 1.0f)});
     }
 
     // Construct the rasterizer and init it

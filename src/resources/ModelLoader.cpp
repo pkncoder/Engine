@@ -14,7 +14,7 @@ template <> struct hash<Engine::Vertex> {
         // Using a simple bit-shifting combine method
         size_t res = 0;
 
-        // GLM's gtx/hash.hpp provides these:
+        // Seperate the data evenly through the hash
         res ^= hash<glm::vec3>()(vertex.position) + 0x9e3779b9 + (res << 6) +
                (res >> 2);
         res ^= hash<glm::vec3>()(vertex.normal) + 0x9e3779b9 + (res << 6) +
@@ -22,6 +22,7 @@ template <> struct hash<Engine::Vertex> {
         res ^= hash<glm::vec2>()(vertex.texCoords) + 0x9e3779b9 + (res << 6) +
                (res >> 2);
 
+        // Retrun the final hash
         return res;
     }
 };
@@ -44,18 +45,21 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
         if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
             std::cerr << "TinyObj Error: " << reader.Error() << std::endl;
         }
+
+        // Error
         return false;
     }
 
-    // Set the outMesh information
+    // Reset the outmesh & update the filepath name
     outMesh.name = filepath;
     outMesh.vertices.clear();
     outMesh.indices.clear();
 
-    // Push the new vertex and indecies into the outMesh
+    // Avoid sending duplicated verticies by tracking unique ones, and trashing
+    // any duplicates
     std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 
-    // Get the attributes and shapes from the reader
+    // Get the attributes and shapes from the reader of the mesh
     const auto &attrib = reader.GetAttrib();
     const auto &shapes = reader.GetShapes();
 
@@ -87,18 +91,23 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
                     attrib.texcoords[2 * index.texcoord_index + 1]};
             }
 
-            // CHECK IF WE ALREADY LOADED THIS EXACT VERTEX
-            if (uniqueVertices.count(vertex) == 0) {
-                uniqueVertices[vertex] =
-                    static_cast<uint32_t>(outMesh.vertices.size());
+            // Check if this vertex is unique
+            if (uniqueVertices.count(vertex) == 0) { // If it is
+
+                // Save the vertex in the map
+                uniqueVertices[vertex] = static_cast<uint32_t>(
+                    outMesh.vertices.size()); // Cast into a uint32
+
+                // Only push the unique vertex
                 outMesh.vertices.push_back(vertex);
             }
 
-            // Always push the index pointing to the unique vertex
+            // Push the indicie back for the unique vertex
             outMesh.indices.push_back(uniqueVertices[vertex]);
         }
     }
 
+    // TODO: temp, add to a Logger
     std::cout << "Vert List Length: " << outMesh.vertices.size() << std::endl;
 
     // No errors

@@ -26,10 +26,11 @@ class Shader {
 
   private:
     // Recursively handles #include statements
-    std::string processIncludes(const std::string &shaderPath);
+    std::string getExpandedShaderCode(const std::string &shaderPath);
 
     // Writes the final stitched code to a file for easy debugging
-    void dumpLog(const std::string &source, const std::string &type);
+    void dumpExpandedShaderCode(const std::string &source,
+                                const std::string &type);
 
     // Used to check errors on shader & program compilations
     void checkCompileErrors(uint32_t shader, std::string type) const;
