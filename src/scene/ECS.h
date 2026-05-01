@@ -24,7 +24,6 @@ inline ComponentType getUniqueComponentTypeID() {
 }
 
 // Get the component type id for a specific component type
-// TODO: is this right? how does it return the old one if it already exists
 template <typename T> inline ComponentType getComponentTypeID() {
     // Wrapper function for getting the component type id
     static const ComponentType typeID = getUniqueComponentTypeID();

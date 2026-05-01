@@ -68,6 +68,8 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
         }
     }
 
+    std::cout << "Vert List Length: " << outMesh.vertices.size() << std::endl;
+
     // No errors
     return true;
 }

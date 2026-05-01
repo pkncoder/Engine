@@ -48,7 +48,7 @@ void Application::init() {
 
         // Load the meshes to CPU from disk
         auto optionalBunnyMesh =
-            AssetManager::loadMesh("assets/models/bunny.obj");
+            AssetManager::loadMesh("assets/models/cube.obj");
         auto optionalDragonMesh =
             AssetManager::loadMesh("assets/models/dragon.obj");
         auto optionalCatMesh = AssetManager::loadMesh("assets/models/cat.obj");

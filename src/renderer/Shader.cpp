@@ -140,7 +140,6 @@ std::string Shader::processIncludes(const std::string &shaderPath) {
 
 void Shader::dumpLog(const std::string &source, const std::string &type) {
     // Creates a directory called 'debug' if it doesn't exist
-    // TODO: change name
     if (!fs::exists("debug_shaders")) {
         fs::create_directory("debug_shaders");
     }

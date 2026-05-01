@@ -37,8 +37,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         // Calculate Model Matrix (Rasterizer handles the math)
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform.position);
-        model *=
-            glm::mat4_cast(transform.rotation); // TODO: either fix or how use
+        model *= glm::mat4_cast(transform.rotation);
         model = glm::scale(model, transform.scale);
 
         // Pass the model matrix to the shader

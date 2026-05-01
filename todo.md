@@ -37,6 +37,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
 - [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
+- [ ] Create a logger service
 
 ### Todo - Not Code
 
