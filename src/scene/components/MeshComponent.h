@@ -8,9 +8,9 @@ namespace Engine {
 struct MeshComponent {
 
     // Opengl buffers / arrays
-    GLuint VAO = 0;
-    GLuint VBO = 0;
-    GLuint EBO = 0;
+    GLuint vao = 0;
+    GLuint vbo = 0;
+    GLuint ebo = 0;
 
     // Required information in glDrawElements
     unsigned int indexCount = 0;

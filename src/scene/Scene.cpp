@@ -14,11 +14,11 @@ Scene::~Scene() {}
 // Propogating a new entity id (returning a new id)
 // TODO: Return entity not entity id?
 EntityID Scene::createEntity() {
-    assert(m_LivingEntityCount < MAX_ENTITIES &&
+    assert(livingEntityCount < MAX_ENTITIES &&
            "Too many entities in existence."); // Error check
 
     // Grab the next available ID
-    EntityID id = m_LivingEntityCount++;
+    EntityID id = livingEntityCount++;
 
     // Ensure its signature is clean
     signatures[id].reset();

@@ -13,20 +13,20 @@ MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
     comp.indexCount = meshData.indices.size();
 
     // Generating arrays and buffers
-    glGenVertexArrays(1, &comp.VAO);
-    glGenBuffers(1, &comp.VBO);
-    glGenBuffers(1, &comp.EBO);
+    glGenVertexArrays(1, &comp.vao);
+    glGenBuffers(1, &comp.vbo);
+    glGenBuffers(1, &comp.ebo);
 
     // Bind the vertex array data
-    glBindVertexArray(comp.VAO);
+    glBindVertexArray(comp.vao);
 
     // Bind and set the data for the vertex buffer data
-    glBindBuffer(GL_ARRAY_BUFFER, comp.VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, comp.vbo);
     glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(Vertex),
                  meshData.vertices.data(), GL_STATIC_DRAW);
 
     // Bind the element buffer and data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, comp.EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, comp.ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  meshData.indices.size() * sizeof(uint32_t),
                  meshData.indices.data(), GL_STATIC_DRAW);

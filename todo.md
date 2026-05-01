@@ -9,6 +9,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ## TOC
 
 <!--toc:start-->
+
 - [TODO](#todo)
   - [Mission Statements](#mission-statements)
   - [Todos](#todos)
@@ -20,7 +21,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - [Steps](#steps)
     - [Refactor Checklist](#refactor-checklist)
   - [Finished Todos](#finished-todos)
-<!--toc:end-->
+  <!--toc:end-->
 
 ## Mission Statements
 
@@ -29,12 +30,10 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Todo - Code
 
 - [ ] Extend and use Defaults.h more
-- [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Figure out how shader including will work in current code
 - [ ] Create a full Logger class that can then be used later in UI
 - [ ] Should AssetTypes really be called & used like that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
-- [ ] Check for not foo_bar, and repladce with fooBar
 - [ ] Figure out how getting all of the "renderables" will work
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
@@ -42,6 +41,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Todo - Not Code
 
 - [ ] Change how .mtl and .obj files are stored
+- [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 
 ### Todo - Future Todos
 
@@ -53,7 +53,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Todo - Editor
 
 - [ ] MD - Try to get checkboxes rendering
-    bool isValid() const { return m_ID != NULL_ENTITY && m_Scene != nullptr; }
+      bool isValid() const { return m_ID != NULL_ENTITY && m_Scene != nullptr; }
 - [ ] MD - Get rid of the line length warning
 - [ ] TMUX - Make keybinds to run launch, run, and test bash scripts
 - [ ] TMUX - Change to catpuccin Moccioto or something like that
@@ -95,3 +95,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Re-fit file tree to figure out what files are just header files, and what files have header AND c++ files.
 - [x] Make sure everything that should be in the engine namespace, is
 - [x] Make github repo
+- [x] Check for not foo_bar, and repladce with fooBar

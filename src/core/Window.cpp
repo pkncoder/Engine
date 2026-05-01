@@ -6,7 +6,7 @@
 namespace Engine {
 
 // Code ran when window size is changed
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     // Change the viewport size
     glViewport(0, 0, width, height);
 }
@@ -47,7 +47,7 @@ Window::Window(int width, int height, const std::string &title)
     setSettings();
 
     // Set the size change callback
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     // Set the intial window size
     int bufferWidth, bufferHeight;

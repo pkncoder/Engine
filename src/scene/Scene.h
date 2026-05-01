@@ -38,7 +38,7 @@ class Scene {
     template <typename T> void registerComponent() {
 
         // Get the id of this component type
-        ComponentType type = GetComponentTypeID<T>();
+        ComponentType type = getComponentTypeID<T>();
         assert(componentPools.find(type) == componentPools.end() &&
                "Registering component type more than once."); // Error checking
 
@@ -50,7 +50,7 @@ class Scene {
     template <typename T> void addComponent(EntityID entity, T component) {
 
         // Get the component type's id
-        ComponentType type = GetComponentTypeID<T>();
+        ComponentType type = getComponentTypeID<T>();
 
         // Flip the bit at the component id on the signature of the entity
         signatures[entity].set(type, true);
@@ -65,7 +65,7 @@ class Scene {
     template <typename T> T &getComponent(EntityID entity) {
 
         // Get the component type id
-        ComponentType type = GetComponentTypeID<T>();
+        ComponentType type = getComponentTypeID<T>();
         assert(signatures[entity].test(type) &&
                "Entity does not have this component."); // Error checking
 
@@ -81,13 +81,13 @@ class Scene {
         Signature requiredSignature; // Wanted signature
 
         // Set the bit for each component type's id (C++ fold)
-        (requiredSignature.set(GetComponentTypeID<ComponentTypes>()), ...);
+        (requiredSignature.set(getComponentTypeID<ComponentTypes>()), ...);
 
         // List of entity idsthat will be returned
         std::vector<EntityID> matchingEntities;
 
         // Loop through every existing entity
-        for (EntityID i = 1; i < m_LivingEntityCount; ++i) {
+        for (EntityID i = 1; i < livingEntityCount; ++i) {
             // Compare signatures with a bitwise and, if they are the same, then
             // add it to the list
             if ((signatures[i] & requiredSignature) == requiredSignature) {
@@ -103,11 +103,11 @@ class Scene {
     EntityID createEntity();
 
     // Getter for the total living entity count
-    uint32_t getLivingEntityCount() const { return m_LivingEntityCount; }
+    uint32_t getLivingEntityCount() const { return livingEntityCount; }
 
   private:
     // Count of total entities, used to count and create custom id'ed entites
-    EntityID m_LivingEntityCount = 1; // Start at 1, so 0 remains NULL_ENTITY
+    EntityID livingEntityCount = 1; // Start at 1, so 0 remains NULL_ENTITY
 
     // Component and signature pool
     std::array<Signature, MAX_ENTITIES> signatures;

@@ -45,7 +45,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         shader.setMat4("u_Model", model);
 
         // Give the vertex array
-        glBindVertexArray(mesh.VAO);
+        glBindVertexArray(mesh.vao);
 
         // Draw this with GL_TRIANGLES + the index count
         glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
