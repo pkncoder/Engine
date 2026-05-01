@@ -69,6 +69,12 @@ void Window::setSettings() const {
 
     // Turn on the OpenGL depth test
     glEnable(GL_DEPTH_TEST);
+
+    // Turn on back face culling
+    glEnable(GL_CULL_FACE);
+
+    // Hardware anti-aliasing
+    glEnable(GL_MULTISAMPLE);
 }
 
 // Checking for closing the window
