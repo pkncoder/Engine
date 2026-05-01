@@ -30,13 +30,13 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Todo - Code
 
 - [ ] Extend and use Defaults.h more
-- [ ] Figure out how shader including will work in current code
 - [ ] Create a full Logger class that can then be used later in UI
 - [ ] Should AssetTypes really be called & used like that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
 - [ ] Figure out how getting all of the "renderables" will work
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
+- [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
 
 ### Todo - Not Code
 
@@ -96,3 +96,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Make sure everything that should be in the engine namespace, is
 - [x] Make github repo
 - [x] Check for not foo_bar, and repladce with fooBar
+- [x] Figure out how shader including will work in current code

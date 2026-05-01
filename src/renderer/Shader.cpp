@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+#include <filesystem>
 #include <fstream>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,41 +9,16 @@
 
 namespace Engine {
 
+namespace fs = std::filesystem;
+
 // On construction - compile source code & program
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
-    // Set spots for the code & open file streams
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
-    std::string vertexCode;
-    std::string fragmentCode;
+    std::string vertexCode = processIncludes(vertexPath);
+    std::string fragmentCode = processIncludes(fragmentPath);
 
-    // Set for file exceptions
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-    // Try-catch loop for shader file opening and parsing
-    try {
-
-        // Open the shader files
-        vShaderFile.open(vertexPath);
-        fShaderFile.open(fragmentPath);
-
-        // Create and fill file reading streams
-        std::stringstream vShaderStream, fShaderStream;
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
-
-        // Close code files
-        vShaderFile.close();
-        fShaderFile.close();
-
-        // Turn the streams to strings and set the code
-        vertexCode = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure &e) {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
-    }
+    dumpLog(vertexCode, "VERTEX");
+    dumpLog(fragmentCode, "FRAGMENT");
 
     // Get char pointers for the strings
     const char *vShaderSource = vertexCode.c_str();
@@ -118,6 +94,63 @@ void Shader::setVec3(const std::string &name, const glm::vec3 &value) const {
 void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE,
                        glm::value_ptr(mat));
+}
+
+std::string Shader::processIncludes(const std::string &shaderPath) {
+    std::ifstream file(shaderPath);
+    if (!file.is_open()) {
+        std::cerr << "ERROR::SHADER::FILE_NOT_FOUND: " << shaderPath
+                  << std::endl;
+        return "";
+    }
+
+    // Get the directory of the current file to resolve relative includes
+    fs::path currentFilePath(shaderPath);
+    fs::path directory = currentFilePath.parent_path();
+
+    std::stringstream output;
+    std::string line;
+
+    while (std::getline(file, line)) {
+        // Look for #include "filename"
+        if (line.find("#include") == 0) {
+            size_t firstQuote = line.find('\"');
+            size_t lastQuote = line.find_last_of('\"');
+
+            if (firstQuote != std::string::npos &&
+                lastQuote != std::string::npos && firstQuote != lastQuote) {
+                std::string includeFileName =
+                    line.substr(firstQuote + 1, lastQuote - firstQuote - 1);
+
+                // Construct path relative to the current shader file
+                fs::path includePath = directory / includeFileName;
+
+                // Recursively process the included file
+                output << "// BEGIN INCLUDE: " << includeFileName << "\n";
+                output << processIncludes(includePath.string());
+                output << "// END INCLUDE: " << includeFileName << "\n";
+                continue;
+            }
+        }
+        output << line << "\n";
+    }
+
+    return output.str();
+}
+
+void Shader::dumpLog(const std::string &source, const std::string &type) {
+    // Creates a directory called 'debug' if it doesn't exist
+    // TODO: change name
+    if (!fs::exists("debug_shaders")) {
+        fs::create_directory("debug_shaders");
+    }
+
+    std::string fileName = "debug_shaders/last_" + type + ".glsl";
+    std::ofstream out(fileName);
+    if (out.is_open()) {
+        out << source;
+        out.close();
+    }
 }
 
 // Custom compilation error checking script
