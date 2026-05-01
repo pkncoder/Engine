@@ -34,7 +34,6 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
     outMesh.indices.clear();
 
     // Loop each shape
-    // TODO: Is better way?
     for (const auto &shape : shapes) {
 
         // Loop each index in the shape
