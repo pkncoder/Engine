@@ -47,10 +47,6 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
         return false;
     }
 
-    // Get the attributes and shapes from the reader
-    const auto &attrib = reader.GetAttrib();
-    const auto &shapes = reader.GetShapes();
-
     // Set the outMesh information
     outMesh.name = filepath;
     outMesh.vertices.clear();
@@ -58,6 +54,10 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
 
     // Push the new vertex and indecies into the outMesh
     std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
+    // Get the attributes and shapes from the reader
+    const auto &attrib = reader.GetAttrib();
+    const auto &shapes = reader.GetShapes();
 
     // Loop each shape
     for (const auto &shape : shapes) {

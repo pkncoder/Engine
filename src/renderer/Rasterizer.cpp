@@ -20,8 +20,9 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
-    shader.setMat4("u_ViewProjection", proj * view);
 
+    // TODO: Move global uniforms to their own method
+    shader.setMat4("u_ViewProjection", proj * view);
     shader.setVec3("u_ViewPos", camera.position);
 
     // Get all of the renderables from the scene

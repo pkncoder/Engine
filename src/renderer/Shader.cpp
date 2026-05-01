@@ -29,8 +29,6 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
     // Create a vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
-
-    // Set the shader code and compile it
     glShaderSource(vertex, 1, &vShaderSource, NULL);
     glCompileShader(vertex);
 
@@ -39,8 +37,6 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
     // Create a fragment shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Set the shader code and compile it
     glShaderSource(fragment, 1, &fShaderSource, NULL);
     glCompileShader(fragment);
 
@@ -49,8 +45,6 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
     // Create an OpenGL program
     ID = glCreateProgram();
-
-    // Attatch the vert & fragment shaders
     glAttachShader(ID, vertex);
     glAttachShader(ID, fragment);
 
@@ -97,6 +91,8 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
 }
 
 std::string Shader::processIncludes(const std::string &shaderPath) {
+
+    // Get the file and check if it exists
     std::ifstream file(shaderPath);
     if (!file.is_open()) {
         std::cerr << "ERROR::SHADER::FILE_NOT_FOUND: " << shaderPath
@@ -146,6 +142,7 @@ void Shader::dumpLog(const std::string &source, const std::string &type) {
 
     std::string fileName = "debug_shaders/last_" + type + ".glsl";
     std::ofstream out(fileName);
+
     if (out.is_open()) {
         out << source;
         out.close();
