@@ -65,9 +65,9 @@ void Timer::endProfile(const std::string &name) {
 // Log time data
 void Timer::logPerformance(bool clearTerminal) {
 
-    // Clear terminal (ansi)
-    if (clearTerminal)
-        std::cout << "\x1B[2J\x1B[H";
+    // // Clear terminal (ansi)
+    // if (clearTerminal)
+    //     std::cout << "\x1B[2J\x1B[H";
 
     // Log performance
     std::cout << "\n--- ENGINE PERFORMANCE LOG ---" << std::endl;

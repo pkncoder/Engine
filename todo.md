@@ -44,6 +44,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Should AssetTypes really be called that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
 - [ ] Decide how AssetTypes.h should be layed out, and if I should split up the file.
+- [ ] Clean up CMakeLists.txt
 
 ### Todo - Future Todos
 

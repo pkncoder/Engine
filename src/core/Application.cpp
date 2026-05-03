@@ -6,6 +6,7 @@
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Input.h"
+#include "../services/Logger.h"
 #include "../services/Timer.h"
 #include "Defaults.h"
 
@@ -15,7 +16,7 @@ namespace Engine {
 
 // Constructor & Deconstructor
 Application::Application() {}
-Application::~Application() {}
+Application::~Application() { Logger::shutdown(); }
 
 // Init the window, camera, etc.
 void Application::init() {
@@ -30,6 +31,8 @@ void Application::init() {
 
     // Init the timer service
     Timer::init();
+
+    Logger::init();
 
     // Init the camera at a starting pos
     camera = Camera(Defaults::Camera::START_POSITION);
@@ -89,6 +92,10 @@ void Application::init() {
     // Construct the rasterizer and init it
     rasterizer = std::make_unique<Rasterizer>();
     rasterizer->init();
+
+    Logger::registerTag("CHECK", LogType::IN_PLACE);
+
+    Logger::info("SYSTEM", "Application init complete");
 }
 
 // Main loop
@@ -120,12 +127,19 @@ void Application::run() {
         // Do things like event polling & buffer swapping
         window->postFrame();
 
+        Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()));
+        Logger::info("PROFILE",
+                     "AFPS: " + std::to_string(Timer::getAverageFPS()));
+
+        Logger::warn("CHECK", "Check");
         // Log performance every second
         logCounter += Timer::getDeltaTime();
-        if (logCounter >= 1.0f) {
-            Timer::logPerformance();
+        if (logCounter >= 5.0f) {
+            // Timer::logPerformance();
             logCounter = 0.0;
         }
+
+        Logger::outputLogs();
     }
 }
 

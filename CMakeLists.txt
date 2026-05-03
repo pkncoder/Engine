@@ -28,6 +28,7 @@ set(SOURCES
     src/resources/AssetManager.cpp
     src/resources/ModelLoader.cpp
     src/scene/Scene.cpp
+    src/services/Logger.cpp
 )
 
 # --- Executable ---
