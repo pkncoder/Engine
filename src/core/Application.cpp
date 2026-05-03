@@ -129,6 +129,7 @@ void Application::run() {
         // Do things like event polling & buffer swapping
         window->postFrame();
 
+        // TODO: Fix
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()));
         Logger::info("PROFILE",
                      "Average FPS: " + std::to_string(Timer::getAverageFPS()));

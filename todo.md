@@ -62,6 +62,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] TMUX - Make keybinds to run launch, run, and test bash scripts
 - [ ] TMUX - Change to catpuccin Moccioto or something like that
 - [ ] CPP - gcc (compent) keybind not working on single lines (sometimes)
+- [ ] NVIM - Make it stop fuly hiding git ignored files
+- [ ] Change Leader+Arrows to Leader+Shift+Varrows
 
 ## Ideas
 
@@ -78,7 +80,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 3. [x] Make variables & functions const when needed
 4. [x] Fix placement of functions
 5. [x] Refactor step by step in code
-6. [ ] Rename things
+6. [x] Rename things
 7. [ ] Add comments
 8. [ ] Place the \#includes in the right spots
 9. [ ] Fix file tree

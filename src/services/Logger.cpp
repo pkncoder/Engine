@@ -3,61 +3,62 @@
 
 namespace Engine {
 
-std::unordered_map<std::string, TagMetadata> Logger::s_TagRegistry;
-std::vector<std::string> Logger::s_TagOrder;
-std::vector<std::string> Logger::s_InPlaceTags;
-std::unordered_map<std::string, std::deque<LogEntry>> Logger::s_HistoryMap;
-int Logger::s_LastInPlaceLineCount = 0;
-std::ofstream Logger::s_LogFile;
-std::mutex Logger::s_LogMutex;
+std::unordered_map<std::string, TagMetadata> Logger::tagRegistry;
+std::vector<std::string> Logger::stackedTagOrder;
+std::vector<std::string> Logger::inPlaceTagOrder;
+std::unordered_map<std::string, std::deque<LogEntry>> Logger::history;
+int Logger::lastLogCount = 0;
+std::ofstream Logger::logFile;
+std::mutex Logger::logMutex;
 
 void Logger::init() {
-    s_LogFile.open("engine.log", std::ios::out | std::ios::trunc);
+    logFile.open("engine.log", std::ios::out | std::ios::trunc);
 }
 
-void Logger::shutdown() { s_LogFile.close(); }
+void Logger::shutdown() { logFile.close(); }
 
 void Logger::registerTag(const std::string &tag, LogType type) {
-    s_TagRegistry[tag].type = type;
-    s_TagOrder.push_back(tag);
+    tagRegistry[tag].type = type;
+    stackedTagOrder.push_back(tag);
 
     if (type == LogType::IN_PLACE) {
-        s_InPlaceTags.push_back(tag);
+        inPlaceTagOrder.push_back(tag);
     }
 }
 void Logger::log(LogLevel level, std::string_view tag,
                  std::string_view message) {
 
-    std::lock_guard<std::mutex> lock(s_LogMutex);
+    std::lock_guard<std::mutex> lock(logMutex);
     std::string tagStr(tag);
 
-    if (s_LogFile.is_open()) {
-        s_LogFile << "[" << getLevelName(level) << "][" << tag << "] "
-                  << message << "\n";
-        s_LogFile.flush();
+    if (logFile.is_open()) {
+        logFile << "[" << getLevelName(level) << "][" << tag << "] " << message
+                << "\n";
+        logFile.flush();
     }
 
-    s_HistoryMap[tagStr].push_back({level, std::string(message)});
-    if (s_HistoryMap[tagStr].size() > 1000) // TODO: Fix that NUMBER
-        s_HistoryMap[tagStr].pop_front();
+    history[tagStr].push_back({level, std::string(message)});
+    if (history[tagStr].size() > 1000) // TODO: Fix that NUMBER
+        history[tagStr].pop_front();
 }
 
 void Logger::outputLogs() {
-    std::lock_guard<std::mutex> lock(s_LogMutex);
+    std::lock_guard<std::mutex> lock(logMutex);
 
     // Wipe the old lines
-    for (int i = 0; i < s_LastInPlaceLineCount; ++i)
+    for (int i = 0; i < lastLogCount; ++i)
         std::cout << "\033[F\033[K";
 
     // TODO: Stacked (temp comment)
-    for (const auto &tag : s_TagOrder) {
-        auto &metadata = s_TagRegistry[tag];
+    for (const auto &tag : stackedTagOrder) {
+        auto &metadata = tagRegistry[tag];
 
         if (metadata.type == LogType::STACKED) {
-            auto &history = s_HistoryMap[tag];
+            auto &tagHistory = history[tag];
 
-            while (metadata.lastPrintedIndex < history.size()) {
-                auto &entry = history[metadata.lastPrintedIndex];
+            // TODO: Better way?
+            while (metadata.lastPrintedIndex < tagHistory.size()) {
+                auto &entry = tagHistory[metadata.lastPrintedIndex];
 
                 std::cout << getLevelColor(entry.level) << "["
                           << getLevelName(entry.level) << "][" << tag << "] "
@@ -70,26 +71,26 @@ void Logger::outputLogs() {
 
     int currentDashboardLines = 0;
 
-    if (!s_InPlaceTags.empty()) {
+    if (!inPlaceTagOrder.empty()) {
         std::cout
             << "\033[90m------------------------------------------\033[0m\n";
         currentDashboardLines++;
     }
 
-    for (const auto &tag : s_InPlaceTags) {
-        auto &history = s_HistoryMap[tag];
+    for (const auto &tag : inPlaceTagOrder) {
+        auto &tagHistory = history[tag];
 
-        for (const auto &entry : history) {
+        for (const auto &entry : tagHistory) {
             std::cout << getLevelColor(entry.level) << "["
                       << getLevelName(entry.level) << "][" << tag << "] "
                       << entry.message << "\033[0m\n";
             currentDashboardLines++;
         }
 
-        history.clear();
+        tagHistory.clear();
     }
 
-    s_LastInPlaceLineCount = currentDashboardLines;
+    lastLogCount = currentDashboardLines;
     std::cout << std::flush;
 }
 

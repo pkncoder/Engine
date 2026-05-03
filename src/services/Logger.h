@@ -20,7 +20,7 @@ struct LogEntry {
 
 struct TagMetadata {
     LogType type = LogType::STACKED;
-    size_t lastPrintedIndex = 0; // Only used for STACKED  TODO: Why need
+    size_t lastPrintedIndex = 0; // Only used for STACKED
 };
 
 class Logger {
@@ -44,16 +44,16 @@ class Logger {
     static void log(LogLevel level, std::string_view tag,
                     std::string_view message);
 
-    static std::unordered_map<std::string, TagMetadata> s_TagRegistry;
+    static std::unordered_map<std::string, TagMetadata> tagRegistry;
 
-    static std::vector<std::string> s_TagOrder;
-    static std::vector<std::string> s_InPlaceTags;
+    static std::vector<std::string> stackedTagOrder;
+    static std::vector<std::string> inPlaceTagOrder;
 
-    static std::unordered_map<std::string, std::deque<LogEntry>> s_HistoryMap;
+    static std::unordered_map<std::string, std::deque<LogEntry>> history;
 
-    static int s_LastInPlaceLineCount;
-    static std::mutex s_LogMutex;
-    static std::ofstream s_LogFile;
+    static int lastLogCount;
+    static std::mutex logMutex;
+    static std::ofstream logFile;
 };
 
 } // namespace Engine
