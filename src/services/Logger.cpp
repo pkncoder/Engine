@@ -81,7 +81,7 @@ void Logger::outputLogs() {
 
     // Wipe the old dashboard lines AND reset lastDashboardLogCount back to 0 by
     // making "i" a referance
-    for (int *i = &lastDashboardLogCount; *i > 0; --i)
+    for (int *i = &lastDashboardLogCount; *i > 0; --(*i))
         std::cout << "\033[F\033[K"; // \033[F up line & \033[K wipe line
 
     // Loop the order for each stacked tag
@@ -93,6 +93,7 @@ void Logger::outputLogs() {
         // Get the history of that tag
         auto &tagHistory = history[tag];
 
+        // TODO: temp
         while (metadata.lastPrintedIndex < tagHistory.size()) {
 
             // Get the entry data
@@ -131,8 +132,6 @@ void Logger::outputLogs() {
         // Clear the tagHistory for next round
         tagHistory.clear();
     }
-
-    // lastDashboardLogCount = currentDashboardLines;
 
     // Flush the cout
     std::cout << std::flush;
