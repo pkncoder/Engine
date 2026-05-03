@@ -28,37 +28,32 @@ class Logger {
     static void init();
     static void shutdown();
 
-    // Call this in Application::init() to set behavior for specific tags
     static void registerTag(const std::string &tag, LogType type);
 
-    static void trace(std::string_view tag, std::string_view message);
+    static void outputLogs();
+
     static void info(std::string_view tag, std::string_view message);
     static void warn(std::string_view tag, std::string_view message);
     static void error(std::string_view tag, std::string_view message);
     static void fatal(std::string_view tag, std::string_view message);
 
-    // THE NEW HEARTBEAT: Call this once per frame in Application::run()
-    static void outputLogs();
-
-  private:
-    static void log(LogLevel level, std::string_view tag,
-                    std::string_view message);
     static const char *getLevelColor(LogLevel level);
     static const char *getLevelName(LogLevel level);
 
   private:
-    static std::unordered_map<std::string, std::deque<LogEntry>> s_HistoryMap;
+    static void log(LogLevel level, std::string_view tag,
+                    std::string_view message);
+
     static std::unordered_map<std::string, TagMetadata> s_TagRegistry;
 
-    // Add to Logger class private members
-    static std::vector<std::string>
-        s_TagOrder; // Tracks the order tags were registered
-    static std::vector<std::string>
-        s_InPlaceTags; // Specific order for the dashboard
+    static std::vector<std::string> s_TagOrder;
+    static std::vector<std::string> s_InPlaceTags;
 
-    static std::ofstream s_LogFile;
-    static std::mutex s_LogMutex;
+    static std::unordered_map<std::string, std::deque<LogEntry>> s_HistoryMap;
+
     static int s_LastInPlaceLineCount;
+    static std::mutex s_LogMutex;
+    static std::ofstream s_LogFile;
 };
 
 } // namespace Engine

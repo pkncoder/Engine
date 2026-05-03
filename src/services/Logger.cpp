@@ -3,13 +3,13 @@
 
 namespace Engine {
 
-std::unordered_map<std::string, std::deque<LogEntry>> Logger::s_HistoryMap;
 std::unordered_map<std::string, TagMetadata> Logger::s_TagRegistry;
 std::vector<std::string> Logger::s_TagOrder;
 std::vector<std::string> Logger::s_InPlaceTags;
+std::unordered_map<std::string, std::deque<LogEntry>> Logger::s_HistoryMap;
+int Logger::s_LastInPlaceLineCount = 0;
 std::ofstream Logger::s_LogFile;
 std::mutex Logger::s_LogMutex;
-int Logger::s_LastInPlaceLineCount = 0;
 
 void Logger::init() {
     s_LogFile.open("engine.log", std::ios::out | std::ios::trunc);
@@ -101,9 +101,6 @@ void Logger::outputLogs() {
     std::cout << std::flush;
 }
 
-void Logger::trace(std::string_view tag, std::string_view message) {
-    log(LogLevel::TRACE, tag, message);
-}
 void Logger::info(std::string_view tag, std::string_view message) {
     log(LogLevel::INFO, tag, message);
 }
@@ -119,8 +116,6 @@ void Logger::fatal(std::string_view tag, std::string_view message) {
 
 const char *Logger::getLevelName(LogLevel level) {
     switch (level) {
-    case LogLevel::TRACE:
-        return "TRACE";
     case LogLevel::INFO:
         return "INFO";
     case LogLevel::WARNING:
@@ -137,8 +132,6 @@ const char *Logger::getLevelName(LogLevel level) {
 const char *Logger::getLevelColor(LogLevel level) {
     // ANSI escape codes for terminal coloring
     switch (level) {
-    case LogLevel::TRACE:
-        return "\033[90m"; // Dark Gray
     case LogLevel::INFO:
         return "\033[32m"; // Green
     case LogLevel::WARNING:
