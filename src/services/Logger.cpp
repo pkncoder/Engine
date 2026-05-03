@@ -5,7 +5,6 @@
 namespace Engine {
 
 // Init the static attributes
-// TODO: See actually why
 std::unordered_map<std::string, TagMetadata> Logger::tagRegistry;
 std::vector<std::string> Logger::stackedTagOrder;
 std::vector<std::string> Logger::inPlaceTagOrder;
@@ -13,6 +12,7 @@ std::unordered_map<std::string, std::deque<LogEntry>> Logger::history;
 int Logger::lastDashboardLogCount = 0;
 std::ofstream Logger::logFile;
 std::mutex Logger::logMutex;
+int Logger::MAX_LOGGER_HISTORY_PER_TAG = 100;
 
 // Init instructions
 void Logger::init() {
@@ -36,6 +36,20 @@ void Logger::registerTag(const std::string &tag, LogType type) {
     }
 }
 
+// Log wrappers
+void Logger::info(std::string_view tag, std::string_view message) {
+    log(LogLevel::INFO, tag, message);
+}
+void Logger::warn(std::string_view tag, std::string_view message) {
+    log(LogLevel::WARNING, tag, message);
+}
+void Logger::error(std::string_view tag, std::string_view message) {
+    log(LogLevel::ERR, tag, message);
+}
+void Logger::fatal(std::string_view tag, std::string_view message) {
+    log(LogLevel::FATAL, tag, message);
+}
+
 // Save a new log into the tag history
 void Logger::log(LogLevel level, std::string_view tag,
                  std::string_view message) {
@@ -55,22 +69,8 @@ void Logger::log(LogLevel level, std::string_view tag,
     history[tagStr].push_back({level, std::string(message)});
 
     // If the history for that tag is too long, pop off the front
-    if (history[tagStr].size() > 1000) // TODO: Fix that NUMBER
+    if (history[tagStr].size() > MAX_LOGGER_HISTORY_PER_TAG)
         history[tagStr].pop_front();
-}
-
-// Log wrappers
-void Logger::info(std::string_view tag, std::string_view message) {
-    log(LogLevel::INFO, tag, message);
-}
-void Logger::warn(std::string_view tag, std::string_view message) {
-    log(LogLevel::WARNING, tag, message);
-}
-void Logger::error(std::string_view tag, std::string_view message) {
-    log(LogLevel::ERR, tag, message);
-}
-void Logger::fatal(std::string_view tag, std::string_view message) {
-    log(LogLevel::FATAL, tag, message);
 }
 
 // Print out the logs (ansi)
@@ -79,9 +79,10 @@ void Logger::outputLogs() {
     // Lock the thread to avoid multi-threaded logging problems
     std::lock_guard<std::mutex> lock(logMutex);
 
-    // Wipe the old dashboard lines
-    for (int i = 0; i < lastDashboardLogCount; ++i)
-        std::cout << "\033[F\033[K";
+    // Wipe the old dashboard lines AND reset lastDashboardLogCount back to 0 by
+    // making "i" a referance
+    for (int *i = &lastDashboardLogCount; *i > 0; --i)
+        std::cout << "\033[F\033[K"; // \033[F up line & \033[K wipe line
 
     // Loop the order for each stacked tag
     for (const auto &tag : stackedTagOrder) {
@@ -89,38 +90,28 @@ void Logger::outputLogs() {
         // Get that tag's metadata
         auto &metadata = tagRegistry[tag];
 
-        // Make sure it's stacked
-        if (metadata.type == LogType::STACKED) {
-            // Get the history of that tag
-            auto &tagHistory = history[tag];
+        // Get the history of that tag
+        auto &tagHistory = history[tag];
 
-            // TODO: Better way?
-            while (metadata.lastPrintedIndex < tagHistory.size()) {
+        while (metadata.lastPrintedIndex < tagHistory.size()) {
 
-                // Get the entry data
-                auto &entry = tagHistory[metadata.lastPrintedIndex];
+            // Get the entry data
+            auto &entry = tagHistory[metadata.lastPrintedIndex];
 
-                // Print out the new log w/ ansi escape for the colors
-                std::cout << getLevelColor(entry.level) << "["
-                          << getLevelName(entry.level) << "][" << tag << "] "
-                          << entry.message << "\033[0m\n";
+            // Print out the new log w/ ansi escape for the colors
+            std::cout << getLevelColor(entry.level) << "["
+                      << getLevelName(entry.level) << "][" << tag << "] "
+                      << entry.message << "\033[0m\n";
 
-                // TODO: Better way?
-                metadata.lastPrintedIndex++;
-            }
+            metadata.lastPrintedIndex++;
         }
     }
-
-    // Save a variable to count the dashboard lines
-    // TODO: Move to an approach not to create a variable, and to use for-loops
-    // to set lastDashboardLogCount to 0, then increase it in the loop
-    int currentDashboardLines = 0;
 
     // Print the dashboard seporater only if there is a dashboard
     if (!inPlaceTagOrder.empty()) {
         std::cout
             << "\033[90m-------------------------------------------\033[0m\n";
-        currentDashboardLines++;
+        lastDashboardLogCount++;
     }
 
     // Loop each inPlace tag
@@ -134,14 +125,14 @@ void Logger::outputLogs() {
             std::cout << getLevelColor(entry.level) << "["
                       << getLevelName(entry.level) << "] [" << tag << "] "
                       << entry.message << "\033[0m\n";
-            currentDashboardLines++;
+            lastDashboardLogCount++;
         }
 
         // Clear the tagHistory for next round
         tagHistory.clear();
     }
 
-    lastDashboardLogCount = currentDashboardLines;
+    // lastDashboardLogCount = currentDashboardLines;
 
     // Flush the cout
     std::cout << std::flush;
@@ -150,7 +141,7 @@ void Logger::outputLogs() {
 // Switch statement to get a string of the level name
 const char *Logger::getLevelName(LogLevel level) {
     switch (level) {
-    case LogLevel::INFO:
+    case LogLevel::INFO: // NOTODO
         return "INFO";
     case LogLevel::WARNING:
         return "WARN";

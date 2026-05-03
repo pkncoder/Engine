@@ -93,6 +93,8 @@ void Application::init() {
     rasterizer = std::make_unique<Rasterizer>();
     rasterizer->init();
 
+    // Register logger tags
+    // TODO: Move
     Logger::registerTag("SYSTEM", LogType::STACKED);
     Logger::registerTag("PROFILE", LogType::IN_PLACE);
 
@@ -102,8 +104,7 @@ void Application::init() {
 // Main loop
 void Application::run() {
 
-    // Save a value to keep track of when to log
-    double logCounter = 0.0f;
+    double lastLog = 0;
 
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
@@ -133,13 +134,6 @@ void Application::run() {
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()));
         Logger::info("PROFILE",
                      "Average FPS: " + std::to_string(Timer::getAverageFPS()));
-
-        // Log performance every second
-        logCounter += Timer::getDeltaTime();
-        if (logCounter >= 5.0f) {
-            // Timer::logPerformance();
-            logCounter = 0.0;
-        }
 
         Logger::outputLogs();
     }

@@ -61,10 +61,14 @@ class Logger {
     static std::vector<std::string> inPlaceTagOrder;
 
     // History of all log data
+    // TODO: Change from history to a list off all not-yet-printed logs
     static std::unordered_map<std::string, std::deque<LogEntry>> history;
 
     // Count of the length of the dashboard so it can be overwritten
     static int lastDashboardLogCount;
+
+    // Cap of how many logs are stored in the logger history before poped
+    static int MAX_LOGGER_HISTORY_PER_TAG; // TODO: temp
 
     // Log file & thread locker
     static std::mutex logMutex;
