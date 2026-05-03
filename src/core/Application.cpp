@@ -93,7 +93,8 @@ void Application::init() {
     rasterizer = std::make_unique<Rasterizer>();
     rasterizer->init();
 
-    Logger::registerTag("CHECK", LogType::IN_PLACE);
+    Logger::registerTag("SYSTEM", LogType::STACKED);
+    Logger::registerTag("PROFILE", LogType::IN_PLACE);
 
     Logger::info("SYSTEM", "Application init complete");
 }
@@ -107,6 +108,7 @@ void Application::run() {
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
 
+        // TODO: Integrate profilers into the logger
         SCOPED_PROFILE("Run Loop"); // Setup timer for run loop
 
         // Update the timer service and run the log function
@@ -129,9 +131,8 @@ void Application::run() {
 
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()));
         Logger::info("PROFILE",
-                     "AFPS: " + std::to_string(Timer::getAverageFPS()));
+                     "Average FPS: " + std::to_string(Timer::getAverageFPS()));
 
-        Logger::warn("CHECK", "Check");
         // Log performance every second
         logCounter += Timer::getDeltaTime();
         if (logCounter >= 5.0f) {

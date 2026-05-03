@@ -20,7 +20,7 @@ struct LogEntry {
 
 struct TagMetadata {
     LogType type = LogType::STACKED;
-    size_t lastPrintedIndex = 0; // Only used for STACKED
+    size_t lastPrintedIndex = 0; // Only used for STACKED  TODO: Why need
 };
 
 class Logger {
