@@ -30,12 +30,11 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Todo - Code
 
 - [ ] Extend and use Defaults.h more
-- [ ] Create a full Logger class that can then be used later in UI
 - [ ] Figure out how getting all of the "renderables" will work
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
 - [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
-- [ ] Create a logger service
+- [ ] Move to logger instead of cout
 
 ### Todo - Not Code
 
@@ -75,15 +74,15 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ### Refactor Checklist
 
-1. [x] Fix warnings
-2. [x] Fix public vs. private
-3. [x] Make variables & functions const when needed
-4. [x] Fix placement of functions
-5. [x] Refactor step by step in code
-6. [x] Rename things
-7. [x] Add comments
-8. [x] Place the \#includes in the right spots
-9. [x] Fix file tree
+1. [ ] Fix warnings
+2. [ ] Fix public vs. private
+3. [ ] Make variables & functions const when needed
+4. [ ] Fix placement of functions
+5. [ ] Refactor step by step in code
+6. [ ] Rename things
+7. [ ] Add comments
+8. [ ] Place the \#includes in the right spots
+9. [ ] Fix file tree
 
 ## Finished Todos
 
@@ -104,3 +103,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Make github repo
 - [x] Check for not foo_bar, and repladce with fooBar
 - [x] Figure out how shader including will work in current code
+- [x] Create a full Logger class that can then be used later in UI
