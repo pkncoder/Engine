@@ -80,7 +80,7 @@ void Logger::outputLogs() {
     std::lock_guard<std::mutex> lock(logMutex);
 
     // Wipe the old dashboard lines AND reset lastDashboardLogCount back to 0 by
-    // making "i" a referance
+    // making "i" a pointer
     for (int *i = &lastDashboardLogCount; *i > 0; --(*i))
         std::cout << "\033[F\033[K"; // \033[F up line & \033[K wipe line
 
@@ -114,6 +114,8 @@ void Logger::outputLogs() {
             << "\033[90m-------------------------------------------\033[0m\n";
         lastDashboardLogCount++;
     }
+
+    lastDashboardLogCount = 0;
 
     // Loop each inPlace tag
     for (const auto &tag : inPlaceTagOrder) {
