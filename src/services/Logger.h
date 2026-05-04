@@ -6,7 +6,6 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <vector>
 
 namespace Engine {
 
@@ -60,7 +59,7 @@ class Logger {
     static int MAX_IN_PLACE_PENDING;
 
     // Log file & thread locker
-    static std::mutex logMutex;
+    static std::mutex logMutex; // TODO: Overkill?
     static std::ofstream logFile;
 };
 

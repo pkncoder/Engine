@@ -21,24 +21,6 @@ void Logger::init() {
 // Shutdown instructions for the logger
 void Logger::shutdown() { logFile.close(); }
 
-// Log wrappers
-void Logger::info(std::string_view tag, std::string_view message,
-                  LogType type) {
-    log(LogLevel::INFO, tag, message, type);
-}
-void Logger::warn(std::string_view tag, std::string_view message,
-                  LogType type) {
-    log(LogLevel::WARNING, tag, message, type);
-}
-void Logger::error(std::string_view tag, std::string_view message,
-                   LogType type) {
-    log(LogLevel::ERR, tag, message, type);
-}
-void Logger::fatal(std::string_view tag, std::string_view message,
-                   LogType type) {
-    log(LogLevel::FATAL, tag, message, type);
-}
-
 // Add a new log to the pending logs list
 // TODO: Why std::string_view
 void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
@@ -67,6 +49,24 @@ void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
         pendingLogsByType[type].pop_back();
 }
 
+// Log wrappers
+void Logger::info(std::string_view tag, std::string_view message,
+                  LogType type) {
+    log(LogLevel::INFO, tag, message, type);
+}
+void Logger::warn(std::string_view tag, std::string_view message,
+                  LogType type) {
+    log(LogLevel::WARNING, tag, message, type);
+}
+void Logger::error(std::string_view tag, std::string_view message,
+                   LogType type) {
+    log(LogLevel::ERR, tag, message, type);
+}
+void Logger::fatal(std::string_view tag, std::string_view message,
+                   LogType type) {
+    log(LogLevel::FATAL, tag, message, type);
+}
+
 // Print out the logs (ansi)
 void Logger::outputLogs() {
 
@@ -79,33 +79,39 @@ void Logger::outputLogs() {
         lastDashboardLogCount--;
     }
 
-    // Loop the order for each stacked tag
-    for (const auto &entry : pendingLogsByType[LogType::STACKED]) {
-        // Print out the new log w/ ansi escape for the colors
-        std::cout << getLevelColor(entry.level) << "["
-                  << getLevelName(entry.level) << "][" << entry.tag << "] "
-                  << entry.message << "\033[0m\n";
+    // Loop each log for the stacked logs
+    for (const auto &log : pendingLogsByType[LogType::STACKED]) {
+
+        // Print out the log w/ ansi data (colors)
+        std::cout << getLevelColor(log.level) << "[" << getLevelName(log.level)
+                  << "][" << log.tag << "] " << log.message << "\033[0m\n";
     }
 
+    // Wipe the pending logs for the stacked logs
     pendingLogsByType[LogType::STACKED].clear();
 
     // Print the dashboard seporater only if there is a dashboard
     if (!pendingLogsByType[LogType::IN_PLACE].empty()) {
         std::cout
             << "\033[90m-------------------------------------------\033[0m\n";
+
+        // Count this line for this itteration
         lastDashboardLogCount++;
     }
 
-    // Loop each inPlace tag
+    // Loop each log for the in_place/dashboard logs
     for (const auto &entry : pendingLogsByType[LogType::IN_PLACE]) {
+
+        // Print out the log w/ ansi data (colors)
         std::cout << getLevelColor(entry.level) << "["
                   << getLevelName(entry.level) << "] [" << entry.tag << "] "
                   << entry.message << "\033[0m\n";
-        lastDashboardLogCount++;
 
-        // Clear the tagHistory for next round
+        // Count this line for next itteration
+        lastDashboardLogCount++;
     }
 
+    // Clear the pending logs for the in place logs
     pendingLogsByType[LogType::IN_PLACE].clear();
 
     // Flush the cout
