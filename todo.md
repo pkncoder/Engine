@@ -35,6 +35,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - Force them to have these, exclude lights?
 - [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
 - [ ] Move to logger instead of cout
+- [ ] Add to timer a "periodic" way to run code
+  - IDEA: Use % and a total deltaTime / time to run whenever
 
 ### Todo - Not Code
 

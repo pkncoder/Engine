@@ -22,7 +22,6 @@ void Logger::init() {
 void Logger::shutdown() { logFile.close(); }
 
 // Add a new log to the pending logs list
-// TODO: Why std::string_view
 void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
                  LogType type) {
 
@@ -84,7 +83,7 @@ void Logger::outputLogs() {
 
         // Print out the log w/ ansi data (colors)
         std::cout << getLevelColor(log.level) << "[" << getLevelName(log.level)
-                  << "][" << log.tag << "] " << log.message << "\033[0m\n";
+                  << "] [" << log.tag << "] " << log.message << "\033[0m\n";
     }
 
     // Wipe the pending logs for the stacked logs

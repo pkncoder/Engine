@@ -59,7 +59,7 @@ class Logger {
     static int MAX_IN_PLACE_PENDING;
 
     // Log file & thread locker
-    static std::mutex logMutex; // TODO: Overkill?
+    static std::mutex logMutex;
     static std::ofstream logFile;
 };
 

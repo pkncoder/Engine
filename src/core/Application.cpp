@@ -99,8 +99,6 @@ void Application::init() {
 // Main loop
 void Application::run() {
 
-    double lastLog = 0;
-
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
 
