@@ -19,16 +19,16 @@ set(SOURCES
     src/main.cpp
     src/core/Application.cpp
     src/core/Window.cpp
-    src/services/Input.cpp
-    src/services/Timer.cpp
-    src/scene/Camera.cpp
-    src/renderer/Rasterizer.cpp
     src/renderer/BufferManager.cpp
+    src/renderer/Rasterizer.cpp
     src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
     src/resources/ModelLoader.cpp
+    src/scene/Camera.cpp
     src/scene/Scene.cpp
+    src/services/Input.cpp
     src/services/Logger.cpp
+    src/services/Timer.cpp
 )
 
 # --- Executable ---

@@ -106,7 +106,7 @@ void Application::run() {
     while (!window->shouldClose()) {
 
         // TODO: Integrate profilers into the logger
-        SCOPED_PROFILE("Run Loop"); // Setup timer for run loop
+        START_PROFILE("Run Loop"); // Setup timer for run loop
 
         // Update the timer service and run the log function
         Timer::update();
@@ -132,6 +132,8 @@ void Application::run() {
         Logger::info("PROFILE",
                      "Average FPS: " + std::to_string(Timer::getAverageFPS()),
                      LogType::IN_PLACE);
+
+        END_PROFILE("Run Loop"); // End timer for run loop
 
         Logger::outputLogs();
     }

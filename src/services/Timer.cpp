@@ -3,8 +3,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include <iomanip>
 #include <iostream>
+#include <string>
 
 namespace Engine {
 
@@ -18,7 +18,7 @@ double Timer::totalTime = 0.0f;
 uint32_t Timer::totalFrames = 0;
 
 // FPS
-float Timer::fps = 0.0f;
+float Timer::averageFPS = 0.0f;
 float Timer::ms = 0.0f;
 float Timer::lastLogTime = 0.0f;
 
@@ -47,7 +47,7 @@ void Timer::update() {
 
     // Calculate rolling average stats
     if (currentTime - lastLogTime >= 1.0) {
-        fps = (float)totalFrames / (float)totalTime; // Simple average
+        averageFPS = (float)totalFrames / (float)totalTime; // Simple average
         ms = deltaTime * 1000.0f;
     }
 }
@@ -65,29 +65,11 @@ void Timer::endProfile(const std::string &name) {
         profileResults[name] = duration;
         activeProfiles.erase(it);
     }
-}
 
-// Log time data
-void Timer::logPerformance(bool clearTerminal) {
-
-    // // Clear terminal (ansi)
-    // if (clearTerminal)
-    //     std::cout << "\x1B[2J\x1B[H";
-
-    // Log performance
-    std::cout << "\n--- ENGINE PERFORMANCE LOG ---" << std::endl;
-    std::cout << "FPS: " << (int)(1.0f / deltaTime) << " | Avg: " << (int)fps
-              << std::endl;
-    std::cout << "Total Frames: " << totalFrames
-              << " | Total Time: " << (int)totalTime << "s" << std::endl;
-
-    // Log scoped profiles
-    for (auto const &[name, duration] : profileResults) {
-        std::cout << "  " << name << ": " << std::fixed << std::setprecision(4)
-                  << duration << "ms" << std::endl;
-    }
-
-    lastLogTime = (float)glfwGetTime();
+    Logger::info("PROFILE",
+                 name + ": " +
+                     std::to_string(profileResults[name]).substr(0, 6) + "ms",
+                 LogType::IN_PLACE);
 }
 
 } // namespace Engine

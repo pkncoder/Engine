@@ -36,7 +36,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
 - [ ] Add to timer a "periodic" way to run code
   - IDEA: Use % and a total deltaTime / time to run whenever
-- [ ] Integrate timer's profiler with the logger
 
 ### Todo - Not Code
 
@@ -45,7 +44,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Should AssetTypes really be called that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
 - [ ] Decide how AssetTypes.h should be layed out, and if I should split up the file.
-- [ ] Clean up CMakeLists.txt
 
 ### Todo - Future Todos
 
@@ -109,3 +107,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Create a full Logger class that can then be used later in UI
 - [x] Move to logger instead of cout
 - [x] Create a setting in Logger that will output a log every time you send one instead of send it to pending
+- [x] Integrate timer's profiler with the logger

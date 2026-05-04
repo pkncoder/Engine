@@ -24,8 +24,8 @@ class Timer {
     static float getDeltaTime() { return deltaTime; }
     static double getTotalTime() { return totalTime; }
     static uint32_t getTotalFrames() { return totalFrames; }
-    static float getFPS() { return (int)(1.0f / deltaTime); } // TODO: Why flip
-    static float getAverageFPS() { return fps; }              // TODO: Why flip
+    static float getFPS() { return (int)(1.0f / deltaTime); }
+    static float getAverageFPS() { return averageFPS; }
 
     // Profiling logic
     static void beginProfile(const std::string &name);
@@ -44,7 +44,7 @@ class Timer {
     static uint32_t totalFrames;
 
     // FPS/Logging state
-    static float fps;
+    static float averageFPS;
     static float ms;
     static float lastLogTime;
 
