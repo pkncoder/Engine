@@ -1,11 +1,12 @@
 #include "Shader.h"
 
+#include "../services/Logger.h"
+
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 namespace Engine {
@@ -100,8 +101,7 @@ std::string Shader::getExpandedShaderCode(const std::string &shaderPath) {
     // Get the file and check if it exists
     std::ifstream file(shaderPath);
     if (!file.is_open()) {
-        std::cerr << "ERROR::SHADER::FILE_NOT_FOUND: " << shaderPath
-                  << std::endl;
+        Logger::fatal("SYSTEM", "ERROR::SHADER::FILE_NOT_FOUND: " + shaderPath);
         return "";
     }
 
@@ -180,12 +180,13 @@ void Shader::checkCompileErrors(uint32_t shader, std::string type) const {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            std::cout
-                << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
-                << infoLog
-                << "\n -- --------------------------------------------------- "
-                   "-- "
-                << std::endl;
+            Logger::fatal(
+                "SYSTEM",
+                "ERROR::SHADER_COMPILATION_ERROR of type: " + type + "\n" +
+                    infoLog +
+                    "\n -- "
+                    "--------------------------------------------------- "
+                    "-- ");
         }
     }
 
@@ -194,12 +195,13 @@ void Shader::checkCompileErrors(uint32_t shader, std::string type) const {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            std::cout
-                << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
-                << infoLog
-                << "\n -- --------------------------------------------------- "
-                   "-- "
-                << std::endl;
+            Logger::fatal(
+                "SYSTEM",
+                "ERROR::PROGRAM_LINKING_ERROR of type: " + type + "\n" +
+                    infoLog +
+                    "\n -- "
+                    "--------------------------------------------------- "
+                    "-- ");
         }
     }
 }

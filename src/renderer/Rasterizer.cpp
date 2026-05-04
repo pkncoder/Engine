@@ -2,6 +2,7 @@
 
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
+#include "../services/Logger.h"
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
@@ -15,6 +16,8 @@ void Rasterizer::init() {
     // Compile the shader code
     shader =
         Shader("shaders/raster/viewport.vert", "shaders/raster/viewport.frag");
+
+    Logger::info("SYSTEM", "Rasterizer initialized.");
 }
 
 // Render a frame

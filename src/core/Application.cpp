@@ -21,6 +21,10 @@ Application::~Application() { Logger::shutdown(); }
 // Init the window, camera, etc.
 void Application::init() {
 
+    // Initialize the logger and set no_pending_logs
+    Logger::init();
+    Logger::setNoPendingLogs(true);
+
     // Create the window
     window = std::make_unique<Window>(Defaults::Window::START_WIDTH,
                                       Defaults::Window::START_HEIGHT,
@@ -31,8 +35,6 @@ void Application::init() {
 
     // Init the timer service
     Timer::init();
-
-    Logger::init();
 
     // Init the camera at a starting pos
     camera = Camera(Defaults::Camera::START_POSITION);
@@ -51,7 +53,7 @@ void Application::init() {
 
         // Load the meshes to CPU from disk
         auto optionalMeshOne =
-            AssetManager::loadMesh("assets/models/bunny.obj");
+            AssetManager::loadMesh("assets/models/breakfast_room.obj");
         auto optionalMeshTwo =
             AssetManager::loadMesh("assets/models/dragon.obj");
         auto optionalMeshThree =
@@ -94,6 +96,7 @@ void Application::init() {
     rasterizer->init();
 
     Logger::info("SYSTEM", "Application init complete");
+    Logger::setNoPendingLogs(false);
 }
 
 // Main loop

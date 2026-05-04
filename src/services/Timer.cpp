@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include "Logger.h"
 
 #include <GLFW/glfw3.h>
 
@@ -26,7 +27,11 @@ std::map<std::string, double> Timer::profileResults;
 std::unordered_map<std::string, double> Timer::activeProfiles;
 
 // Initalize the starting log values
-void Timer::init() { lastFrameTime = glfwGetTime(); }
+void Timer::init() {
+    lastFrameTime = glfwGetTime();
+
+    Logger::info("SYSTEM", "Timer service initialized.");
+}
 
 // Update the tracked times
 void Timer::update() {

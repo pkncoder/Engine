@@ -1,10 +1,12 @@
 #include "ModelLoader.h"
 
+#include "../services/Logger.h"
+
+#include <string>
 #include <tiny_obj_loader.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
-#include <iostream>
 #include <unordered_map>
 
 // TODO: Here? Can be moved by vertex definition?
@@ -43,7 +45,7 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
     // Try to read from the file, and parse information if error
     if (!reader.ParseFromFile(filepath, readerConfig)) { // Error
         if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
-            std::cerr << "TinyObj Error: " << reader.Error() << std::endl;
+            Logger::error("SYSTEM", "TinyObj Error: " + reader.Error());
         }
 
         // Error
@@ -62,6 +64,11 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
     // Get the attributes and shapes from the reader of the mesh
     const auto &attrib = reader.GetAttrib();
     const auto &shapes = reader.GetShapes();
+
+    Logger::line();
+    Logger::info("SYSTEM", "Shapes: " + std::to_string(shapes.size()));
+    Logger::info("SYSTEM",
+                 "Raw Verts: " + std::to_string(attrib.vertices.size()));
 
     // Loop each shape
     for (const auto &shape : shapes) {
@@ -107,18 +114,10 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
         }
     }
 
-    // TODO: temp, add to a Logger
-    std::cout << "Vert List Length: " << outMesh.vertices.size() << std::endl;
-
     // No errors
     return true;
 }
 
 } // namespace Engine
 
-// // --- DIAGNOSTIC LOGS ---
-// std::cout << "[Diagnostic] File: " << filepath << std::endl;
-// std::cout << "[Diagnostic] Shapes found: " << shapes.size() << std::endl;
-// std::cout << "[Diagnostic] Raw Vertices in attrib: "
-//           << (attrib.vertices.size() / 3) << std::endl;
-// TODO: Add to a logger ^^^^^^^^^
+// --- DIAGNOSTIC LOGS ---

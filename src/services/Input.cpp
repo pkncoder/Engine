@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "Logger.h"
 
 namespace Engine {
 
@@ -17,6 +18,8 @@ void Input::init(GLFWwindow *window_ptr) {
     double x, y;
     glfwGetCursorPos(window, &x, &y);
     lastMousePos = {(float)x, (float)y};
+
+    Logger::info("SYSTEM", "Input service initialized.");
 }
 
 // Update information per-frame

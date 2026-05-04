@@ -11,28 +11,31 @@ int Logger::MAX_STACKED_PENDING = 100;
 int Logger::MAX_IN_PLACE_PENDING = 30;
 int Logger::lastDashboardLogCount = 0;
 std::ofstream Logger::logFile;
-std::mutex Logger::logMutex;
 
 // Init instructions
 void Logger::init() {
     logFile.open("engine.log", std::ios::out | std::ios::trunc);
+    info("SYSTEM", "Logger service initialized.");
 }
 
 // Shutdown instructions for the logger
-void Logger::shutdown() { logFile.close(); }
+void Logger::shutdown() {
+    logFile.close();
+    info("SYSTEM", "Logger service shutdown.");
+}
 
 // Add a new log to the pending logs list
 void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
                  LogType type) {
 
-    // Lock the thread
-    std::lock_guard<std::mutex> lock(logMutex);
-    std::string tagStr(tag);
-
     // If the file is open, push the new text before anything for debug
     if (type == LogType::STACKED && logFile.is_open()) {
-        logFile << "[" << getLevelName(level) << "][" << tag << "] " << message
-                << "\n";
+        if (level != LogLevel::FORMATTING) {
+            logFile << "[" << getLevelName(level) << "][" << tag << "] "
+                    << message << "\n";
+        } else {
+            logFile << message << "\n";
+        }
         logFile.flush();
     }
 
@@ -43,9 +46,13 @@ void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
     // If the pending list is to long, pop off the front
     if (type == LogType::STACKED &&
         pendingLogsByType[type].size() > MAX_STACKED_PENDING)
-        pendingLogsByType[type].pop_back();
+        pendingLogsByType[type].pop_front();
     else if (pendingLogsByType[type].size() > MAX_IN_PLACE_PENDING)
-        pendingLogsByType[type].pop_back();
+        pendingLogsByType[type].pop_front();
+
+    if (no_periodic_wait) {
+        outputLogs();
+    }
 }
 
 // Log wrappers
@@ -69,9 +76,6 @@ void Logger::fatal(std::string_view tag, std::string_view message,
 // Print out the logs (ansi)
 void Logger::outputLogs() {
 
-    // Lock the thread to avoid multi-threaded logging problems
-    std::lock_guard<std::mutex> lock(logMutex);
-
     // Move up the dashboard, wiping it, and reseting lastDashboardLogCount
     while (lastDashboardLogCount > 0) {
         std::cout << "\033[F\033[K"; // \033[F up line & \033[K wipe line
@@ -82,8 +86,13 @@ void Logger::outputLogs() {
     for (const auto &log : pendingLogsByType[LogType::STACKED]) {
 
         // Print out the log w/ ansi data (colors)
-        std::cout << getLevelColor(log.level) << "[" << getLevelName(log.level)
-                  << "] [" << log.tag << "] " << log.message << "\033[0m\n";
+        if (log.level != LogLevel::FORMATTING) {
+            std::cout << getLevelColor(log.level) << "["
+                      << getLevelName(log.level) << "] [" << log.tag << "] "
+                      << log.message << "\033[0m\n";
+        } else {
+            std::cout << log.message << std::endl;
+        }
     }
 
     // Wipe the pending logs for the stacked logs
@@ -120,6 +129,8 @@ void Logger::outputLogs() {
 // Switch statement to get a string of the level name
 const char *Logger::getLevelName(LogLevel level) {
     switch (level) {
+    case LogLevel::FORMATTING:
+        return "FORMATTING";
     case LogLevel::INFO:
         return "INFO";
     case LogLevel::WARNING:
@@ -137,6 +148,8 @@ const char *Logger::getLevelName(LogLevel level) {
 const char *Logger::getLevelColor(LogLevel level) {
     // ANSI escape codes for terminal coloring
     switch (level) {
+    case LogLevel::FORMATTING:
+        return "\033[90m"; // Gray
     case LogLevel::INFO:
         return "\033[32m"; // Green
     case LogLevel::WARNING:

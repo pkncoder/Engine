@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#include "../services/Logger.h"
+
 namespace Engine {
 
 // Constructor & deconstructor
@@ -8,6 +10,8 @@ Scene::Scene() {
     for (auto &sig : signatures) {
         sig.reset();
     }
+
+    Logger::info("SYSTEM", "Scene initialized");
 }
 Scene::~Scene() {}
 

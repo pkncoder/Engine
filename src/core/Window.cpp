@@ -1,7 +1,7 @@
 #include "Window.h"
-#include "Defaults.h"
 
-#include <iostream>
+#include "../services/Logger.h"
+#include "Defaults.h"
 
 namespace Engine {
 
@@ -16,7 +16,7 @@ Window::Window(int width, int height, const std::string &title)
 
     // Initialize & check for error for glfw
     if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
+        Logger::fatal("SYSTEM", "Failed to initialize GLFW");
         return;
     }
 
@@ -30,7 +30,7 @@ Window::Window(int width, int height, const std::string &title)
 
     // Check to make sure the window actually got made
     if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
+        Logger::fatal("SYSTEM", "Failed to create GLFW window");
         glfwTerminate();
         return;
     }
@@ -40,7 +40,7 @@ Window::Window(int width, int height, const std::string &title)
 
     // Initialize & check GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
+        Logger::fatal("SYSTEM", "Failed to initialize GLAD");
     }
 
     // Set other settings

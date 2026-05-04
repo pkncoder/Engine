@@ -2,7 +2,6 @@
 
 #include <deque>
 #include <fstream>
-#include <mutex>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -10,7 +9,7 @@
 namespace Engine {
 
 // Log severity + log printing status
-enum class LogLevel { TRACE, INFO, WARNING, ERR, FATAL };
+enum class LogLevel { FORMATTING, INFO, WARNING, ERR, FATAL };
 enum class LogType { STACKED, IN_PLACE };
 
 // Log entry
@@ -36,8 +35,23 @@ class Logger {
     static void fatal(std::string_view tag, std::string_view message,
                       LogType type = LogType::STACKED);
 
+    // Special log wrappers
+    static inline void space(LogType type = LogType::STACKED) {
+        log(LogLevel::FORMATTING, "NULL", "", type);
+    };
+    static inline void line(int length = 15, LogType type = LogType::STACKED) {
+        std::string line(length, '-');
+
+        log(LogLevel::FORMATTING, "NULL", line, type);
+    };
+
     // Output all logs (ansi)
     static void outputLogs();
+
+    // Set the boolean to print a log right when added
+    static inline void setNoPendingLogs(bool newValue) {
+        no_periodic_wait = newValue;
+    }
 
     // Get string & ansi color for a specific level
     static const char *getLevelName(LogLevel level);
@@ -47,6 +61,9 @@ class Logger {
     // Add a new log to the pending list
     static void log(LogLevel level, std::string_view tag,
                     std::string_view message, LogType type);
+
+    // Boolean that, if true, will print whenever a new log is sent
+    static inline bool no_periodic_wait = false;
 
     // Logs waiting to be outputed
     static std::unordered_map<LogType, std::deque<LogEntry>> pendingLogsByType;
@@ -58,8 +75,7 @@ class Logger {
     static int MAX_STACKED_PENDING;
     static int MAX_IN_PLACE_PENDING;
 
-    // Log file & thread locker
-    static std::mutex logMutex;
+    // Log file
     static std::ofstream logFile;
 };
 

@@ -34,9 +34,9 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
 - [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
-- [ ] Move to logger instead of cout
 - [ ] Add to timer a "periodic" way to run code
   - IDEA: Use % and a total deltaTime / time to run whenever
+- [ ] Integrate timer's profiler with the logger
 
 ### Todo - Not Code
 
@@ -54,6 +54,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Orbital camera
 - [ ] Add a worldpos camera movement overload
 - [ ] Custom errors
+- [ ] Multithread
 
 ### Todo - Editor
 
@@ -106,3 +107,5 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Check for not foo_bar, and repladce with fooBar
 - [x] Figure out how shader including will work in current code
 - [x] Create a full Logger class that can then be used later in UI
+- [x] Move to logger instead of cout
+- [x] Create a setting in Logger that will output a log every time you send one instead of send it to pending
