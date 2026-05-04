@@ -1,18 +1,17 @@
 #include "Logger.h"
 
 #include <iostream>
+#include <string>
 
 namespace Engine {
 
 // Init the static attributes
-std::unordered_map<std::string, TagMetadata> Logger::tagRegistry;
-std::vector<std::string> Logger::stackedTagOrder;
-std::vector<std::string> Logger::inPlaceTagOrder;
-std::unordered_map<std::string, std::deque<LogEntry>> Logger::history;
+std::unordered_map<LogType, std::deque<LogEntry>> Logger::pendingLogsByType;
+int Logger::MAX_STACKED_PENDING = 100;
+int Logger::MAX_IN_PLACE_PENDING = 30;
 int Logger::lastDashboardLogCount = 0;
 std::ofstream Logger::logFile;
 std::mutex Logger::logMutex;
-int Logger::MAX_LOGGER_HISTORY_PER_TAG = 100;
 
 // Init instructions
 void Logger::init() {
@@ -22,55 +21,50 @@ void Logger::init() {
 // Shutdown instructions for the logger
 void Logger::shutdown() { logFile.close(); }
 
-// Register a new tag into the registries
-void Logger::registerTag(const std::string &tag, LogType type) {
-
-    // Add the tag to the registy
-    tagRegistry[tag].type = type;
-
-    // Sort the tag into the tag order it belongs in
-    if (type == LogType::IN_PLACE) {
-        inPlaceTagOrder.push_back(tag);
-    } else {
-        stackedTagOrder.push_back(tag);
-    }
-}
-
 // Log wrappers
-void Logger::info(std::string_view tag, std::string_view message) {
-    log(LogLevel::INFO, tag, message);
+void Logger::info(std::string_view tag, std::string_view message,
+                  LogType type) {
+    log(LogLevel::INFO, tag, message, type);
 }
-void Logger::warn(std::string_view tag, std::string_view message) {
-    log(LogLevel::WARNING, tag, message);
+void Logger::warn(std::string_view tag, std::string_view message,
+                  LogType type) {
+    log(LogLevel::WARNING, tag, message, type);
 }
-void Logger::error(std::string_view tag, std::string_view message) {
-    log(LogLevel::ERR, tag, message);
+void Logger::error(std::string_view tag, std::string_view message,
+                   LogType type) {
+    log(LogLevel::ERR, tag, message, type);
 }
-void Logger::fatal(std::string_view tag, std::string_view message) {
-    log(LogLevel::FATAL, tag, message);
+void Logger::fatal(std::string_view tag, std::string_view message,
+                   LogType type) {
+    log(LogLevel::FATAL, tag, message, type);
 }
 
-// Save a new log into the tag history
-void Logger::log(LogLevel level, std::string_view tag,
-                 std::string_view message) {
+// Add a new log to the pending logs list
+// TODO: Why std::string_view
+void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
+                 LogType type) {
 
     // Lock the thread
     std::lock_guard<std::mutex> lock(logMutex);
     std::string tagStr(tag);
 
     // If the file is open, push the new text before anything for debug
-    if (logFile.is_open()) {
+    if (type == LogType::STACKED && logFile.is_open()) {
         logFile << "[" << getLevelName(level) << "][" << tag << "] " << message
                 << "\n";
         logFile.flush();
     }
 
-    // Push in the new log to the specific tag's history
-    history[tagStr].push_back({level, std::string(message)});
+    // Push in the new log to the specific tag's pending list
+    pendingLogsByType[type].push_back(
+        {level, std::string(tag), std::string(message)});
 
-    // If the history for that tag is too long, pop off the front
-    if (history[tagStr].size() > MAX_LOGGER_HISTORY_PER_TAG)
-        history[tagStr].pop_front();
+    // If the pending list is to long, pop off the front
+    if (type == LogType::STACKED &&
+        pendingLogsByType[type].size() > MAX_STACKED_PENDING)
+        pendingLogsByType[type].pop_back();
+    else if (pendingLogsByType[type].size() > MAX_IN_PLACE_PENDING)
+        pendingLogsByType[type].pop_back();
 }
 
 // Print out the logs (ansi)
@@ -79,61 +73,40 @@ void Logger::outputLogs() {
     // Lock the thread to avoid multi-threaded logging problems
     std::lock_guard<std::mutex> lock(logMutex);
 
-    // Wipe the old dashboard lines AND reset lastDashboardLogCount back to 0 by
-    // making "i" a pointer
-    for (int *i = &lastDashboardLogCount; *i > 0; --(*i))
+    // Move up the dashboard, wiping it, and reseting lastDashboardLogCount
+    while (lastDashboardLogCount > 0) {
         std::cout << "\033[F\033[K"; // \033[F up line & \033[K wipe line
-
-    // Loop the order for each stacked tag
-    for (const auto &tag : stackedTagOrder) {
-
-        // Get that tag's metadata
-        auto &metadata = tagRegistry[tag];
-
-        // Get the history of that tag
-        auto &tagHistory = history[tag];
-
-        // TODO: temp
-        while (metadata.lastPrintedIndex < tagHistory.size()) {
-
-            // Get the entry data
-            auto &entry = tagHistory[metadata.lastPrintedIndex];
-
-            // Print out the new log w/ ansi escape for the colors
-            std::cout << getLevelColor(entry.level) << "["
-                      << getLevelName(entry.level) << "][" << tag << "] "
-                      << entry.message << "\033[0m\n";
-
-            metadata.lastPrintedIndex++;
-        }
+        lastDashboardLogCount--;
     }
 
+    // Loop the order for each stacked tag
+    for (const auto &entry : pendingLogsByType[LogType::STACKED]) {
+        // Print out the new log w/ ansi escape for the colors
+        std::cout << getLevelColor(entry.level) << "["
+                  << getLevelName(entry.level) << "][" << entry.tag << "] "
+                  << entry.message << "\033[0m\n";
+    }
+
+    pendingLogsByType[LogType::STACKED].clear();
+
     // Print the dashboard seporater only if there is a dashboard
-    if (!inPlaceTagOrder.empty()) {
+    if (!pendingLogsByType[LogType::IN_PLACE].empty()) {
         std::cout
             << "\033[90m-------------------------------------------\033[0m\n";
         lastDashboardLogCount++;
     }
 
-    lastDashboardLogCount = 0;
-
     // Loop each inPlace tag
-    for (const auto &tag : inPlaceTagOrder) {
-
-        // Get the history for the tag
-        auto &tagHistory = history[tag];
-
-        // Loop each entry & print out the ansi data (color) + entry
-        for (const auto &entry : tagHistory) {
-            std::cout << getLevelColor(entry.level) << "["
-                      << getLevelName(entry.level) << "] [" << tag << "] "
-                      << entry.message << "\033[0m\n";
-            lastDashboardLogCount++;
-        }
+    for (const auto &entry : pendingLogsByType[LogType::IN_PLACE]) {
+        std::cout << getLevelColor(entry.level) << "["
+                  << getLevelName(entry.level) << "] [" << entry.tag << "] "
+                  << entry.message << "\033[0m\n";
+        lastDashboardLogCount++;
 
         // Clear the tagHistory for next round
-        tagHistory.clear();
     }
+
+    pendingLogsByType[LogType::IN_PLACE].clear();
 
     // Flush the cout
     std::cout << std::flush;
@@ -142,7 +115,7 @@ void Logger::outputLogs() {
 // Switch statement to get a string of the level name
 const char *Logger::getLevelName(LogLevel level) {
     switch (level) {
-    case LogLevel::INFO: // NOTODO
+    case LogLevel::INFO:
         return "INFO";
     case LogLevel::WARNING:
         return "WARN";

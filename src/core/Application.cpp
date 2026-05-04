@@ -93,11 +93,6 @@ void Application::init() {
     rasterizer = std::make_unique<Rasterizer>();
     rasterizer->init();
 
-    // Register logger tags
-    // TODO: Move
-    Logger::registerTag("SYSTEM", LogType::STACKED);
-    Logger::registerTag("PROFILE", LogType::IN_PLACE);
-
     Logger::info("SYSTEM", "Application init complete");
 }
 
@@ -131,9 +126,11 @@ void Application::run() {
         window->postFrame();
 
         // TODO: Fix
-        Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()));
+        Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()),
+                     LogType::IN_PLACE);
         Logger::info("PROFILE",
-                     "Average FPS: " + std::to_string(Timer::getAverageFPS()));
+                     "Average FPS: " + std::to_string(Timer::getAverageFPS()),
+                     LogType::IN_PLACE);
 
         Logger::outputLogs();
     }
