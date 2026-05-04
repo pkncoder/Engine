@@ -105,7 +105,6 @@ void Application::run() {
     // Start of main loop, only ends when the window is set to
     while (!window->shouldClose()) {
 
-        // TODO: Integrate profilers into the logger
         START_PROFILE("Run Loop"); // Setup timer for run loop
 
         // Update the timer service and run the log function
@@ -126,7 +125,6 @@ void Application::run() {
         // Do things like event polling & buffer swapping
         window->postFrame();
 
-        // TODO: Fix
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()),
                      LogType::IN_PLACE);
         Logger::info("PROFILE",
