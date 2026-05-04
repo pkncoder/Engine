@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Logger.h"
+
 #include <cstdint>
 #include <map>
 #include <string>
@@ -29,7 +31,8 @@ class Timer {
 
     // Profiling logic
     static void beginProfile(const std::string &name);
-    static void endProfile(const std::string &name);
+    static void endProfile(const std::string &name,
+                           const LogType logType = LogType::IN_PLACE);
 
     // Output relevant data to console
     static void logPerformance(bool clearTerminal = true);
@@ -70,5 +73,7 @@ struct ScopedProfiler {
 // Macro to start and stop profilers
 #define START_PROFILE(name) Engine::Timer::beginProfile(name)
 #define END_PROFILE(name) Engine::Timer::endProfile(name)
+#define END_PROFILE_STACKED_LOG(name)                                          \
+    Engine::Timer::endProfile(name, LogType::STACKED)
 
 } // namespace Engine

@@ -51,6 +51,8 @@ void Application::init() {
         activeScene.registerComponent<Transform>();
         activeScene.registerComponent<MeshComponent>();
 
+        START_PROFILE("Mesh Loading");
+
         // Load the meshes to CPU from disk
         auto optionalMeshOne =
             AssetManager::loadMesh("assets/models/breakfast_room.obj");
@@ -58,6 +60,8 @@ void Application::init() {
             AssetManager::loadMesh("assets/models/dragon.obj");
         auto optionalMeshThree =
             AssetManager::loadMesh("assets/models/cat.obj");
+
+        END_PROFILE_STACKED_LOG("Mesh Loading");
 
         // Upload the CPU mesh data to the GPU (VRAM)
         MeshComponent meshComponentOne =

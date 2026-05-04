@@ -1,9 +1,7 @@
 #include "Timer.h"
-#include "Logger.h"
 
 #include <GLFW/glfw3.h>
 
-#include <iostream>
 #include <string>
 
 namespace Engine {
@@ -58,7 +56,7 @@ void Timer::beginProfile(const std::string &name) {
 }
 
 // Stop profile
-void Timer::endProfile(const std::string &name) {
+void Timer::endProfile(const std::string &name, const LogType logType) {
     auto it = activeProfiles.find(name);
     if (it != activeProfiles.end()) {
         double duration = (glfwGetTime() - it->second) * 1000.0; // to ms
@@ -69,7 +67,7 @@ void Timer::endProfile(const std::string &name) {
     Logger::info("PROFILE",
                  name + ": " +
                      std::to_string(profileResults[name]).substr(0, 6) + "ms",
-                 LogType::IN_PLACE);
+                 logType);
 }
 
 } // namespace Engine
