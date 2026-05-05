@@ -1,5 +1,4 @@
-// #version 430 core
-#version 330 core
+#version 460 core
 
 // 1. Define the local group size (8x8 threads per block)
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;

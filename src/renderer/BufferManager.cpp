@@ -1,5 +1,6 @@
 #include "BufferManager.h"
 
+#include "../services/Logger.h"
 #include <cstring> // for memcpy
 #include <iostream>
 
@@ -63,6 +64,7 @@ void PersistentBuffer::setup(GLenum bufferTarget, size_t bufferSize) {
     GLbitfield flags =
         GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
 
+    Logger::info("SYSTEM", "Check");
     // Allocate immutable storage
     glBufferStorage(target, size, nullptr, flags);
 

@@ -30,6 +30,9 @@ void Application::init() {
                                       Defaults::Window::START_HEIGHT,
                                       Defaults::Window::START_TITLE);
 
+    printf("Renderer: %s\n", glGetString(GL_RENDERER));
+    printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
+
     // Init the input service
     Input::init(window->getNativeWindow());
 
@@ -132,6 +135,8 @@ void Application::init() {
     // rasterizer->init();
     pathTracer = std::make_unique<PathTracer>();
     pathTracer->init();
+
+    glGenFramebuffers(1, &presentFBO);
 
     int width, height;
     window->getSize(width, height);

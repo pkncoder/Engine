@@ -32,7 +32,7 @@ struct MeshData {
 } // namespace Engine
 
 namespace std {
-template <> struct std::hash<Engine::Vertex> {
+template <> struct hash<Engine::Vertex> {
     size_t operator()(Engine::Vertex const &vertex) const {
         // Using a simple bit-shifting combine method
         size_t res = 0;
