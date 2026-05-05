@@ -60,6 +60,8 @@ void Application::init() {
             AssetManager::loadMesh("assets/models/dragon.obj");
         auto optionalMeshThree =
             AssetManager::loadMesh("assets/models/cat.obj");
+        auto optionalMeshFour =
+            AssetManager::loadMesh("assets/models/moai.obj");
 
         END_PROFILE_STACKED_LOG("Mesh Loading");
 
@@ -70,29 +72,39 @@ void Application::init() {
             BufferManager::uploadMesh(optionalMeshTwo.value());
         MeshComponent meshComponentThree =
             BufferManager::uploadMesh(optionalMeshThree.value());
+        MeshComponent meshComponentFour =
+            BufferManager::uploadMesh(optionalMeshFour.value());
 
         // Create entity wrappers & instiate entity ids in the ECS (Scene.h)
         Entity entityOne(activeScene.createEntity(), &activeScene);
         Entity entityTwo(activeScene.createEntity(), &activeScene);
         Entity entityThree(activeScene.createEntity(), &activeScene);
+        Entity entityFour(activeScene.createEntity(), &activeScene);
 
         // Add mesh #1 components
         entityOne.addComponent<MeshComponent>(meshComponentOne);
-        entityOne.addComponent<Transform>({glm::vec3(-1.0f, -0.6f, -4.0f),
+        entityOne.addComponent<Transform>({glm::vec3(-1.0f, -1.2f, -4.0f),
                                            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
                                            glm::vec3(1.0f, 1.0f, 1.0f)});
 
         // Add mesh #2 components
         entityTwo.addComponent<MeshComponent>(meshComponentTwo);
-        entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.0f, -3.5f),
+        entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.6f, -3.5f),
                                            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
                                            glm::vec3(1.0f, 1.0f, 1.0f)});
 
         // Add mesh #3 components
         entityThree.addComponent<MeshComponent>(meshComponentThree);
-        entityThree.addComponent<Transform>({glm::vec3(0.0f, 0.0f, -4.0f),
+        entityThree.addComponent<Transform>({glm::vec3(0.0f, -0.6f, -4.0f),
                                              glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
                                              glm::vec3(1.0f, 1.0f, 1.0f)});
+
+        // Add mesh #4 components
+        entityFour.addComponent<MeshComponent>(meshComponentFour);
+        entityFour.addComponent<Transform>(
+            {glm::vec3(0.0f, 1.3f, -4.0f),
+             glm::quat(-0.707f, 0.0f, 0.707f, 0.0f),
+             glm::vec3(0.14f, 0.14f, 0.14f)});
     }
 
     // Construct the rasterizer and init it
