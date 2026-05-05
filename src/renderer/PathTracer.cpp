@@ -2,12 +2,19 @@
 #include "../resources/AssetManager.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
+#include "../services/Logger.h"
+
 #include <set>
 
 namespace Engine {
 
-void PathTracer::init(int screenWidth, int screenHeight) {
+void PathTracer::init() {
     computeShader = Shader("shaders/compute/path_tracer.comp");
+
+    if (glDispatchCompute == nullptr) {
+        Logger::fatal("RENDERER",
+                      "Compute Shaders are not supported on this system!");
+    }
 
     // Allocate the Dynamic Instance Buffer up front.
     // We allocate enough space for MAX_INSTANCES.
@@ -16,8 +23,6 @@ void PathTracer::init(int screenWidth, int screenHeight) {
 
     // Bind the buffers to their respective GLSL binding points
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, instanceBuffer.id);
-
-    resize(screenWidth, screenHeight);
 }
 
 void PathTracer::resize(int newWidth, int newHeight) {
@@ -148,7 +153,8 @@ void PathTracer::rebuildGeometryAtlas(Scene &activeScene) {
     geometryDirty = false;
 }
 
-void PathTracer::render(const Camera &camera, Scene &activeScene) {
+void PathTracer::render(const Camera &camera, Scene &activeScene,
+                        float aspectRatio) {
     if (currentWidth == 0 || currentHeight == 0)
         return;
 

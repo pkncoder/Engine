@@ -39,8 +39,8 @@ struct alignas(16) GPUInstance {
 
 class PathTracer : IRenderer {
   public:
-    void init(int screenWidth, int screenHeight);
-    void render(const Camera &camera, Scene &activeScene);
+    void init();
+    void render(const Camera &camera, Scene &activeScene, float aspectRatio);
     void shutdown();
     void resize(int newWidth, int newHeight);
 

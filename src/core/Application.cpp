@@ -54,62 +54,88 @@ void Application::init() {
         START_PROFILE("Mesh Loading");
 
         // Load the meshes to CPU from disk
-        auto optionalMeshOne =
-            AssetManager::loadMesh("assets/models/bunny.obj");
-        auto optionalMeshTwo =
-            AssetManager::loadMesh("assets/models/dragon.obj");
-        auto optionalMeshThree =
-            AssetManager::loadMesh("assets/models/cat.obj");
-        auto optionalMeshFour =
-            AssetManager::loadMesh("assets/models/moai.obj");
+        // auto optionalMeshOne =
+        //     AssetManager::loadMesh("assets/models/bunny.obj");
+        // auto optionalMeshTwo =
+        //     AssetManager::loadMesh("assets/models/dragon.obj");
+        // auto optionalMeshThree =
+        //     AssetManager::loadMesh("assets/models/cat.obj");
+        // auto optionalMeshFour =
+        //     AssetManager::loadMesh("assets/models/moai.obj");
+        auto optionalMeshFive =
+            AssetManager::loadMesh("assets/models/cube.obj");
 
         END_PROFILE_STACKED_LOG("Mesh Loading");
 
         // Upload the CPU mesh data to the GPU (VRAM)
-        MeshComponent meshComponentOne =
-            BufferManager::uploadMesh(optionalMeshOne.value());
-        MeshComponent meshComponentTwo =
-            BufferManager::uploadMesh(optionalMeshTwo.value());
-        MeshComponent meshComponentThree =
-            BufferManager::uploadMesh(optionalMeshThree.value());
-        MeshComponent meshComponentFour =
-            BufferManager::uploadMesh(optionalMeshFour.value());
+        // MeshComponent meshComponentOne =
+        //     BufferManager::uploadMesh(optionalMeshOne.value());
+        // MeshComponent meshComponentTwo =
+        //     BufferManager::uploadMesh(optionalMeshTwo.value());
+        // MeshComponent meshComponentThree =
+        //     BufferManager::uploadMesh(optionalMeshThree.value());
+        // MeshComponent meshComponentFour =
+        //     BufferManager::uploadMesh(optionalMeshFour.value());
+        MeshComponent meshComponentFive =
+            BufferManager::uploadMesh(optionalMeshFive.value());
+
+        // Set mesh component ids for the path tracer
+        // meshComponentOne.assetID = "assets/models/bunny.obj";
+        // meshComponentTwo.assetID = "assets/models/dragon.obj";
+        // meshComponentThree.assetID = "assets/models/cat.obj";
+        // meshComponentFour.assetID = "assets/models/moai.obj";
+        meshComponentFive.assetID = "assets/models/cube.obj";
 
         // Create entity wrappers & instiate entity ids in the ECS (Scene.h)
-        Entity entityOne(activeScene.createEntity(), &activeScene);
-        Entity entityTwo(activeScene.createEntity(), &activeScene);
-        Entity entityThree(activeScene.createEntity(), &activeScene);
-        Entity entityFour(activeScene.createEntity(), &activeScene);
+        // Entity entityOne(activeScene.createEntity(), &activeScene);
+        // Entity entityTwo(activeScene.createEntity(), &activeScene);
+        // Entity entityThree(activeScene.createEntity(), &activeScene);
+        // Entity entityFour(activeScene.createEntity(), &activeScene);
+        Entity entityFive(activeScene.createEntity(), &activeScene);
 
-        // Add mesh #1 components
-        entityOne.addComponent<MeshComponent>(meshComponentOne);
-        entityOne.addComponent<Transform>({glm::vec3(-1.0f, -1.2f, -4.0f),
-                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                           glm::vec3(1.0f, 1.0f, 1.0f)});
-
-        // Add mesh #2 components
-        entityTwo.addComponent<MeshComponent>(meshComponentTwo);
-        entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.6f, -3.5f),
-                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                           glm::vec3(1.0f, 1.0f, 1.0f)});
-
-        // Add mesh #3 components
-        entityThree.addComponent<MeshComponent>(meshComponentThree);
-        entityThree.addComponent<Transform>({glm::vec3(0.0f, -0.6f, -4.0f),
-                                             glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                             glm::vec3(1.0f, 1.0f, 1.0f)});
+        // // Add mesh #1 components
+        // entityOne.addComponent<MeshComponent>(meshComponentOne);
+        // entityOne.addComponent<Transform>({glm::vec3(-1.0f, -1.2f, -4.0f),
+        //                                    glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+        //                                    glm::vec3(1.0f, 1.0f, 1.0f)});
+        //
+        // // Add mesh #2 components
+        // entityTwo.addComponent<MeshComponent>(meshComponentTwo);
+        // entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.6f, -3.5f),
+        //                                    glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+        //                                    glm::vec3(1.0f, 1.0f, 1.0f)});
+        //
+        // // Add mesh #3 components
+        // entityThree.addComponent<MeshComponent>(meshComponentThree);
+        // entityThree.addComponent<Transform>({glm::vec3(0.0f, -0.6f, -4.0f),
+        //                                      glm::quat(1.0f, 0.0f, 0.0f,
+        //                                      0.0f),
+        //                                      glm::vec3(1.0f, 1.0f, 1.0f)});
+        //
+        // // Add mesh #4 components
+        // entityFour.addComponent<MeshComponent>(meshComponentFour);
+        // entityFour.addComponent<Transform>(
+        //     {glm::vec3(0.0f, 1.3f, -4.0f),
+        //      glm::quat(-0.707f, 0.0f, 0.707f, 0.0f),
+        //      glm::vec3(0.14f, 0.14f, 0.14f)});
 
         // Add mesh #4 components
-        entityFour.addComponent<MeshComponent>(meshComponentFour);
-        entityFour.addComponent<Transform>(
+        entityFive.addComponent<MeshComponent>(meshComponentFive);
+        entityFive.addComponent<Transform>(
             {glm::vec3(0.0f, 1.3f, -4.0f),
              glm::quat(-0.707f, 0.0f, 0.707f, 0.0f),
              glm::vec3(0.14f, 0.14f, 0.14f)});
     }
 
     // Construct the rasterizer and init it
-    rasterizer = std::make_unique<Rasterizer>();
-    rasterizer->init();
+    // rasterizer = std::make_unique<Rasterizer>();
+    // rasterizer->init();
+    pathTracer = std::make_unique<PathTracer>();
+    pathTracer->init();
+
+    int width, height;
+    window->getSize(width, height);
+    pathTracer->resize(width, height);
 
     Logger::info("SYSTEM", "Application init complete");
     Logger::setNoPendingLogs(false);
@@ -135,8 +161,12 @@ void Application::run() {
 
         // Render the scene
         START_PROFILE("Render"); // Start timer for renderer
-        rasterizer->render(camera, activeScene, window->getAspectRatio());
+        // rasterizer->render(camera, activeScene, window->getAspectRatio());
+        pathTracer->render(camera, activeScene, window->getAspectRatio());
         END_PROFILE("Render"); // End Timer for renderer
+
+        // 2. Present the compute texture to the main window
+        presentToScreen();
 
         // Do things like event polling & buffer swapping
         window->postFrame();
@@ -151,6 +181,27 @@ void Application::run() {
 
         Logger::outputLogs();
     }
+}
+
+// Helper function to draw the compute shader texture to the window
+void Application::presentToScreen() {
+    // Bind our temporary FBO for reading
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
+
+    // Attach the Path Tracer's output texture to it
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, pathTracer->getOutputTexture(), 0);
+
+    // Bind the default window buffer for drawing
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    int width, height;
+    window->getSize(width, height);
+    pathTracer->resize(width, height);
+
+    // Blit (copy) the pixels from the texture FBO to the screen
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 // Handle any inputs that come in this frame

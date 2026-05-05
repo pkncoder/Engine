@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../renderer/PathTracer.h"
 #include "../renderer/Rasterizer.h"
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
@@ -33,7 +34,13 @@ class Application {
     Camera camera;
 
     // Active renderer
-    std::unique_ptr<Rasterizer> rasterizer;
+    // std::unique_ptr<Rasterizer> rasterizer;
+    std::unique_ptr<PathTracer> pathTracer;
+
+    GLuint presentFBO = 0;
+
+    // Presenting a texture to the screen
+    void presentToScreen();
 
     // Handling inputs
     void handleInputs();

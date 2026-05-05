@@ -36,6 +36,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
 - [ ] Add to timer a "periodic" way to run code
   - IDEA: Use % and a total deltaTime / time to run whenever
+- [ ] Standize and fix "attributes first, then methods"", or vice-versa in header files
 
 ### Todo - Not Code
 
