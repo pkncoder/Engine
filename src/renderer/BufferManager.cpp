@@ -1,5 +1,8 @@
 #include "BufferManager.h"
 
+#include <cstring> // for memcpy
+#include <iostream>
+
 namespace Engine {
 
 // Takes CPU data, pushes to VRAM, returns ECS-ready component
@@ -43,6 +46,51 @@ MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
 
     // Return the mesh component previously made
     return comp;
+}
+
+void PersistentBuffer::setup(GLenum bufferTarget, size_t bufferSize) {
+    if (id != 0)
+        shutdown(); // Clean up if re-allocating
+
+    target = bufferTarget;
+    size = bufferSize;
+
+    glGenBuffers(1, &id);
+    glBindBuffer(target, id);
+
+    // GL_MAP_COHERENT_BIT means the GPU automatically sees CPU changes without
+    // us needing to call glFlushMappedBufferRange
+    GLbitfield flags =
+        GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+
+    // Allocate immutable storage
+    glBufferStorage(target, size, nullptr, flags);
+
+    // Get the permanent CPU pointer
+    mappedPtr = glMapBufferRange(target, 0, size, flags);
+
+    glBindBuffer(target, 0);
+}
+
+void PersistentBuffer::update(const void *data, size_t updateSize) {
+    if (mappedPtr && data && updateSize <= size) {
+        // Direct memory copy to the mapped VRAM pointer. Lightning fast.
+        std::memcpy(mappedPtr, data, updateSize);
+    } else {
+        std::cerr
+            << "PersistentBuffer Update Error: Out of bounds or unmapped.\n";
+    }
+}
+
+void PersistentBuffer::shutdown() {
+    if (id != 0) {
+        glBindBuffer(target, id);
+        glUnmapBuffer(target); // Unmap before deleting
+        glDeleteBuffers(1, &id);
+        id = 0;
+        mappedPtr = nullptr;
+        size = 0;
+    }
 }
 
 } // namespace Engine

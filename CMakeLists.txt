@@ -20,6 +20,7 @@ set(SOURCES
     src/core/Application.cpp
     src/core/Window.cpp
     src/renderer/BufferManager.cpp
+    src/renderer/PathTracer.cpp
     src/renderer/Rasterizer.cpp
     src/renderer/Shader.cpp
     src/resources/AssetManager.cpp

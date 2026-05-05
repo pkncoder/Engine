@@ -63,6 +63,37 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     glDeleteShader(fragment);
 }
 
+// Constructor for Compute Shaders
+Shader::Shader(const char *computePath) {
+    // 1. Get and expand the shader code using your existing recursive logic
+    std::string computeCode = getExpandedShaderCode(computePath);
+
+    // 2. Dump for debug
+    dumpExpandedShaderCode(computeCode, "COMPUTE");
+
+    const char *cShaderSource = computeCode.c_str();
+    uint32_t compute;
+
+    // 3. Create and compile the compute shader
+    compute = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderSource(compute, 1, &cShaderSource, NULL);
+    glCompileShader(compute);
+
+    // 4. Check for errors using your existing helper
+    checkCompileErrors(compute, "COMPUTE");
+
+    // 5. Create Program and link
+    ID = glCreateProgram();
+    glAttachShader(ID, compute);
+    glLinkProgram(ID);
+
+    // 6. Check for linking errors
+    checkCompileErrors(ID, "PROGRAM");
+
+    // 7. Cleanup
+    glDeleteShader(compute);
+}
+
 // Bind and unbind
 void Shader::bind() const { glUseProgram(ID); }
 void Shader::unbind() const { glUseProgram(0); }

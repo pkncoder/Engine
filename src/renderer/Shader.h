@@ -13,6 +13,7 @@ class Shader {
     // Constructors
     Shader() : ID(0) {}
     Shader(const char *vertexPath, const char *fragmentPath);
+    Shader(const char *computePath);
 
     // Binding and unbinding the program
     void bind() const;
