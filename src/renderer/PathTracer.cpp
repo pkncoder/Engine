@@ -14,6 +14,7 @@ void PathTracer::init() {
     if (glDispatchCompute == nullptr) {
         Logger::fatal("RENDERER",
                       "Compute Shaders are not supported on this system!");
+        return;
     }
 
     // Allocate the Dynamic Instance Buffer up front.
