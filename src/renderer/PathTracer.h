@@ -42,7 +42,7 @@ class PathTracer : IRenderer {
     void render(const Camera &camera, Scene &activeScene, float aspectRatio);
     void shutdown();
     void resize(int newWidth, int newHeight);
-    void presentTextureToFramebuffer(int width, int height);
+    void presentTextureToFramebuffer(int width, int height) const;
 
     GLuint getOutputTexture() const { return outputTexture; }
 

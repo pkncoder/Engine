@@ -198,7 +198,7 @@ void PathTracer::shutdown() {
     }
 }
 
-void PathTracer::presentTextureToFramebuffer(int width, int height) {
+void PathTracer::presentTextureToFramebuffer(int width, int height) const {
     // Bind our temporary FBO for reading
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
 

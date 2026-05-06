@@ -45,6 +45,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Should AssetTypes really be called that?
 - [ ] BufferManger.cpp/h inside of renderer, or resources?
 - [ ] Decide how AssetTypes.h should be layed out, and if I should split up the file.
+- [ ] Figure out the issue w/ width & height passing being a lot
 
 ### Todo - Future Todos
 
@@ -77,8 +78,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Refactor Checklist
 
 1. [x] Fix warnings
-2. [ ] Fix public vs. private
-3. [ ] Make variables & functions const when needed
+2. [x] Fix public vs. private
+3. [x] Make variables & functions const when needed
 4. [ ] Fix placement of functions
 5. [ ] Refactor step by step in code
 6. [ ] Rename things
