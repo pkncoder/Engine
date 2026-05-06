@@ -14,17 +14,17 @@ namespace Engine {
 
 // --- GPU Data Structures (Must match GLSL std430 exactly) ---
 
-struct alignas(16) GPUVertex {
-    glm::vec4 position;  // w unused
-    glm::vec4 normal;    // w unused
-    glm::vec4 texCoords; // z, w unused
-};
-
 struct alignas(16) GPUMeshEntry {
     uint32_t baseVertex;
     uint32_t baseIndex;
     uint32_t indexCount;
     uint32_t padding;
+};
+
+struct alignas(16) GPUVertex {
+    glm::vec4 position;  // w unused
+    glm::vec4 normal;    // w unused
+    glm::vec4 texCoords; // z, w unused
 };
 
 struct alignas(16) GPUInstance {
@@ -53,15 +53,17 @@ class PathTracer : IRenderer {
 
   private:
     Shader computeShader;
-    GLuint outputTexture = 0;
-    GLuint presentFBO = 0;
+
     int currentWidth = 0;
     int currentHeight = 0;
 
+    GLuint outputTexture = 0;
+    GLuint presentFBO = 0;
+
     // SSBOs using our new PersistentBuffer
+    PersistentBuffer meshEntryBuffer;
     PersistentBuffer vertexBuffer;
     PersistentBuffer indexBuffer;
-    PersistentBuffer meshEntryBuffer;
     PersistentBuffer instanceBuffer;
 
     // State Tracking
