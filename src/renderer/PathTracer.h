@@ -38,35 +38,46 @@ struct alignas(16) GPUInstance {
 
 class PathTracer : IRenderer {
   public:
+    // Init and shutdown
     void init();
     void shutdown();
 
+    // Rendering and resizing windows
     void render(const Camera &camera, Scene &activeScene, float aspectRatio);
     void resize(int newWidth, int newHeight);
 
+    // Getter for the output texture
     // GLuint getOutputTexture() const { return outputTexture; }
+
+    // Bliting the output texture onto the framebuffer
     void presentOutputTextureToFramebuffer(int width, int height) const;
 
   private:
+    // Scene modifications & building
     void flattenScene(Scene &activeScene);
     void rebuildGeometryLookupTable(Scene &activeScene);
 
   private:
+    // Shader w/ the program + compute shader code
     Shader computeShader;
 
+    // Saved image dimentions
     int currentWidth = 0;
     int currentHeight = 0;
 
+    // Texture the compute shader writes to
     GLuint outputTexture = 0;
+
+    // Framebuffer that the texture will be blited onto
     GLuint presentFBO = 0;
 
-    // SSBOs using our new PersistentBuffer
-    PersistentBuffer meshEntryBuffer;
-    PersistentBuffer vertexBuffer;
-    PersistentBuffer indexBuffer;
-    PersistentBuffer instanceBuffer;
+    // SSBOs that get sent over to the GPU
+    PersistentBuffer meshEntryBuffer; // Mesh information
+    PersistentBuffer vertexBuffer;    // Vertex pool
+    PersistentBuffer indexBuffer;     // Indicie pool
+    PersistentBuffer instanceBuffer;  // Buffer for each per-instance info
 
-    // State Tracking
+    // Geometry state tracking
     bool geometryDirty = true;
     std::unordered_map<std::string, uint32_t> instanceLookupTable;
 
