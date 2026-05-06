@@ -45,11 +45,11 @@ class PathTracer : IRenderer {
     void resize(int newWidth, int newHeight);
 
     // GLuint getOutputTexture() const { return outputTexture; }
-    void presentTextureToFramebuffer(int width, int height) const;
+    void presentOutputTextureToFramebuffer(int width, int height) const;
 
   private:
     void flattenScene(Scene &activeScene);
-    void rebuildGeometryAtlas(Scene &activeScene);
+    void rebuildGeometryLookupTable(Scene &activeScene);
 
   private:
     Shader computeShader;
@@ -68,7 +68,7 @@ class PathTracer : IRenderer {
 
     // State Tracking
     bool geometryDirty = true;
-    std::unordered_map<std::string, uint32_t> meshToAtlasMap;
+    std::unordered_map<std::string, uint32_t> instanceLookupTable;
 
     // Maximum instances we allocate memory for up front
     const size_t MAX_INSTANCES = 10000;

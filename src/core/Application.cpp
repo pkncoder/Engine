@@ -169,7 +169,7 @@ void Application::run() {
         pathTracer->resize(width, height);
 
         // 2. Present the compute texture to the main window
-        pathTracer->presentTextureToFramebuffer(width, height);
+        pathTracer->presentOutputTextureToFramebuffer(width, height);
 
         // Do things like event polling & buffer swapping
         window->postFrame();

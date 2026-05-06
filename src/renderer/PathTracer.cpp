@@ -97,7 +97,8 @@ void PathTracer::resize(int newWidth, int newHeight) {
     glBindTexture(GL_TEXTURE_2D, 0); // Clean up the binding
 }
 
-void PathTracer::presentTextureToFramebuffer(int width, int height) const {
+void PathTracer::presentOutputTextureToFramebuffer(int width,
+                                                   int height) const {
     // Bind our temporary FBO for reading
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
 
@@ -118,9 +119,10 @@ void PathTracer::flattenScene(Scene &activeScene) {
     // 1. Check if we need to rebuild the Static Geometry Atlas
     for (EntityID id : renderables) {
         auto &meshComp = activeScene.getComponent<MeshComponent>(id);
-        if (meshToAtlasMap.find(meshComp.assetID) == meshToAtlasMap.end()) {
+        if (instanceLookupTable.find(meshComp.assetID) ==
+            instanceLookupTable.end()) {
             geometryDirty = true;
-            rebuildGeometryAtlas(activeScene);
+            rebuildGeometryLookupTable(activeScene);
             break;
         }
     }
@@ -142,7 +144,7 @@ void PathTracer::flattenScene(Scene &activeScene) {
 
         inst.transform = model;
         inst.invTransform = glm::inverse(model);
-        inst.meshIndex = meshToAtlasMap[meshComp.assetID];
+        inst.meshIndex = instanceLookupTable[meshComp.assetID];
 
         instances.push_back(inst);
     }
@@ -154,12 +156,12 @@ void PathTracer::flattenScene(Scene &activeScene) {
     }
 }
 
-void PathTracer::rebuildGeometryAtlas(Scene &activeScene) {
-    std::vector<GPUVertex> atlasVertices;
-    std::vector<uint32_t> atlasIndices;
+void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
+    std::vector<GPUVertex> instanceVertices;
+    std::vector<uint32_t> instanceIndices;
     std::vector<GPUMeshEntry> meshEntries;
 
-    meshToAtlasMap.clear();
+    instanceLookupTable.clear();
 
     // Get unique assets
     std::set<std::string> uniqueAssets;
@@ -175,34 +177,35 @@ void PathTracer::rebuildGeometryAtlas(Scene &activeScene) {
         auto meshData = AssetManager::loadMesh(assetID);
 
         GPUMeshEntry entry{};
-        entry.baseVertex = static_cast<uint32_t>(atlasVertices.size());
-        entry.baseIndex = static_cast<uint32_t>(atlasIndices.size());
+        entry.baseVertex = static_cast<uint32_t>(instanceVertices.size());
+        entry.baseIndex = static_cast<uint32_t>(instanceIndices.size());
         entry.indexCount = static_cast<uint32_t>(meshData->indices.size());
 
         for (const auto &v : meshData->vertices) {
-            atlasVertices.push_back({glm::vec4(v.position, 1.0f),
-                                     glm::vec4(v.normal, 0.0f),
-                                     glm::vec4(v.texCoords, 0.0f, 0.0f)});
+            instanceVertices.push_back({glm::vec4(v.position, 1.0f),
+                                        glm::vec4(v.normal, 0.0f),
+                                        glm::vec4(v.texCoords, 0.0f, 0.0f)});
         }
 
-        atlasIndices.insert(atlasIndices.end(), meshData->indices.begin(),
-                            meshData->indices.end());
+        instanceIndices.insert(instanceIndices.end(), meshData->indices.begin(),
+                               meshData->indices.end());
 
-        meshToAtlasMap[assetID] = static_cast<uint32_t>(meshEntries.size());
+        instanceLookupTable[assetID] =
+            static_cast<uint32_t>(meshEntries.size());
         meshEntries.push_back(entry);
     }
 
     // Allocate and map static buffers
     vertexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                       atlasVertices.size() * sizeof(GPUVertex));
-    vertexBuffer.update(atlasVertices.data(),
-                        atlasVertices.size() * sizeof(GPUVertex));
+                       instanceVertices.size() * sizeof(GPUVertex));
+    vertexBuffer.update(instanceVertices.data(),
+                        instanceVertices.size() * sizeof(GPUVertex));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vertexBuffer.id);
 
     indexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                      atlasIndices.size() * sizeof(uint32_t));
-    indexBuffer.update(atlasIndices.data(),
-                       atlasIndices.size() * sizeof(uint32_t));
+                      instanceIndices.size() * sizeof(uint32_t));
+    indexBuffer.update(instanceIndices.data(),
+                       instanceIndices.size() * sizeof(uint32_t));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, indexBuffer.id);
 
     meshEntryBuffer.setup(GL_SHADER_STORAGE_BUFFER,
