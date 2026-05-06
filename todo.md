@@ -37,6 +37,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Add to timer a "periodic" way to run code
   - IDEA: Use % and a total deltaTime / time to run whenever
 - [ ] Standize and fix "attributes first, then methods"", or vice-versa in header files
+- [ ] Move the loadMesh from Application into Rasterizer (Look at PathTracer.cpp for example)
 
 ### Todo - Not Code
 
@@ -81,7 +82,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 2. [x] Fix public vs. private
 3. [x] Make variables & functions const when needed
 4. [x] Fix placement of functions
-5. [ ] Refactor step by step in code
+5. [x] Refactor step by step in code
 6. [ ] Rename things
 7. [ ] Add comments
 8. [ ] Place the \#includes in the right spots

@@ -23,15 +23,14 @@ void PathTracer::init() {
     // We allocate enough space for MAX_INSTANCES.
     instanceBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                          MAX_INSTANCES * sizeof(GPUInstance));
-
-    // Bind the buffers to their respective GLSL binding points
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, instanceBuffer.id);
 }
 
 void PathTracer::shutdown() {
+
+    meshEntryBuffer.shutdown();
     vertexBuffer.shutdown();
     indexBuffer.shutdown();
-    meshEntryBuffer.shutdown();
     instanceBuffer.shutdown();
 
     if (outputTexture != 0) {
@@ -50,6 +49,7 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
 
     // 2. Bind
     computeShader.bind();
+
     glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
                        GL_RGBA32F);
 
@@ -67,7 +67,8 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
     glDispatchCompute(numGroupsX, numGroupsY, 1);
 
     // 5. Memory Barrier
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+                    GL_FRAMEBUFFER_BARRIER_BIT);
 }
 
 void PathTracer::resize(int newWidth, int newHeight) {
@@ -80,15 +81,20 @@ void PathTracer::resize(int newWidth, int newHeight) {
     if (outputTexture != 0)
         glDeleteTextures(1, &outputTexture);
 
-    glGenTextures(1, &outputTexture);
-    glBindTexture(GL_TEXTURE_2D, outputTexture);
+    glGenTextures(1, &outputTexture); // Generate
+    glBindTexture(GL_TEXTURE_2D,
+                  outputTexture); // Tell the texture its a texture
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, currentWidth, currentHeight, 0,
-                 GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                 GL_RGBA, GL_FLOAT, NULL); // Allocate VRAM
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR); // Scaling filter
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                    GL_LINEAR); // Scaling filter
+
     glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
-                       GL_RGBA32F);
-    glBindTexture(GL_TEXTURE_2D, 0);
+                       GL_RGBA32F);  // Write-Only mode
+    glBindTexture(GL_TEXTURE_2D, 0); // Clean up the binding
 }
 
 void PathTracer::presentTextureToFramebuffer(int width, int height) const {
@@ -101,8 +107,6 @@ void PathTracer::presentTextureToFramebuffer(int width, int height) const {
 
     // Bind the default window buffer for drawing
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-    // Blit (copy) the pixels from the texture FBO to the screen
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
                       GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
@@ -116,14 +120,10 @@ void PathTracer::flattenScene(Scene &activeScene) {
         auto &meshComp = activeScene.getComponent<MeshComponent>(id);
         if (meshToAtlasMap.find(meshComp.assetID) == meshToAtlasMap.end()) {
             geometryDirty = true;
+            rebuildGeometryAtlas(activeScene);
             break;
         }
     }
-
-    if (geometryDirty) {
-        rebuildGeometryAtlas(activeScene);
-    }
-
     // 2. Update Dynamic Instances
     std::vector<GPUInstance> instances;
     instances.reserve(renderables.size());
