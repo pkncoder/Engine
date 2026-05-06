@@ -1,4 +1,5 @@
 #include "PathTracer.h"
+
 #include "../resources/AssetManager.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
