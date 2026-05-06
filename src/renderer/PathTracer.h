@@ -9,7 +9,6 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 namespace Engine {
 

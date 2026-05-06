@@ -2,7 +2,6 @@
 
 #include "../services/Logger.h"
 #include <cstring> // for memcpy
-#include <iostream>
 
 namespace Engine {
 
@@ -78,8 +77,9 @@ void PersistentBuffer::update(const void *data, size_t updateSize) {
         // Direct memory copy to the mapped VRAM pointer. Lightning fast.
         std::memcpy(mappedPtr, data, updateSize);
     } else {
-        std::cerr
-            << "PersistentBuffer Update Error: Out of bounds or unmapped.\n";
+        Logger::error(
+            "SYSTEM",
+            "PersistentBuffer Update Error: Out of bounds or unmapped");
     }
 }
 

@@ -3,7 +3,6 @@
 #include "../services/Logger.h"
 #include "ModelLoader.h"
 
-#include <iostream>
 #include <string>
 
 namespace Engine {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../renderer/PathTracer.h"
-#include "../renderer/Rasterizer.h"
+// #include "../renderer/Rasterizer.h"
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
 #include "Window.h"
