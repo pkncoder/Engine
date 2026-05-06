@@ -28,6 +28,48 @@ void PathTracer::init() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, instanceBuffer.id);
 }
 
+void PathTracer::shutdown() {
+    vertexBuffer.shutdown();
+    indexBuffer.shutdown();
+    meshEntryBuffer.shutdown();
+    instanceBuffer.shutdown();
+
+    if (outputTexture != 0) {
+        glDeleteTextures(1, &outputTexture);
+        outputTexture = 0;
+    }
+}
+
+void PathTracer::render(const Camera &camera, Scene &activeScene,
+                        float aspectRatio) {
+    if (currentWidth == 0 || currentHeight == 0)
+        return;
+
+    // 1. Sync Data
+    flattenScene(activeScene);
+
+    // 2. Bind
+    computeShader.bind();
+    glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
+                       GL_RGBA32F);
+
+    // 3. Set basic Uniforms
+    computeShader.setVec3("u_CameraPos", camera.position);
+    // You will need to pass inverse view/proj to cast rays:
+    // computeShader.setMat4("u_InverseView",
+    // glm::inverse(camera.getViewMatrix()));
+    // computeShader.setMat4("u_InverseProj",
+    // glm::inverse(camera.getProjectionMatrix()));
+
+    // 4. Dispatch (8x8 blocks)
+    GLuint numGroupsX = (currentWidth + 7) / 8;
+    GLuint numGroupsY = (currentHeight + 7) / 8;
+    glDispatchCompute(numGroupsX, numGroupsY, 1);
+
+    // 5. Memory Barrier
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+}
+
 void PathTracer::resize(int newWidth, int newHeight) {
     if (newWidth == currentWidth && newHeight == currentHeight)
         return;
@@ -47,6 +89,22 @@ void PathTracer::resize(int newWidth, int newHeight) {
     glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
                        GL_RGBA32F);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void PathTracer::presentTextureToFramebuffer(int width, int height) const {
+    // Bind our temporary FBO for reading
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
+
+    // Attach the Path Tracer's output texture to it
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, outputTexture, 0);
+
+    // Bind the default window buffer for drawing
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    // Blit (copy) the pixels from the texture FBO to the screen
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 void PathTracer::flattenScene(Scene &activeScene) {
@@ -154,64 +212,6 @@ void PathTracer::rebuildGeometryAtlas(Scene &activeScene) {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, meshEntryBuffer.id);
 
     geometryDirty = false;
-}
-
-void PathTracer::render(const Camera &camera, Scene &activeScene,
-                        float aspectRatio) {
-    if (currentWidth == 0 || currentHeight == 0)
-        return;
-
-    // 1. Sync Data
-    flattenScene(activeScene);
-
-    // 2. Bind
-    computeShader.bind();
-    glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
-                       GL_RGBA32F);
-
-    // 3. Set basic Uniforms
-    computeShader.setVec3("u_CameraPos", camera.position);
-    // You will need to pass inverse view/proj to cast rays:
-    // computeShader.setMat4("u_InverseView",
-    // glm::inverse(camera.getViewMatrix()));
-    // computeShader.setMat4("u_InverseProj",
-    // glm::inverse(camera.getProjectionMatrix()));
-
-    // 4. Dispatch (8x8 blocks)
-    GLuint numGroupsX = (currentWidth + 7) / 8;
-    GLuint numGroupsY = (currentHeight + 7) / 8;
-    glDispatchCompute(numGroupsX, numGroupsY, 1);
-
-    // 5. Memory Barrier
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-}
-
-void PathTracer::shutdown() {
-    vertexBuffer.shutdown();
-    indexBuffer.shutdown();
-    meshEntryBuffer.shutdown();
-    instanceBuffer.shutdown();
-
-    if (outputTexture != 0) {
-        glDeleteTextures(1, &outputTexture);
-        outputTexture = 0;
-    }
-}
-
-void PathTracer::presentTextureToFramebuffer(int width, int height) const {
-    // Bind our temporary FBO for reading
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
-
-    // Attach the Path Tracer's output texture to it
-    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                           GL_TEXTURE_2D, getOutputTexture(), 0);
-
-    // Bind the default window buffer for drawing
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-    // Blit (copy) the pixels from the texture FBO to the screen
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
-                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 } // namespace Engine
