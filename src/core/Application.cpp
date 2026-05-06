@@ -136,12 +136,6 @@ void Application::init() {
     pathTracer = std::make_unique<PathTracer>();
     pathTracer->init();
 
-    glGenFramebuffers(1, &presentFBO);
-
-    int width, height;
-    window->getSize(width, height);
-    pathTracer->resize(width, height);
-
     Logger::info("SYSTEM", "Application init complete");
     Logger::setNoPendingLogs(false);
 }
@@ -170,8 +164,12 @@ void Application::run() {
         pathTracer->render(camera, activeScene, window->getAspectRatio());
         END_PROFILE("Render"); // End Timer for renderer
 
+        int width, height;
+        window->getSize(width, height);
+        pathTracer->resize(width, height);
+
         // 2. Present the compute texture to the main window
-        presentToScreen();
+        pathTracer->presentTextureToFramebuffer(width, height);
 
         // Do things like event polling & buffer swapping
         window->postFrame();
@@ -186,27 +184,6 @@ void Application::run() {
 
         Logger::outputLogs();
     }
-}
-
-// Helper function to draw the compute shader texture to the window
-void Application::presentToScreen() {
-    // Bind our temporary FBO for reading
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
-
-    // Attach the Path Tracer's output texture to it
-    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                           GL_TEXTURE_2D, pathTracer->getOutputTexture(), 0);
-
-    // Bind the default window buffer for drawing
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-    int width, height;
-    window->getSize(width, height);
-    pathTracer->resize(width, height);
-
-    // Blit (copy) the pixels from the texture FBO to the screen
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
-                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 // Handle any inputs that come in this frame

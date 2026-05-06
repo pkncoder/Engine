@@ -17,6 +17,8 @@ void PathTracer::init() {
         return;
     }
 
+    glGenFramebuffers(1, &presentFBO);
+
     // Allocate the Dynamic Instance Buffer up front.
     // We allocate enough space for MAX_INSTANCES.
     instanceBuffer.setup(GL_SHADER_STORAGE_BUFFER,
@@ -194,6 +196,22 @@ void PathTracer::shutdown() {
         glDeleteTextures(1, &outputTexture);
         outputTexture = 0;
     }
+}
+
+void PathTracer::presentTextureToFramebuffer(int width, int height) {
+    // Bind our temporary FBO for reading
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
+
+    // Attach the Path Tracer's output texture to it
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, getOutputTexture(), 0);
+
+    // Bind the default window buffer for drawing
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    // Blit (copy) the pixels from the texture FBO to the screen
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 } // namespace Engine
