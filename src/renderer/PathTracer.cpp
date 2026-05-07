@@ -244,26 +244,26 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
         meshEntries.push_back(entry);
     }
 
+    // Mesh buffer setup, updating, and binding
+    meshEntryBuffer.setup(GL_SHADER_STORAGE_BUFFER,
+                          meshEntries.size() * sizeof(GPUMeshEntry));
+    meshEntryBuffer.update(meshEntries.data(),
+                           meshEntries.size() * sizeof(GPUMeshEntry));
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, meshEntryBuffer.id);
+
     // Vertex buffer setup, updating, and binding
     vertexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                        instanceVertices.size() * sizeof(GPUVertex));
     vertexBuffer.update(instanceVertices.data(),
                         instanceVertices.size() * sizeof(GPUVertex));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vertexBuffer.id);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, vertexBuffer.id);
 
     // Index buffer setup, updating, and binding
     indexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                       instanceIndices.size() * sizeof(uint32_t));
     indexBuffer.update(instanceIndices.data(),
                        instanceIndices.size() * sizeof(uint32_t));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, indexBuffer.id);
-
-    // Mesh buffer setup, updating, and binding
-    meshEntryBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                          meshEntries.size() * sizeof(GPUMeshEntry));
-    meshEntryBuffer.update(meshEntries.data(),
-                           meshEntries.size() * sizeof(GPUMeshEntry));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, meshEntryBuffer.id);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, indexBuffer.id);
 
     // Un-dirty the geometry
     geometryDirty = false;
