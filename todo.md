@@ -38,6 +38,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - IDEA: Use % and a total deltaTime / time to run whenever
 - [ ] Standize and fix "attributes first, then methods"", or vice-versa in header files
 - [ ] Move the loadMesh from Application into Rasterizer (Look at PathTracer.cpp for example)
+- [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 
 ### Todo - Not Code
 
@@ -79,15 +80,15 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ### Refactor Checklist
 
-1. [ ] Fix warnings
-2. [ ] Fix public vs. private
-3. [ ] Make variables & functions const when needed
-4. [ ] Fix placement of functions
-5. [ ] Refactor step by step in code
-6. [ ] Rename things
-7. [ ] Add comments
-8. [ ] Place the \#includes in the right spots
-9. [ ] Fix file tree
+1. [x] Fix warnings
+2. [x] Fix public vs. private
+3. [x] Make variables & functions const when needed
+4. [x] Fix placement of functions
+5. [x] Refactor step by step in code
+6. [x] Rename things
+7. [x] Add comments
+8. [x] Place the \#includes in the right spots
+9. [x] Fix file tree
 
 ## Finished Todos
 

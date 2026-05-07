@@ -13,7 +13,7 @@ const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.25f;
-const float ZOOM = 45.0f;
+const float FOV = 45.0f;
 
 class Camera {
   public:
@@ -31,7 +31,7 @@ class Camera {
     // Camera options
     float mouseSensitivity;
     float movementSpeed;
-    float zoom;
+    float fov;
 
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),

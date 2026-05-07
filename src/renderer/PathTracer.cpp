@@ -66,9 +66,10 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
 
     // Set uniforms for the compute shader
     computeShader.setVec3("u_cameraPos", camera.position);
-    computeShader.setInt("u_InstanceCount", instanceCount);
+    computeShader.setFloat("u_FOV", camera.fov);
+    computeShader.setInt("u_instanceCount", instanceCount);
     // You will need to pass inverse view/proj to cast rays:
-    computeShader.setMat4("u_InverseView",
+    computeShader.setMat4("u_inverseView",
                           glm::inverse(camera.getViewMatrix()));
     // computeShader.setMat4("u_InverseProj",
     // glm::inverse(camera.getProjectionMatrix()));
