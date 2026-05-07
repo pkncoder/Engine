@@ -65,10 +65,11 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
                        GL_RGBA32F);
 
     // Set uniforms for the compute shader
-    computeShader.setVec3("u_CameraPos", camera.position);
+    computeShader.setVec3("u_cameraPos", camera.position);
+    computeShader.setInt("u_InstanceCount", instanceCount);
     // You will need to pass inverse view/proj to cast rays:
-    // computeShader.setMat4("u_InverseView",
-    // glm::inverse(camera.getViewMatrix()));
+    computeShader.setMat4("u_InverseView",
+                          glm::inverse(camera.getViewMatrix()));
     // computeShader.setMat4("u_InverseProj",
     // glm::inverse(camera.getProjectionMatrix()));
 
@@ -189,6 +190,8 @@ void PathTracer::flattenScene(Scene &activeScene) {
         instanceBuffer.update(instances.data(),
                               instances.size() * sizeof(GPUInstance));
     }
+
+    instanceCount = instances.size();
 }
 
 // Rebuild the geometry data

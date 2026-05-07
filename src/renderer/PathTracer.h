@@ -84,6 +84,7 @@ class PathTracer : IRenderer {
 
     // Maximum instances we allocate memory for up front
     const size_t MAX_INSTANCES = 10000;
+    size_t instanceCount = 0;
 };
 
 } // namespace Engine
