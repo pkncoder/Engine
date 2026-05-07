@@ -164,9 +164,11 @@ void Application::run() {
         pathTracer->render(camera, activeScene, window->getAspectRatio());
         END_PROFILE("Render"); // End Timer for renderer
 
+        START_PROFILE("Blit"); // Blit profiler
         int width, height;
         window->getSize(width, height);
         pathTracer->resize(width, height);
+        END_PROFILE("Blit"); // Blit profiler
 
         // 2. Present the compute texture to the main window
         pathTracer->presentOutputTextureToFramebuffer(width, height);
