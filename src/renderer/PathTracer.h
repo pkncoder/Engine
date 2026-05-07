@@ -37,21 +37,22 @@ struct alignas(16) GPUInstance {
 
 // ------------------------------------------------------------
 
-class PathTracer : IRenderer {
+class PathTracer : public IRenderer {
   public:
     // Init and shutdown
-    void init();
-    void shutdown();
+    void init() override;
+    void shutdown() override;
 
     // Rendering and resizing windows
-    void render(const Camera &camera, Scene &activeScene, float aspectRatio);
-    void resize(int newWidth, int newHeight);
+    void render(const Camera &camera, Scene &activeScene,
+                float aspectRatio) override;
+    void resize(int newWidth, int newHeight) override;
 
     // Getter for the output texture
     // GLuint getOutputTexture() const { return outputTexture; }
 
     // Bliting the output texture onto the framebuffer
-    void presentOutputTextureToFramebuffer(int width, int height) const;
+    void present(int width, int height) override;
 
   private:
     // Scene modifications & building

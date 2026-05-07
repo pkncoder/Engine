@@ -1,7 +1,8 @@
 #pragma once
 
+#include "../renderer/IRenderer.h"
 #include "../renderer/PathTracer.h"
-// #include "../renderer/Rasterizer.h"
+#include "../renderer/Rasterizer.h"
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
 #include "Window.h"
@@ -33,11 +34,16 @@ class Application {
     // Camera object
     Camera camera;
 
-    // Active renderer
-    // std::unique_ptr<Rasterizer> rasterizer;
+    // Both renderers stay loaded in VRAM
+    std::unique_ptr<Rasterizer> rasterizer;
     std::unique_ptr<PathTracer> pathTracer;
 
+    // Pointer to the currently active one
+    IRenderer *activeRenderer = nullptr;
+
     GLuint presentFBO = 0;
+
+    bool swapActiveRendererMark = false;
 
     // Presenting a texture to the screen
     void presentToScreen();

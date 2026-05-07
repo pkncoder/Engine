@@ -131,10 +131,12 @@ void Application::init() {
     }
 
     // Construct the rasterizer and init it
-    // rasterizer = std::make_unique<Rasterizer>();
-    // rasterizer->init();
+    rasterizer = std::make_unique<Rasterizer>();
+    rasterizer->init();
     pathTracer = std::make_unique<PathTracer>();
     pathTracer->init();
+
+    activeRenderer = rasterizer.get();
 
     Logger::info("SYSTEM", "Application init complete");
     Logger::setNoPendingLogs(false);
@@ -161,17 +163,17 @@ void Application::run() {
         // Render the scene
         START_PROFILE("Render"); // Start timer for renderer
         // rasterizer->render(camera, activeScene, window->getAspectRatio());
-        pathTracer->render(camera, activeScene, window->getAspectRatio());
+        activeRenderer->render(camera, activeScene, window->getAspectRatio());
         END_PROFILE("Render"); // End Timer for renderer
 
         START_PROFILE("Blit"); // Blit profiler
         int width, height;
         window->getSize(width, height);
-        pathTracer->resize(width, height);
+        activeRenderer->resize(width, height);
         END_PROFILE("Blit"); // Blit profiler
 
         // 2. Present the compute texture to the main window
-        pathTracer->presentOutputTextureToFramebuffer(width, height);
+        activeRenderer->present(width, height);
 
         // Do things like event polling & buffer swapping
         window->postFrame();
@@ -210,6 +212,22 @@ void Application::handleInputs() {
         camera.processMovement(UP);
     if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
         camera.processMovement(DOWN);
+
+    if (swapActiveRendererMark) {
+        if (activeRenderer == pathTracer.get()) {
+            activeRenderer = rasterizer.get();
+            Logger::info("SYSTEM", "Swapped to Rasterizer");
+        } else {
+            activeRenderer = pathTracer.get();
+            Logger::info("SYSTEM", "Swapped to Path Tracer");
+        }
+
+        swapActiveRendererMark = false;
+    }
+
+    if (Input::isKeyPressed(GLFW_KEY_R)) {
+        swapActiveRendererMark = true;
+    }
 }
 
 } // namespace Engine

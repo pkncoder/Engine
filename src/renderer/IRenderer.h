@@ -12,6 +12,9 @@ class IRenderer {
                         float aspectRatio = 0) = 0; // Rendering a frame
 
     virtual void shutdown() = 0; // Shutting down a renderer
+
+    virtual void resize(int width, int height) {}
+    virtual void present(int width, int height) {}
 };
 
 }; // namespace Engine

@@ -7,14 +7,14 @@
 
 namespace Engine {
 
-class Rasterizer : IRenderer {
+class Rasterizer : public IRenderer {
   public:
-    void init(); // Init the renderer
+    void init() override; // Init the renderer
 
     void render(const Camera &camera, Scene &scene,
-                float aspectRatio); // Render frame
+                float aspectRatio) override; // Render frame
 
-    void shutdown(); // Shut down the renderer
+    void shutdown() override; // Shut down the renderer
 
   private:
     // Shader code

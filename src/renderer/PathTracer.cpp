@@ -122,8 +122,7 @@ void PathTracer::resize(int newWidth, int newHeight) {
 }
 
 // Blit, or move over the data from the texture to the framebuffer
-void PathTracer::presentOutputTextureToFramebuffer(int width,
-                                                   int height) const {
+void PathTracer::present(int width, int height) {
     // Bind the framebuffer
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
 
