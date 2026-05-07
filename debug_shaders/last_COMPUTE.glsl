@@ -123,7 +123,8 @@ HitInfo rayScene(Ray ray) {
                 
                 // Transform normal back to world space 
                 // (Using transpose of inverse is technically better for non-uniform scale)
-                closestHit.normal = normalize((instance.invTransform * vec4(currentHit.normal, 0.0)).xyz);
+                closestHit.hitPos = (instance.transform * vec4(currentHit.hitPos, 1.0)).xyz;
+                closestHit.normal = normalize((vec4(currentHit.normal, 0.0) * instance.invTransform).xyz);
             }
         }
     }
@@ -160,13 +161,14 @@ void main() {
     vec3 col;
     if (hit.hit) {
         // Simple "NdotL" shading based on a fake light source
-        float light = max(dot(hit.normal, normalize(u_cameraPos)), 0.1);
+        vec3 lightDir = normalize(u_cameraPos - hit.hitPos);
+        float light = max(dot(hit.normal, lightDir), 0.1);
         col = vec3(0.8, 0.3, 0.2) * light; // Reddish color
     } else {
         // Sky Gradient
         float t = 0.5 * (ray.direction.y + 1.0);
         col = (1.0 - t) * vec3(1.0) + t * vec3(0.5, 0.7, 1.0);
     }
-
-    imageStore(img_output, pixel_coords, vec4(hit.hit ? vec3(hit.hitPos) : vec3(0.0), 1.0));
+    // imageStore(img_output, pixel_coords, vec4(hit.hit ? vec3(hit.hitPos) : vec3(0.0), 1.0));
+    imageStore(img_output, pixel_coords, vec4(col, 1.0));
 }
