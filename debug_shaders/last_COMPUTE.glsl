@@ -106,7 +106,7 @@ vec3 blinnPhong(Ray ray, HitInfo hit) {
 // END INCLUDE: ../include/models/blinn_phong.glsl
 
 // Path tracing includes
-// BEGIN INCLUDE: ../include/pathTracingStructures.glsl
+// BEGIN INCLUDE: ../include/pathTracing/structures.glsl
 struct GPUMeshEntry {
     uint baseVertex;
     uint baseIndex;
@@ -129,8 +129,8 @@ struct GPUInstance {
     uint padding3;
 };
 
-// END INCLUDE: ../include/pathTracingStructures.glsl
-
+// END INCLUDE: ../include/pathTracing/structures.glsl
+// BEGIN INCLUDE: ../include/pathTracing/sceneBuffers.glsl
 // SSBO buffers
 layout(std430, binding = 0) readonly buffer MeshEntryBuffer { GPUMeshEntry meshEntries[]; };
 layout(std430, binding = 1) readonly buffer VertexBuffer { GPUVertex vertices[]; };
@@ -139,6 +139,7 @@ layout(std430, binding = 3) readonly buffer InstanceBuffer { GPUInstance instanc
 
 // Total instance count
 uniform int u_instanceCount;
+// END INCLUDE: ../include/pathTracing/sceneBuffers.glsl
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D img_output;

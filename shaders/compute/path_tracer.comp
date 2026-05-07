@@ -15,16 +15,8 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 #include "../include/models/blinn_phong.glsl"
 
 // Path tracing includes
-#include "../include/pathTracingStructures.glsl"
-
-// SSBO buffers
-layout(std430, binding = 0) readonly buffer MeshEntryBuffer { GPUMeshEntry meshEntries[]; };
-layout(std430, binding = 1) readonly buffer VertexBuffer { GPUVertex vertices[]; };
-layout(std430, binding = 2) readonly buffer IndexBuffer { uint indices[]; };
-layout(std430, binding = 3) readonly buffer InstanceBuffer { GPUInstance instances[]; };
-
-// Total instance count
-uniform int u_instanceCount;
+#include "../include/pathTracing/structures.glsl"
+#include "../include/pathTracing/sceneBuffers.glsl"
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D img_output;
