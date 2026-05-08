@@ -218,7 +218,7 @@ void Application::handleInputs() {
     if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
         camera.processMovement(DOWN);
 
-    if (swapActiveRendererMark) {
+    if (swapActiveRendererMark && !swapActiveRendererLock) {
 
         GLint major, minor;
         glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -229,24 +229,23 @@ void Application::handleInputs() {
             if (major > 4 || (major == 4 && minor >= 6)) {
                 activeRenderer = pathTracer.get();
                 Logger::info("SYSTEM", "Swapped to Path Tracer");
-            } else if (!pathTraceErrorPrintLock) {
+            } else {
                 Logger::error("SYSTEM",
                               "Path Tracer is not supported on this system.");
-
-                pathTraceErrorPrintLock = true;
             }
         } else {
             activeRenderer = rasterizer.get();
             Logger::info("SYSTEM", "Swapped to Rasterizer");
         }
 
-        swapActiveRendererMark = false;
+        swapActiveRendererLock = true;
     }
 
     if (Input::isKeyPressed(GLFW_KEY_R)) {
         swapActiveRendererMark = true;
     } else {
-        pathTraceErrorPrintLock = false;
+        swapActiveRendererMark = false;
+        swapActiveRendererLock = false;
     }
 }
 

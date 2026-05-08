@@ -51,7 +51,7 @@ class Application {
     GLuint presentFBO = 0;
 
     bool swapActiveRendererMark = false;
-    bool pathTraceErrorPrintLock = false;
+    bool swapActiveRendererLock = false;
 };
 
 } // namespace Engine
