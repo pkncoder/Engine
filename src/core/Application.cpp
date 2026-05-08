@@ -57,84 +57,89 @@ void Application::init() {
         START_PROFILE("Mesh Loading");
 
         // Load the meshes to CPU from disk
-        // auto optionalMeshOne =
-        //     AssetManager::loadMesh("assets/models/bunny.obj");
-        // auto optionalMeshTwo =
-        //     AssetManager::loadMesh("assets/models/dragon.obj");
-        // auto optionalMeshThree =
-        //     AssetManager::loadMesh("assets/models/cat.obj");
-        // auto optionalMeshFour =
-        //     AssetManager::loadMesh("assets/models/moai.obj");
+        auto optionalMeshOne =
+            AssetManager::loadMesh("assets/models/bunny.obj");
+        auto optionalMeshTwo =
+            AssetManager::loadMesh("assets/models/dragon.obj");
+        auto optionalMeshThree =
+            AssetManager::loadMesh("assets/models/cat.obj");
+        auto optionalMeshFour =
+            AssetManager::loadMesh("assets/models/moai.obj");
         auto optionalMeshFive =
             AssetManager::loadMesh("assets/models/cube.obj");
 
         END_PROFILE_STACKED_LOG("Mesh Loading");
 
         // Upload the CPU mesh data to the GPU (VRAM)
-        // MeshComponent meshComponentOne =
-        //     BufferManager::uploadMesh(optionalMeshOne.value());
-        // MeshComponent meshComponentTwo =
-        //     BufferManager::uploadMesh(optionalMeshTwo.value());
-        // MeshComponent meshComponentThree =
-        //     BufferManager::uploadMesh(optionalMeshThree.value());
-        // MeshComponent meshComponentFour =
-        //     BufferManager::uploadMesh(optionalMeshFour.value());
+        MeshComponent meshComponentOne =
+            BufferManager::uploadMesh(optionalMeshOne.value());
+        MeshComponent meshComponentTwo =
+            BufferManager::uploadMesh(optionalMeshTwo.value());
+        MeshComponent meshComponentThree =
+            BufferManager::uploadMesh(optionalMeshThree.value());
+        MeshComponent meshComponentFour =
+            BufferManager::uploadMesh(optionalMeshFour.value());
         MeshComponent meshComponentFive =
             BufferManager::uploadMesh(optionalMeshFive.value());
 
         // Set mesh component ids for the path tracer
-        // meshComponentOne.assetID = "assets/models/bunny.obj";
-        // meshComponentTwo.assetID = "assets/models/dragon.obj";
-        // meshComponentThree.assetID = "assets/models/cat.obj";
-        // meshComponentFour.assetID = "assets/models/moai.obj";
+        meshComponentOne.assetID = "assets/models/bunny.obj";
+        meshComponentTwo.assetID = "assets/models/dragon.obj";
+        meshComponentThree.assetID = "assets/models/cat.obj";
+        meshComponentFour.assetID = "assets/models/moai.obj";
         meshComponentFive.assetID = "assets/models/cube.obj";
 
         // Create entity wrappers & instiate entity ids in the ECS (Scene.h)
-        // Entity entityOne(activeScene.createEntity(), &activeScene);
-        // Entity entityTwo(activeScene.createEntity(), &activeScene);
-        // Entity entityThree(activeScene.createEntity(), &activeScene);
-        // Entity entityFour(activeScene.createEntity(), &activeScene);
+        Entity entityOne(activeScene.createEntity(), &activeScene);
+        Entity entityTwo(activeScene.createEntity(), &activeScene);
+        Entity entityThree(activeScene.createEntity(), &activeScene);
+        Entity entityFour(activeScene.createEntity(), &activeScene);
         Entity entityFive(activeScene.createEntity(), &activeScene);
 
-        // // Add mesh #1 components
-        // entityOne.addComponent<MeshComponent>(meshComponentOne);
-        // entityOne.addComponent<Transform>({glm::vec3(-1.0f, -1.2f, -4.0f),
-        //                                    glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-        //                                    glm::vec3(1.0f, 1.0f, 1.0f)});
-        //
-        // // Add mesh #2 components
-        // entityTwo.addComponent<MeshComponent>(meshComponentTwo);
-        // entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.6f, -3.5f),
-        //                                    glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-        //                                    glm::vec3(1.0f, 1.0f, 1.0f)});
-        //
-        // // Add mesh #3 components
-        // entityThree.addComponent<MeshComponent>(meshComponentThree);
-        // entityThree.addComponent<Transform>({glm::vec3(0.0f, -0.6f, -4.0f),
-        //                                      glm::quat(1.0f, 0.0f, 0.0f,
-        //                                      0.0f),
-        //                                      glm::vec3(1.0f, 1.0f, 1.0f)});
-        //
-        // // Add mesh #4 components
-        // entityFour.addComponent<MeshComponent>(meshComponentFour);
-        // entityFour.addComponent<Transform>(
-        //     {glm::vec3(0.0f, 1.3f, -4.0f),
-        //      glm::quat(-0.707f, 0.0f, 0.707f, 0.0f),
-        //      glm::vec3(0.14f, 0.14f, 0.14f)});
+        // Add mesh #1 components
+        entityOne.addComponent<MeshComponent>(meshComponentOne);
+        entityOne.addComponent<Transform>({glm::vec3(-1.0f, -1.2f, -4.0f),
+                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                           glm::vec3(1.0f, 1.0f, 1.0f)});
+
+        // Add mesh #2 components
+        entityTwo.addComponent<MeshComponent>(meshComponentTwo);
+        entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.6f, -4.0f),
+                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                           glm::vec3(1.0f, 1.0f, 1.0f)});
+
+        // Add mesh #3 components
+        entityThree.addComponent<MeshComponent>(meshComponentThree);
+        entityThree.addComponent<Transform>({glm::vec3(0.0f, -0.6f, -4.0f),
+                                             glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                             glm::vec3(1.0f, 1.0f, 1.0f)});
 
         // Add mesh #4 components
-        entityFive.addComponent<MeshComponent>(meshComponentFive);
-        entityFive.addComponent<Transform>(
+        entityFour.addComponent<MeshComponent>(meshComponentFour);
+        entityFour.addComponent<Transform>(
             {glm::vec3(0.0f, 1.3f, -4.0f),
              glm::quat(-0.707f, 0.0f, 0.707f, 0.0f),
              glm::vec3(0.14f, 0.14f, 0.14f)});
+
+        // Add mesh #4 components
+        entityFive.addComponent<MeshComponent>(meshComponentFive);
+        entityFive.addComponent<Transform>({glm::vec3(-1.5f, 1.3f, -4.0f),
+                                            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+                                            glm::vec3(0.4f, 0.4f, 0.4f)});
     }
 
     // Construct the rasterizer and init it
     rasterizer = std::make_unique<Rasterizer>();
     rasterizer->init();
-    pathTracer = std::make_unique<PathTracer>();
-    pathTracer->init();
+
+    GLint major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &major);
+    glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+    if (major > 4 || (major == 4 && minor >= 6)) {
+        pathTracer = std::make_unique<PathTracer>();
+        pathTracer->init();
+    }
 
     activeRenderer = rasterizer.get();
 
@@ -214,12 +219,25 @@ void Application::handleInputs() {
         camera.processMovement(DOWN);
 
     if (swapActiveRendererMark) {
-        if (activeRenderer == pathTracer.get()) {
+
+        GLint major, minor;
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+        if (activeRenderer == rasterizer.get()) {
+
+            if (major > 4 || (major == 4 && minor >= 6)) {
+                activeRenderer = pathTracer.get();
+                Logger::info("SYSTEM", "Swapped to Path Tracer");
+            } else if (!pathTraceErrorPrintLock) {
+                Logger::error("SYSTEM",
+                              "Path Tracer is not supported on this system.");
+
+                pathTraceErrorPrintLock = true;
+            }
+        } else {
             activeRenderer = rasterizer.get();
             Logger::info("SYSTEM", "Swapped to Rasterizer");
-        } else {
-            activeRenderer = pathTracer.get();
-            Logger::info("SYSTEM", "Swapped to Path Tracer");
         }
 
         swapActiveRendererMark = false;
@@ -227,6 +245,8 @@ void Application::handleInputs() {
 
     if (Input::isKeyPressed(GLFW_KEY_R)) {
         swapActiveRendererMark = true;
+    } else {
+        pathTraceErrorPrintLock = false;
     }
 }
 

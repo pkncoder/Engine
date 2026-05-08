@@ -35,8 +35,8 @@ class Application {
     Camera camera;
 
     // Both renderers stay loaded in VRAM
-    std::unique_ptr<Rasterizer> rasterizer;
-    std::unique_ptr<PathTracer> pathTracer;
+    std::unique_ptr<Rasterizer> rasterizer = nullptr;
+    std::unique_ptr<PathTracer> pathTracer = nullptr;
 
     // Pointer to the currently active one
     IRenderer *activeRenderer = nullptr;
@@ -44,6 +44,7 @@ class Application {
     GLuint presentFBO = 0;
 
     bool swapActiveRendererMark = false;
+    bool pathTraceErrorPrintLock = false;
 
     // Presenting a texture to the screen
     void presentToScreen();
