@@ -38,6 +38,11 @@ class Timer {
     static void logPerformance(bool clearTerminal = true);
 
   private:
+    // Profile results
+    static std::map<std::string, double> profileResults;
+    static std::unordered_map<std::string, double> activeProfiles;
+
+  private:
     // Delta time and delta time math
     static float deltaTime;
     static double lastFrameTime;
@@ -50,10 +55,6 @@ class Timer {
     static float averageFPS;
     static float ms;
     static float lastLogTime;
-
-    // Profile results
-    static std::map<std::string, double> profileResults;
-    static std::unordered_map<std::string, double> activeProfiles;
 };
 
 // Timer that can either start and stop on const & scope, or manually keyed

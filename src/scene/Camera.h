@@ -17,22 +17,6 @@ const float FOV = 45.0f;
 
 class Camera {
   public:
-    // Camera Attributes
-    glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 up;
-    glm::vec3 right;
-    glm::vec3 worldUp;
-
-    // Euler Angles
-    float yaw;
-    float pitch;
-
-    // Camera options
-    float mouseSensitivity;
-    float movementSpeed;
-    float fov;
-
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW,
@@ -50,6 +34,23 @@ class Camera {
     // Processes the change to where the camera is looking
     void processLookingDirectionMovement(float xoffset, float yoffset,
                                          bool constrainPitch = true);
+
+  public:
+    // Camera Attributes
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
+    glm::vec3 right;
+    glm::vec3 worldUp;
+
+    // Euler Angles
+    float yaw;
+    float pitch;
+
+    // Camera options
+    float mouseSensitivity;
+    float movementSpeed;
+    float fov;
 
   private:
     // Update the front, right, and up camera vectors

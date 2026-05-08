@@ -25,6 +25,13 @@ class Application {
     void run();
 
   private:
+    // Presenting a texture to the screen
+    void presentToScreen();
+
+    // Handling inputs
+    void handleInputs();
+
+  private:
     // Window information
     std::unique_ptr<Window> window;
 
@@ -45,12 +52,6 @@ class Application {
 
     bool swapActiveRendererMark = false;
     bool pathTraceErrorPrintLock = false;
-
-    // Presenting a texture to the screen
-    void presentToScreen();
-
-    // Handling inputs
-    void handleInputs();
 };
 
 } // namespace Engine

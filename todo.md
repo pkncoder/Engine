@@ -33,10 +33,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out how getting all of the "renderables" will work
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
-- [ ] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
 - [ ] Add to timer a "periodic" way to run code
   - IDEA: Use % and a total deltaTime / time to run whenever
-- [ ] Standize and fix "attributes first, then methods"", or vice-versa in header files
 - [ ] Move the loadMesh from Application into Rasterizer (Look at PathTracer.cpp for example)
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 
@@ -113,3 +111,5 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Move to logger instead of cout
 - [x] Create a setting in Logger that will output a log every time you send one instead of send it to pending
 - [x] Integrate timer's profiler with the logger
+- [x] Standize and fix "attributes first, then methods"", or vice-versa in header files
+- [x] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.

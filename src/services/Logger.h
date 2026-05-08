@@ -62,6 +62,7 @@ class Logger {
     static void log(LogLevel level, std::string_view tag,
                     std::string_view message, LogType type);
 
+  private:
     // Boolean that, if true, will print whenever a new log is sent
     static inline bool no_periodic_wait = false;
 
