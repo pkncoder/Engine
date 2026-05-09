@@ -132,7 +132,7 @@ std::string Shader::getExpandedShaderCode(const std::string &shaderPath) {
     // Get the file and check if it exists
     std::ifstream file(shaderPath);
     if (!file.is_open()) {
-        Logger::fatal("SYSTEM", "ERROR::SHADER::FILE_NOT_FOUND: " + shaderPath);
+        Logger::fatal("SHADER", "ERROR::SHADER::FILE_NOT_FOUND: " + shaderPath);
         return "";
     }
 
@@ -212,7 +212,7 @@ void Shader::checkCompileErrors(uint32_t shader, std::string type) const {
         if (!success) {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
             Logger::fatal(
-                "SYSTEM",
+                "SHADER",
                 "ERROR::SHADER_COMPILATION_ERROR of type: " + type + "\n" +
                     infoLog +
                     "\n -- "
@@ -227,7 +227,7 @@ void Shader::checkCompileErrors(uint32_t shader, std::string type) const {
         if (!success) {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
             Logger::fatal(
-                "SYSTEM",
+                "SHADER",
                 "ERROR::PROGRAM_LINKING_ERROR of type: " + type + "\n" +
                     infoLog +
                     "\n -- "

@@ -17,7 +17,7 @@ void Rasterizer::init() {
     shader =
         Shader("shaders/raster/viewport.vert", "shaders/raster/viewport.frag");
 
-    Logger::info("SYSTEM", "Rasterizer initialized.");
+    Logger::info("RENDERER", "Rasterizer initialized.");
 }
 
 // Render a frame

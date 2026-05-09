@@ -11,7 +11,7 @@ Scene::Scene() {
         sig.reset();
     }
 
-    Logger::info("SYSTEM", "Scene initialized");
+    Logger::info("SCENE", "Scene initialized");
 }
 Scene::~Scene() {}
 

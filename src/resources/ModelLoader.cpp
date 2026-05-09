@@ -22,7 +22,7 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
     // Try to read from the file, and parse information if error
     if (!reader.ParseFromFile(filepath, readerConfig)) { // Error
         if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
-            Logger::error("SYSTEM", "TinyObj Error: " + reader.Error());
+            Logger::error("ASSET", "TinyObj Error: " + reader.Error());
         }
 
         // Error
@@ -42,8 +42,8 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
     const auto &attrib = reader.GetAttrib();
     const auto &shapes = reader.GetShapes();
 
-    Logger::info("SYSTEM", "Shapes: " + std::to_string(shapes.size()));
-    Logger::info("SYSTEM",
+    Logger::info("ASSET", "Shapes: " + std::to_string(shapes.size()));
+    Logger::info("ASSET",
                  "Raw Verts: " + std::to_string(attrib.vertices.size()));
 
     // Loop each shape

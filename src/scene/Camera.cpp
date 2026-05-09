@@ -21,7 +21,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     // Intialize the camera vectors
     updateCameraVectors();
 
-    Logger::info("SYSTEM", "Camera initialized.");
+    Logger::info("SCENE", "Camera initialized.");
 }
 
 // Calc (short for calculate) the view matrix

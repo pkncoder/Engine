@@ -86,7 +86,7 @@ void PersistentBuffer::update(const void *data, size_t updateSize) {
         std::memcpy(mappedPtr, data, updateSize);
     } else {
         Logger::error(
-            "SYSTEM",
+            "SHADER",
             "PersistentBuffer Update Error: Out of bounds or unmapped");
     }
 }

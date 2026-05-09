@@ -28,6 +28,8 @@ void PathTracer::init() {
     instanceBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                          MAX_INSTANCES * sizeof(GPUInstance));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, instanceBuffer.id);
+
+    Logger::info("RENDERER", "Path Tracer initialized");
 }
 
 // Cleaning up opengl memory

@@ -113,3 +113,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Integrate timer's profiler with the logger
 - [x] Standize and fix "attributes first, then methods"", or vice-versa in header files
 - [x] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
+- [x] Extend the tags in Logger calls
