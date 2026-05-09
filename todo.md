@@ -37,16 +37,14 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - IDEA: Use % and a total deltaTime / time to run whenever
 - [ ] Move the loadMesh from Application into Rasterizer (Look at PathTracer.cpp for example)
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
+- [ ] Move all these dang structs
 
 ### Todo - Not Code
 
 - [ ] Change how .mtl and .obj files are stored
-- [ ] Figure out the issue on MAC when clicking out and struggling to get back into the window
 - [ ] Should AssetTypes really be called that?
-- [ ] BufferManger.cpp/h inside of renderer, or resources?
 - [ ] Decide how AssetTypes.h should be layed out, and if I should split up the file.
 - [ ] Figure out the issue w/ width & height passing being a lot
-- [ ] Move all these dang structs
 
 ### Todo - Future Todos
 
@@ -66,7 +64,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] TMUX - Change to catpuccin Moccioto or something like that
 - [ ] CPP - gcc (compent) keybind not working on single lines (sometimes)
 - [ ] NVIM - Make it stop fuly hiding git ignored files
-- [ ] Change Leader+Arrows to Leader+Shift+Varrows
+- [ ] Change Leader+Arrows to Leader+Shift+(V)arrows
 
 ## Ideas
 
@@ -114,3 +112,5 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Standize and fix "attributes first, then methods"", or vice-versa in header files
 - [x] Check to see how acurate line numbers are in errors from shader code, try to fix if off too much / inconsistant.
 - [x] Extend the tags in Logger calls
+- [x] BufferManger.cpp/h inside of renderer, or resources?
+- [x] Figure out the issue on MAC when clicking out and struggling to get back into the window
