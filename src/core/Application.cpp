@@ -56,38 +56,19 @@ void Application::init() {
 
         START_PROFILE("Mesh Loading");
 
-        // Load the meshes to CPU from disk
-        auto optionalMeshOne =
-            AssetManager::loadMesh("assets/models/bunny.obj");
-        auto optionalMeshTwo =
-            AssetManager::loadMesh("assets/models/dragon.obj");
-        auto optionalMeshThree =
-            AssetManager::loadMesh("assets/models/cat.obj");
-        auto optionalMeshFour =
-            AssetManager::loadMesh("assets/models/moai.obj");
-        auto optionalMeshFive =
-            AssetManager::loadMesh("assets/models/cube.obj");
+        // Upload the CPU mesh data to the GPU (VRAM)
+        MeshComponent meshComponentOne = BufferManager::uploadMesh(
+            AssetManager::loadMesh("assets/models/bunny.obj").value());
+        MeshComponent meshComponentTwo = BufferManager::uploadMesh(
+            AssetManager::loadMesh("assets/models/dragon.obj").value());
+        MeshComponent meshComponentThree = BufferManager::uploadMesh(
+            AssetManager::loadMesh("assets/models/cat.obj").value());
+        MeshComponent meshComponentFour = BufferManager::uploadMesh(
+            AssetManager::loadMesh("assets/models/moai.obj").value());
+        MeshComponent meshComponentFive = BufferManager::uploadMesh(
+            AssetManager::loadMesh("assets/models/cube.obj").value());
 
         END_PROFILE_STACKED_LOG("Mesh Loading");
-
-        // Upload the CPU mesh data to the GPU (VRAM)
-        MeshComponent meshComponentOne =
-            BufferManager::uploadMesh(optionalMeshOne.value());
-        MeshComponent meshComponentTwo =
-            BufferManager::uploadMesh(optionalMeshTwo.value());
-        MeshComponent meshComponentThree =
-            BufferManager::uploadMesh(optionalMeshThree.value());
-        MeshComponent meshComponentFour =
-            BufferManager::uploadMesh(optionalMeshFour.value());
-        MeshComponent meshComponentFive =
-            BufferManager::uploadMesh(optionalMeshFive.value());
-
-        // Set mesh component ids for the path tracer
-        meshComponentOne.assetID = "assets/models/bunny.obj";
-        meshComponentTwo.assetID = "assets/models/dragon.obj";
-        meshComponentThree.assetID = "assets/models/cat.obj";
-        meshComponentFour.assetID = "assets/models/moai.obj";
-        meshComponentFive.assetID = "assets/models/cube.obj";
 
         // Create entity wrappers & instiate entity ids in the ECS (Scene.h)
         Entity entityOne(activeScene.createEntity(), &activeScene);
