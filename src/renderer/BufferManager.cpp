@@ -8,6 +8,11 @@ namespace Engine {
 // Takes CPU data, pushes to VRAM, returns ECS-ready component
 MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
 
+    if (gpuMeshCache.find(meshData.name) != gpuMeshCache.end()) {
+        return gpuMeshCache[meshData.name]; // Return the existing VAO/VBO/EBO
+                                            // handles
+    }
+
     // Create the new mesh component and set the index count
     MeshComponent comp;
     comp.indexCount = meshData.indices.size();
@@ -44,6 +49,8 @@ MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
 
     // Unbind the vertex array for storage reasongs
     glBindVertexArray(0);
+
+    gpuMeshCache[meshData.name] = comp;
 
     // Return the mesh component previously made
     return comp;

@@ -30,6 +30,9 @@ class BufferManager {
   public:
     // Keep your existing Rasterizer methods here...
     static MeshComponent uploadMesh(const MeshData &meshData);
+
+  private:
+    static inline std::unordered_map<std::string, MeshComponent> gpuMeshCache;
 };
 
 } // namespace Engine

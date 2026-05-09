@@ -42,7 +42,6 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
     const auto &attrib = reader.GetAttrib();
     const auto &shapes = reader.GetShapes();
 
-    Logger::line();
     Logger::info("SYSTEM", "Shapes: " + std::to_string(shapes.size()));
     Logger::info("SYSTEM",
                  "Raw Verts: " + std::to_string(attrib.vertices.size()));

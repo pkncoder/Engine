@@ -58,15 +58,15 @@ void Application::init() {
 
         // Upload the CPU mesh data to the GPU (VRAM)
         MeshComponent meshComponentOne = BufferManager::uploadMesh(
-            AssetManager::loadMesh("assets/models/bunny.obj").value());
+            *AssetManager::loadMesh("assets/models/bunny.obj"));
         MeshComponent meshComponentTwo = BufferManager::uploadMesh(
-            AssetManager::loadMesh("assets/models/dragon.obj").value());
+            *AssetManager::loadMesh("assets/models/dragon.obj"));
         MeshComponent meshComponentThree = BufferManager::uploadMesh(
-            AssetManager::loadMesh("assets/models/cat.obj").value());
+            *AssetManager::loadMesh("assets/models/cat.obj"));
         MeshComponent meshComponentFour = BufferManager::uploadMesh(
-            AssetManager::loadMesh("assets/models/moai.obj").value());
+            *AssetManager::loadMesh("assets/models/moai.obj"));
         MeshComponent meshComponentFive = BufferManager::uploadMesh(
-            AssetManager::loadMesh("assets/models/cube.obj").value());
+            *AssetManager::loadMesh("assets/models/cube.obj"));
 
         END_PROFILE_STACKED_LOG("Mesh Loading");
 
