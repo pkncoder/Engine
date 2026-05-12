@@ -3,6 +3,7 @@
 #include "Logger.h"
 
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -33,6 +34,7 @@ class Timer {
     static void beginProfile(const std::string &name);
     static void endProfile(const std::string &name,
                            const LogType logType = LogType::IN_PLACE);
+    static void periodicRun(int period, std::function<void()> function);
 
     // Output relevant data to console
     static void logPerformance(bool clearTerminal = true);
@@ -46,6 +48,8 @@ class Timer {
     // Delta time and delta time math
     static float deltaTime;
     static double lastFrameTime;
+
+    static inline bool periodPrintLock = false;
 
     // Total time + frames count
     static double totalTime;

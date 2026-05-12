@@ -70,4 +70,14 @@ void Timer::endProfile(const std::string &name, const LogType logType) {
                  logType);
 }
 
+void Timer::periodicRun(int period, std::function<void()> function) {
+    if (!periodPrintLock && (int)totalTime % period == 0) {
+        function();
+
+        periodPrintLock = true;
+    } else {
+        periodPrintLock = false;
+    }
+}
+
 } // namespace Engine
