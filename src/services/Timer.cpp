@@ -71,10 +71,12 @@ void Timer::endProfile(const std::string &name, const LogType logType) {
 }
 
 void Timer::periodicRun(int period, std::function<void()> function) {
-    if (!periodPrintLock && (int)totalTime % period == 0) {
-        function();
+    if ((int)totalTime % period == 0) {
+        if (!periodPrintLock) {
+            function();
 
-        periodPrintLock = true;
+            periodPrintLock = true;
+        }
     } else {
         periodPrintLock = false;
     }

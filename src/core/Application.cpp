@@ -172,10 +172,10 @@ void Application::run() {
 
         Logger::outputLogs();
 
-        Timer::periodicRun(4, []() {
+        Timer::periodicRun(2, []() {
             Logger::info("DEBUG",
                          "One second: " +
-                             std::to_string((int)Timer::getTotalTime() % 4));
+                             std::to_string((int)Timer::getTotalTime()));
         });
     }
 }
