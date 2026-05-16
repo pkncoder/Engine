@@ -68,7 +68,7 @@ struct ScopedProfiler {
 
     ScopedProfiler(const std::string &name) : name(name) {
         Timer::beginProfile(name);
-    } // Constructor - Starts timer
+    }                                              // Constructor - Starts timer
     ~ScopedProfiler() { Timer::endProfile(name); } // Deconstructor - Ends timer
 };
 

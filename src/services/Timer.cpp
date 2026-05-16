@@ -70,6 +70,7 @@ void Timer::endProfile(const std::string &name, const LogType logType) {
                  logType);
 }
 
+// TODO: Fix - DOES NOT WORK WITH 1 SECOND OR FRACTIONAL INTERVALS
 void Timer::periodicRun(int period, std::function<void()> function) {
     if ((int)totalTime % period == 0) {
         if (!periodPrintLock) {

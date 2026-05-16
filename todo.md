@@ -38,6 +38,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Move the loadMesh from Application into Rasterizer (Look at PathTracer.cpp for example)
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 - [ ] Move all these dang structs
+- [ ] Fix periodicRun to work with fractional & 1 second intervals
 
 ### Todo - Not Code
 
