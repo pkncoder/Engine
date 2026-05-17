@@ -4,6 +4,7 @@
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
+#include "GPUStructs.h"
 
 #include <set>
 

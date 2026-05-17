@@ -37,8 +37,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - IDEA: Use % and a total deltaTime / time to run whenever
 - [ ] Move the loadMesh from Application into Rasterizer (Look at PathTracer.cpp for example)
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
-- [ ] Move all these dang structs
-- [ ] Fix periodicRun to work with fractional & 1 second intervals
 
 ### Todo - Not Code
 
@@ -115,3 +113,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Extend the tags in Logger calls
 - [x] BufferManger.cpp/h inside of renderer, or resources?
 - [x] Figure out the issue on MAC when clicking out and struggling to get back into the window
+- [x] Add to timer a "periodic" way to run code
+  - IDEA: Use % and a total deltaTime / time to run whenever
+- [x] Move all these dang structs

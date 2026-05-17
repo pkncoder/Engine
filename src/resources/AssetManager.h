@@ -1,8 +1,7 @@
 #pragma once
 
-#include "AssetTypes.h"
+#include "CPUStructs.h"
 
-#include <optional>
 #include <string>
 
 namespace Engine {
@@ -13,10 +12,10 @@ class AssetManager {
     static void init();
 
     // Load and return a std::optional in case of failed loading
-    static const MeshData *loadMesh(const std::string &filepath);
+    static const CPUMeshData *loadMesh(const std::string &filepath);
 
   private:
-    static inline std::unordered_map<std::string, MeshData> cpuMeshCache;
+    static inline std::unordered_map<std::string, CPUMeshData> cpuMeshCache;
 };
 
 } // namespace Engine

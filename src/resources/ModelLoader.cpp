@@ -1,16 +1,15 @@
 #include "ModelLoader.h"
-
 #include "../services/Logger.h"
 
-#include <string>
 #include <tiny_obj_loader.h>
 
+#include <string>
 #include <unordered_map>
 
 namespace Engine {
 
 // Loading an obj mesh
-bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
+bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh) {
 
     // tinyobjloader obj file reading configuration
     tinyobj::ObjReaderConfig readerConfig;
@@ -36,7 +35,7 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
 
     // Avoid sending duplicated verticies by tracking unique ones, and trashing
     // any duplicates
-    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+    std::unordered_map<CPUVertex, uint32_t> uniqueVertices{};
 
     // Get the attributes and shapes from the reader of the mesh
     const auto &attrib = reader.GetAttrib();
@@ -53,7 +52,7 @@ bool ModelLoader::loadOBJ(const std::string &filepath, MeshData &outMesh) {
         for (const auto &index : shape.mesh.indices) {
 
             // Initialize a temp vertex
-            Vertex vertex{};
+            CPUVertex vertex{};
 
             // Pull position
             vertex.position = {attrib.vertices[3 * index.vertex_index + 0],

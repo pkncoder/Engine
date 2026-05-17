@@ -5,35 +5,31 @@
 #include <glm/gtx/hash.hpp>
 
 #include <string>
-#include <vector>
 
 namespace Engine {
-
-// Vertex w/ attributes
-struct Vertex {
+struct CPUVertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
 
     // Equality opporator, used for hashing
-    bool operator==(const Vertex &other) const {
+    bool operator==(const CPUVertex &other) const {
         return position == other.position && normal == other.normal &&
                texCoords == other.texCoords;
     }
 };
 
 // Mesh information
-struct MeshData {
+struct CPUMeshData {
     std::string name;
-    std::vector<Vertex> vertices;
+    std::vector<CPUVertex> vertices;
     std::vector<uint32_t> indices;
 };
-
 } // namespace Engine
 
 namespace std {
-template <> struct hash<Engine::Vertex> {
-    size_t operator()(Engine::Vertex const &vertex) const {
+template <> struct hash<Engine::CPUVertex> {
+    size_t operator()(Engine::CPUVertex const &vertex) const {
         // Using a simple bit-shifting combine method
         size_t res = 0;
 

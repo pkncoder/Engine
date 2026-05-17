@@ -13,7 +13,7 @@ void AssetManager::init() {
 }
 
 // Load a mesh + optional for error catching
-const MeshData *AssetManager::loadMesh(const std::string &filepath) {
+const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
 
     // 1. Check if we already loaded this OBJ
     if (cpuMeshCache.find(filepath) != cpuMeshCache.end()) {
@@ -26,7 +26,7 @@ const MeshData *AssetManager::loadMesh(const std::string &filepath) {
     Logger::info("ASSET", "Starting to load mesh: " + filepath);
 
     // 2. If not, load it via tinyobjloader
-    MeshData newMesh;
+    CPUMeshData newMesh;
     if (ModelLoader::loadOBJ(filepath, newMesh)) {
 
         Logger::info("ASSET", "Successfully loaded mesh: " + filepath + " (" +

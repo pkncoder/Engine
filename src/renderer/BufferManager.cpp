@@ -6,7 +6,7 @@
 namespace Engine {
 
 // Takes CPU data, pushes to VRAM, returns ECS-ready component
-MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
+MeshComponent BufferManager::uploadMesh(const CPUMeshData &meshData) {
 
     if (gpuMeshCache.find(meshData.name) != gpuMeshCache.end()) {
         return gpuMeshCache[meshData.name]; // Return the existing VAO/VBO/EBO
@@ -28,7 +28,7 @@ MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
 
     // Bind and set the data for the vertex buffer data
     glBindBuffer(GL_ARRAY_BUFFER, comp.vbo);
-    glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(Vertex),
+    glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(CPUVertex),
                  meshData.vertices.data(), GL_STATIC_DRAW);
 
     // Bind the element buffer and data
@@ -39,13 +39,13 @@ MeshComponent BufferManager::uploadMesh(const MeshData &meshData) {
 
     // Vertex attribute setting (position)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, position));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(CPUVertex),
+                          (void *)offsetof(CPUVertex, position));
 
     // Vertex attribute setting (normal)
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, normal));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(CPUVertex),
+                          (void *)offsetof(CPUVertex, normal));
 
     // Unbind the vertex array for storage reasongs
     glBindVertexArray(0);

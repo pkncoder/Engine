@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../resources/AssetTypes.h"
+#include "../resources/CPUStructs.h"
 #include "../scene/components/MeshComponent.h"
 
 #include <glad/glad.h>
@@ -29,7 +29,7 @@ struct PersistentBuffer {
 class BufferManager {
   public:
     // Keep your existing Rasterizer methods here...
-    static MeshComponent uploadMesh(const MeshData &meshData);
+    static MeshComponent uploadMesh(const CPUMeshData &meshData);
 
   private:
     static inline std::unordered_map<std::string, MeshComponent> gpuMeshCache;
