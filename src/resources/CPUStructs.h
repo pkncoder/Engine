@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
@@ -24,6 +25,22 @@ struct CPUMeshData {
     std::string name;
     std::vector<CPUVertex> vertices;
     std::vector<uint32_t> indices;
+};
+
+struct CPUMaterialData {
+    std::string name;
+
+    glm::vec3 albedo{1.0f, 0.0f, 1.0f};
+    glm::vec3 emmission{0.0f, 0.0f, 0.0f};
+
+    float roughness = 1.0f;
+    float metallic = 0.0f;
+    float ior = 0.0f;
+};
+
+struct CPURenderableEntityData {
+    CPUMeshData meshData;
+    std::vector<CPUMaterialData> materials;
 };
 } // namespace Engine
 

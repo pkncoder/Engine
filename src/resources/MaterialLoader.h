@@ -6,11 +6,11 @@
 
 namespace Engine {
 
-class ModelLoader {
+class MaterialLoader {
   public:
     // Load a mesh, return true for sucess, false for error
-    static bool loadOBJ(const std::string &filepath, CPUMeshData &outMesh,
-                        std::string &outMtlFilename);
+    static bool loadMTL(const std::string &filepath,
+                        std::vector<CPUMaterialData> &outMaterials);
 };
 
 } // namespace Engine

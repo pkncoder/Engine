@@ -24,6 +24,7 @@ set(SOURCES
     src/renderer/Rasterizer.cpp
     src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
+    src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp
     src/scene/Camera.cpp
     src/scene/Scene.cpp

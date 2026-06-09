@@ -1,6 +1,7 @@
 #include "ModelLoader.h"
 #include "../services/Logger.h"
 
+#include <fstream>
 #include <tiny_obj_loader.h>
 
 #include <string>
@@ -9,7 +10,23 @@
 namespace Engine {
 
 // Loading an obj mesh
-bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh) {
+bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh,
+                          std::string &outMtlFilename) {
+
+    std::ifstream file(filepath);
+    std::string line;
+    outMtlFilename = "";
+
+    while (std::getline(file, line)) {
+        if (line.substr(0, 7) == "mtllib ") {
+            outMtlFilename = line.substr(7);
+
+            outMtlFilename.erase(outMtlFilename.find_last_not_of(" \n\r\t") +
+                                 1);
+            break;
+        }
+    }
+    file.close();
 
     // tinyobjloader obj file reading configuration
     tinyobj::ObjReaderConfig readerConfig;

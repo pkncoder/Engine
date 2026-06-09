@@ -1,8 +1,11 @@
 #include "AssetManager.h"
 
 #include "../services/Logger.h"
+#include "CPUStructs.h"
+#include "MaterialLoader.h"
 #include "ModelLoader.h"
 
+#include <__config>
 #include <string>
 
 namespace Engine {
@@ -27,7 +30,17 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
 
     // 2. If not, load it via tinyobjloader
     CPUMeshData newMesh;
-    if (ModelLoader::loadOBJ(filepath, newMesh)) {
+    std::string mtlFilename;
+
+    if (ModelLoader::loadOBJ(filepath, newMesh, mtlFilename)) {
+
+        if (!mtlFilename.empty()) {
+            std::string base_dir =
+                filepath.substr(0, filepath.find_last_of('/') + 1);
+            std::string fullMtlPath = base_dir + mtlFilename;
+
+            loadMaterialBank(fullMtlPath);
+        }
 
         Logger::info("ASSET", "Successfully loaded mesh: " + filepath + " (" +
                                   std::to_string(newMesh.vertices.size()) +
@@ -38,8 +51,40 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
         return &cpuMeshCache[filepath];
     }
 
-    Logger::error("ASSET", "AssetManager Failed to load mesh: ");
+    Logger::error("ASSET", "AssetManager Failed to load mesh at: " + filepath);
 
     return nullptr; // Failed to load
 }
+
+const void AssetManager::loadMaterialBank(const std::string &filepath) {
+    std::vector<CPUMaterialData> newMaterials;
+
+    if (MaterialLoader::loadMTL(filepath, newMaterials)) {
+        std::string base_dir =
+            filepath.substr(0, filepath.find_last_of('/') + 1);
+
+        for (auto &mat : newMaterials) {
+
+            Logger::info("ASSET",
+                         "Successfully cached material at: " + base_dir);
+
+            matMeshCache[mat.name] = mat;
+        }
+    }
+}
+
+const CPUMaterialData *
+AssetManager::getMaterial(const std::string &materialName) {
+    if (matMeshCache.find(materialName) != matMeshCache.end()) {
+
+        Logger::info("ASSET", "Returning cached material: " + materialName);
+
+        return &matMeshCache[materialName];
+    }
+
+    Logger::error("ASSET",
+                  "AssetManager failed to load material: " + materialName);
+    return nullptr;
+}
+
 } // namespace Engine
