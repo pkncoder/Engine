@@ -31,6 +31,14 @@ class Application {
     // Handling inputs
     void handleInputs();
 
+    // Registering components
+    // TODO: temp?
+    void registerSceneComponents(Scene &scene);
+
+    // Loading the models + allocating the entities
+    // TODO: temp
+    void setupEntities(Scene &scene);
+
   private:
     // Window information
     std::unique_ptr<Window> window;

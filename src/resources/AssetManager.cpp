@@ -14,9 +14,8 @@ void AssetManager::init() {
 
     // Setup an initial material in the cache for objects that don't have any
     // material listed
-    // TODO: Rename
     // TODO: defaults
-    matMeshCache["ENG_Default"] = CPUMaterialData{
+    materialCache["ENG_Default"] = CPUMaterialData{
         "ENG_Default", glm::vec3(0.9f), glm::vec3(0.0f), 1.0f, 0.0f};
 
     Logger::info("ASSET", "AssetManager Initialized."); // Logging
@@ -26,10 +25,10 @@ void AssetManager::init() {
 const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
 
     // Check if we already loaded this OBJ
-    if (cpuMeshCache.find(filepath) != cpuMeshCache.end()) {
+    if (meshCache.find(filepath) != meshCache.end()) {
         Logger::info("ASSET", "Returning cached mesh: " + filepath);
-        return &cpuMeshCache[filepath]; // Instantly return the cached
-                                        // data
+        return &meshCache[filepath]; // Instantly return the cached
+                                     // data
     }
 
     Logger::line();
@@ -46,7 +45,7 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
                 filepath.substr(0, filepath.find_last_of('/') + 1);
             std::string fullMtlPath = base_dir + mtlFilename;
 
-            loadMaterialBank(fullMtlPath);
+            cacheMaterials(fullMtlPath);
         }
 
         Logger::info("ASSET", "Successfully loaded mesh: " + filepath + " (" +
@@ -54,8 +53,8 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
                                   " vertices)");
         Logger::space();
 
-        cpuMeshCache[filepath] = newMesh; // Save to cache
-        return &cpuMeshCache[filepath];
+        meshCache[filepath] = newMesh; // Save to cache
+        return &meshCache[filepath];
     }
 
     Logger::error("ASSET", "AssetManager Failed to load mesh at: " + filepath);
@@ -66,8 +65,8 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
 const CPUMaterialData *
 AssetManager::getMaterial(const std::string &materialName) {
 
-    auto it = matMeshCache.find(materialName);
-    if (it != matMeshCache.end()) {
+    auto it = materialCache.find(materialName);
+    if (it != materialCache.end()) {
         Logger::info("ASSET", "Returning cached material: " + materialName);
         return &it->second; // Safely return the memory address of the cached
                             // value
@@ -78,7 +77,7 @@ AssetManager::getMaterial(const std::string &materialName) {
     return nullptr;
 }
 
-const void AssetManager::loadMaterialBank(const std::string &filepath) {
+const void AssetManager::cacheMaterials(const std::string &filepath) {
     std::vector<CPUMaterialData> newMaterials;
 
     if (MaterialLoader::loadMTL(filepath, newMaterials)) {
@@ -90,7 +89,7 @@ const void AssetManager::loadMaterialBank(const std::string &filepath) {
             Logger::info("ASSET",
                          "Successfully cached material at: " + base_dir);
 
-            matMeshCache[mat.name] = mat;
+            materialCache[mat.name] = mat;
         }
     }
 }

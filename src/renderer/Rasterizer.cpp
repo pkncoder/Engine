@@ -35,14 +35,14 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
     // Get all of the renderables from the scene
     auto renderables =
-        activeScene
-            .getMatchingEntities<Transform, MeshComponent, MaterialComponent>();
+        activeScene.getMatchingEntities<TransformComponent, MeshComponent,
+                                        MaterialComponent>();
 
     // Loop every one to draw
     for (EntityID id : renderables) {
         // Get the components from the entity that are used in rendering
         auto &mesh = activeScene.getComponent<MeshComponent>(id);
-        auto &transform = activeScene.getComponent<Transform>(id);
+        auto &transform = activeScene.getComponent<TransformComponent>(id);
         auto &material = activeScene.getComponent<MaterialComponent>(id);
 
         // Calculate Model Matrix (Rasterizer handles the math)
@@ -71,6 +71,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glBindVertexArray(0);
 }
 
-void Rasterizer::shutdown(){};
+void Rasterizer::shutdown() {};
 
 } // namespace Engine

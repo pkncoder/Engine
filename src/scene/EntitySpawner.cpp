@@ -9,12 +9,13 @@
 
 namespace Engine {
 
-Entity EntitySpawner::spawnModel(Scene &scene, const std::string &filepath) {
+Entity EntitySpawner::spawnObjEntity(Scene &scene,
+                                     const std::string &filepath) {
 
     // Get the mesh data & check for it's existace
     const CPUMeshData *meshData = AssetManager::loadMesh(filepath);
     if (!meshData) {
-        Logger::error("SPAWNER",
+        Logger::error("ASSET",
                       "Failed to load mesh data for asset: " + filepath);
         return Entity(NULL_ENTITY,
                       nullptr); // Return an invalid handle on failure
@@ -30,7 +31,7 @@ Entity EntitySpawner::spawnModel(Scene &scene, const std::string &filepath) {
 
     // Apply a default spatial transform
     // TODO: Defaults?
-    entity.addComponent<Transform>({
+    entity.addComponent<TransformComponent>({
         glm::vec3(0.0f),                   // Position
         glm::quat(1.0f, 0.0f, 0.0f, 0.0f), // Rotation
         glm::vec3(1.0f)                    // Scale
@@ -46,14 +47,14 @@ Entity EntitySpawner::spawnModel(Scene &scene, const std::string &filepath) {
         entity.addComponent<MaterialComponent>(
             MaterialComponent(*materialData));
     } else { // If it doesn't exist
-        Logger::warn("SPAWNER", "No material found for '" +
-                                    meshData->materialName +
-                                    "'. Defaulting baseline.");
+        // TODO: Seperate spawner tag?
+        Logger::warn("ASSET",
+                     "No material found for: " + meshData->materialName);
 
-        // Default material
+        // Error material
         // TODO: DEfault?
-        entity.addComponent<MaterialComponent>(
-            MaterialComponent(glm::vec3(0.7f), glm::vec3(0.0f), 0.5f, 0.0f));
+        entity.addComponent<MaterialComponent>(MaterialComponent(
+            glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f), 0.5f, 0.0f));
     }
 
     // Return the final entity

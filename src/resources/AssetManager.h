@@ -18,10 +18,11 @@ class AssetManager {
     static const CPUMaterialData *getMaterial(const std::string &materialName);
 
   private:
-    static inline std::unordered_map<std::string, CPUMeshData> cpuMeshCache;
-    static inline std::unordered_map<std::string, CPUMaterialData> matMeshCache;
+    static inline std::unordered_map<std::string, CPUMeshData> meshCache;
+    static inline std::unordered_map<std::string, CPUMaterialData>
+        materialCache;
 
-    static const void loadMaterialBank(const std::string &filepath);
+    static const void cacheMaterials(const std::string &filepath);
 };
 
 } // namespace Engine

@@ -40,9 +40,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Sub-object entities
 - [ ] CPURenderableData struct integration
 - [ ] Create a Readme
-- [ ] Make a method to spawn entities easeir than it is
-- [ ] Change TransformComponent's struct declaration from Transform to TransformComponent
-- [ ] Unabstract "model" to "obj" to prepare for way in the future, other model files
+- [ ] Redo the temp rasterizer & path tracer shaders
 
 ### Todo - Not Code
 
@@ -54,7 +52,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 - [ ] Use EnTT instead of custom ECS
 - [ ] Make live aspect ratio drawing
-- [ ] Orbital camera
+- [ ] Orbital camera ability
 - [ ] Add a worldpos camera movement overload
 - [ ] Custom errors
 - [ ] Multithread
@@ -124,3 +122,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Logger DEBUG LogLevel
 - [x] Should AssetTypes really be called that?
 - [x] Decide how AssetTypes.h should be layed out, and if I should split up the file.
+- [x] Make a method to spawn entities easeir than it is
+- [x] Change TransformComponent's struct declaration from Transform to TransformComponent
+- [x] Unabstract "model" to "obj" to prepare for way in the future, other model files

@@ -144,7 +144,7 @@ void PathTracer::flattenScene(Scene &activeScene) {
 
     // Get the scene entities that are set for rendering
     auto renderables =
-        activeScene.getMatchingEntities<Transform, MeshComponent>();
+        activeScene.getMatchingEntities<TransformComponent, MeshComponent>();
 
     // Check each entity for if the geometry needs to be rebuilt or not
     for (EntityID id : renderables) {
@@ -165,7 +165,7 @@ void PathTracer::flattenScene(Scene &activeScene) {
     for (EntityID id : renderables) {
 
         // Get the transform & mesh components
-        auto &transform = activeScene.getComponent<Transform>(id);
+        auto &transform = activeScene.getComponent<TransformComponent>(id);
         auto &meshComp = activeScene.getComponent<MeshComponent>(id);
 
         // Get a new GPUInstance

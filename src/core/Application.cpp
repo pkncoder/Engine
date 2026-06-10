@@ -47,62 +47,10 @@ void Application::init() {
     // Initialize the scene
     activeScene = Scene();
 
-    // TODO: temp (move it somewhere)
-    {
-        // Register components
-        activeScene.registerComponent<Transform>();
-        activeScene.registerComponent<MeshComponent>();
-        activeScene.registerComponent<MaterialComponent>();
-
-        START_PROFILE("Entity Loading");
-
-        {
-            Entity bunny = EntitySpawner::spawnModel(activeScene,
-                                                     "assets/models/bunny.obj");
-
-            bunny.getComponent<Transform>().position =
-                glm::vec3(-1.0f, -1.2f, -4.0f);
-        }
-
-        {
-            Entity dragon = EntitySpawner::spawnModel(
-                activeScene, "assets/models/dragon.obj");
-
-            dragon.getComponent<Transform>().position =
-                glm::vec3(1.0f, -0.6f, -4.0f);
-        }
-
-        {
-            Entity cat =
-                EntitySpawner::spawnModel(activeScene, "assets/models/cat.obj");
-
-            cat.getComponent<Transform>().position =
-                glm::vec3(0.0f, -0.6f, -4.0f);
-        }
-
-        {
-            Entity moai = EntitySpawner::spawnModel(activeScene,
-                                                    "assets/models/moai.obj");
-
-            moai.getComponent<Transform>().position =
-                glm::vec3(0.0f, 1.3f, -4.0f);
-            moai.getComponent<Transform>().rotation =
-                glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
-            moai.getComponent<Transform>().scale =
-                glm::vec3(0.14f, 0.14f, 0.14f);
-        }
-
-        {
-            Entity cube = EntitySpawner::spawnModel(activeScene,
-                                                    "assets/models/cube.obj");
-
-            cube.getComponent<Transform>().position =
-                glm::vec3(-1.5f, 1.3f, -4.0f);
-            cube.getComponent<Transform>().scale = glm::vec3(0.4f, 0.4f, 0.4f);
-        }
-
-        END_PROFILE_STACKED_LOG("Entity Loading");
-    }
+    // Register the scene components and load the scene
+    // TODO: temp
+    this->registerSceneComponents(activeScene);
+    this->setupEntities(activeScene);
 
     // Construct the rasterizer and init it
     rasterizer = std::make_unique<Rasterizer>();
@@ -224,6 +172,65 @@ void Application::handleInputs() {
         swapActiveRendererMark = false;
         swapActiveRendererLock = false;
     }
+}
+
+void Application::registerSceneComponents(Scene &scene) {
+    // Register components
+    scene.registerComponent<TransformComponent>();
+    scene.registerComponent<MeshComponent>();
+    scene.registerComponent<MaterialComponent>();
+}
+
+void Application::setupEntities(Scene &scene) {
+    START_PROFILE("Entity Loading");
+
+    {
+        Entity bunny = EntitySpawner::spawnObjEntity(activeScene,
+                                                     "assets/models/bunny.obj");
+
+        bunny.getComponent<TransformComponent>().position =
+            glm::vec3(-1.0f, -1.2f, -4.0f);
+    }
+
+    {
+        Entity dragon = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/dragon.obj");
+
+        dragon.getComponent<TransformComponent>().position =
+            glm::vec3(1.0f, -0.6f, -4.0f);
+    }
+
+    {
+        Entity cat =
+            EntitySpawner::spawnObjEntity(activeScene, "assets/models/cat.obj");
+
+        cat.getComponent<TransformComponent>().position =
+            glm::vec3(0.0f, -0.6f, -4.0f);
+    }
+
+    {
+        Entity moai = EntitySpawner::spawnObjEntity(activeScene,
+                                                    "assets/models/moai.obj");
+
+        moai.getComponent<TransformComponent>().position =
+            glm::vec3(0.0f, 1.3f, -4.0f);
+        moai.getComponent<TransformComponent>().rotation =
+            glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
+        moai.getComponent<TransformComponent>().scale =
+            glm::vec3(0.14f, 0.14f, 0.14f);
+    }
+
+    {
+        Entity cube = EntitySpawner::spawnObjEntity(activeScene,
+                                                    "assets/models/cube.obj");
+
+        cube.getComponent<TransformComponent>().position =
+            glm::vec3(-1.5f, 1.3f, -4.0f);
+        cube.getComponent<TransformComponent>().scale =
+            glm::vec3(0.4f, 0.4f, 0.4f);
+    }
+
+    END_PROFILE_STACKED_LOG("Entity Loading");
 }
 
 } // namespace Engine
