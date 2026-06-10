@@ -27,6 +27,7 @@ set(SOURCES
     src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp
     src/scene/Camera.cpp
+    src/scene/EntitySpawner.cpp
     src/scene/Scene.cpp
     src/services/Input.cpp
     src/services/Logger.cpp

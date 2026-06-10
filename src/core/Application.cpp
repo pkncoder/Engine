@@ -1,8 +1,8 @@
 #include "Application.h"
 
-#include "../renderer/BufferManager.h"
 #include "../resources/AssetManager.h"
 #include "../scene/Entity.h"
+#include "../scene/EntitySpawner.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
@@ -48,8 +48,6 @@ void Application::init() {
     // Initialize the scene
     activeScene = Scene();
 
-    Logger::check();
-
     // TODO: temp (move it somewhere)
     {
         // Register components
@@ -57,69 +55,54 @@ void Application::init() {
         activeScene.registerComponent<MeshComponent>();
         activeScene.registerComponent<MaterialComponent>();
 
-        START_PROFILE("Mesh Loading");
+        START_PROFILE("Entity Loading");
 
-        const CPUMeshData *meshDataFour =
-            AssetManager::loadMesh("assets/models/moai.obj");
+        {
+            Entity bunny = EntitySpawner::spawnModel(activeScene,
+                                                     "assets/models/bunny.obj");
 
-        // Upload the CPU mesh data to the GPU (VRAM)
-        MeshComponent meshComponentOne = BufferManager::uploadMesh(
-            *AssetManager::loadMesh("assets/models/bunny.obj"));
-        MeshComponent meshComponentTwo = BufferManager::uploadMesh(
-            *AssetManager::loadMesh("assets/models/dragon.obj"));
-        MeshComponent meshComponentThree = BufferManager::uploadMesh(
-            *AssetManager::loadMesh("assets/models/cat.obj"));
-        MeshComponent meshComponentFour =
-            BufferManager::uploadMesh(*meshDataFour);
-        MeshComponent meshComponentFive = BufferManager::uploadMesh(
-            *AssetManager::loadMesh("assets/models/cube.obj"));
+            bunny.getComponent<Transform>().position =
+                glm::vec3(-1.0f, -1.2f, -4.0f);
+        }
 
-        END_PROFILE_STACKED_LOG("Mesh Loading");
+        {
+            Entity dragon = EntitySpawner::spawnModel(
+                activeScene, "assets/models/dragon.obj");
 
-        // Create entity wrappers & instiate entity ids in the ECS (Scene.h)
-        Entity entityOne(activeScene.createEntity(), &activeScene);
-        Entity entityTwo(activeScene.createEntity(), &activeScene);
-        Entity entityThree(activeScene.createEntity(), &activeScene);
-        Entity entityFour(activeScene.createEntity(), &activeScene);
-        Entity entityFive(activeScene.createEntity(), &activeScene);
+            dragon.getComponent<Transform>().position =
+                glm::vec3(1.0f, -0.6f, -4.0f);
+        }
 
-        // Add mesh #1 components
-        entityOne.addComponent<MeshComponent>(meshComponentOne);
-        entityOne.addComponent<Transform>({glm::vec3(-1.0f, -1.2f, -4.0f),
-                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                           glm::vec3(1.0f, 1.0f, 1.0f)});
+        {
+            Entity cat =
+                EntitySpawner::spawnModel(activeScene, "assets/models/cat.obj");
 
-        // Add mesh #2 components
-        entityTwo.addComponent<MeshComponent>(meshComponentTwo);
-        entityTwo.addComponent<Transform>({glm::vec3(1.0f, -0.6f, -4.0f),
-                                           glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                           glm::vec3(1.0f, 1.0f, 1.0f)});
+            cat.getComponent<Transform>().position =
+                glm::vec3(0.0f, -0.6f, -4.0f);
+        }
 
-        // Add mesh #3 components
-        entityThree.addComponent<MeshComponent>(meshComponentThree);
-        entityThree.addComponent<Transform>({glm::vec3(0.0f, -0.6f, -4.0f),
-                                             glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                             glm::vec3(1.0f, 1.0f, 1.0f)});
+        {
+            Entity moai = EntitySpawner::spawnModel(activeScene,
+                                                    "assets/models/moai.obj");
 
-        // Add mesh #4 components
-        entityFour.addComponent<MeshComponent>(meshComponentFour);
-        entityFour.addComponent<Transform>(
-            {glm::vec3(0.0f, 1.3f, -4.0f),
-             glm::quat(-0.707f, 0.0f, 0.707f, 0.0f),
-             glm::vec3(0.14f, 0.14f, 0.14f)});
+            moai.getComponent<Transform>().position =
+                glm::vec3(0.0f, 1.3f, -4.0f);
+            moai.getComponent<Transform>().rotation =
+                glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
+            moai.getComponent<Transform>().scale =
+                glm::vec3(0.14f, 0.14f, 0.14f);
+        }
 
-        const CPUMaterialData *materialDataFour = AssetManager::getMaterial(
-            meshDataFour->materialName); // Use dynamic name!
+        {
+            Entity cube = EntitySpawner::spawnModel(activeScene,
+                                                    "assets/models/cube.obj");
 
-        entityFour.addComponent<MaterialComponent>(MaterialComponent{
-            materialDataFour->albedo, materialDataFour->emmission,
-            materialDataFour->roughness, materialDataFour->metallic});
+            cube.getComponent<Transform>().position =
+                glm::vec3(-1.5f, 1.3f, -4.0f);
+            cube.getComponent<Transform>().scale = glm::vec3(0.4f, 0.4f, 0.4f);
+        }
 
-        // Add mesh #5 components
-        entityFive.addComponent<MeshComponent>(meshComponentFive);
-        entityFive.addComponent<Transform>({glm::vec3(-1.5f, 1.3f, -4.0f),
-                                            glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
-                                            glm::vec3(0.4f, 0.4f, 0.4f)});
+        END_PROFILE_STACKED_LOG("Entity Loading");
     }
 
     // Construct the rasterizer and init it
