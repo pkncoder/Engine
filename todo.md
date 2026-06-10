@@ -39,6 +39,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Multi-materials
 - [ ] Sub-object entities
 - [ ] CPURenderableData struct integration
+- [ ] Create a Readme
+- [ ] Make a method to spawn entities easeir than it is
 
 ### Todo - Not Code
 
