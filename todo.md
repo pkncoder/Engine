@@ -41,13 +41,13 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] CPURenderableData struct integration
 - [ ] Create a Readme
 - [ ] Make a method to spawn entities easeir than it is
+- [ ] Change TransformComponent's struct declaration from Transform to TransformComponent
 
 ### Todo - Not Code
 
 - [ ] Change how .mtl and .obj files are stored
-- [ ] Should AssetTypes really be called that?
-- [ ] Decide how AssetTypes.h should be layed out, and if I should split up the file.
 - [ ] Figure out the issue w/ width & height passing being a lot
+- [ ] Change the plan for the scene.h into a new directory
 
 ### Todo - Future Todos
 
@@ -87,7 +87,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 6. [x] Rename things
 7. [x] Add comments
 8. [x] Place the \#includes in the right spots
-9. [ ] Fix file tree
+9. [x] Fix file tree
 
 ## Finished Todos
 
@@ -121,3 +121,5 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - IDEA: Use % and a total deltaTime / time to run whenever
 - [x] Move all these dang structs
 - [x] Logger DEBUG LogLevel
+- [x] Should AssetTypes really be called that?
+- [x] Decide how AssetTypes.h should be layed out, and if I should split up the file.

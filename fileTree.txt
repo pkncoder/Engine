@@ -1,5 +1,6 @@
 .
 ├── assets/                                 # Scenes, models, textures, and HDRI maps
+├── debug_shaders/                          # The last compiled fully concatenated shaders from the #includes (in text)
 ├── build/                                  # Generated build files (gitignored)
 ├── shaders/                                # GPU-Code
 │   ├── compute/                                # Ray-Based Rendering shaders (.comp)
@@ -21,20 +22,20 @@
 │   │   ├── IAccelerationStructure.h                # Base Interface
 │   │   ├── BVHBuilder.cpp/h                        # Surface Area Heuristic (SAH) logic
 │   │   ├── Octree.cpp/h                            # For Ray Marching/SDFs
-│   │   └── UniformGrid.cpp/h                       # For simple/liquid simulations
 │   ├── core/                                   # Engine internals
 │   │   ├── Application.cpp/h                       # Main loop & layer management
 │   │   ├── Defaults.h                              # Default values
 │   │   └── Window.cpp/h                            # GLFW abstraction
 │   ├── renderer/                               # Differing Renderer Logic
 │   │   ├── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
+│   │   ├── GPUStructs.h                            # Struct declarations for anything that deals with sending data to the GPU. Similar to CPUStructs.h
 │   │   ├── IRenderer.h                             # Base interface
 │   │   ├── PathTracer.cpp/h                        # GPU Path tracing logic
 │   │   ├── Rasterizer.cpp/h                        # Real-time modeling view
 │   │   └── Shader.cpp/h                            # OpenGL shader and program compilation and usage
 │   ├── resources/                              # Resource loaders & managers
 │   │   ├── AssetManager.cpp/h                      # The "Central Hub" / Cache logic
-│   │   ├── AssetTypes.h                            # Struct declarations for the AssetManager & co.
+│   │   ├── CPUStructs.h                            # Struct declarations for the AssetManager & co. (anything that deals with CPU Data)
 │   │   ├── MaterialLoader.cpp/h                    # Material parsing
 │   │   ├── ModelLoader.cpp/h                       # Geometry parsing
 │   │   └── TextureLoader.cpp/h                     # Image decoding (stb_image)
