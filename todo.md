@@ -41,6 +41,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] CPURenderableData struct integration
 - [ ] Create a Readme
 - [ ] Redo the temp rasterizer & path tracer shaders
+- [ ] Fix the issue on the path tracer on overloads
 
 ### Todo - Not Code
 
