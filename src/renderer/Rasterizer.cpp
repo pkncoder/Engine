@@ -1,5 +1,6 @@
 #include "Rasterizer.h"
 
+#include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
@@ -34,13 +35,15 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
     // Get all of the renderables from the scene
     auto renderables =
-        activeScene.getMatchingEntities<Transform, MeshComponent>();
+        activeScene
+            .getMatchingEntities<Transform, MeshComponent, MaterialComponent>();
 
     // Loop every one to draw
     for (EntityID id : renderables) {
         // Get the components from the entity that are used in rendering
         auto &mesh = activeScene.getComponent<MeshComponent>(id);
         auto &transform = activeScene.getComponent<Transform>(id);
+        auto &material = activeScene.getComponent<MaterialComponent>(id);
 
         // Calculate Model Matrix (Rasterizer handles the math)
         glm::mat4 model = glm::mat4(1.0f);
@@ -50,6 +53,13 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
         // Pass the model matrix to the shader
         shader.setMat4("u_Model", model);
+
+        // Set the material uniforms
+        shader.setVec3("u_albedo", material.albedo);
+        shader.setVec3("u_emmissive", material.emmission);
+        shader.setFloat("u_roughness", material.roughness);
+        shader.setFloat("u_metallic", material.metallic);
+        shader.setFloat("u_ior", material.ior);
 
         // Give the vertex array
         glBindVertexArray(mesh.vao);
@@ -62,6 +72,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glBindVertexArray(0);
 }
 
-void Rasterizer::shutdown() {};
+void Rasterizer::shutdown(){};
 
 } // namespace Engine

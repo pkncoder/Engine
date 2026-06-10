@@ -3,6 +3,7 @@
 #include "../renderer/BufferManager.h"
 #include "../resources/AssetManager.h"
 #include "../scene/Entity.h"
+#include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Input.h"
@@ -11,6 +12,8 @@
 #include "Defaults.h"
 
 #include <GLFW/glfw3.h>
+#include <cstddef>
+#include <glm/ext/vector_float3.hpp>
 
 namespace Engine {
 
@@ -50,8 +53,12 @@ void Application::init() {
         // Register components
         activeScene.registerComponent<Transform>();
         activeScene.registerComponent<MeshComponent>();
+        activeScene.registerComponent<MaterialComponent>();
 
         START_PROFILE("Mesh Loading");
+
+        const CPUMeshData *meshDataFour =
+            AssetManager::loadMesh("assets/models/moai.obj");
 
         // Upload the CPU mesh data to the GPU (VRAM)
         MeshComponent meshComponentOne = BufferManager::uploadMesh(
@@ -60,8 +67,8 @@ void Application::init() {
             *AssetManager::loadMesh("assets/models/dragon.obj"));
         MeshComponent meshComponentThree = BufferManager::uploadMesh(
             *AssetManager::loadMesh("assets/models/cat.obj"));
-        MeshComponent meshComponentFour = BufferManager::uploadMesh(
-            *AssetManager::loadMesh("assets/models/moai.obj"));
+        MeshComponent meshComponentFour =
+            BufferManager::uploadMesh(*meshDataFour);
         MeshComponent meshComponentFive = BufferManager::uploadMesh(
             *AssetManager::loadMesh("assets/models/cube.obj"));
 
@@ -99,7 +106,15 @@ void Application::init() {
              glm::quat(-0.707f, 0.0f, 0.707f, 0.0f),
              glm::vec3(0.14f, 0.14f, 0.14f)});
 
-        // Add mesh #4 components
+        const CPUMaterialData *materialDataFour = AssetManager::getMaterial(
+            meshDataFour->materialName); // Use dynamic name!
+
+        entityFour.addComponent<MaterialComponent>(MaterialComponent{
+            materialDataFour->albedo, materialDataFour->emmission,
+            materialDataFour->roughness, materialDataFour->metallic,
+            materialDataFour->ior});
+
+        // Add mesh #5 components
         entityFive.addComponent<MeshComponent>(meshComponentFive);
         entityFive.addComponent<Transform>({glm::vec3(-1.5f, 1.3f, -4.0f),
                                             glm::quat(1.0f, 0.0f, 0.0f, 0.0f),

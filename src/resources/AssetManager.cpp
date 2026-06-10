@@ -5,7 +5,6 @@
 #include "MaterialLoader.h"
 #include "ModelLoader.h"
 
-#include <__config>
 #include <string>
 
 namespace Engine {
@@ -75,11 +74,12 @@ const void AssetManager::loadMaterialBank(const std::string &filepath) {
 
 const CPUMaterialData *
 AssetManager::getMaterial(const std::string &materialName) {
-    if (matMeshCache.find(materialName) != matMeshCache.end()) {
 
+    auto it = matMeshCache.find(materialName);
+    if (it != matMeshCache.end()) {
         Logger::info("ASSET", "Returning cached material: " + materialName);
-
-        return &matMeshCache[materialName];
+        return &it->second; // Safely return the memory address of the cached
+                            // value
     }
 
     Logger::error("ASSET",

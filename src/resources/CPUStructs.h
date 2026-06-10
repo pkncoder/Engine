@@ -23,6 +23,8 @@ struct CPUVertex {
 // Mesh information
 struct CPUMeshData {
     std::string name;
+    std::string materialName;
+
     std::vector<CPUVertex> vertices;
     std::vector<uint32_t> indices;
 };

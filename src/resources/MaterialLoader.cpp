@@ -1,6 +1,7 @@
 #include "MaterialLoader.h"
 
 #include "CPUStructs.h"
+
 #include "tiny_obj_loader.h"
 
 #include <fstream>

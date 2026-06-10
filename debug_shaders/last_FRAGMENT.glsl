@@ -8,13 +8,19 @@ out vec4 FragColor;
 uniform vec3 u_ViewPos;   // The Camera's position in world space
 // uniform vec3 u_LightPos;  // The Light's position in world space
 
+uniform vec3 u_albedo;
+uniform vec3 u_emmissive;
+uniform float u_roughness;
+uniform float u_metallic;
+uniform float u_ior;
+
 void main() {
 
     vec3 u_LightPos = u_ViewPos;
 
     // Basic Properties
     vec3 lightColor = vec3(1.0);
-    vec3 matColor = vec3(0.4, 0.8, 0.5);
+    vec3 matColor = u_albedo;
     vec3 normal = normalize(vNormal);
 
     // 1. Ambient

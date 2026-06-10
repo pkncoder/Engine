@@ -106,6 +106,24 @@ bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh,
         }
     }
 
+    const auto &materials = reader.GetMaterials();
+
+    // Check if the mesh has any shapes and if that shape has an assigned
+    // material ID
+    if (!shapes.empty() && !shapes[0].mesh.material_ids.empty()) {
+        int matId = shapes[0].mesh.material_ids[0];
+
+        // Ensure the ID is valid and exists in the parsed materials list
+        if (matId >= 0 && matId < materials.size()) {
+            outMesh.materialName = materials[matId].name;
+        }
+    }
+
+    // Fallback just in case the .obj literally doesn't have a usemtl line
+    if (outMesh.materialName.empty()) {
+        outMesh.materialName = "Default";
+    }
+
     // No errors
     return true;
 }
