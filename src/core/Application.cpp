@@ -185,11 +185,6 @@ void Application::run() {
         END_PROFILE("Run Loop"); // End timer for run loop
 
         Logger::outputLogs();
-
-        Timer::periodicRun(3, []() {
-            Logger::info("DEBUG", "Second: " + std::to_string(
-                                                   (int)Timer::getTotalTime()));
-        });
     }
 }
 

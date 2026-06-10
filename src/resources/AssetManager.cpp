@@ -55,6 +55,21 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
     return nullptr; // Failed to load
 }
 
+const CPUMaterialData *
+AssetManager::getMaterial(const std::string &materialName) {
+
+    auto it = matMeshCache.find(materialName);
+    if (it != matMeshCache.end()) {
+        Logger::info("ASSET", "Returning cached material: " + materialName);
+        return &it->second; // Safely return the memory address of the cached
+                            // value
+    }
+
+    Logger::error("ASSET",
+                  "AssetManager failed to load material: " + materialName);
+    return nullptr;
+}
+
 const void AssetManager::loadMaterialBank(const std::string &filepath) {
     std::vector<CPUMaterialData> newMaterials;
 
@@ -70,21 +85,6 @@ const void AssetManager::loadMaterialBank(const std::string &filepath) {
             matMeshCache[mat.name] = mat;
         }
     }
-}
-
-const CPUMaterialData *
-AssetManager::getMaterial(const std::string &materialName) {
-
-    auto it = matMeshCache.find(materialName);
-    if (it != matMeshCache.end()) {
-        Logger::info("ASSET", "Returning cached material: " + materialName);
-        return &it->second; // Safely return the memory address of the cached
-                            // value
-    }
-
-    Logger::error("ASSET",
-                  "AssetManager failed to load material: " + materialName);
-    return nullptr;
 }
 
 } // namespace Engine
