@@ -12,7 +12,6 @@
 #include "Defaults.h"
 
 #include <GLFW/glfw3.h>
-#include <cstddef>
 #include <glm/ext/vector_float3.hpp>
 
 namespace Engine {
