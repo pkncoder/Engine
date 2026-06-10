@@ -111,8 +111,7 @@ void Application::init() {
 
         entityFour.addComponent<MaterialComponent>(MaterialComponent{
             materialDataFour->albedo, materialDataFour->emmission,
-            materialDataFour->roughness, materialDataFour->metallic,
-            materialDataFour->ior});
+            materialDataFour->roughness, materialDataFour->metallic});
 
         // Add mesh #5 components
         entityFive.addComponent<MeshComponent>(meshComponentFive);
@@ -160,7 +159,8 @@ void Application::run() {
 
         // Render the scene
         START_PROFILE("Render"); // Start timer for renderer
-        // rasterizer->render(camera, activeScene, window->getAspectRatio());
+        // rasterizer->render(camera, activeScene,
+        // window->getAspectRatio());
         activeRenderer->render(camera, activeScene, window->getAspectRatio());
         END_PROFILE("Render"); // End Timer for renderer
 

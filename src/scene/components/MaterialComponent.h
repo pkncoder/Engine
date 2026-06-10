@@ -11,7 +11,6 @@ struct MaterialComponent {
 
     float roughness = 1.0f;
     float metallic = 0.0f;
-    float ior = 0.0f;
 };
 
 } // namespace Engine

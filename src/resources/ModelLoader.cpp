@@ -1,9 +1,9 @@
 #include "ModelLoader.h"
 #include "../services/Logger.h"
 
-#include <fstream>
 #include <tiny_obj_loader.h>
 
+#include <fstream>
 #include <string>
 #include <unordered_map>
 
@@ -13,20 +13,20 @@ namespace Engine {
 bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh,
                           std::string &outMtlFilename) {
 
+    // Get the file information for getting the outMtlFilename
     std::ifstream file(filepath);
     std::string line;
-    outMtlFilename = "";
 
+    // Loop every line, and look for "mtllib "
     while (std::getline(file, line)) {
         if (line.substr(0, 7) == "mtllib ") {
-            outMtlFilename = line.substr(7);
-
+            outMtlFilename = line.substr(7); // Get the base of the filename
             outMtlFilename.erase(outMtlFilename.find_last_not_of(" \n\r\t") +
-                                 1);
+                                 1); // Strip of extras
             break;
         }
     }
-    file.close();
+    file.close(); // Close file for cleanup
 
     // tinyobjloader obj file reading configuration
     tinyobj::ObjReaderConfig readerConfig;
@@ -50,7 +50,7 @@ bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh,
     outMesh.vertices.clear();
     outMesh.indices.clear();
 
-    // Avoid sending duplicated verticies by tracking unique ones, and trashing
+    // Avoid sending duplicated verticies by tracking unique ones, and indexing
     // any duplicates
     std::unordered_map<CPUVertex, uint32_t> uniqueVertices{};
 
@@ -106,6 +106,7 @@ bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh,
         }
     }
 
+    // Get all of the read materials to find the names
     const auto &materials = reader.GetMaterials();
 
     // Check if the mesh has any shapes and if that shape has an assigned
@@ -119,9 +120,11 @@ bool ModelLoader::loadOBJ(const std::string &filepath, CPUMeshData &outMesh,
         }
     }
 
-    // Fallback just in case the .obj literally doesn't have a usemtl line
+    // Fallback just in case the .obj doesn't have a usemtl line
+    // TODO: Move the name into a Defaults.h or Constants.h, and add it to the
+    // buffer automaticlly
     if (outMesh.materialName.empty()) {
-        outMesh.materialName = "Default";
+        outMesh.materialName = "ENG_Default";
     }
 
     // No errors

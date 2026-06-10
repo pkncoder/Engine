@@ -59,7 +59,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         shader.setVec3("u_emmissive", material.emmission);
         shader.setFloat("u_roughness", material.roughness);
         shader.setFloat("u_metallic", material.metallic);
-        shader.setFloat("u_ior", material.ior);
 
         // Give the vertex array
         glBindVertexArray(mesh.vao);
