@@ -11,13 +11,21 @@ namespace Engine {
 
 // AssetManager initilaization
 void AssetManager::init() {
+
+    // Setup an initial material in the cache for objects that don't have any
+    // material listed
+    // TODO: Rename
+    // TODO: defaults
+    matMeshCache["ENG_Default"] = CPUMaterialData{
+        "ENG_Default", glm::vec3(0.9f), glm::vec3(0.0f), 1.0f, 0.0f};
+
     Logger::info("ASSET", "AssetManager Initialized."); // Logging
 }
 
 // Load a mesh + optional for error catching
 const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
 
-    // 1. Check if we already loaded this OBJ
+    // Check if we already loaded this OBJ
     if (cpuMeshCache.find(filepath) != cpuMeshCache.end()) {
         Logger::info("ASSET", "Returning cached mesh: " + filepath);
         return &cpuMeshCache[filepath]; // Instantly return the cached

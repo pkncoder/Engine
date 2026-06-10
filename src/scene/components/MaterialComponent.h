@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../resources/CPUStructs.h"
+
 #include <glm/glm.hpp>
 
 namespace Engine {
@@ -11,6 +13,18 @@ struct MaterialComponent {
 
     float roughness = 1.0f;
     float metallic = 0.0f;
+
+    // Default Constructors
+    MaterialComponent() = default;
+
+    // Constructors
+    MaterialComponent(CPUMaterialData materialData)
+        : albedo(materialData.albedo), emmission(materialData.emmission),
+          roughness(materialData.roughness), metallic(materialData.metallic) {}
+    MaterialComponent(glm::vec3 _albedo, glm::vec3 _emmission, float _roughness,
+                      float _metallic)
+        : albedo(_albedo), emmission(_emmission), roughness(_roughness),
+          metallic(_metallic) {}
 };
 
 } // namespace Engine

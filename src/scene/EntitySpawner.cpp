@@ -40,14 +40,11 @@ Entity EntitySpawner::spawnModel(Scene &scene, const std::string &filepath) {
     const CPUMaterialData *materialData =
         AssetManager::getMaterial(meshData->materialName);
 
-    // Check to make sure it exissts
+    // Add the new material component
     if (materialData != nullptr) {
-        // TODO: Make a CPUMaterialData.into<MaterialComponent> "sorry for the
-        // rust"
-        entity.addComponent<MaterialComponent>( // Instantiate a material
-                                                // component
-            MaterialComponent{materialData->albedo, materialData->emmission,
-                              materialData->roughness, materialData->metallic});
+        // Use the CPUMaterialData -> MaterialComponent constructor
+        entity.addComponent<MaterialComponent>(
+            MaterialComponent(*materialData));
     } else { // If it doesn't exist
         Logger::warn("SPAWNER", "No material found for '" +
                                     meshData->materialName +
@@ -55,12 +52,8 @@ Entity EntitySpawner::spawnModel(Scene &scene, const std::string &filepath) {
 
         // Default material
         // TODO: DEfault?
-        entity.addComponent<MaterialComponent>(MaterialComponent{
-            glm::vec3(0.7f), // Mid-gray albedo
-            glm::vec3(0.0f), // No emission
-            0.5f,            // Roughness
-            0.0f             // Non-metallic
-        });
+        entity.addComponent<MaterialComponent>(
+            MaterialComponent(glm::vec3(0.7f), glm::vec3(0.0f), 0.5f, 0.0f));
     }
 
     // Return the final entity
