@@ -48,6 +48,8 @@ void Application::init() {
     // Initialize the scene
     activeScene = Scene();
 
+    Logger::check();
+
     // TODO: temp (move it somewhere)
     {
         // Register components

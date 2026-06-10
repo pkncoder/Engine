@@ -39,7 +39,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Multi-materials
 - [ ] Sub-object entities
 - [ ] CPURenderableData struct integration
-- [ ] Logger DEBUG LogLevel
 
 ### Todo - Not Code
 
@@ -119,3 +118,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Add to timer a "periodic" way to run code
   - IDEA: Use % and a total deltaTime / time to run whenever
 - [x] Move all these dang structs
+- [x] Logger DEBUG LogLevel

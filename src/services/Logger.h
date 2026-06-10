@@ -9,7 +9,7 @@
 namespace Engine {
 
 // Log severity + log printing status
-enum class LogLevel { FORMATTING, INFO, WARNING, ERR, FATAL };
+enum class LogLevel { FORMATTING, INFO, WARNING, ERR, FATAL, DEBUG };
 enum class LogType { STACKED, IN_PLACE };
 
 // Log entry
@@ -37,7 +37,7 @@ class Logger {
 
     // Debug log
     static inline void check() {
-        log(LogLevel::WARNING, "DEBUG", "--- CHECK ---", LogType::STACKED);
+        log(LogLevel::DEBUG, "DEBUG", "--- CHECK ---", LogType::STACKED);
     };
 
     // Special log wrappers

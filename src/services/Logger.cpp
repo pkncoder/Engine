@@ -139,6 +139,8 @@ const char *Logger::getLevelName(LogLevel level) {
         return "ERROR";
     case LogLevel::FATAL:
         return "FATAL";
+    case LogLevel::DEBUG:
+        return "DEBUG";
     default:
         return "UNKN";
     }
@@ -158,6 +160,8 @@ const char *Logger::getLevelColor(LogLevel level) {
         return "\033[31m"; // Red
     case LogLevel::FATAL:
         return "\033[41m\033[37m"; // White on Red background
+    case LogLevel::DEBUG:
+        return "\033[34m"; // Blue
     default:
         return "\033[0m"; // Reset
     }
