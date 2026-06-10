@@ -38,7 +38,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 - [ ] Multi-materials
 - [ ] Sub-object entities
-- [ ] CPURenderableData struct integration
+- [ ] CPURenderableData struct integration?
 - [ ] Create a Readme
 - [ ] Redo the temp rasterizer & path tracer shaders
 - [ ] Fix the issue on the path tracer on overloads
