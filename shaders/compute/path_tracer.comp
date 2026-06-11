@@ -11,14 +11,12 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 #include "../include/sharedUniforms.glsl"
 
 // Other utils
-// TODO: Make a utils directory
-#include "../include/random.glsl"
-#include "../include/srgb.glsl"
-#include "../include/toneMapping.glsl"
+#include "../include/utils/random.glsl"
+#include "../include/utils/srgb.glsl"
+#include "../include/utils/toneMapping.glsl"
 
 // Coloring models
-#include "../include/models/blinn_phong.glsl"
-#include "../include/models/fresnel.glsl"
+// #include "../include/models/blinn_phong.glsl"
 #include "../include/models/cook_torrance_bdrf.glsl"
 
 // Path tracing includes
@@ -29,11 +27,8 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 // Path tracing intersection functions
 #include "../include/pathTracing/intersections.glsl"
 
-// TODO: Make a path tracing uniforms file
-uniform int u_frameNum;
-
-// Final image writeout
-layout(rgba32f, binding = 0) uniform image2D img_output;
+// Path-tracer specific uniforms
+#include "../include/pathTracing/uniforms.glsl"
 
 // Cosine-weighted hemisphere sampling
 vec3 sampleDiffuse(vec3 normal) {
@@ -133,7 +128,7 @@ void processBounceStep(
 // Sky color
 vec3 colorSky(Ray ray) {
     vec3 sunDir = normalize(vec3(0.4, 0.8, 0.3));
-    float sunDot = max(dot(ray.direction, sunDir), 0.0);
+    float sunDot = max(dot(ray.direction, sunDis persona down right nowir), 0.0);
 
     // Horizon/zenith gradient
     float t = max(ray.direction.y, 0.0);

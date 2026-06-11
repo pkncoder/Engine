@@ -60,8 +60,7 @@ uniform float u_FOV;
 // END INCLUDE: ../include/sharedUniforms.glsl
 
 // Other utils
-// TODO: Make a utils directory
-// BEGIN INCLUDE: ../include/random.glsl
+// BEGIN INCLUDE: ../include/utils/random.glsl
 uint seed; // Global seed
 
 // Backup seed for when the blue noise texture isn't loaded
@@ -92,8 +91,8 @@ vec3 rndUnit(inout uint seed) {
     float r = sqrt(1.0f - z * z);
     return vec3(r * cos(a), r * sin(a), z);
 }
-// END INCLUDE: ../include/random.glsl
-// BEGIN INCLUDE: ../include/srgb.glsl
+// END INCLUDE: ../include/utils/random.glsl
+// BEGIN INCLUDE: ../include/utils/srgb.glsl
 vec3 LessThan(vec3 f, float value) {
     return vec3(
         (f.x < value) ? 1.0f : 0.0f,
@@ -119,8 +118,8 @@ vec3 SRGBToLinear(vec3 rgb) {
         LessThan(rgb, 0.04045f)
     );
 }
-// END INCLUDE: ../include/srgb.glsl
-// BEGIN INCLUDE: ../include/toneMapping.glsl
+// END INCLUDE: ../include/utils/srgb.glsl
+// BEGIN INCLUDE: ../include/utils/toneMapping.glsl
 vec3 ACESFilm(vec3 x) {
     float a = 2.51f;
     float b = 0.03f;
@@ -129,7 +128,7 @@ vec3 ACESFilm(vec3 x) {
     float e = 0.14f;
     return clamp((x*(a*x + b)) / (x*(c*x + d) + e), 0.0f, 1.0f);
 }
-// END INCLUDE: ../include/toneMapping.glsl
+// END INCLUDE: ../include/utils/toneMapping.glsl
 
 // Coloring models
 // BEGIN INCLUDE: ../include/models/blinn_phong.glsl
@@ -582,7 +581,7 @@ void main() {
 
     // Color based on the hit
     vec3 col = colorScene(ray);
-    
+
     col = LinearToSRGB(ACESFilm(col));
 
     // Write to the image with the final hit color

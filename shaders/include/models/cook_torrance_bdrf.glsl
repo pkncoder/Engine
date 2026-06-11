@@ -1,4 +1,4 @@
-// GGX Microfacet sampling
+// GGX Microfacet sampling (kinda like D)
 vec3 sampleGGXWorld(vec3 normal, float roughness, float u1, float u2) {
     float a = roughness * roughness;
     float phi = TWO_PI * u1;
@@ -10,11 +10,18 @@ vec3 sampleGGXWorld(vec3 normal, float roughness, float u1, float u2) {
     return getBasis(normal) * localH;
 }
 
-// Microfacet Masking-Shadowing Function (Smith-GGX)
+// Microfacet Masking-Shadowing Function (Smith-GGX) (G)
 float smithGeometry(float NdotV, float NdotL, float roughness) {
     float a = max(roughness * roughness, EPSILON);
     float k = a * 0.5;
     float g1v = NdotV / max(NdotV * (1.0 - k) + k, EPSILON);
     float g1l = NdotL / max(NdotL * (1.0 - k) + k, EPSILON);
     return g1v * g1l;
+}
+
+// Fresnel (F)
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    float t = clamp(1.0 - cosTheta, 0.0, 1.0);
+    float t2 = t * t;
+    return F0 + (vec3(1.0) - F0) * (t2 * t2 * t);
 }
