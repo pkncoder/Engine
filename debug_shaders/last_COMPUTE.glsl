@@ -23,38 +23,6 @@ mat3 getBasis(vec3 n) {
     return mat3(t, b, n);
 }
 // END INCLUDE: ../include/common.glsl
-// BEGIN INCLUDE: ../include/random.glsl
-uint seed; // Global seed
-
-// Backup seed for when the blue noise texture isn't loaded
-void setSeed(vec2 fragCoord, uint frameNum)
-{
-    seed = uint(fragCoord.x) * 1973u + uint(fragCoord.y) * 9277u + frameNum * 26699u | 1u;
-}
-
-// Hash function for random uint
-uint wang_hash(inout uint seed) {
-    seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
-    seed *= uint(9);
-    seed = seed ^ (seed >> 4);
-    seed *= uint(0x27d4eb2d);
-    seed = seed ^ (seed >> 15);
-    return seed;
-}
-
-// Random float one from [0-1]
-float rnd1(inout uint seed){
-    return float(wang_hash(seed)) / float(-1u);
-}
-
-// Random normalized unit vector
-vec3 rndUnit(inout uint seed) {
-    float z = rnd1(seed) * 2.0f - 1.0f;
-    float a = rnd1(seed) * 6.28318530718;
-    float r = sqrt(1.0f - z * z);
-    return vec3(r * cos(a), r * sin(a), z);
-}
-// END INCLUDE: ../include/random.glsl
 
 // Shared includes
 // BEGIN INCLUDE: ../include/sharedStructures.glsl
@@ -90,6 +58,78 @@ uniform mat4 u_inverseView;
 // Camera FOV
 uniform float u_FOV;
 // END INCLUDE: ../include/sharedUniforms.glsl
+
+// Other utils
+// TODO: Make a utils directory
+// BEGIN INCLUDE: ../include/random.glsl
+uint seed; // Global seed
+
+// Backup seed for when the blue noise texture isn't loaded
+void setSeed(vec2 fragCoord, uint frameNum)
+{
+    seed = uint(fragCoord.x) * 1973u + uint(fragCoord.y) * 9277u + frameNum * 26699u | 1u;
+}
+
+// Hash function for random uint
+uint wang_hash(inout uint seed) {
+    seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
+    seed *= uint(9);
+    seed = seed ^ (seed >> 4);
+    seed *= uint(0x27d4eb2d);
+    seed = seed ^ (seed >> 15);
+    return seed;
+}
+
+// Random float one from [0-1]
+float rnd1(inout uint seed){
+    return float(wang_hash(seed)) / float(-1u);
+}
+
+// Random normalized unit vector
+vec3 rndUnit(inout uint seed) {
+    float z = rnd1(seed) * 2.0f - 1.0f;
+    float a = rnd1(seed) * 6.28318530718;
+    float r = sqrt(1.0f - z * z);
+    return vec3(r * cos(a), r * sin(a), z);
+}
+// END INCLUDE: ../include/random.glsl
+// BEGIN INCLUDE: ../include/srgb.glsl
+vec3 LessThan(vec3 f, float value) {
+    return vec3(
+        (f.x < value) ? 1.0f : 0.0f,
+        (f.y < value) ? 1.0f : 0.0f,
+        (f.z < value) ? 1.0f : 0.0f
+    );
+}
+
+vec3 LinearToSRGB(vec3 rgb) {
+    rgb = clamp(rgb, 0.0f, 1.0f);
+    return mix(
+        pow(rgb, vec3(1.0f / 2.4f)) * 1.055f - 0.055f,
+        rgb * 12.92f,
+        LessThan(rgb, 0.0031308f)
+    );
+}
+
+vec3 SRGBToLinear(vec3 rgb) {
+    rgb = clamp(rgb, 0.0f, 1.0f);
+    return mix(
+        pow(((rgb + 0.055f) / 1.055f), vec3(2.4f)),
+        rgb / 12.92f,
+        LessThan(rgb, 0.04045f)
+    );
+}
+// END INCLUDE: ../include/srgb.glsl
+// BEGIN INCLUDE: ../include/toneMapping.glsl
+vec3 ACESFilm(vec3 x) {
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((x*(a*x + b)) / (x*(c*x + d) + e), 0.0f, 1.0f);
+}
+// END INCLUDE: ../include/toneMapping.glsl
 
 // Coloring models
 // BEGIN INCLUDE: ../include/models/blinn_phong.glsl
@@ -542,14 +582,8 @@ void main() {
 
     // Color based on the hit
     vec3 col = colorScene(ray);
-    // if (hit.hit) {
-    //     // Phong-shade to get the color
-    //     col = blinnPhong(ray, hit, Material(vec3(0.4, 0.2, 0.8), vec3(0.0), 0.5, 0.0), ray.origin, Material(vec3(0.0), vec3(1.0), 0.0, 0.0));
-    // } else {
-    //     // Sky Gradient
-    //     const float t = 0.5 * (ray.direction.y + 1.0);
-    //     col = (1.0 - t) * vec3(1.0) + t * vec3(0.5, 0.7, 1.0);
-    // }
+    
+    col = LinearToSRGB(ACESFilm(col));
 
     // Write to the image with the final hit color
     // imageStore(img_output, pixel_coords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));

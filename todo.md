@@ -58,6 +58,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Custom errors
 - [ ] Multithread
 - [ ] Create debug textures that can be viewed from the viewport
+- [ ] Multi-pass setup for renderers
 
 ### Todo - Editor
 
