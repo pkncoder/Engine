@@ -56,7 +56,7 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
     // Check for a texture with 0 width & heihgt
     if (currentWidth == 0 || currentHeight == 0)
         return;
-    Logger::info("RENDERER", std::to_string(frameCount), LogType::IN_PLACE);
+
     // Sync the scene data
     // TODO: Every frame?
     flattenScene(activeScene);
