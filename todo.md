@@ -39,7 +39,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Multi-materials
 - [ ] Sub-object entities
 - [ ] CPURenderableData struct integration?
-- [ ] Create a Readme
 - [ ] Redo the temp rasterizer & path tracer shaders
 - [ ] Fix average FPS
 - [ ] Figure out the issue w/ width & height passing being a lot
@@ -48,6 +47,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 - [ ] Change how .mtl and .obj files are stored
 - [ ] Change the plan for the scene.h into a new directory
+- [ ] Finish the readme
 
 ### Todo - Future Todos
 
