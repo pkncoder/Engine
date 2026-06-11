@@ -16,13 +16,17 @@ uniform float u_metallic;
 struct Ray {
     vec3 origin;
     vec3 direction;
+    vec3 invDirection;
 };
 
 struct HitInfo {
     bool hit;
     float dist;
+
     vec3 hitPos;
     vec3 normal;
+
+    int objectIndex;
 };
 
 struct Material {
@@ -56,7 +60,7 @@ vec3 blinnPhong(const in Ray ray, const in HitInfo hit, const in Material object
 
     // Specular (Blinn-Phong)
     const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
-    const float specularPower = objectMaterial.roughness;
+    const float specularPower = abs(objectMaterial.roughness - 1.0); // TODO: Fix
     const vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color
@@ -86,7 +90,7 @@ vec3 blinnPhong(const in vec3 viewPos, const in vec3 worldPos, const in vec3 nor
 
     // Specular (Blinn-Phong)
     const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
-    const float specularPower = objectMaterial.roughness;
+    const float specularPower = abs(objectMaterial.roughness - 1.0); // TODO: Fix
     const vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color

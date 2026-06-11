@@ -5,6 +5,7 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Common
 #include "../include/common.glsl"
+#include "../include/random.glsl"
 
 // Shared includes
 #include "../include/sharedStructures.glsl"
@@ -12,22 +13,202 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Coloring models
 #include "../include/models/blinn_phong.glsl"
+#include "../include/models/fresnel.glsl"
+#include "../include/models/cook_torrance_bdrf.glsl"
 
 // Path tracing includes
+#include "../include/pathTracing/to_be_uniformed_valeus.glsl"
 #include "../include/pathTracing/structures.glsl"
 #include "../include/pathTracing/sceneBuffers.glsl"
 
 // Path tracing intersection functions
 #include "../include/pathTracing/intersections.glsl"
 
+// TODO: Make a path tracing uniforms file
+uniform int u_frameNum;
+
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D img_output;
+
+// Cosine-weighted hemisphere sampling
+vec3 sampleDiffuse(vec3 normal) {
+    float u1 = rnd1(seed);
+    float u2 = rnd1(seed);
+    float r = sqrt(u2);
+    float phi = TWO_PI * u1;
+
+    vec3 localDir = vec3(r * cos(phi), r * sin(phi), sqrt(max(0.0, 1.0 - u2)));
+
+    return getBasis(normal) * localDir;
+}
+
+// Modify values that need to be changed for the bounce
+void processBounceStep(
+    inout Ray ray,
+    const in HitInfo hit,
+    const in Material mat,
+    inout vec3 colorMult
+) {
+    // Save the view and normal vectors
+    vec3 V = -ray.direction;
+    vec3 N = hit.normal;
+
+    // Lambertion diffuse
+    if (mat.metallic <= 0.5) {
+
+        // Sample the diffuse pdf
+        vec3 rayDirection = sampleDiffuse(N);
+
+        // Update the ray information
+        ray.origin = hit.hitPos + N * EPSILON;
+        ray.direction = rayDirection;
+        ray.invDirection = 1.0 / rayDirection;
+
+        // Modify the throughput
+        colorMult *= mat.albedo;
+    }
+
+    // Specular diffuse / Metal
+    else if (mat.metallic > 0.5) {
+
+        // Perfect reflection (or close enough)
+        if (mat.roughness < 0.01) {
+
+            // Perfectly reflect the ray
+            vec3 rayDirection = reflect(-V, N);
+
+            // Update the ray information
+            ray.origin = hit.hitPos + N * EPSILON;
+            ray.direction = rayDirection;
+            ray.invDirection = 1.0 / rayDirection; 
+
+            // Modify the throughput
+            colorMult *= fresnelSchlick(max(dot(N, rayDirection), 0.0), mat.albedo);
+        }
+
+        // Non-perfect reflections
+        else {
+
+            // Sample GGX world (D)
+            float u1 = rnd1(seed);
+            float u2 = rnd1(seed);
+            vec3 H = sampleGGXWorld(N, mat.roughness, u1, u2);
+
+            // Get NdotL to check for a ray not being visable
+            vec3 rayDirection = reflect(-V, H);
+            float NdotL = dot(N, rayDirection);
+            if (NdotL <= 0.0) {
+                colorMult = vec3(0.0);
+                return; 
+            }
+
+            // Update ray information
+            ray.origin = hit.hitPos + N * EPSILON;
+            ray.direction = rayDirection;
+            ray.invDirection = 1.0 / rayDirection; 
+
+            // Values for the next BDRF calculations
+            float NdotV = max(dot(N, V), EPSILON);
+            float NdotH = max(dot(N, H), EPSILON);
+            float HdotV = max(dot(H, V), EPSILON);
+
+            // Get the G & F components
+            float G = smithGeometry(NdotV, NdotL, mat.roughness);
+            vec3 F = fresnelSchlick(HdotV, mat.albedo);
+
+            // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
+            colorMult *= (F * G * HdotV) / (NdotV * NdotH);
+        }
+    }
+}
+
+
+/* ----------------- COLORING FUNCTIONS ----------------- */
+
+// Sky color
+vec3 colorSky(Ray ray) {
+    vec3 sunDir = normalize(vec3(0.4, 0.8, 0.3));
+    float sunDot = max(dot(ray.direction, sunDir), 0.0);
+
+    // Horizon/zenith gradient
+    float t = max(ray.direction.y, 0.0);
+    vec3 sky = mix(vec3(0.7, 0.85, 1.0), vec3(0.15, 0.35, 0.7), pow(t, 0.6));
+
+    // Sun disc + halo
+    sky += vec3(1.2, 1.0, 0.6) * pow(sunDot, 128.0) * 8.0;  // disc
+    sky += vec3(0.9, 0.7, 0.4) * pow(sunDot, 4.0)   * 0.4;  // halo
+
+    return sky * SKYBOX_COLOR_MULT;
+}
+
+// Main color function / "render" function
+vec3 colorScene(const in Ray cameraRay) {
+    // Set higher-scope mutable structs
+    Ray ray = cameraRay;
+    Material material;
+    HitInfo hit;
+
+    // Color & throughput
+    vec3 color = vec3(0.0);
+    vec3 colorMult = vec3(1.0);
+
+    for (int bounce = 0; bounce < MAX_BOUNCES; bounce++) {
+        hit = rayScene(ray);
+
+        if (!hit.hit) {
+            color += colorSky(ray) * colorMult;
+            break;
+        }
+
+        // TODO: replace
+        if (hit.objectIndex == 0) {
+            material = Material(
+                vec3(0.4, 0.2, 0.8),
+                vec3(0.0),
+                1.0,
+                0.0
+            );
+        } else {
+            material = Material(
+                vec3(0.0),
+                vec3(100.0),
+                0.0,
+                0.0
+            );
+        }
+
+        if (length(material.emmisive) > EPSILON) {
+            color += material.emmisive * colorMult;
+            break;
+        }
+
+        processBounceStep(ray, hit, material, colorMult);
+
+        // Russian roulette
+        if (bounce > MIN_BOUNCE_RUSSIAN_ROULETTE) { // Don't do it too early
+            // Find the largest color weight
+            float p = max(colorMult.r, max(colorMult.g, colorMult.b));
+
+            // If the random chance is bigger than the largest color weight
+            if (rnd1(seed) > p)
+                break;
+
+            // Account for lost energy
+            colorMult /= p;
+        }
+    }
+
+    return color;
+}
 
 void main() {
 
     // Calculate pixel uv
     const ivec2  pixel_coords = ivec2(gl_GlobalInvocationID.xy);
     const ivec2 img_size = imageSize(img_output);
+
+    // TODO: Make the uniform a uint
+    setSeed(pixel_coords, uint(u_frameNum));
 
     // Error check on image size
     if (pixel_coords.x >= img_size.x || pixel_coords.y >= img_size.y) return;
@@ -41,25 +222,26 @@ void main() {
     // Get the ray direction that's in view space and put it into world space
     const float tanHalfFOV = tan(radians(u_FOV * 0.5)); // Helper value
     const vec3 rayDirView = normalize(vec3(uv, -1.0) * vec3(aspectRatio * tanHalfFOV, tanHalfFOV, 1.0));
-    const vec3 rayDirWorld = (u_inverseView * vec4(rayDirView, 0.0)).xyz;
+    const vec3 rayDirWorld = normalize((u_inverseView * vec4(rayDirView, 0.0)).xyz);
 
     // Construct the final ray
-    const Ray ray = Ray(u_cameraPos, normalize(rayDirWorld));
+    const Ray ray = Ray(u_cameraPos, rayDirWorld, 1.0 / rayDirWorld);
 
-    // Find the hit in the scene
-    const HitInfo hit = rayScene(ray);
+    // // Find the hit in the scene
+    // const HitInfo hit = rayScene(ray);
 
     // Color based on the hit
-    vec3 col;
-    if (hit.hit) {
-        // Phong-shade to get the color
-        col = blinnPhong(ray, hit, Material(vec3(0.4, 0.2, 0.8), vec3(0.0), 0.5, 0.0), ray.origin, Material(vec3(0.0), vec3(1.0), 0.0, 0.0));
-    } else {
-        // Sky Gradient
-        const float t = 0.5 * (ray.direction.y + 1.0);
-        col = (1.0 - t) * vec3(1.0) + t * vec3(0.5, 0.7, 1.0);
-    }
+    vec3 col = colorScene(ray);
+    // if (hit.hit) {
+    //     // Phong-shade to get the color
+    //     col = blinnPhong(ray, hit, Material(vec3(0.4, 0.2, 0.8), vec3(0.0), 0.5, 0.0), ray.origin, Material(vec3(0.0), vec3(1.0), 0.0, 0.0));
+    // } else {
+    //     // Sky Gradient
+    //     const float t = 0.5 * (ray.direction.y + 1.0);
+    //     col = (1.0 - t) * vec3(1.0) + t * vec3(0.5, 0.7, 1.0);
+    // }
 
     // Write to the image with the final hit color
+    // imageStore(img_output, pixel_coords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));
     imageStore(img_output, pixel_coords, vec4(col, 1.0));
 }

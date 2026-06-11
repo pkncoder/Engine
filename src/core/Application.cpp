@@ -233,6 +233,14 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(-1.5f, 1.3f, -4.0f);
         cube.getComponent<TransformComponent>().scale =
             glm::vec3(0.4f, 0.4f, 0.4f);
+
+        Entity emmissiveCube = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/cube.obj");
+
+        emmissiveCube.getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.0f);
+        emmissiveCube.getComponent<MaterialComponent>().emmissive =
+            glm::vec3(1.0);
     }
 
     END_PROFILE_STACKED_LOG("Entity Loading");

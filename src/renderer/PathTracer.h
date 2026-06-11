@@ -43,6 +43,9 @@ class PathTracer : public IRenderer {
     int currentWidth = 0;
     int currentHeight = 0;
 
+    // Number of rendered frames (initialized to 1)
+    int frameCount = 1;
+
     // Texture the compute shader writes to
     GLuint outputTexture = 0;
 

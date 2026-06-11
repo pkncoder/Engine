@@ -7,6 +7,7 @@
 #include "GPUStructs.h"
 
 #include <set>
+#include <string>
 
 namespace Engine {
 
@@ -55,7 +56,7 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
     // Check for a texture with 0 width & heihgt
     if (currentWidth == 0 || currentHeight == 0)
         return;
-
+    Logger::info("RENDERER", std::to_string(frameCount), LogType::IN_PLACE);
     // Sync the scene data
     // TODO: Every frame?
     flattenScene(activeScene);
@@ -68,6 +69,7 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
                        GL_RGBA32F);
 
     // Set uniforms for the compute shader
+    computeShader.setInt("u_frameNum", frameCount);
     computeShader.setVec3("u_cameraPos", camera.position);
     computeShader.setFloat("u_FOV", camera.fov);
     computeShader.setInt("u_instanceCount", instanceCount);
@@ -87,6 +89,8 @@ void PathTracer::render(const Camera &camera, Scene &activeScene,
     // framebuffer for bliting to the screen)
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
                     GL_FRAMEBUFFER_BARRIER_BIT);
+
+    frameCount++;
 }
 
 // On window resize, rebuild the texture with the new dimentions

@@ -41,6 +41,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] CPURenderableData struct integration?
 - [ ] Create a Readme
 - [ ] Redo the temp rasterizer & path tracer shaders
+- [ ] Fix average FPS
 
 ### Todo - Not Code
 
@@ -56,6 +57,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Add a worldpos camera movement overload
 - [ ] Custom errors
 - [ ] Multithread
+- [ ] Create debug textures that can be viewed from the viewport
 
 ### Todo - Editor
 
