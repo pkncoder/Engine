@@ -13,7 +13,7 @@ struct HitInfo {
 struct Material {
     vec3 albedo;
     vec3 emmisive;
-    
+
     float roughness;
     float metallic;
 };

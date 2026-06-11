@@ -28,7 +28,7 @@ bool MaterialLoader::loadMTL(const std::string &filepath,
 
         materialData.albedo =
             glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
-        materialData.emmission =
+        materialData.emmissive =
             glm::vec3(mat.emission[0], mat.emission[1], mat.emission[2]);
 
         materialData.roughness = mat.roughness;

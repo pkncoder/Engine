@@ -9,7 +9,7 @@ namespace Engine {
 // Transformation struct, used for maths
 struct MaterialComponent {
     glm::vec3 albedo{1.0f, 0.0f, 1.0f};
-    glm::vec3 emmission{0.0f, 0.0f, 0.0f};
+    glm::vec3 emmissive{0.0f, 0.0f, 0.0f};
 
     float roughness = 1.0f;
     float metallic = 0.0f;
@@ -19,11 +19,11 @@ struct MaterialComponent {
 
     // Constructors
     MaterialComponent(CPUMaterialData materialData)
-        : albedo(materialData.albedo), emmission(materialData.emmission),
+        : albedo(materialData.albedo), emmissive(materialData.emmissive),
           roughness(materialData.roughness), metallic(materialData.metallic) {}
-    MaterialComponent(glm::vec3 _albedo, glm::vec3 _emmission, float _roughness,
+    MaterialComponent(glm::vec3 _albedo, glm::vec3 _emmissive, float _roughness,
                       float _metallic)
-        : albedo(_albedo), emmission(_emmission), roughness(_roughness),
+        : albedo(_albedo), emmissive(_emmissive), roughness(_roughness),
           metallic(_metallic) {}
 };
 

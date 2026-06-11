@@ -41,8 +41,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] CPURenderableData struct integration?
 - [ ] Create a Readme
 - [ ] Redo the temp rasterizer & path tracer shaders
-- [ ] Fix the issue on the path tracer on overloads
-- [ ] "emmision" -> "emmisive" &  "diffuse" -> "albedo"
 
 ### Todo - Not Code
 
@@ -127,3 +125,5 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Make a method to spawn entities easeir than it is
 - [x] Change TransformComponent's struct declaration from Transform to TransformComponent
 - [x] Unabstract "model" to "obj" to prepare for way in the future, other model files
+- [x] "emmision" -> "emmisive"
+- [x] Fix the issue on the path tracer on overloads

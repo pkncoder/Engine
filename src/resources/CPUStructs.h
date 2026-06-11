@@ -37,7 +37,7 @@ struct CPUMaterialData {
 
     // Colored options (diffuse & light)
     glm::vec3 albedo{1.0f, 0.0f, 1.0f};
-    glm::vec3 emmission{0.0f, 0.0f, 0.0f};
+    glm::vec3 emmissive{0.0f, 0.0f, 0.0f};
 
     // Material texture settings
     float roughness = 1.0f;

@@ -56,7 +56,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
         // Set the material uniforms
         shader.setVec3("u_albedo", material.albedo);
-        shader.setVec3("u_emmissive", material.emmission);
+        shader.setVec3("u_emmissive", material.emmissive);
         shader.setFloat("u_roughness", material.roughness);
         shader.setFloat("u_metallic", material.metallic);
 

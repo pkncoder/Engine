@@ -225,6 +225,10 @@ void Application::setupEntities(Scene &scene) {
         Entity cube = EntitySpawner::spawnObjEntity(activeScene,
                                                     "assets/models/cube.obj");
 
+        cube.getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.4f, 0.2f, 0.8f);
+        cube.getComponent<MaterialComponent>().roughness = 0.1;
+
         cube.getComponent<TransformComponent>().position =
             glm::vec3(-1.5f, 1.3f, -4.0f);
         cube.getComponent<TransformComponent>().scale =

@@ -11,36 +11,14 @@ uniform vec3 u_albedo;
 uniform vec3 u_emmissive;
 uniform float u_roughness;
 uniform float u_metallic;
-uniform float u_ior;
+
+#include "../include/sharedStructures.glsl"
+#include "../include/models/blinn_phong.glsl"
 
 void main() {
 
-    vec3 lightPos = u_viewPos;
+    vec3 color = blinnPhong(u_viewPos, v_worldPos, v_normal, Material(u_albedo, u_emmissive, u_roughness, u_metallic), u_viewPos, Material(vec3(0.0), vec3(1.0), 0.0, 0.0));
 
-    // Basic Properties
-    vec3 lightColor = vec3(1.0);
-    vec3 matColor = u_albedo;
-    vec3 normal = normalize(v_normal);
-
-    // 1. Ambient
-    vec3 ambient = 0.15 * lightColor * matColor;
-
-    // 2. Diffuse
-    vec3 lightDir = normalize(lightPos - v_worldPos);
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor * matColor;
-
-    // 3. Specular (Blinn-Phong)
-    // Blinn-Phong uses the "Halfway Vector" between light and view
-    vec3 viewDir = normalize(u_viewPos - v_worldPos);
-    vec3 halfwayDir = normalize(lightDir + viewDir); 
-
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 16.0); // 32 is shininess
-    vec3 specular = spec * lightColor * 0.5; // 0.5 is specular strength
-
-    vec3 result = ambient + diffuse + specular;
-
-    // FragColor = vec4(vec3(vNormal), 1.0);
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(color, 1.0);
 
 }

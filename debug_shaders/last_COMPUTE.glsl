@@ -27,7 +27,7 @@ struct HitInfo {
 struct Material {
     vec3 albedo;
     vec3 emmisive;
-    
+
     float roughness;
     float metallic;
 };
@@ -40,68 +40,32 @@ uniform mat4 u_inverseView;
 // Camera FOV
 uniform float u_FOV;
 // END INCLUDE: ../include/sharedUniforms.glsl
-// BEGIN INCLUDE: ../include/intersections.glsl
-HitInfo rayTriangle(Ray ray, vec3 v0, vec3 v1, vec3 v2) {
-    HitInfo hit;
-    hit.hit = false;
-
-    const vec3 edge1 = v1 - v0;
-    const vec3 edge2 = v2 - v0;
-    const vec3 pvec = cross(ray.direction, edge2);
-    const float det = dot(edge1, pvec);
-
-    if (abs(det) < EPSILON) return hit;
-
-    const float invDet = 1.0 / det;
-    const vec3 tvec = ray.origin - v0;
-    const float u = dot(tvec, pvec) * invDet;
-    if (u < 0.0 || u > 1.0) return hit;
-
-    const vec3 qvec = cross(tvec, edge1);
-    const float v = dot(ray.direction, qvec) * invDet;
-    if (v < 0.0 || u + v > 1.0) return hit;
-
-    const float t = dot(edge2, qvec) * invDet;
-
-    if (t > EPSILON) {
-        hit.hit = true;
-        hit.dist = t;
-        hit.hitPos = ray.origin + ray.direction * t;
-        hit.normal = normalize(cross(edge1, edge2));
-    }
-
-    return hit;
-}
-
-// END INCLUDE: ../include/intersections.glsl
 
 // Coloring models
 // BEGIN INCLUDE: ../include/models/blinn_phong.glsl
-vec3 blinnPhong(Ray ray, HitInfo hit) {
-
-    // Light position is just the camera at the moment
-    const vec3 lightPos = u_cameraPos;
+// TODO: Abstract the math and have the math be done in a seperate function
+vec3 blinnPhong(const in Ray ray, const in HitInfo hit, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial) {
 
     // Basic Properties
-    const vec3 lightColor = vec3(1.0);
-    const vec3 matColor = vec3(0.4, 0.8, 0.5);
+    const vec3 lightColor = lightMaterial.emmisive;
+    const vec3 objectColor = objectMaterial.albedo;
     const vec3 normal = hit.normal;
 
     // Ambient
-    const vec3 ambient = 0.15 * lightColor * matColor;
+    const vec3 ambient = 0.15 * lightColor * objectColor;
 
     // Diffuse
     const vec3 lightDir = normalize(lightPos - hit.hitPos);
-    const float diffuseStrength = max(dot(normal, lightDir), 0.0);
-    const vec3 diffuse = lightColor * matColor * diffuseStrength;
+    const float nDotL = max(dot(normal, lightDir), 0.0);
+    const vec3 diffuse = lightColor * objectColor * nDotL;
 
     // Get the view & halfway vectors
-    const vec3 viewDir = normalize(u_cameraPos - hit.hitPos);
+    const vec3 viewDir = normalize(lightPos - hit.hitPos);
     const vec3 halfwayDir = normalize(lightDir + viewDir); 
 
     // Specular (Blinn-Phong)
     const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
-    const float specularPower = 0.5;
+    const float specularPower = objectMaterial.roughness;
     const vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color
@@ -111,7 +75,7 @@ vec3 blinnPhong(Ray ray, HitInfo hit) {
     return result;
 }
 
-vec3 blinnPhong(vec3 viewPos, vec3 worldPos, vec3 normal, Material objectMaterial, vec3 lightPos, Material lightMaterial) {
+vec3 blinnPhong(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
 
     // Basic Properties
     const vec3 lightColor = lightMaterial.emmisive;
@@ -131,7 +95,7 @@ vec3 blinnPhong(vec3 viewPos, vec3 worldPos, vec3 normal, Material objectMateria
 
     // Specular (Blinn-Phong)
     const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
-    const float specularPower = abs(objectMaterial.roughness - 1.0);
+    const float specularPower = objectMaterial.roughness;
     const vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color
@@ -179,8 +143,39 @@ layout(std430, binding = 3) readonly buffer InstanceBuffer { GPUInstance instanc
 uniform int u_instanceCount;
 // END INCLUDE: ../include/pathTracing/sceneBuffers.glsl
 
-// Final image writeout
-layout(rgba32f, binding = 0) uniform image2D img_output;
+// Path tracing intersection functions
+// BEGIN INCLUDE: ../include/pathTracing/intersections.glsl
+HitInfo rayTriangle(Ray ray, vec3 v0, vec3 v1, vec3 v2) {
+    HitInfo hit;
+    hit.hit = false;
+
+    const vec3 edge1 = v1 - v0;
+    const vec3 edge2 = v2 - v0;
+    const vec3 pvec = cross(ray.direction, edge2);
+    const float det = dot(edge1, pvec);
+
+    if (abs(det) < EPSILON) return hit;
+
+    const float invDet = 1.0 / det;
+    const vec3 tvec = ray.origin - v0;
+    const float u = dot(tvec, pvec) * invDet;
+    if (u < 0.0 || u > 1.0) return hit;
+
+    const vec3 qvec = cross(tvec, edge1);
+    const float v = dot(ray.direction, qvec) * invDet;
+    if (v < 0.0 || u + v > 1.0) return hit;
+
+    const float t = dot(edge2, qvec) * invDet;
+
+    if (t > EPSILON) {
+        hit.hit = true;
+        hit.dist = t;
+        hit.hitPos = ray.origin + ray.direction * t;
+        hit.normal = normalize(cross(edge1, edge2));
+    }
+
+    return hit;
+}
 
 HitInfo rayScene(Ray ray) {
 
@@ -242,6 +237,11 @@ HitInfo rayScene(Ray ray) {
     return closestHit;
 }
 
+// END INCLUDE: ../include/pathTracing/intersections.glsl
+
+// Final image writeout
+layout(rgba32f, binding = 0) uniform image2D img_output;
+
 void main() {
 
     // Calculate pixel uv
@@ -253,15 +253,13 @@ void main() {
 
     // Get screen space coords
     const vec2 uv = (vec2(pixel_coords) + 0.5) / vec2(img_size) * 2.0 - 1.0;
-    
+
     // Get the aspect ratio
     const float aspectRatio = float(img_size.x) / float(img_size.y);
-    const float tanHalfFOV = tan(radians(u_FOV * 0.5));
-    
-    // Get the ray direction that's in view space
-    const vec3 rayDirView = normalize(vec3(uv, -1.0) * vec3(aspectRatio * tanHalfFOV, tanHalfFOV, 1.0));
 
-    // Move the ray direction in view space into world space
+    // Get the ray direction that's in view space and put it into world space
+    const float tanHalfFOV = tan(radians(u_FOV * 0.5)); // Helper value
+    const vec3 rayDirView = normalize(vec3(uv, -1.0) * vec3(aspectRatio * tanHalfFOV, tanHalfFOV, 1.0));
     const vec3 rayDirWorld = (u_inverseView * vec4(rayDirView, 0.0)).xyz;
 
     // Construct the final ray
@@ -274,7 +272,7 @@ void main() {
     vec3 col;
     if (hit.hit) {
         // Phong-shade to get the color
-        col = blinnPhong(ray, hit);
+        col = blinnPhong(ray, hit, Material(vec3(0.4, 0.2, 0.8), vec3(0.0), 0.5, 0.0), ray.origin, Material(vec3(0.0), vec3(1.0), 0.0, 0.0));
     } else {
         // Sky Gradient
         const float t = 0.5 * (ray.direction.y + 1.0);
