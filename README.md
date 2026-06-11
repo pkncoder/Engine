@@ -19,6 +19,37 @@ This project has been tested on:
 
 Due to Apple's discontinuation OpenGL, some features are not supported on the OS. Plans for compatibility shaders are wrote down, however not being worked on.
 
+<!-- TODO: Add the dependencies -->
+
+### Step 1
+
+Clone down this repo in the terminal and cd into it:
+
+```
+git clone https://github.com/pkncoder/Light-Teachings.git && cd ./Engine/
+```
+
+### Step 2
+
+If you are using bash/zsh/similar syntax terminal langauges, you can run the "run" script like this:
+
+```
+./run
+```
+
+If that does not work, you can compile it yourself like this:
+
+```
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=$HOME/.vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build build
+```
+
+And then run it:
+
+```
+./build/bin/engine
+```
+
 ## ⚙️ Usage
 
 ## 💻 Technologies
