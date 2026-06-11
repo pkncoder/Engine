@@ -125,6 +125,13 @@ TODO: fill out
 
 ## 🛝 Demos
 
+The renderers included in Tempname: Engine (not including the rasterizer) were first built and made on a website called [shadertoy](https://www.shadertoy.com), which is an online OpenGL shader runner. It uses WebGL. Here are all the current online demos of those renderers:
+
+- Ray Tracer: [Ray Traced Glass and Shiny](https://www.shadertoy.com/view/tXyXRc)
+- Path Tracer: [Almost Real-Time Path Tracer](https://www.shadertoy.com/view/7fBSzR)
+
+*Note: Some of these may not be completed, or fully/at all implemented in Tempname: Engine yet.*
+
 ## 📚 Resources Used
 
 <!-- TODO: ADD HIGHLIGHTS -->
