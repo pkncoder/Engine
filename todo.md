@@ -42,23 +42,30 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Create a Readme
 - [ ] Redo the temp rasterizer & path tracer shaders
 - [ ] Fix average FPS
+- [ ] Figure out the issue w/ width & height passing being a lot
 
 ### Todo - Not Code
 
 - [ ] Change how .mtl and .obj files are stored
-- [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Change the plan for the scene.h into a new directory
 
 ### Todo - Future Todos
 
 - [ ] Use EnTT instead of custom ECS
 - [ ] Make live aspect ratio drawing
-- [ ] Orbital camera ability
-- [ ] Add a worldpos camera movement overload
+- [ ] Different camera movement modes
 - [ ] Custom errors
 - [ ] Multithread
 - [ ] Create debug textures that can be viewed from the viewport
 - [ ] Multi-pass setup for renderers
+- [ ] Create & Finish multiple renderers
+  - [ ] Rasterizer
+  - [ ] Real-time Ray Tracer
+  - [ ] Real-time Path Tracer
+  - [ ] Real-time Ray Marcher
+  - [ ] Real-time Ray Caster (Voxels)
+- [ ] Different shader models
+  - Ex. Disney BSDF
 
 ### Todo - Editor
 
@@ -76,6 +83,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Add the ability for multiple render methods together (like a path traced scene + ray marched clouds)
 - [ ] Make the engine launch while loading, but show that it is "working" on it
 - [ ] Optomization [Small, Tiny unless on HUGE models] -> merge normals together if they are really similar to try and reduce the total vertex count
+- [ ] Non-Euclideon geometry
+- [ ] Marching Spheres
 
 ## Steps
 

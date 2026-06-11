@@ -4,11 +4,55 @@
 
 ## ☀️ Overview
 
+Tempname: Engine is an application that has the plan for something not seen very often. On a high level, Tempname: Engine is a GPU-Renderer that will have model, scene, and material modifications. This, however, is not the main point.
+
+Tempname: Engine will use the built scene and render it out in a varriety of methods. Instead of forcing the user into a basic Rasterizer and a few different qualities of a Path Tracer, the user will have control of a suite of different rendering techniques. There are some more ideas for others, but the basic renderers will include:
+
+- Rasterizer
+- Ray Tracer
+- Path Tracer
+- Ray Marcher
+- Ray Caster (Voxels)
+
+Along with these, the user will have the utilities to render out stylized scenes to their modifications, and have the ability for simple animations & scene creation.
+
 ## ✨ Features
 
 ### Current
 
-### Planned
+- Renderers
+  - Rasterizer
+  - Path Tracer \*
+- Moveable camera
+- Basic Entity Component System (ECS)
+  - MeshComponent
+  - TransformComponent
+  - MaterialComponent
+- Object Materials
+  - Albedo/Emmissive
+  - Roughness/Metallic
+- .obj and .mat file loading
+- Terminal logger w/ scrolling information & an updating "dashboard"
+  - Log level/type + Tags
+  - Scrolling/stacked logging & In-place or dynamic text
+  - ASCI colors
+
+### Planned /  To-Be-Made
+
+- Renderers
+  - Ray Tracer
+  - Ray Marcher
+  - Ray Caster (Voxels)
+  - Marching Cubes?
+- Larger material support
+- Full editor for scene and render modifications
+- Multi-render pass support
+- Multi-renderer image outputs (ex. rasterized scene, path traced reflections/shadows, ray marched clouds)
+- Multi-threading
+
+\* OpenGL 4.6+ (not MacOS)
+
+For more todos, ideas, and current capibilites, check out: [todo.md](todo.md).
 
 ## 🚀 Running
 
@@ -52,6 +96,10 @@ And then run it:
 
 ## ⚙️ Usage
 
+<!-- TODO: fill out -->
+
+TODO: fill out
+
 ## 💻 Technologies
 
 - **IDE** - Neovim + LazyVim
@@ -66,9 +114,14 @@ Currently, there is no live specific documentation, but there is still some file
 
 - [fileTree.txt](fileTree.txt) - Stores a file tree of current & planned files/directories w/ explanations of their purpose.
 - [todo.md](todo.md) - Stores not only current todos, but all completed todos, project goals, etc.
+- [tags.md](tags.md) - Basic text file with the explanatin of what each tag does when it appears in the Logger service
 - [RESOURCES.md](RESOURCES.md) - Stores the resources used in creation & any important "shout-outs" linked.
 
 ## 🌌 Gallery
+
+<!-- TODO: fill out -->
+
+TODO: fill out
 
 ## 🛝 Demos
 
