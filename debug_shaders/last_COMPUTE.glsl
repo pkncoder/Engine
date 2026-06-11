@@ -131,79 +131,9 @@ vec3 ACESFilm(vec3 x) {
 // END INCLUDE: ../include/utils/toneMapping.glsl
 
 // Coloring models
-// BEGIN INCLUDE: ../include/models/blinn_phong.glsl
-// TODO: Abstract the math and have the math be done in a seperate function
-vec3 blinnPhong(const in Ray ray, const in HitInfo hit, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial) {
-
-    // Basic Properties
-    const vec3 lightColor = lightMaterial.emmisive;
-    const vec3 objectColor = objectMaterial.albedo;
-    const vec3 normal = hit.normal;
-
-    // Ambient
-    const vec3 ambient = 0.15 * lightColor * objectColor;
-
-    // Diffuse
-    const vec3 lightDir = normalize(lightPos - hit.hitPos);
-    const float nDotL = max(dot(normal, lightDir), 0.0);
-    const vec3 diffuse = lightColor * objectColor * nDotL;
-
-    // Get the view & halfway vectors
-    const vec3 viewDir = normalize(lightPos - hit.hitPos);
-    const vec3 halfwayDir = normalize(lightDir + viewDir); 
-
-    // Specular (Blinn-Phong)
-    const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
-    const float specularPower = abs(objectMaterial.roughness - 1.0); // TODO: Fix
-    const vec3 specular = lightColor * specularPower * specularStrength; 
-
-    // Final color
-    const vec3 result = ambient + diffuse + specular;
-
-    // Return the result
-    return result;
-}
-
-vec3 blinnPhong(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
-
-    // Basic Properties
-    const vec3 lightColor = lightMaterial.emmisive;
-    const vec3 objectColor = objectMaterial.albedo;
-
-    // Ambient
-    const vec3 ambient = 0.15 * lightColor * objectColor;
-
-    // Diffuse
-    const vec3 lightDir = normalize(lightPos - worldPos);
-    const float nDotL = max(dot(normal, lightDir), 0.0);
-    const vec3 diffuse = lightColor * objectColor * nDotL;
-
-    // Get the view & halfway vectors
-    const vec3 viewDir = normalize(viewPos - worldPos);
-    const vec3 halfwayDir = normalize(lightDir + viewDir); 
-
-    // Specular (Blinn-Phong)
-    const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
-    const float specularPower = abs(objectMaterial.roughness - 1.0); // TODO: Fix
-    const vec3 specular = lightColor * specularPower * specularStrength; 
-
-    // Final color
-    const vec3 result = ambient + diffuse + specular;
-
-    // Return the result
-    return result;
-}
-
-// END INCLUDE: ../include/models/blinn_phong.glsl
-// BEGIN INCLUDE: ../include/models/fresnel.glsl
-vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    float t = clamp(1.0 - cosTheta, 0.0, 1.0);
-    float t2 = t * t;
-    return F0 + (vec3(1.0) - F0) * (t2 * t2 * t);
-}
-// END INCLUDE: ../include/models/fresnel.glsl
+// #include "../include/models/blinn_phong.glsl"
 // BEGIN INCLUDE: ../include/models/cook_torrance_bdrf.glsl
-// GGX Microfacet sampling
+// GGX Microfacet sampling (kinda like D)
 vec3 sampleGGXWorld(vec3 normal, float roughness, float u1, float u2) {
     float a = roughness * roughness;
     float phi = TWO_PI * u1;
@@ -215,13 +145,20 @@ vec3 sampleGGXWorld(vec3 normal, float roughness, float u1, float u2) {
     return getBasis(normal) * localH;
 }
 
-// Microfacet Masking-Shadowing Function (Smith-GGX)
+// Microfacet Masking-Shadowing Function (Smith-GGX) (G)
 float smithGeometry(float NdotV, float NdotL, float roughness) {
     float a = max(roughness * roughness, EPSILON);
     float k = a * 0.5;
     float g1v = NdotV / max(NdotV * (1.0 - k) + k, EPSILON);
     float g1l = NdotL / max(NdotL * (1.0 - k) + k, EPSILON);
     return g1v * g1l;
+}
+
+// Fresnel (F)
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    float t = clamp(1.0 - cosTheta, 0.0, 1.0);
+    float t2 = t * t;
+    return F0 + (vec3(1.0) - F0) * (t2 * t2 * t);
 }
 // END INCLUDE: ../include/models/cook_torrance_bdrf.glsl
 
@@ -373,11 +310,13 @@ HitInfo rayScene(Ray ray) {
 
 // END INCLUDE: ../include/pathTracing/intersections.glsl
 
-// TODO: Make a path tracing uniforms file
+// Path-tracer specific uniforms
+// BEGIN INCLUDE: ../include/pathTracing/uniforms.glsl
 uniform int u_frameNum;
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D img_output;
+// END INCLUDE: ../include/pathTracing/uniforms.glsl
 
 // Cosine-weighted hemisphere sampling
 vec3 sampleDiffuse(vec3 normal) {

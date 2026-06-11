@@ -128,7 +128,7 @@ void processBounceStep(
 // Sky color
 vec3 colorSky(Ray ray) {
     vec3 sunDir = normalize(vec3(0.4, 0.8, 0.3));
-    float sunDot = max(dot(ray.direction, sunDis persona down right nowir), 0.0);
+    float sunDot = max(dot(ray.direction, sunDir), 0.0);
 
     // Horizon/zenith gradient
     float t = max(ray.direction.y, 0.0);
