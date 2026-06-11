@@ -30,8 +30,8 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
 
     // Upload the camera uniforms
-    shader.setMat4("u_ViewProjection", proj * view);
-    shader.setVec3("u_ViewPos", camera.position);
+    shader.setMat4("u_viewProjection", proj * view);
+    shader.setVec3("u_viewPos", camera.position);
 
     // Get all of the renderables from the scene
     auto renderables =
@@ -52,7 +52,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         model = glm::scale(model, transform.scale);
 
         // Pass the model matrix to the shader
-        shader.setMat4("u_Model", model);
+        shader.setMat4("u_model", model);
 
         // Set the material uniforms
         shader.setVec3("u_albedo", material.albedo);

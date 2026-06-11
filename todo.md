@@ -42,6 +42,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Create a Readme
 - [ ] Redo the temp rasterizer & path tracer shaders
 - [ ] Fix the issue on the path tracer on overloads
+- [ ] "emmision" -> "emmisive" &  "diffuse" -> "albedo"
 
 ### Todo - Not Code
 

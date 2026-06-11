@@ -1,12 +1,11 @@
 #version 330 core
 
-in vec3 vNormal;
-in vec3 vWorldPos;
+in vec3 v_normal;
+in vec3 v_worldPos;
 
 out vec4 FragColor;
 
-uniform vec3 u_ViewPos;   // The Camera's position in world space
-// uniform vec3 u_LightPos;  // The Light's position in world space
+uniform vec3 u_viewPos;   // The Camera's position in world space
 
 uniform vec3 u_albedo;
 uniform vec3 u_emmissive;
@@ -16,24 +15,24 @@ uniform float u_ior;
 
 void main() {
 
-    vec3 u_LightPos = u_ViewPos;
+    vec3 lightPos = u_viewPos;
 
     // Basic Properties
     vec3 lightColor = vec3(1.0);
     vec3 matColor = u_albedo;
-    vec3 normal = normalize(vNormal);
+    vec3 normal = normalize(v_normal);
 
     // 1. Ambient
     vec3 ambient = 0.15 * lightColor * matColor;
 
     // 2. Diffuse
-    vec3 lightDir = normalize(u_LightPos - vWorldPos);
+    vec3 lightDir = normalize(lightPos - v_worldPos);
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 diffuse = diff * lightColor * matColor;
 
     // 3. Specular (Blinn-Phong)
     // Blinn-Phong uses the "Halfway Vector" between light and view
-    vec3 viewDir = normalize(u_ViewPos - vWorldPos);
+    vec3 viewDir = normalize(u_viewPos - v_worldPos);
     vec3 halfwayDir = normalize(lightDir + viewDir); 
 
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 16.0); // 32 is shininess

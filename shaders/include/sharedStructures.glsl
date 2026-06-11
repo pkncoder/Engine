@@ -9,3 +9,11 @@ struct HitInfo {
     vec3 hitPos;
     vec3 normal;
 };
+
+struct Material {
+    vec3 albedo;
+    vec3 emmisive;
+    
+    float roughness;
+    float metallic;
+};

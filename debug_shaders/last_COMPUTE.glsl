@@ -23,6 +23,14 @@ struct HitInfo {
     vec3 hitPos;
     vec3 normal;
 };
+
+struct Material {
+    vec3 albedo;
+    vec3 emmisive;
+    
+    float roughness;
+    float metallic;
+};
 // END INCLUDE: ../include/sharedStructures.glsl
 // BEGIN INCLUDE: ../include/sharedUniforms.glsl
 // Camera position + inverseView matrix
@@ -94,6 +102,36 @@ vec3 blinnPhong(Ray ray, HitInfo hit) {
     // Specular (Blinn-Phong)
     const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
     const float specularPower = 0.5;
+    const vec3 specular = lightColor * specularPower * specularStrength; 
+
+    // Final color
+    const vec3 result = ambient + diffuse + specular;
+
+    // Return the result
+    return result;
+}
+
+vec3 blinnPhong(vec3 viewPos, vec3 worldPos, vec3 normal, Material objectMaterial, vec3 lightPos, Material lightMaterial) {
+
+    // Basic Properties
+    const vec3 lightColor = lightMaterial.emmisive;
+    const vec3 objectColor = objectMaterial.albedo;
+
+    // Ambient
+    const vec3 ambient = 0.15 * lightColor * objectColor;
+
+    // Diffuse
+    const vec3 lightDir = normalize(lightPos - worldPos);
+    const float nDotL = max(dot(normal, lightDir), 0.0);
+    const vec3 diffuse = lightColor * objectColor * nDotL;
+
+    // Get the view & halfway vectors
+    const vec3 viewDir = normalize(viewPos - worldPos);
+    const vec3 halfwayDir = normalize(lightDir + viewDir); 
+
+    // Specular (Blinn-Phong)
+    const float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
+    const float specularPower = abs(objectMaterial.roughness - 1.0);
     const vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color

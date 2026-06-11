@@ -184,41 +184,42 @@ void Application::registerSceneComponents(Scene &scene) {
 void Application::setupEntities(Scene &scene) {
     START_PROFILE("Entity Loading");
 
-    {
-        Entity bunny = EntitySpawner::spawnObjEntity(activeScene,
-                                                     "assets/models/bunny.obj");
-
-        bunny.getComponent<TransformComponent>().position =
-            glm::vec3(-1.0f, -1.2f, -4.0f);
-    }
-
-    {
-        Entity dragon = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/dragon.obj");
-
-        dragon.getComponent<TransformComponent>().position =
-            glm::vec3(1.0f, -0.6f, -4.0f);
-    }
-
-    {
-        Entity cat =
-            EntitySpawner::spawnObjEntity(activeScene, "assets/models/cat.obj");
-
-        cat.getComponent<TransformComponent>().position =
-            glm::vec3(0.0f, -0.6f, -4.0f);
-    }
-
-    {
-        Entity moai = EntitySpawner::spawnObjEntity(activeScene,
-                                                    "assets/models/moai.obj");
-
-        moai.getComponent<TransformComponent>().position =
-            glm::vec3(0.0f, 1.3f, -4.0f);
-        moai.getComponent<TransformComponent>().rotation =
-            glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
-        moai.getComponent<TransformComponent>().scale =
-            glm::vec3(0.14f, 0.14f, 0.14f);
-    }
+    // {
+    //     Entity bunny = EntitySpawner::spawnObjEntity(activeScene,
+    //                                                  "assets/models/bunny.obj");
+    //
+    //     bunny.getComponent<TransformComponent>().position =
+    //         glm::vec3(-1.0f, -1.2f, -4.0f);
+    // }
+    //
+    // {
+    //     Entity dragon = EntitySpawner::spawnObjEntity(
+    //         activeScene, "assets/models/dragon.obj");
+    //
+    //     dragon.getComponent<TransformComponent>().position =
+    //         glm::vec3(1.0f, -0.6f, -4.0f);
+    // }
+    //
+    // {
+    //     Entity cat =
+    //         EntitySpawner::spawnObjEntity(activeScene,
+    //         "assets/models/cat.obj");
+    //
+    //     cat.getComponent<TransformComponent>().position =
+    //         glm::vec3(0.0f, -0.6f, -4.0f);
+    // }
+    //
+    // {
+    //     Entity moai = EntitySpawner::spawnObjEntity(activeScene,
+    //                                                 "assets/models/moai.obj");
+    //
+    //     moai.getComponent<TransformComponent>().position =
+    //         glm::vec3(0.0f, 1.3f, -4.0f);
+    //     moai.getComponent<TransformComponent>().rotation =
+    //         glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
+    //     moai.getComponent<TransformComponent>().scale =
+    //         glm::vec3(0.14f, 0.14f, 0.14f);
+    // }
 
     {
         Entity cube = EntitySpawner::spawnObjEntity(activeScene,
