@@ -42,6 +42,18 @@ class PathTracer : public IRenderer {
     void dispatchCompute();
 
   private:
+    // TODO: Defaults/Constants?
+    const static inline GLuint MESH_ENTRY_BUFFER_BINDING_INDEX = 0;
+    const static inline GLuint VERTEX_BUFFER_BINDING_INDEX = 1;
+    const static inline GLuint INDEX_BUFFER_BINDING_INDEX = 2;
+    const static inline GLuint INSTANCE_BUFFER_BINDING_INDEX = 3;
+    const static inline GLuint MATERIALS_BUFFER_BINDING_INDEX = 4;
+
+    // Compute shader group sizes
+    const static inline GLuint WORKGROUP_SIZE_X = 8;
+    const static inline GLuint WORKGROUP_SIZE_Y = 8;
+    const static inline GLuint WORKGROUP_SIZE_Z = 1;
+
     // Shader w/ the program + compute shader code
     Shader computeShader;
 
@@ -63,7 +75,7 @@ class PathTracer : public IRenderer {
     PersistentBuffer vertexBuffer;    // Vertex pool
     PersistentBuffer indexBuffer;     // Indicie pool
     PersistentBuffer instanceBuffer;  // Buffer for each per-instance info
-    PersistentBuffer materialBuffer;  // Material information buffer
+    PersistentBuffer materialsBuffer; // Material information buffer
 
     // Geometry state tracking
     bool geometryDirty = true;

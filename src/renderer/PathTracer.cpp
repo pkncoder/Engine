@@ -29,12 +29,16 @@ void PathTracer::init() {
     // Pre-alocate and setup the GPUInstance buffer with the max instances
     instanceBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                          MAX_INSTANCES * sizeof(GPUInstance));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, instanceBuffer.id);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
+                     PathTracer::INSTANCE_BUFFER_BINDING_INDEX,
+                     instanceBuffer.id);
 
     // Pre-allocate Material Buffer (Binding 4)
-    materialBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                         MAX_INSTANCES * sizeof(GPUMaterial));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, materialBuffer.id);
+    materialsBuffer.setup(GL_SHADER_STORAGE_BUFFER,
+                          MAX_INSTANCES * sizeof(GPUMaterial));
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
+                     PathTracer::MATERIALS_BUFFER_BINDING_INDEX,
+                     materialsBuffer.id);
 
     Logger::info("RENDERER", "Path Tracer initialized");
 }
@@ -47,7 +51,7 @@ void PathTracer::shutdown() {
     vertexBuffer.shutdown();
     indexBuffer.shutdown();
     instanceBuffer.shutdown();
-    materialBuffer.shutdown();
+    materialsBuffer.shutdown();
 
     // Clean up teh texture
     if (outputTexture != 0) {
@@ -143,9 +147,14 @@ void PathTracer::bindComputePipeline(const Camera &camera) {
 
 // Dispatch step in the render function
 void PathTracer::dispatchCompute() {
-    GLuint numGroupsX = (currentWidth + 7) / 8;
-    GLuint numGroupsY = (currentHeight + 7) / 8;
-    glDispatchCompute(numGroupsX, numGroupsY, 1);
+    // Calculate the number of thread groups needed to cover the entire screen
+    GLuint numGroupsX =
+        (currentWidth + (WORKGROUP_SIZE_X - 1)) / WORKGROUP_SIZE_X;
+    GLuint numGroupsY =
+        (currentHeight + (WORKGROUP_SIZE_Y - 1)) / WORKGROUP_SIZE_Y;
+
+    // Dispatch the compute shader
+    glDispatchCompute(numGroupsX, numGroupsY, WORKGROUP_SIZE_Z);
 
     // Memory flush bits (ImageAccess incase of any extra work on texture, and
     // framebuffer for bliting to the screen)
@@ -222,8 +231,8 @@ void PathTracer::flattenScene(Scene &activeScene) {
     instanceCount = instances.size();
 
     if (!materialList.empty()) {
-        materialBuffer.update(materialList.data(),
-                              materialList.size() * sizeof(GPUMaterial));
+        materialsBuffer.update(materialList.data(),
+                               materialList.size() * sizeof(GPUMaterial));
     }
 }
 
@@ -281,21 +290,25 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
                           meshEntries.size() * sizeof(GPUMeshEntry));
     meshEntryBuffer.update(meshEntries.data(),
                            meshEntries.size() * sizeof(GPUMeshEntry));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, meshEntryBuffer.id);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
+                     PathTracer::MESH_ENTRY_BUFFER_BINDING_INDEX,
+                     meshEntryBuffer.id);
 
     // Vertex buffer setup, updating, and binding
     vertexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                        instanceVertices.size() * sizeof(GPUVertex));
     vertexBuffer.update(instanceVertices.data(),
                         instanceVertices.size() * sizeof(GPUVertex));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, vertexBuffer.id);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
+                     PathTracer::VERTEX_BUFFER_BINDING_INDEX, vertexBuffer.id);
 
     // Index buffer setup, updating, and binding
     indexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                       instanceIndices.size() * sizeof(uint32_t));
     indexBuffer.update(instanceIndices.data(),
                        instanceIndices.size() * sizeof(uint32_t));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, indexBuffer.id);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
+                     PathTracer::INDEX_BUFFER_BINDING_INDEX, indexBuffer.id);
 
     // Un-dirty the geometry
     geometryDirty = false;

@@ -43,7 +43,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
 - [ ] Make dirty mesh/camera flags
-- [ ] Get rid of all of the "magic numbers" in the renderers
 
 ### Todo - Not Code
 
@@ -143,3 +142,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Change how .mtl and .obj files are stored
 - [x] Fix average FPS
 - [x] Make all basic inits inlines
+- [x] Get rid of all of the "magic numbers" in the renderers
