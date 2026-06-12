@@ -26,34 +26,34 @@
 │   │   ├── Application.cpp/h                       # Main loop & layer management
 │   │   ├── Defaults.h                              # Default values
 │   │   └── Window.cpp/h                            # GLFW abstraction
-│   ├── renderer/                               # Differing Renderer Logic
+│   ├── renderer/                               # Rendering Logic & GPU Data handling
 │   │   ├── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
 │   │   ├── GPUStructs.h                            # Struct declarations for anything that deals with sending data to the GPU. Similar to CPUStructs.h
-│   │   ├── IRenderer.h                             # Base interface
-│   │   ├── PathTracer.cpp/h                        # GPU Path tracing logic
-│   │   ├── Rasterizer.cpp/h                        # Real-time modeling view
-│   │   └── Shader.cpp/h                            # OpenGL shader and program compilation and usage
+│   │   ├── IRenderer.h                             # Base interface for a renderer
+│   │   ├── PathTracer.cpp/h                        # GPU Path Tracing
+│   │   ├── Rasterizer.cpp/h                        # GPU Rasterizer
+│   │   └── Shader.cpp/h                            # OpenGL shader and program compilation & usage
 │   ├── resources/                              # Resource loaders & managers
 │   │   ├── AssetManager.cpp/h                      # The "Central Hub" / Cache logic
 │   │   ├── CPUStructs.h                            # Struct declarations for the AssetManager & co. (anything that deals with CPU Data)
-│   │   ├── MaterialLoader.cpp/h                    # Material parsing
-│   │   ├── ModelLoader.cpp/h                       # Geometry parsing
-│   │   └── TextureLoader.cpp/h                     # Image decoding (stb_image)
+│   │   ├── MaterialLoader.cpp/h                    # Material parsing (tinyobjloader)
+│   │   ├── ModelLoader.cpp/h                       # Geometry parsing (tinyobjloader)
+│   │   └── TextureLoader.cpp/h                     # Image parsing (stb_image)
 │   ├── scene/                                  # Scene and entity logic
 │   │   ├── Components/                             # Component Logic
-│   │   │   ├── LightComponent.h                        # Reference to a Light ID
-│   │   │   ├── MaterialComponent.h                     # Reference to a Material ID
-│   │   │   ├── MeshComponent.h                         # Reference to a Mesh resource ID
-│   │   │   └── TransformComponent.h                    # Position, Rotation, Scale
+│   │   │   ├── MaterialComponent.h                     # Material information
+│   │   │   ├── MeshComponent.h                         # Mesh component glad IDs
+│   │   │   └── TransformComponent.h                    # Position, Rotation, Scale information
 │   │   ├── Campera.cpp/h                           # Camera logic
-│   │   ├── ECS.h                                   # Basic ID types (typedef uint32_t EntityID)
+│   │   ├── ECS.h                                   # Entity ID typdefs & component registering
 │   │   ├── Entity.h                                # Entity wrapper for ease of use
+│   │   ├── EntitySpawner.h                         # Helper header file for spawning specific entity types (ex. renderable)
 │   │   ├── Scene.cpp/h                             # The "Registry" (manages the list of entities)
-│   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.)
+│   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.) TODO: change
 │   ├── services/                               # Static classes that provide services
 │   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling
 │   │   ├── Logger.cpp/h                            # Engine-wide static logger for anything required
-│   │   └── Timer.ccp/h                             # FPS and profiling services
+│   │   └── Timer.ccp/h                             # FPS, profiling, and anything time-based service
 │   ├── ui/                                     # UI/UX Layer
 │   │   ├── Panels/                                 # Individual windows (Properties, Hierarchy)
 │   │   │    ├── ViewportPanel.cpp/h                    # Shows the actual rendered image/texture
@@ -64,11 +64,5 @@
 │   │   ├── IPanel.h                                    # Real-time modeling view
 │   │   └── UIController.cpp/h                      # ImGui setup/docking logic
 │   └── main.cpp                                # Entry point
-├── vendor/                                 # Libraries, some are handled by vcpkg.json
-│   ├── glad/                                   # OpenGL Loader
-│   ├── glfw/                                   # Windowing
-│   ├── glm/                                    # Math (header only)
-│   ├── imgui/                                  # UI
-│   └── tinyobjloader/                          # Mesh loading
 ├── CMakeLists.txt                          # Main build script
-└── vcpkg.json                              # Package stuff for helping CMakeLists
+└── vcpkg.json                              # Package manager

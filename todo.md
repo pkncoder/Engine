@@ -43,6 +43,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Use a UBO for passing uniforms
 - [ ] Make dirty mesh/camera flags
 - [ ] Material Index in GPUInstance
+- [ ] Change MaterialComponent to GPU glad handles?
 
 ### Todo - Not Code
 
