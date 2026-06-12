@@ -25,7 +25,7 @@ class Timer {
     // Getters
     static float getDeltaTime() { return deltaTime; }
     static double getTotalTime() { return totalTime; }
-    static float getFPS() { return (int)(1.0f / deltaTime); }
+    static float getFPS() { return currentFPS; }
     static float getAverageFPS() { return averageFPS; }
 
     // Profiling logic
