@@ -42,6 +42,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Redo the temp rasterizer & path tracer shaders
 - [ ] Fix average FPS
 - [ ] Figure out the issue w/ width & height passing being a lot
+- [ ] Use a UBO for passing uniforms
+- [ ] Make dirty mesh/camera flags
 
 ### Todo - Not Code
 

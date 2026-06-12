@@ -4,7 +4,6 @@
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
-#include "GPUStructs.h"
 
 #include <set>
 #include <string>
@@ -51,44 +50,15 @@ void PathTracer::shutdown() {
 }
 
 // Dispatch the computer shader + all of the uniforms/buffers for it
-void PathTracer::render(const Camera &camera, Scene &activeScene,
-                        float aspectRatio) {
-    // Check for a texture with 0 width & heihgt
+void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
+    // Make sure the render is valid
     if (currentWidth == 0 || currentHeight == 0)
         return;
 
-    // Sync the scene data
-    // TODO: Every frame?
-    flattenScene(activeScene);
-
-    // Bind the compute shader program
-    computeShader.bind();
-
-    // Bind the texture for the compute shader
-    glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
-                       GL_RGBA32F);
-
-    // Set uniforms for the compute shader
-    computeShader.setInt("u_frameNum", frameCount);
-    computeShader.setVec3("u_cameraPos", camera.position);
-    computeShader.setFloat("u_FOV", camera.fov);
-    computeShader.setInt("u_instanceCount", instanceCount);
-    // You will need to pass inverse view/proj to cast rays:
-    computeShader.setMat4("u_inverseView",
-                          glm::inverse(camera.getViewMatrix()));
-    // computeShader.setMat4("u_InverseProj",
-    // glm::inverse(camera.getProjectionMatrix()));
-
-    // Dispatch the compute shader
-    // TODO: Read more up on compute shader "blocks"
-    GLuint numGroupsX = (currentWidth + 7) / 8;
-    GLuint numGroupsY = (currentHeight + 7) / 8;
-    glDispatchCompute(numGroupsX, numGroupsY, 1);
-
-    // Memory flush bits (ImageAccess incase of any extra work on texture, and
-    // framebuffer for bliting to the screen)
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
-                    GL_FRAMEBUFFER_BARRIER_BIT);
+    flattenScene(scene); // flaten scene TODO: Dirty scene & camera
+    //
+    bindComputePipeline(camera); // Bind the shader & uniforms
+    dispatchCompute();           // Dispatch & do any extra setup
 
     frameCount++;
 }
@@ -143,6 +113,37 @@ void PathTracer::present(int width, int height) {
                       GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
+// Bind the compute shader, set uniforms
+void PathTracer::bindComputePipeline(const Camera &camera) {
+    // Bind the compute shader program
+    computeShader.bind();
+
+    // Bind the texture for the compute shader
+    glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
+                       GL_RGBA32F);
+
+    // Set uniforms for the compute shader
+    computeShader.setInt("u_frameNum", frameCount);
+    computeShader.setVec3("u_cameraPos", camera.position);
+    computeShader.setFloat("u_FOV", camera.fov);
+    computeShader.setInt("u_instanceCount", instanceCount);
+    // You will need to pass inverse view/proj to cast rays:
+    computeShader.setMat4("u_inverseView",
+                          glm::inverse(camera.getViewMatrix()));
+}
+
+// Dispatch step in the render function
+void PathTracer::dispatchCompute() {
+    GLuint numGroupsX = (currentWidth + 7) / 8;
+    GLuint numGroupsY = (currentHeight + 7) / 8;
+    glDispatchCompute(numGroupsX, numGroupsY, 1);
+
+    // Memory flush bits (ImageAccess incase of any extra work on texture, and
+    // framebuffer for bliting to the screen)
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+                    GL_FRAMEBUFFER_BARRIER_BIT);
+}
+
 // Flatten the scene geometry to the SSBOs
 void PathTracer::flattenScene(Scene &activeScene) {
 
@@ -161,8 +162,8 @@ void PathTracer::flattenScene(Scene &activeScene) {
         }
     }
 
-    // Get a new instances vector and reserve memory for the size of renderables
-    std::vector<GPUInstance> instances;
+    // Wipe the instances vector and reseve space again
+    instances.clear();
     instances.reserve(renderables.size());
 
     // Loop each renderable entity

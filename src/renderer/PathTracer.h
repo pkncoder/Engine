@@ -3,6 +3,7 @@
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
 #include "BufferManager.h"
+#include "GPUStructs.h"
 #include "IRenderer.h"
 #include "Shader.h"
 
@@ -35,6 +36,10 @@ class PathTracer : public IRenderer {
     void flattenScene(Scene &activeScene);
     void rebuildGeometryLookupTable(Scene &activeScene);
 
+    // Render steps
+    void bindComputePipeline(const Camera &camera);
+    void dispatchCompute();
+
   private:
     // Shader w/ the program + compute shader code
     Shader computeShader;
@@ -62,9 +67,10 @@ class PathTracer : public IRenderer {
     bool geometryDirty = true;
     std::unordered_map<std::string, uint32_t> instanceLookupTable;
 
-    // Maximum instances we allocate memory for up front
+    // Maximum instances we allocate memory for up front + the instances vector
     const size_t MAX_INSTANCES = 10000;
     size_t instanceCount = 0;
+    std::vector<GPUInstance> instances;
 };
 
 } // namespace Engine
