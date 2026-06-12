@@ -14,7 +14,7 @@ namespace Engine {
 // Path tracer shader setup & memory setup
 void PathTracer::init() {
     // Build the shader wrapper to get the final compute shader + program
-    computeShader = Shader("shaders/compute/path_tracer.comp");
+    computeShader = Shader("shaders/compute/pathTracer.comp");
 
     // Check to see if compute shaders are supported, send a fatal if not
     if (glDispatchCompute == nullptr) {

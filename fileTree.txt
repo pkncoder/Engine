@@ -1,13 +1,16 @@
 .
 ├── assets/                                 # Scenes, models, textures, and HDRI maps
-├── debug_shaders/                          # The last compiled fully concatenated shaders from the #includes (in text)
+├── debugShaders/                          # The last compiled fully concatenated shaders from the #includes (in text)
+│   ├── last_COMPUTE.glsl                       # Final compute shader
+│   ├── last_FRAGMENT.cpp                       # Final fragment shader
+│   └── last_VERTEX.cpp                         # Final vertex shader
 ├── build/                                  # Generated build files (gitignored)
 ├── shaders/                                # GPU-Code
 │   ├── compute/                                # Ray-Based Rendering shaders (.comp)
-│   │   ├── path_tracer.comp                        # Uses BVH + Triangles (Physics-based)
-│   │   ├── ray_tracer.comp                         # Standard Whitted-style (Clean, non-noisy)
-│   │   ├── ray_marcher.comp                        # Uses Signed Distance Fields (SDFs)
-│   │   └── voxel_tracer.comp                       # Uses a 3D Texture or SVO (Sparse Voxel Octree)
+│   │   ├── pathTracer.comp                         # Uses BVH + Triangles (Physics-based)
+│   │   ├── rayTracer.comp                          # Standard Whitted-style (Clean, non-noisy)
+│   │   ├── rayMarcher.comp                         # Uses Signed Distance Fields (SDFs)
+│   │   └── rayCaster.comp                          # Uses a 3D Texture or SVO (Sparse Voxel Octree)
 │   ├── raster/                                 # Raterized shaders (.vert/frag)
 │   │   ├── viewport.vert/frag                      # Standard shaders for the modeling "grid" & wireframes
 │   │   ├── ui_overlay.vert/frag                    # Shaders for UI elements or gizmos (if not handled by ImGui)

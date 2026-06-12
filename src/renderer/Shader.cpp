@@ -185,12 +185,12 @@ void Shader::dumpExpandedShaderCode(const std::string &source,
                                     const std::string &type) {
 
     // Creates a directory called 'debug_shaders' if it doesn't exist
-    if (!fs::exists("debug_shaders")) {
-        fs::create_directory("debug_shaders");
+    if (!fs::exists("debugShaders")) {
+        fs::create_directory("debugShaders");
     }
 
     // Get the file name and an out stream
-    std::string fileName = "debug_shaders/last_" + type + ".glsl";
+    std::string fileName = "debugShaders/last_" + type + ".glsl";
     std::ofstream out(fileName);
 
     // Open the file, push the source code, and close it
