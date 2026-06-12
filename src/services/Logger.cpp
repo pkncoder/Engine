@@ -5,13 +5,6 @@
 
 namespace Engine {
 
-// Init the static attributes
-std::unordered_map<LogType, std::deque<LogEntry>> Logger::pendingLogsByType;
-int Logger::MAX_STACKED_PENDING = 100;
-int Logger::MAX_IN_PLACE_PENDING = 30;
-int Logger::lastDashboardLogCount = 0;
-std::ofstream Logger::logFile;
-
 // Init instructions
 void Logger::init() {
     logFile.open("engine.log", std::ios::out | std::ios::trunc);

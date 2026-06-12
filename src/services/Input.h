@@ -25,11 +25,11 @@ class Input {
 
   private:
     // Window pointer
-    static GLFWwindow *window;
+    static inline GLFWwindow *window = nullptr;
 
     // Mouse movement
-    static glm::vec2 lastMousePos;
-    static glm::vec2 mouseDelta;
+    static inline glm::vec2 lastMousePos = {0.0, 0.0};
+    static inline glm::vec2 mouseDelta = {0.0, 0.0};
 };
 
 } // namespace Engine

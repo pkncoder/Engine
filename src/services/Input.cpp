@@ -3,11 +3,6 @@
 
 namespace Engine {
 
-// Initialize static members w/ dud values
-GLFWwindow *Input::window = nullptr;
-glm::vec2 Input::lastMousePos = {0.0f, 0.0f};
-glm::vec2 Input::mouseDelta = {0.0f, 0.0f};
-
 // Input "service" init
 void Input::init(GLFWwindow *window_ptr) {
 

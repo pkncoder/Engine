@@ -43,7 +43,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
 - [ ] Make dirty mesh/camera flags
-- [ ] Make all basic inits inlines
 
 ### Todo - Not Code
 
@@ -142,3 +141,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Fix the issue on the path tracer on overloads
 - [x] Change how .mtl and .obj files are stored
 - [x] Fix average FPS
+- [x] Make all basic inits inlines

@@ -72,17 +72,18 @@ class Logger {
     static inline bool no_periodic_wait = false;
 
     // Logs waiting to be outputed
-    static std::unordered_map<LogType, std::deque<LogEntry>> pendingLogsByType;
+    static inline std::unordered_map<LogType, std::deque<LogEntry>>
+        pendingLogsByType;
 
     // Count of the length of the dashboard so it can be overwritten
-    static int lastDashboardLogCount;
+    static inline int lastDashboardLogCount = 0;
 
     // Cap of how many logs are stored to wait to be printed
-    static int MAX_STACKED_PENDING;
-    static int MAX_IN_PLACE_PENDING;
+    static inline int MAX_STACKED_PENDING = 100;
+    static inline int MAX_IN_PLACE_PENDING = 30;
 
     // Log file
-    static std::ofstream logFile;
+    static inline std::ofstream logFile;
 };
 
 } // namespace Engine
