@@ -38,11 +38,11 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 - [ ] Multi-materials
 - [ ] Sub-object entities
-- [ ] CPURenderableData struct integration?
 - [ ] Redo the temp rasterizer & path tracer shaders
 - [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
 - [ ] Make dirty mesh/camera flags
+- [ ] Material Index in GPUInstance
 
 ### Todo - Not Code
 

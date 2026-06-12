@@ -44,12 +44,6 @@ struct CPUMaterialData {
     float metallic = 0.0f;
 };
 
-struct CPURenderableEntityData {
-    CPUMeshData meshData;
-    std::vector<CPUMaterialData> materials;
-};
-} // namespace Engine
-
 namespace std {
 template <> struct hash<Engine::CPUVertex> {
     size_t operator()(Engine::CPUVertex const &vertex) const {
