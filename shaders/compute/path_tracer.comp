@@ -46,7 +46,7 @@ vec3 sampleDiffuse(vec3 normal) {
 void processBounceStep(
     inout Ray ray,
     const in HitInfo hit,
-    const in Material mat,
+    const in GPUMaterial mat,
     inout vec3 colorMult
 ) {
     // Save the view and normal vectors
@@ -65,7 +65,7 @@ void processBounceStep(
         ray.invDirection = 1.0 / rayDirection;
 
         // Modify the throughput
-        colorMult *= mat.albedo;
+        colorMult *= mat.albedo.xyz;
     }
 
     // Specular diffuse / Metal
@@ -83,7 +83,7 @@ void processBounceStep(
             ray.invDirection = 1.0 / rayDirection; 
 
             // Modify the throughput
-            colorMult *= fresnelSchlick(max(dot(N, rayDirection), 0.0), mat.albedo);
+            colorMult *= fresnelSchlick(max(dot(N, rayDirection), 0.0), mat.albedo.xyz);
         }
 
         // Non-perfect reflections
@@ -114,7 +114,7 @@ void processBounceStep(
 
             // Get the G & F components
             float G = smithGeometry(NdotV, NdotL, mat.roughness);
-            vec3 F = fresnelSchlick(HdotV, mat.albedo);
+            vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
 
             // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
             colorMult *= (F * G * HdotV) / (NdotV * NdotH);
@@ -145,7 +145,7 @@ vec3 colorSky(Ray ray) {
 vec3 colorScene(const in Ray cameraRay) {
     // Set higher-scope mutable structs
     Ray ray = cameraRay;
-    Material material;
+    GPUMaterial material;
     HitInfo hit;
 
     // Color & throughput
@@ -161,24 +161,10 @@ vec3 colorScene(const in Ray cameraRay) {
         }
 
         // TODO: replace
-        if (hit.objectIndex == 0) {
-            material = Material(
-                vec3(0.4, 0.2, 0.8),
-                vec3(0.0),
-                1.0,
-                0.0
-            );
-        } else {
-            material = Material(
-                vec3(0.0),
-                vec3(100.0),
-                0.0,
-                0.0
-            );
-        }
+        material = materials[hit.objectIndex];
 
-        if (length(material.emmisive) > EPSILON) {
-            color += material.emmisive * colorMult;
+        if (length(material.emissive.xyz) > EPSILON) {
+            color += material.emissive.xyz * colorMult;
             break;
         }
 

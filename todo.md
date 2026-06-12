@@ -43,6 +43,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
 - [ ] Make dirty mesh/camera flags
+- [ ] Get rid of all of the "magic numbers" in the renderers
 
 ### Todo - Not Code
 

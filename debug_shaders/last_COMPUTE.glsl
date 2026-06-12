@@ -191,6 +191,12 @@ struct GPUInstance {
     uint padding3;
 };
 
+struct GPUMaterial {
+    vec4 albedo;
+    vec4 emissive;
+    float roughness;
+    float metallic;
+};
 // END INCLUDE: ../include/pathTracing/structures.glsl
 // BEGIN INCLUDE: ../include/pathTracing/sceneBuffers.glsl
 // SSBO buffers
@@ -198,6 +204,7 @@ layout(std430, binding = 0) readonly buffer MeshEntryBuffer { GPUMeshEntry meshE
 layout(std430, binding = 1) readonly buffer VertexBuffer { GPUVertex vertices[]; };
 layout(std430, binding = 2) readonly buffer IndexBuffer { uint indices[]; };
 layout(std430, binding = 3) readonly buffer InstanceBuffer { GPUInstance instances[]; };
+layout(std430, binding = 4) readonly buffer MaterialBuffer { GPUMaterial materials[]; };
 
 // Total instance count
 uniform int u_instanceCount;
@@ -334,7 +341,7 @@ vec3 sampleDiffuse(vec3 normal) {
 void processBounceStep(
     inout Ray ray,
     const in HitInfo hit,
-    const in Material mat,
+    const in GPUMaterial mat,
     inout vec3 colorMult
 ) {
     // Save the view and normal vectors
@@ -353,7 +360,7 @@ void processBounceStep(
         ray.invDirection = 1.0 / rayDirection;
 
         // Modify the throughput
-        colorMult *= mat.albedo;
+        colorMult *= mat.albedo.xyz;
     }
 
     // Specular diffuse / Metal
@@ -371,7 +378,7 @@ void processBounceStep(
             ray.invDirection = 1.0 / rayDirection; 
 
             // Modify the throughput
-            colorMult *= fresnelSchlick(max(dot(N, rayDirection), 0.0), mat.albedo);
+            colorMult *= fresnelSchlick(max(dot(N, rayDirection), 0.0), mat.albedo.xyz);
         }
 
         // Non-perfect reflections
@@ -402,7 +409,7 @@ void processBounceStep(
 
             // Get the G & F components
             float G = smithGeometry(NdotV, NdotL, mat.roughness);
-            vec3 F = fresnelSchlick(HdotV, mat.albedo);
+            vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
 
             // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
             colorMult *= (F * G * HdotV) / (NdotV * NdotH);
@@ -433,7 +440,7 @@ vec3 colorSky(Ray ray) {
 vec3 colorScene(const in Ray cameraRay) {
     // Set higher-scope mutable structs
     Ray ray = cameraRay;
-    Material material;
+    GPUMaterial material;
     HitInfo hit;
 
     // Color & throughput
@@ -449,24 +456,10 @@ vec3 colorScene(const in Ray cameraRay) {
         }
 
         // TODO: replace
-        if (hit.objectIndex == 0) {
-            material = Material(
-                vec3(0.4, 0.2, 0.8),
-                vec3(0.0),
-                1.0,
-                0.0
-            );
-        } else {
-            material = Material(
-                vec3(0.0),
-                vec3(100.0),
-                0.0,
-                0.0
-            );
-        }
+        material = materials[hit.objectIndex];
 
-        if (length(material.emmisive) > EPSILON) {
-            color += material.emmisive * colorMult;
+        if (length(material.emissive.xyz) > EPSILON) {
+            color += material.emissive.xyz * colorMult;
             break;
         }
 

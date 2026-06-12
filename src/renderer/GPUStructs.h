@@ -24,4 +24,12 @@ struct alignas(16) GPUInstance {
     uint32_t padding[3]; // Pad to 16 bytes
 };
 
+struct alignas(16) GPUMaterial {
+    glm::vec4 albedo;
+    glm::vec4 emmissive;
+    float roughness;
+    float metallic;
+    float padding[2];
+};
+
 } // namespace Engine

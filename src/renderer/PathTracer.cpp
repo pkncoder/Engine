@@ -1,6 +1,7 @@
 #include "PathTracer.h"
 
 #include "../resources/AssetManager.h"
+#include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
@@ -30,6 +31,11 @@ void PathTracer::init() {
                          MAX_INSTANCES * sizeof(GPUInstance));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, instanceBuffer.id);
 
+    // Pre-allocate Material Buffer (Binding 4)
+    materialBuffer.setup(GL_SHADER_STORAGE_BUFFER,
+                         MAX_INSTANCES * sizeof(GPUMaterial));
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, materialBuffer.id);
+
     Logger::info("RENDERER", "Path Tracer initialized");
 }
 
@@ -41,6 +47,7 @@ void PathTracer::shutdown() {
     vertexBuffer.shutdown();
     indexBuffer.shutdown();
     instanceBuffer.shutdown();
+    materialBuffer.shutdown();
 
     // Clean up teh texture
     if (outputTexture != 0) {
@@ -55,8 +62,10 @@ void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
     if (currentWidth == 0 || currentHeight == 0)
         return;
 
-    flattenScene(scene); // flaten scene TODO: Dirty scene & camera
-    //
+    // TODO: dirty mesh & camera implementation
+    flattenScene(scene); // flaten scene
+
+    // Main compute running
     bindComputePipeline(camera); // Bind the shader & uniforms
     dispatchCompute();           // Dispatch & do any extra setup
 
@@ -149,7 +158,8 @@ void PathTracer::flattenScene(Scene &activeScene) {
 
     // Get the scene entities that are set for rendering
     auto renderables =
-        activeScene.getMatchingEntities<TransformComponent, MeshComponent>();
+        activeScene.getMatchingEntities<TransformComponent, MeshComponent,
+                                        MaterialComponent>();
 
     // Check each entity for if the geometry needs to be rebuilt or not
     for (EntityID id : renderables) {
@@ -166,12 +176,17 @@ void PathTracer::flattenScene(Scene &activeScene) {
     instances.clear();
     instances.reserve(renderables.size());
 
+    // Wipe the material list vector and reseve space again
+    materialList.clear();
+    materialList.reserve(renderables.size());
+
     // Loop each renderable entity
     for (EntityID id : renderables) {
 
         // Get the transform & mesh components
-        auto &transform = activeScene.getComponent<TransformComponent>(id);
         auto &meshComp = activeScene.getComponent<MeshComponent>(id);
+        auto &transform = activeScene.getComponent<TransformComponent>(id);
+        auto &materialComp = activeScene.getComponent<MaterialComponent>(id);
 
         // Get a new GPUInstance
         GPUInstance inst{};
@@ -185,12 +200,17 @@ void PathTracer::flattenScene(Scene &activeScene) {
         // Set the transform matrix + the inverse matrix
         inst.transform = model;
         inst.invTransform = glm::inverse(model);
-
-        // Set the mesh index of the instance lookup table
         inst.meshIndex = instanceLookupTable[meshComp.assetID];
 
         // Push the new instance to the full instances array
         instances.push_back(inst);
+
+        GPUMaterial mat{};
+        mat.albedo = glm::vec4(materialComp.albedo, 0.0);
+        mat.emmissive = glm::vec4(materialComp.emmissive, 0.0);
+        mat.roughness = materialComp.roughness;
+        mat.metallic = materialComp.metallic;
+        materialList.push_back(mat);
     }
 
     // Push to GPU using persistent mapped pointer
@@ -200,6 +220,11 @@ void PathTracer::flattenScene(Scene &activeScene) {
     }
 
     instanceCount = instances.size();
+
+    if (!materialList.empty()) {
+        materialBuffer.update(materialList.data(),
+                              materialList.size() * sizeof(GPUMaterial));
+    }
 }
 
 // Rebuild the geometry data

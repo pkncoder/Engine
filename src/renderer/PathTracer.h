@@ -11,6 +11,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace Engine {
 
@@ -62,6 +63,7 @@ class PathTracer : public IRenderer {
     PersistentBuffer vertexBuffer;    // Vertex pool
     PersistentBuffer indexBuffer;     // Indicie pool
     PersistentBuffer instanceBuffer;  // Buffer for each per-instance info
+    PersistentBuffer materialBuffer;  // Material information buffer
 
     // Geometry state tracking
     bool geometryDirty = true;
@@ -70,7 +72,10 @@ class PathTracer : public IRenderer {
     // Maximum instances we allocate memory for up front + the instances vector
     const size_t MAX_INSTANCES = 10000;
     size_t instanceCount = 0;
+
+    // Vectors made for scene flattening
     std::vector<GPUInstance> instances;
+    std::vector<GPUMaterial> materialList;
 };
 
 } // namespace Engine
