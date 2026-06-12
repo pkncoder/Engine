@@ -40,11 +40,33 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
 
     if (ModelLoader::loadOBJ(filepath, newMesh, mtlFilename)) {
 
+        // Make sure to check the mtlFilename's existance
         if (!mtlFilename.empty()) {
+
+            // Get the base directory path
             std::string base_dir =
                 filepath.substr(0, filepath.find_last_of('/') + 1);
+
+            // Find where the models/ part of the base_dir is so we can cut that
+            // out
+            size_t modelFolderPos = base_dir.find("models/");
+            if (modelFolderPos != std::string::npos) { // Safety check
+
+                // Replace "models/" (7 characters) with "materials/"
+                base_dir.replace(modelFolderPos, 7, "materials/");
+            } else {
+
+                // Filepath is not as expected
+                Logger::warn(
+                    "ASSET",
+                    "'models/' directory not found in path: " + filepath +
+                        ". Falling back to default directory.");
+            }
+
+            // Get the full path
             std::string fullMtlPath = base_dir + mtlFilename;
 
+            // Cache the materials
             cacheMaterials(fullMtlPath);
         }
 
@@ -53,7 +75,7 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
                                   " vertices)");
         Logger::space();
 
-        meshCache[filepath] = newMesh; // Save to cache
+        meshCache[filepath] = newMesh;
         return &meshCache[filepath];
     }
 
@@ -81,13 +103,10 @@ const void AssetManager::cacheMaterials(const std::string &filepath) {
     std::vector<CPUMaterialData> newMaterials;
 
     if (MaterialLoader::loadMTL(filepath, newMaterials)) {
-        std::string base_dir =
-            filepath.substr(0, filepath.find_last_of('/') + 1);
-
         for (auto &mat : newMaterials) {
 
             Logger::info("ASSET",
-                         "Successfully cached material at: " + base_dir);
+                         "Successfully cached material at: " + filepath);
 
             materialCache[mat.name] = mat;
         }

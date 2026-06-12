@@ -47,7 +47,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ### Todo - Not Code
 
-- [ ] Change how .mtl and .obj files are stored
 - [ ] Change the plan for the scene.h into a new directory
 - [ ] Finish the readme
 
@@ -141,3 +140,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Unabstract "model" to "obj" to prepare for way in the future, other model files
 - [x] "emmision" -> "emmisive"
 - [x] Fix the issue on the path tracer on overloads
+- [x] Change how .mtl and .obj files are stored
