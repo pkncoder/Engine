@@ -2,7 +2,6 @@
 
 #include "Logger.h"
 
-#include <cstdint>
 #include <functional>
 #include <map>
 #include <string>
