@@ -44,6 +44,8 @@ struct CPUMaterialData {
     float metallic = 0.0f;
 };
 
+} // namespace Engine
+
 namespace std {
 template <> struct hash<Engine::CPUVertex> {
     size_t operator()(Engine::CPUVertex const &vertex) const {
