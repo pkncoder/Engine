@@ -26,7 +26,6 @@ class Timer {
     // Getters
     static float getDeltaTime() { return deltaTime; }
     static double getTotalTime() { return totalTime; }
-    static uint32_t getTotalFrames() { return totalFrames; }
     static float getFPS() { return (int)(1.0f / deltaTime); }
     static float getAverageFPS() { return averageFPS; }
 
@@ -40,25 +39,23 @@ class Timer {
     static void logPerformance(bool clearTerminal = true);
 
   private:
-    // Profile results
-    static std::map<std::string, double> profileResults;
-    static std::unordered_map<std::string, double> activeProfiles;
-
-  private:
     // Delta time and delta time math
-    static float deltaTime;
-    static double lastFrameTime;
+    static inline float deltaTime = 0.0;
+    static inline double lastFrameTime = 0.0;
 
+    // Total time
+    static inline double totalTime = 0.0;
+
+    // Current & average fps
+    static inline float currentFPS = 0.0;
+    static inline float averageFPS = 0.0;
+
+    // Periodic printing logic lock
     static inline bool periodPrintLock = false;
 
-    // Total time + frames count
-    static double totalTime;
-    static uint32_t totalFrames;
-
-    // FPS/Logging state
-    static float averageFPS;
-    static float ms;
-    static float lastLogTime;
+    // Profile results
+    static inline std::map<std::string, double> profileResults;
+    static inline std::unordered_map<std::string, double> activeProfiles;
 };
 
 // Timer that can either start and stop on const & scope, or manually keyed
@@ -68,7 +65,7 @@ struct ScopedProfiler {
 
     ScopedProfiler(const std::string &name) : name(name) {
         Timer::beginProfile(name);
-    }                                              // Constructor - Starts timer
+    } // Constructor - Starts timer
     ~ScopedProfiler() { Timer::endProfile(name); } // Deconstructor - Ends timer
 };
 

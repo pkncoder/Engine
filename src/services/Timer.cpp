@@ -6,24 +6,6 @@
 
 namespace Engine {
 
-// Starting values
-// Delta time
-float Timer::deltaTime = 0.0f;
-double Timer::lastFrameTime = 0.0f;
-
-// Total time + frames
-double Timer::totalTime = 0.0f;
-uint32_t Timer::totalFrames = 0;
-
-// FPS
-float Timer::averageFPS = 0.0f;
-float Timer::ms = 0.0f;
-float Timer::lastLogTime = 0.0f;
-
-// Profiling
-std::map<std::string, double> Timer::profileResults;
-std::unordered_map<std::string, double> Timer::activeProfiles;
-
 // Initalize the starting log values
 void Timer::init() {
     lastFrameTime = glfwGetTime();
@@ -41,13 +23,10 @@ void Timer::update() {
 
     // Update totals
     totalTime = currentTime;
-    totalFrames++;
 
-    // Calculate rolling average stats
-    if (currentTime - lastLogTime >= 1.0) {
-        averageFPS = (float)totalFrames / (float)totalTime; // Simple average
-        ms = deltaTime * 1000.0f;
-    }
+    // Get the instantanius fps and update the average
+    currentFPS = (deltaTime > 0.0f) ? (1.0f / deltaTime) : 0.0f;
+    averageFPS = (currentFPS * 0.05f) + (averageFPS * (1.0f - 0.05f));
 }
 
 // Start profile
@@ -70,6 +49,8 @@ void Timer::endProfile(const std::string &name, const LogType logType) {
                  logType);
 }
 
+// Example: Timer::periodicRun(2, []() { Logger::inf("EXAMPLE", "All of the
+// bagels please."); });
 // TODO: Fix - DOES NOT WORK WITH 1 SECOND OR FRACTIONAL INTERVALS
 void Timer::periodicRun(int period, std::function<void()> function) {
     if ((int)totalTime % period == 0) {
