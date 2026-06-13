@@ -44,6 +44,9 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Make dirty mesh/camera flags
 - [ ] Material Index in GPUInstance
 - [ ] Change MaterialComponent to GPU glad handles?
+- [ ] Fix the materialIndex
+- [ ] Fix the flashing compute shader issue + maybe being too slow?
+- [ ] Non-triangle objects
 
 ### Todo - Not Code
 
