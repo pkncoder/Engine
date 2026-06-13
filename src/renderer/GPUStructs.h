@@ -21,7 +21,8 @@ struct alignas(16) GPUInstance {
     glm::mat4 transform;
     glm::mat4 invTransform;
     uint32_t meshIndex;
-    uint32_t padding[3]; // Pad to 16 bytes
+    uint32_t materialIndex;
+    uint32_t padding[2]; // Pad to 16 bytes
 };
 
 struct alignas(16) GPUMaterial {

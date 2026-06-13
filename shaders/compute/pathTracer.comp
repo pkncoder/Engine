@@ -161,7 +161,7 @@ vec3 colorScene(const in Ray cameraRay) {
         }
 
         // TODO: replace
-        material = materials[hit.objectIndex];
+        material = materials[hit.materialIndex];
 
         if (length(material.emissive.xyz) > EPSILON) {
             color += material.emissive.xyz * colorMult;

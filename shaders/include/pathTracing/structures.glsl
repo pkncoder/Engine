@@ -15,7 +15,7 @@ struct GPUInstance {
     mat4 transform;
     mat4 invTransform;
     uint meshIndex;
-    uint padding1;
+    uint materialIndex;
     uint padding2;
     uint padding3;
 };

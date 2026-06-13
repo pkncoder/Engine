@@ -73,6 +73,7 @@ HitInfo rayScene(Ray ray) {
             // Test the ray-triangle intersection for this triangle
             HitInfo currentHit = rayTriangle(localRay, v0, v1, v2);
             currentHit.objectIndex = instID;
+            currentHit.materialIndex = instance.materialIndex;
 
             // Re-scale distance back to World Space BEFORE checking EPSILON
             currentHit.dist /= rayLength;
