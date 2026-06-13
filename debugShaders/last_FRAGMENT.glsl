@@ -27,6 +27,7 @@ struct HitInfo {
     vec3 normal;
 
     int objectIndex;
+    uint materialIndex;
 };
 
 struct Material {
