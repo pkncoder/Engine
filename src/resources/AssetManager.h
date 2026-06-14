@@ -22,7 +22,8 @@ class AssetManager {
     static inline std::unordered_map<std::string, CPUMaterialData>
         materialCache;
 
-    static const void cacheMaterials(const std::string &filepath);
+    static const void cacheMaterials(const std::string &filepath,
+                                     CPUMeshData *tempMeshData);
 };
 
 } // namespace Engine

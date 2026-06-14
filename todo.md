@@ -46,7 +46,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Change MaterialComponent to GPU glad handles?
 - [ ] Fix the flashing compute shader issue + maybe being too slow?
 - [ ] Non-triangle objects
-- [ ] Redo all of pathTracer.cpp for struct passing (like idk, materials)
+- [ ] Try to reduce the amount of looping being done on materials / instances etc. Maybe try to use the caches in AssetManager more?
 
 ### Todo - Not Code
 
@@ -147,3 +147,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Fix average FPS
 - [x] Make all basic inits inlines
 - [x] Get rid of all of the "magic numbers" in the renderers
+- [x] Redo all of pathTracer.cpp for struct passing (like idk, materials)

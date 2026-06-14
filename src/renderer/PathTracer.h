@@ -15,78 +15,82 @@
 
 namespace Engine {
 
+// Structure to define dynamic output textures
+struct RenderTarget {
+    std::string name;
+    GLuint id = 0;
+    GLuint bindingIndex = 0;
+    GLenum format = GL_RGBA32F;
+};
+
+// Structure to define a dynamic pass
+struct ShaderPass {
+    std::string name;
+    Shader shader;
+
+    glm::ivec3 workgroupSize{8, 8, 1};
+
+    // TODO: dispatch size overide?
+    bool enabled = true;
+};
+
 class PathTracer : public IRenderer {
   public:
-    // Init and shutdown
     void init() override;
     void shutdown() override;
 
-    // Rendering and resizing windows
     void render(const Camera &camera, Scene &activeScene,
                 float aspectRatio) override;
     void resize(int newWidth, int newHeight) override;
-
-    // Getter for the output texture
-    // GLuint getOutputTexture() const { return outputTexture; }
-
-    // Bliting the output texture onto the framebuffer
     void present(int width, int height) override;
 
+    // --- NEW: Dynamic Resource Management ---
+    void addStorageBuffer(const std::string &name, GLuint bindingIndex,
+                          size_t elementSize, size_t initialElementCount);
+    void addRenderTarget(const std::string &name, GLuint bindingIndex,
+                         GLenum format = GL_RGBA32F);
+    void addShaderPass(const std::string &name, const char *computeShaderPath);
+
+    // Choose which texture blits to the screen
+    void setDisplayTarget(const std::string &name);
+
   private:
-    // Scene modifications & building
+    // Core steps separated for multi-pass versatility
     void flattenScene(Scene &activeScene);
     void rebuildGeometryLookupTable(Scene &activeScene);
+    void updateBuffer(const std::string &name, const void *data,
+                      size_t elementCount);
 
-    // Render steps
-    void bindComputePipeline(const Camera &camera);
-    void dispatchCompute();
+    // Shader pass mangment
+    void dispatchShaderPass(const ShaderPass &pass);
+
+    void allocateRenderTarget(RenderTarget &target);
+    void bindRenderTarget(RenderTarget &target);
+
+    // Uniforms
+    void bindGlobalUniforms(Shader &shader, const Camera &camera);
 
   private:
-    // TODO: Defaults/Constants?
-    const static inline GLuint MESH_ENTRY_BUFFER_BINDING_INDEX = 0;
-    const static inline GLuint VERTEX_BUFFER_BINDING_INDEX = 1;
-    const static inline GLuint INDEX_BUFFER_BINDING_INDEX = 2;
-    const static inline GLuint INSTANCE_BUFFER_BINDING_INDEX = 3;
-    const static inline GLuint MATERIALS_BUFFER_BINDING_INDEX = 4;
-
-    // Compute shader group sizes
-    const static inline GLuint WORKGROUP_SIZE_X = 8;
-    const static inline GLuint WORKGROUP_SIZE_Y = 8;
-    const static inline GLuint WORKGROUP_SIZE_Z = 1;
-
-    // Shader w/ the program + compute shader code
-    Shader computeShader;
-
-    // Saved image dimentions
+    // Sizing and state
     int currentWidth = 0;
     int currentHeight = 0;
-
-    // Number of rendered frames (initialized to 1)
-    int frameCount = 1;
-
-    // Texture the compute shader writes to
-    GLuint outputTexture = 0;
-
-    // Framebuffer that the texture will be blited onto
+    int frameCount = 0;
     GLuint presentFBO = 0;
 
-    // SSBOs that get sent over to the GPU
-    PersistentBuffer meshEntryBuffer; // Mesh information
-    PersistentBuffer vertexBuffer;    // Vertex pool
-    PersistentBuffer indexBuffer;     // Indicie pool
-    PersistentBuffer instanceBuffer;  // Buffer for each per-instance info
-    PersistentBuffer materialsBuffer; // Material information buffer
+    std::unordered_map<std::string, PersistentBuffer> storageBuffers;
+    std::unordered_map<std::string, RenderTarget>
+        renderTargets; // TODO: string name
+    std::vector<ShaderPass> shaderPasses;
 
-    // Geometry state tracking
-    bool geometryDirty = true;
-    std::unordered_map<std::string, uint32_t> instanceLookupTable;
+    std::string currentDisplayTarget; // TODO: string?
 
-    // Maximum instances we allocate memory for up front + the instances vector
-    const size_t MAX_INSTANCES = 10000;
-    size_t instanceCount = 0;
-
-    // Vectors made for scene flattening
+    // Instance data cache
     std::vector<GPUInstance> instances;
+    std::unordered_map<std::string, uint32_t> instanceLookupTable;
+    uint32_t instanceCount = 0;
+    bool geometryDirty = true;
+
+    // Material data cache
     std::vector<GPUMaterial> materialList;
 };
 

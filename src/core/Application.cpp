@@ -238,10 +238,27 @@ void Application::setupEntities(Scene &scene) {
         Entity emmissiveCube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
+        emmissiveCube.getComponent<TransformComponent>().position =
+            glm::vec3(4.0f, 0.0f, 2.0f);
         emmissiveCube.getComponent<MaterialComponent>().albedo =
             glm::vec3(0.0f);
         emmissiveCube.getComponent<MaterialComponent>().emmissive =
             glm::vec3(1.0);
+    }
+
+    {
+        Entity white = EntitySpawner::spawnObjEntity(activeScene,
+                                                     "assets/models/white.obj");
+        white.getComponent<MaterialComponent>().metallic = 1.0;
+        white.getComponent<MaterialComponent>().roughness = 0.2;
+        Entity pink = EntitySpawner::spawnObjEntity(activeScene,
+                                                    "assets/models/pink.obj");
+        pink.getComponent<MaterialComponent>().metallic = 1.0;
+        pink.getComponent<MaterialComponent>().roughness = 0.2;
+        Entity blue = EntitySpawner::spawnObjEntity(activeScene,
+                                                    "assets/models/blue.obj");
+        blue.getComponent<MaterialComponent>().metallic = 1.0;
+        blue.getComponent<MaterialComponent>().roughness = 0.2;
     }
 
     END_PROFILE_STACKED_LOG("Entity Loading");

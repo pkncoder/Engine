@@ -11,10 +11,14 @@
 namespace Engine {
 
 // A modern, persistently mapped GPU buffer
+// TODO: format
 struct PersistentBuffer {
     GLuint id = 0;
+    GLuint bindingIndex = 0;
+
     void *mappedPtr = nullptr;
     size_t size = 0;
+    size_t elementSize = 0;
     GLenum target = GL_SHADER_STORAGE_BUFFER;
 
     // Allocates immutable VRAM and maps it permanently to CPU space

@@ -99,6 +99,7 @@ void PersistentBuffer::shutdown() {
         id = 0;
         mappedPtr = nullptr;
         size = 0;
+        elementSize = 0;
     }
 }
 

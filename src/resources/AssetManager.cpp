@@ -67,7 +67,7 @@ const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
             std::string fullMtlPath = base_dir + mtlFilename;
 
             // Cache the materials
-            cacheMaterials(fullMtlPath);
+            cacheMaterials(fullMtlPath, &newMesh);
         }
 
         Logger::info("ASSET", "Successfully loaded mesh: " + filepath + " (" +
@@ -99,7 +99,8 @@ AssetManager::getMaterial(const std::string &materialName) {
     return nullptr;
 }
 
-const void AssetManager::cacheMaterials(const std::string &filepath) {
+const void AssetManager::cacheMaterials(const std::string &filepath,
+                                        CPUMeshData *tempMeshData) {
     std::vector<CPUMaterialData> newMaterials;
 
     if (MaterialLoader::loadMTL(filepath, newMaterials)) {
@@ -109,6 +110,8 @@ const void AssetManager::cacheMaterials(const std::string &filepath) {
                          "Successfully cached material at: " + filepath);
 
             materialCache[mat.name] = mat;
+
+            tempMeshData->materialName = mat.name;
         }
     }
 }

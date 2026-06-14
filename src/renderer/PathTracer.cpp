@@ -1,253 +1,283 @@
 #include "PathTracer.h"
-
 #include "../resources/AssetManager.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
-
+#include "BufferManager.h"
 #include <set>
-#include <string>
 
 namespace Engine {
 
-// Path tracer shader setup & memory setup
-void PathTracer::init() {
-    // Build the shader wrapper to get the final compute shader + program
-    computeShader = Shader("shaders/compute/pathTracer.comp");
+// --- INITIALIZATION & SHUTDOWN ---
 
-    // Check to see if compute shaders are supported, send a fatal if not
+void PathTracer::init() {
     if (glDispatchCompute == nullptr) {
-        Logger::fatal("RENDERER",
-                      "Compute Shaders are not supported on this system!");
+        Logger::fatal("RENDERER", "Compute Shaders are not supported!");
         return;
     }
 
-    // Create our framebuffer that we will blit onto
     glGenFramebuffers(1, &presentFBO);
 
-    // Pre-alocate and setup the GPUInstance buffer with the max instances
-    instanceBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                         MAX_INSTANCES * sizeof(GPUInstance));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
-                     PathTracer::INSTANCE_BUFFER_BINDING_INDEX,
-                     instanceBuffer.id);
+    // 1. Setup default buffers dynamically!
+    // You can easily add a BVH buffer here later: addStorageBuffer(5,
+    // BVH_SIZE);
+    const size_t MAX_INSTANCES = 10000;
+    addStorageBuffer("meshEntries", 0, sizeof(GPUMeshEntry),
+                     1024);                                   // Mesh Entries
+    addStorageBuffer("vertices", 1, sizeof(GPUVertex), 1024); // Vertices
+    addStorageBuffer("indices", 2, sizeof(uint32_t), 1024);   // Indices
+    addStorageBuffer("instances", 3, sizeof(GPUInstance), MAX_INSTANCES);
+    addStorageBuffer("materials", 4, sizeof(GPUMaterial), MAX_INSTANCES);
 
-    // Pre-allocate Material Buffer (Binding 4)
-    materialsBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                          MAX_INSTANCES * sizeof(GPUMaterial));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
-                     PathTracer::MATERIALS_BUFFER_BINDING_INDEX,
-                     materialsBuffer.id);
+    // 2. Setup default render targets dynamically!
+    addRenderTarget("MainColorOutput", 0);
+    // addRenderTarget(1, "NormalsDebug", GL_RGBA32F); // Easy
+    // to add more!
+
+    addShaderPass("renderPass", "shaders/compute/pathTracer.comp");
+
+    setDisplayTarget("MainColorOutput"); // Display the main output by default
 
     Logger::info("RENDERER", "Path Tracer initialized");
 }
 
-// Cleaning up opengl memory
 void PathTracer::shutdown() {
+    for (auto &[name, buffer] : storageBuffers) {
+        buffer.shutdown();
+    }
+    storageBuffers.clear();
 
-    // Clean up all of the SSBOs' memory
-    meshEntryBuffer.shutdown();
-    vertexBuffer.shutdown();
-    indexBuffer.shutdown();
-    instanceBuffer.shutdown();
-    materialsBuffer.shutdown();
+    for (auto &[name, target] : renderTargets) {
+        if (target.id != 0)
+            glDeleteTextures(1, &target.id);
+    }
+    renderTargets.clear();
+}
 
-    // Clean up teh texture
-    if (outputTexture != 0) {
-        glDeleteTextures(1, &outputTexture);
-        outputTexture = 0;
+// --- RESOURCE MANAGEMENT ---
+
+void PathTracer::addStorageBuffer(const std::string &name, GLuint bindingIndex,
+                                  size_t elementSize,
+                                  size_t initialElementCount) {
+    PersistentBuffer newBuffer;
+    newBuffer.bindingIndex = bindingIndex;
+    newBuffer.elementSize = elementSize;
+
+    newBuffer.setup(GL_SHADER_STORAGE_BUFFER,
+                    elementSize * initialElementCount);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingIndex, newBuffer.id);
+    storageBuffers[name] = newBuffer;
+}
+
+void PathTracer::addRenderTarget(const std::string &name, GLuint bindingIndex,
+                                 GLenum format) {
+    RenderTarget target;
+    target.name = name;
+    target.bindingIndex = bindingIndex;
+    target.format = format;
+
+    if (currentWidth > 0 && currentHeight > 0) {
+        allocateRenderTarget(target);
+        bindRenderTarget(target);
+    }
+
+    renderTargets[name] = target;
+}
+
+void PathTracer::allocateRenderTarget(RenderTarget &target) {
+    if (target.id != 0)
+        glDeleteTextures(1, &target.id);
+
+    glGenTextures(1, &target.id);
+    glBindTexture(GL_TEXTURE_2D, target.id);
+    glTexImage2D(GL_TEXTURE_2D, 0, target.format, currentWidth, currentHeight,
+                 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void PathTracer::bindRenderTarget(RenderTarget &target) {
+    glBindImageTexture(target.bindingIndex, target.id, 0, GL_FALSE, 0,
+                       GL_WRITE_ONLY, target.format);
+}
+
+void PathTracer::addShaderPass(const std::string &name,
+                               const char *computeShaderPath) {
+    ShaderPass pass;
+    pass.name = name;
+    pass.shader = Shader(computeShaderPath);
+    shaderPasses.push_back(std::move(pass));
+}
+
+void PathTracer::setDisplayTarget(const std::string &name) {
+    if (renderTargets.find(name) != renderTargets.end()) {
+        currentDisplayTarget = name;
+    } else {
+        Logger::warn("RENDERER",
+                     "Attempted to set invalid display target: " + name);
     }
 }
 
-// Dispatch the computer shader + all of the uniforms/buffers for it
+// --- CORE LOOP ---
+
 void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
-    // Make sure the render is valid
     if (currentWidth == 0 || currentHeight == 0)
         return;
 
-    // TODO: dirty mesh & camera implementation
-    flattenScene(scene); // flaten scene
-
-    // Main compute running
-    bindComputePipeline(camera); // Bind the shader & uniforms
-    dispatchCompute();           // Dispatch & do any extra setup
-
     frameCount++;
+
+    // 1. Prepare Data
+    flattenScene(scene);
+
+    // TODO: check whats needed    glBindImageTexture(0, outputTexture, 0,
+    // GL_FALSE, 0, GL_WRITE_ONLY,
+    for (auto &pass : shaderPasses) {
+        if (!pass.enabled)
+            continue;
+
+        pass.shader.bind();
+        bindGlobalUniforms(pass.shader, camera);
+        dispatchShaderPass(pass);
+    }
 }
 
-// On window resize, rebuild the texture with the new dimentions
-void PathTracer::resize(int newWidth, int newHeight) {
+void PathTracer::dispatchShaderPass(const ShaderPass &pass) {
 
-    // Check for an actual change in size
-    // TODO: This shouldn't be done here
+    GLuint groupsX =
+        (currentWidth + pass.workgroupSize.x - 1) / pass.workgroupSize.x;
+    GLuint groupsY =
+        (currentHeight + pass.workgroupSize.y - 1) / pass.workgroupSize.y;
+    // TODO: groupsZ
+
+    glDispatchCompute(groupsX, groupsY, pass.workgroupSize.z);
+
+    // Conservative barrier - covers SSBO reads/writes between passes and
+    // image writes feeding the next pass or the present blit.
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+                    GL_SHADER_STORAGE_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT);
+}
+
+void PathTracer::bindGlobalUniforms(Shader &shader, const Camera &camera) {
+    // TODO: UBO for at least defaults & dynamic uniforms
+    shader.setInt("u_frameNum", frameCount);
+    shader.setVec3("u_cameraPos", camera.position);
+    shader.setFloat("u_FOV", camera.fov);
+    shader.setInt("u_instanceCount", static_cast<int>(instances.size()));
+    shader.setMat4("u_inverseView", glm::inverse(camera.getViewMatrix()));
+}
+
+// --- WINDOW & DISPLAY ---
+
+void PathTracer::resize(int newWidth, int newHeight) {
     if (newWidth == currentWidth && newHeight == currentHeight)
         return;
 
-    // Update the saved widths
     currentWidth = newWidth;
     currentHeight = newHeight;
 
-    // Delete the old texture
-    if (outputTexture != 0)
-        glDeleteTextures(1, &outputTexture);
+    // Rebuild ALL active render targets automatically
+    for (auto &[binding, target] : renderTargets) {
+        if (target.id != 0)
+            glDeleteTextures(1, &target.id);
+        allocateRenderTarget(target);
+        bindRenderTarget(target);
+    }
 
-    // Get the new texure
-    glGenTextures(1, &outputTexture); // Generate
-    glBindTexture(GL_TEXTURE_2D,
-                  outputTexture); // Tell the texture its a texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, currentWidth, currentHeight, 0,
-                 GL_RGBA, GL_FLOAT, NULL); // Allocate VRAM
-
-    // Set parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR); // Scaling filter
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                    GL_LINEAR); // Scaling filter
-
-    // Set the texture mode
-    glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
-                       GL_RGBA32F);  // Write-Only mode
-    glBindTexture(GL_TEXTURE_2D, 0); // Clean up the binding
+    frameCount = 1; // Reset progressive rendering on camera/resize change
 }
 
-// Blit, or move over the data from the texture to the framebuffer
 void PathTracer::present(int width, int height) {
-    // Bind the framebuffer
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
 
-    // Move the texture ontop off the framebuffer
-    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                           GL_TEXTURE_2D, outputTexture, 0);
+    // Blit whichever target is currently selected for display
+    auto it = renderTargets.find(currentDisplayTarget);
+    if (it == renderTargets.end())
+        return;
+    GLuint targetTex = it->second.id;
 
-    // Draw the framebuffer
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, targetTex, 0);
+
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
                       GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
-// Bind the compute shader, set uniforms
-void PathTracer::bindComputePipeline(const Camera &camera) {
-    // Bind the compute shader program
-    computeShader.bind();
+// --- DATA FLATTENING ---
 
-    // Bind the texture for the compute shader
-    glBindImageTexture(0, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY,
-                       GL_RGBA32F);
-
-    // Set uniforms for the compute shader
-    computeShader.setInt("u_frameNum", frameCount);
-    computeShader.setVec3("u_cameraPos", camera.position);
-    computeShader.setFloat("u_FOV", camera.fov);
-    computeShader.setInt("u_instanceCount", instanceCount);
-    // You will need to pass inverse view/proj to cast rays:
-    computeShader.setMat4("u_inverseView",
-                          glm::inverse(camera.getViewMatrix()));
-}
-
-// Dispatch step in the render function
-void PathTracer::dispatchCompute() {
-    // Calculate the number of thread groups needed to cover the entire screen
-    GLuint numGroupsX =
-        (currentWidth + (WORKGROUP_SIZE_X - 1)) / WORKGROUP_SIZE_X;
-    GLuint numGroupsY =
-        (currentHeight + (WORKGROUP_SIZE_Y - 1)) / WORKGROUP_SIZE_Y;
-
-    // Dispatch the compute shader
-    glDispatchCompute(numGroupsX, numGroupsY, WORKGROUP_SIZE_Z);
-
-    // Memory flush bits (ImageAccess incase of any extra work on texture, and
-    // framebuffer for bliting to the screen)
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
-                    GL_FRAMEBUFFER_BARRIER_BIT);
-}
-
-// Flatten the scene geometry to the SSBOs
 void PathTracer::flattenScene(Scene &activeScene) {
-
-    // Get the scene entities that are set for rendering
     auto renderables =
         activeScene.getMatchingEntities<TransformComponent, MeshComponent,
                                         MaterialComponent>();
 
-    // Check each entity for if the geometry needs to be rebuilt or not
-    for (EntityID id : renderables) {
-        auto &meshComp = activeScene.getComponent<MeshComponent>(id);
-        if (instanceLookupTable.find(meshComp.assetID) ==
-            instanceLookupTable.end()) {
-            geometryDirty = true;
-            rebuildGeometryLookupTable(activeScene);
-            break;
+    // If any renderable references a mesh we haven't uploaded yet, rebuild
+    // the whole geometry table.
+    if (!geometryDirty) {
+        for (EntityID id : renderables) {
+            auto &meshComp = activeScene.getComponent<MeshComponent>(id);
+            if (instanceLookupTable.find(meshComp.assetID) ==
+                instanceLookupTable.end()) {
+                geometryDirty = true;
+                break;
+            }
         }
     }
 
-    // Wipe the instances vector and reseve space again
+    if (geometryDirty) {
+        rebuildGeometryLookupTable(activeScene);
+    }
+
     instances.clear();
     instances.reserve(renderables.size());
 
-    // Wipe the material list vector and reseve space again
+    // TODO: Material dirty flag
     materialList.clear();
     materialList.reserve(renderables.size());
 
-    // Loop each renderable entity
     for (EntityID id : renderables) {
-
-        // Get the transform & mesh components
         auto &meshComp = activeScene.getComponent<MeshComponent>(id);
         auto &transform = activeScene.getComponent<TransformComponent>(id);
         auto &materialComp = activeScene.getComponent<MaterialComponent>(id);
 
-        // Get a new GPUInstance
         GPUInstance inst{};
 
-        // Build the model matrix
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform.position);
         model *= glm::mat4_cast(transform.rotation);
         model = glm::scale(model, transform.scale);
 
-        // Set the transform matrix + the inverse matrix
         inst.transform = model;
         inst.invTransform = glm::inverse(model);
         inst.meshIndex = instanceLookupTable[meshComp.assetID];
+        // TODO: materialID
 
-        // Push the new instance to the full instances array
         instances.push_back(inst);
 
         GPUMaterial mat{};
-        mat.albedo = glm::vec4(materialComp.albedo, 0.0);
-        mat.emmissive = glm::vec4(materialComp.emmissive, 0.0);
+        mat.albedo = glm::vec4(materialComp.albedo, 0.0f);
+        mat.emmissive = glm::vec4(materialComp.emmissive, 0.0f);
         mat.roughness = materialComp.roughness;
         mat.metallic = materialComp.metallic;
+
         materialList.push_back(mat);
     }
 
-    // Push to GPU using persistent mapped pointer
-    if (!instances.empty()) {
-        instanceBuffer.update(instances.data(),
-                              instances.size() * sizeof(GPUInstance));
-    }
+    updateBuffer("instances", instances.data(), instances.size());
+    updateBuffer("materials", materialList.data(), materialList.size());
 
-    instanceCount = instances.size();
+    instanceCount = static_cast<uint32_t>(instances.size());
+} //
 
-    if (!materialList.empty()) {
-        materialsBuffer.update(materialList.data(),
-                               materialList.size() * sizeof(GPUMaterial));
-    }
-}
-
-// Rebuild the geometry data
 void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
-
-    // Save new vectors for all of the new geometry / instance tables
     std::vector<GPUVertex> instanceVertices;
     std::vector<uint32_t> instanceIndices;
     std::vector<GPUMeshEntry> meshEntries;
 
-    // Clear the loopup table
     instanceLookupTable.clear();
 
-    // Get the unique mesh components (ids)
     std::set<std::string> uniqueMeshes;
     auto renderables = activeScene.getMatchingEntities<MeshComponent>();
     for (EntityID id : renderables) {
@@ -255,63 +285,50 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
             activeScene.getComponent<MeshComponent>(id).assetID);
     }
 
-    // Stitch meshes together into the vectors
     for (const auto &assetID : uniqueMeshes) {
-        // Get the mesh assigned in AssetManager with the current assetID
         auto meshData = AssetManager::loadMesh(assetID);
 
-        // Get a new GPUMeshEntry
         GPUMeshEntry entry{};
         entry.baseVertex = static_cast<uint32_t>(instanceVertices.size());
         entry.baseIndex = static_cast<uint32_t>(instanceIndices.size());
         entry.indexCount = static_cast<uint32_t>(meshData->indices.size());
 
-        // Push all of the new verticies into instanceVertices
         for (const auto &v : meshData->vertices) {
             instanceVertices.push_back({glm::vec4(v.position, 1.0f),
                                         glm::vec4(v.normal, 0.0f),
                                         glm::vec4(v.texCoords, 0.0f, 0.0f)});
         }
 
-        // Insert the indicies
         instanceIndices.insert(instanceIndices.end(), meshData->indices.begin(),
                                meshData->indices.end());
 
-        // Set the lookup table with all of the mesh entries here
         instanceLookupTable[assetID] =
             static_cast<uint32_t>(meshEntries.size());
-
-        // Push the new entry into the meshEntries vector
         meshEntries.push_back(entry);
     }
 
-    // Mesh buffer setup, updating, and binding
-    meshEntryBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                          meshEntries.size() * sizeof(GPUMeshEntry));
-    meshEntryBuffer.update(meshEntries.data(),
-                           meshEntries.size() * sizeof(GPUMeshEntry));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
-                     PathTracer::MESH_ENTRY_BUFFER_BINDING_INDEX,
-                     meshEntryBuffer.id);
+    updateBuffer("meshEntries", meshEntries.data(), meshEntries.size());
+    updateBuffer("vertices", instanceVertices.data(), instanceVertices.size());
+    updateBuffer("indices", instanceIndices.data(), instanceIndices.size());
 
-    // Vertex buffer setup, updating, and binding
-    vertexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                       instanceVertices.size() * sizeof(GPUVertex));
-    vertexBuffer.update(instanceVertices.data(),
-                        instanceVertices.size() * sizeof(GPUVertex));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
-                     PathTracer::VERTEX_BUFFER_BINDING_INDEX, vertexBuffer.id);
-
-    // Index buffer setup, updating, and binding
-    indexBuffer.setup(GL_SHADER_STORAGE_BUFFER,
-                      instanceIndices.size() * sizeof(uint32_t));
-    indexBuffer.update(instanceIndices.data(),
-                       instanceIndices.size() * sizeof(uint32_t));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER,
-                     PathTracer::INDEX_BUFFER_BINDING_INDEX, indexBuffer.id);
-
-    // Un-dirty the geometry
     geometryDirty = false;
+}
+
+void PathTracer::updateBuffer(const std::string &name, const void *data,
+                              size_t elementCount) {
+    if (elementCount == 0)
+        return;
+
+    auto it = storageBuffers.find(name);
+    if (it == storageBuffers.end()) {
+        Logger::error("RENDERER",
+                      "PathTracer::updateBuffer - unknown buffer: " + name);
+        return;
+    }
+
+    PersistentBuffer &buffer = it->second;
+
+    buffer.update(data, elementCount * buffer.elementSize);
 }
 
 } // namespace Engine
