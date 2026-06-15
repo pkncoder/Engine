@@ -54,7 +54,8 @@ class PathTracer : public IRenderer {
                           size_t elementSize, size_t initialElementCount);
     void addRenderTarget(const std::string &name, GLuint bindingIndex,
                          GLenum format = GL_RGBA32F);
-    void addShaderPass(const std::string &name, const char *computeShaderPath);
+    void addShaderPass(const std::string &name, const char *computeShaderPath,
+                       const bool enabled = true);
 
   private:
     // Render target management
@@ -81,7 +82,7 @@ class PathTracer : public IRenderer {
     int currentHeight = 0;
 
     // State tracking
-    int frameCount = 0;
+    int frameCount = 0; // TODO: Use the "Timer" service
 
     // Dynamic resource information
     std::unordered_map<std::string, PersistentBuffer> storageBuffers;

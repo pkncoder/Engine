@@ -32,7 +32,8 @@ class Shader {
     std::string getExpandedShaderCode(const std::string &shaderPath);
 
     // Writes the final stitched code to a file for easy debugging
-    void dumpExpandedShaderCode(const std::string &source,
+    void dumpExpandedShaderCode(const std::string &sourceFileName,
+                                const std::string &source,
                                 const std::string &type);
 
     // Used to check errors on shader & program compilations

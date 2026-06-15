@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 namespace Engine {
 
@@ -21,8 +22,16 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     std::string fragmentCode = getExpandedShaderCode(fragmentPath);
 
     // Dump the expanded shader code for debug
-    dumpExpandedShaderCode(vertexCode, "VERTEX");
-    dumpExpandedShaderCode(fragmentCode, "FRAGMENT");
+    std::string vertexFileName =
+        std::string(vertexPath)
+            .substr(std::string(vertexPath).find_last_of('/') + 1);
+
+    std::string fragmentFileName =
+        std::string(fragmentPath)
+            .substr(std::string(fragmentPath).find_last_of('/') + 1);
+
+    dumpExpandedShaderCode(vertexFileName, vertexCode, "VERTEX");
+    dumpExpandedShaderCode(fragmentFileName, fragmentCode, "FRAGMENT");
 
     // Get c-strings of the shader code
     const char *vShaderSource = vertexCode.c_str();
@@ -69,7 +78,10 @@ Shader::Shader(const char *computePath) {
     std::string computeCode = getExpandedShaderCode(computePath);
 
     // 2. Dump for debug
-    dumpExpandedShaderCode(computeCode, "COMPUTE");
+    std::string fileName =
+        std::string(computePath)
+            .substr(std::string(computePath).find_last_of('/') + 1);
+    dumpExpandedShaderCode(fileName, computeCode, "COMPUTE");
 
     const char *cShaderSource = computeCode.c_str();
     uint32_t compute;
@@ -181,7 +193,8 @@ std::string Shader::getExpandedShaderCode(const std::string &shaderPath) {
 }
 
 // Output the final shader code to a dump file for debug purposes
-void Shader::dumpExpandedShaderCode(const std::string &source,
+void Shader::dumpExpandedShaderCode(const std::string &sourceFileName,
+                                    const std::string &source,
                                     const std::string &type) {
 
     // Creates a directory called 'debug_shaders' if it doesn't exist
@@ -190,7 +203,8 @@ void Shader::dumpExpandedShaderCode(const std::string &source,
     }
 
     // Get the file name and an out stream
-    std::string fileName = "debugShaders/last_" + type + ".glsl";
+    std::string fileName =
+        "debugShaders/last_" + type + "_" + sourceFileName + ".glsl";
     std::ofstream out(fileName);
 
     // Open the file, push the source code, and close it

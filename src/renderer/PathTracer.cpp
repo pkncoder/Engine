@@ -29,10 +29,10 @@ void PathTracer::init() {
     addStorageBuffer("instances", 3, sizeof(GPUInstance), MAX_INSTANCES);
     addStorageBuffer("materials", 4, sizeof(GPUMaterial), MAX_INSTANCES);
 
-    // 2. Setup default render targets dynamically!
     addRenderTarget("MainColorOutput", 0);
 
     addShaderPass("renderPass", "shaders/compute/pathTracer.comp");
+    addShaderPass("invert", "shaders/compute/invert.comp", false);
 
     setDisplayTarget("MainColorOutput"); // Display the main output by default
 
@@ -63,8 +63,6 @@ void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
     // 1. Prepare Data
     flattenScene(scene);
 
-    // TODO: check whats needed    glBindImageTexture(0, outputTexture, 0,
-    // GL_FALSE, 0, GL_WRITE_ONLY,
     for (auto &pass : shaderPasses) {
         if (!pass.enabled)
             continue;
@@ -83,17 +81,17 @@ void PathTracer::resize(int newWidth, int newHeight) {
     currentHeight = newHeight;
 
     // Rebuild ALL active render targets automatically
-    for (auto &[binding, target] : renderTargets) {
+    for (auto &[name, target] : renderTargets) {
         if (target.id != 0)
             glDeleteTextures(1, &target.id);
+
         allocateRenderTarget(target);
         bindRenderTarget(target);
     }
-
-    frameCount = 1; // Reset progressive rendering on camera/resize change
 }
 
-// --- Render target presenting
+// --- Render target presenting ---
+
 void PathTracer::setDisplayTarget(const std::string &name) {
     if (renderTargets.find(name) != renderTargets.end()) {
         currentRenderTarget = name;
@@ -106,11 +104,13 @@ void PathTracer::setDisplayTarget(const std::string &name) {
 void PathTracer::present(int width, int height) {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
 
-    // Blit whichever target is currently selected for display
-    const auto it = renderTargets.find(currentRenderTarget);
-    if (it == renderTargets.end())
+    const auto ittr = renderTargets.find(currentRenderTarget);
+    if (ittr == renderTargets.end()) {
+        Logger::error("RENDERER", "Could not find the render target.");
         return;
-    const GLuint targetTex = it->second.id;
+    }
+
+    const GLuint targetTex = ittr->second.id;
 
     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                            GL_TEXTURE_2D, targetTex, 0);
@@ -133,6 +133,7 @@ void PathTracer::addStorageBuffer(const std::string &name, GLuint bindingIndex,
                     elementSize * initialElementCount);
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingIndex, newBuffer.id);
+
     storageBuffers[name] = newBuffer;
 }
 
@@ -152,18 +153,22 @@ void PathTracer::addRenderTarget(const std::string &name, GLuint bindingIndex,
 }
 
 void PathTracer::addShaderPass(const std::string &name,
-                               const char *computeShaderPath) {
+                               const char *computeShaderPath,
+                               const bool enabled) {
     ShaderPass pass;
     pass.name = name;
     pass.shader = Shader(computeShaderPath);
+    pass.enabled = enabled;
+
     shaderPasses.push_back(std::move(pass));
 }
 
 // --- Render target management ---
 
 void PathTracer::allocateRenderTarget(RenderTarget &target) {
-    if (target.id != 0)
+    if (target.id != 0) {
         glDeleteTextures(1, &target.id);
+    }
 
     glGenTextures(1, &target.id);
     glBindTexture(GL_TEXTURE_2D, target.id);
@@ -186,14 +191,14 @@ void PathTracer::updateBuffer(const std::string &name, const void *data,
     if (elementCount == 0)
         return;
 
-    const auto it = storageBuffers.find(name);
-    if (it == storageBuffers.end()) {
+    const auto ittr = storageBuffers.find(name);
+    if (ittr == storageBuffers.end()) {
         Logger::error("RENDERER",
                       "PathTracer::updateBuffer - unknown buffer: " + name);
         return;
     }
 
-    PersistentBuffer &buffer = it->second;
+    PersistentBuffer &buffer = ittr->second;
 
     buffer.update(data, elementCount * buffer.elementSize);
 }
@@ -201,25 +206,21 @@ void PathTracer::updateBuffer(const std::string &name, const void *data,
 // --- Scene managemnet ---
 
 void PathTracer::flattenScene(Scene &activeScene) {
+    if (geometryDirty) {
+        rebuildGeometryLookupTable(activeScene);
+    }
+
     const auto renderables =
         activeScene.getMatchingEntities<TransformComponent, MeshComponent,
                                         MaterialComponent>();
 
-    // If any renderable references a mesh we haven't uploaded yet, rebuild
-    // the whole geometry table.
-    if (!geometryDirty) {
-        for (EntityID id : renderables) {
-            auto &meshComp = activeScene.getComponent<MeshComponent>(id);
-            if (instanceLookupTable.find(meshComp.assetID) ==
-                instanceLookupTable.end()) {
-                geometryDirty = true;
-                break;
-            }
+    for (EntityID id : renderables) {
+        auto &meshComp = activeScene.getComponent<MeshComponent>(id);
+        if (instanceLookupTable.find(meshComp.assetID) ==
+            instanceLookupTable.end()) {
+            geometryDirty = true;
+            break;
         }
-    }
-
-    if (geometryDirty) {
-        rebuildGeometryLookupTable(activeScene);
     }
 
     instances.clear();
@@ -327,8 +328,6 @@ void PathTracer::dispatchShaderPass(const ShaderPass &pass) {
 
     glDispatchCompute(groupsX, groupsY, pass.workgroupSize.z);
 
-    // Conservative barrier - covers SSBO reads/writes between passes and
-    // image writes feeding the next pass or the present blit.
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
                     GL_SHADER_STORAGE_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT);
 }
