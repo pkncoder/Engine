@@ -30,65 +30,73 @@ struct ShaderPass {
 
     glm::ivec3 workgroupSize{8, 8, 1};
 
-    // TODO: dispatch size overide?
+    // TODO: dispatch size overide
     bool enabled = true;
 };
 
 class PathTracer : public IRenderer {
   public:
+    // Init & shutdown
     void init() override;
     void shutdown() override;
 
+    // Rendering & render management
     void render(const Camera &camera, Scene &activeScene,
                 float aspectRatio) override;
     void resize(int newWidth, int newHeight) override;
+
+    // Presenting rendering target
+    void setDisplayTarget(const std::string &name);
     void present(int width, int height) override;
 
-    // --- NEW: Dynamic Resource Management ---
+    // Dynamic resource management
     void addStorageBuffer(const std::string &name, GLuint bindingIndex,
                           size_t elementSize, size_t initialElementCount);
     void addRenderTarget(const std::string &name, GLuint bindingIndex,
                          GLenum format = GL_RGBA32F);
     void addShaderPass(const std::string &name, const char *computeShaderPath);
 
-    // Choose which texture blits to the screen
-    void setDisplayTarget(const std::string &name);
-
   private:
-    // Core steps separated for multi-pass versatility
-    void flattenScene(Scene &activeScene);
-    void rebuildGeometryLookupTable(Scene &activeScene);
+    // Render target management
+    void allocateRenderTarget(RenderTarget &target);
+    void bindRenderTarget(RenderTarget &target);
+
+    // Buffer management
     void updateBuffer(const std::string &name, const void *data,
                       size_t elementCount);
 
-    // Shader pass mangment
-    void dispatchShaderPass(const ShaderPass &pass);
-
-    void allocateRenderTarget(RenderTarget &target);
-    void bindRenderTarget(RenderTarget &target);
+    // Scene management
+    void flattenScene(Scene &activeScene);
+    void rebuildGeometryLookupTable(Scene &activeScene);
 
     // Uniforms
     void bindGlobalUniforms(Shader &shader, const Camera &camera);
 
+    // Shader pass mangment
+    void dispatchShaderPass(const ShaderPass &pass);
+
   private:
-    // Sizing and state
+    // Render size information
     int currentWidth = 0;
     int currentHeight = 0;
-    int frameCount = 0;
-    GLuint presentFBO = 0;
 
+    // State tracking
+    int frameCount = 0;
+
+    // Dynamic resource information
     std::unordered_map<std::string, PersistentBuffer> storageBuffers;
-    std::unordered_map<std::string, RenderTarget>
-        renderTargets; // TODO: string name
+    std::unordered_map<std::string, RenderTarget> renderTargets;
     std::vector<ShaderPass> shaderPasses;
 
-    std::string currentDisplayTarget; // TODO: string?
+    // Name of the renderTarget to be presented + the framebuffer
+    std::string currentRenderTarget;
+    GLuint presentFBO = 0;
 
     // Instance data cache
     std::vector<GPUInstance> instances;
     std::unordered_map<std::string, uint32_t> instanceLookupTable;
-    uint32_t instanceCount = 0;
-    bool geometryDirty = true;
+    bool geometryDirty = true; // TODO: move tracking elsewhere, this honestly
+                               // shouldn'tbe PathTracer's job
 
     // Material data cache
     std::vector<GPUMaterial> materialList;

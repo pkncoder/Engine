@@ -1,10 +1,12 @@
 #include "PathTracer.h"
+
 #include "../resources/AssetManager.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
 #include "BufferManager.h"
+
 #include <set>
 
 namespace Engine {
@@ -19,10 +21,7 @@ void PathTracer::init() {
 
     glGenFramebuffers(1, &presentFBO);
 
-    // 1. Setup default buffers dynamically!
-    // You can easily add a BVH buffer here later: addStorageBuffer(5,
-    // BVH_SIZE);
-    const size_t MAX_INSTANCES = 10000;
+    const size_t MAX_INSTANCES = 10000; // TODO: renderer settings maybe?
     addStorageBuffer("meshEntries", 0, sizeof(GPUMeshEntry),
                      1024);                                   // Mesh Entries
     addStorageBuffer("vertices", 1, sizeof(GPUVertex), 1024); // Vertices
@@ -32,8 +31,6 @@ void PathTracer::init() {
 
     // 2. Setup default render targets dynamically!
     addRenderTarget("MainColorOutput", 0);
-    // addRenderTarget(1, "NormalsDebug", GL_RGBA32F); // Easy
-    // to add more!
 
     addShaderPass("renderPass", "shaders/compute/pathTracer.comp");
 
@@ -55,7 +52,75 @@ void PathTracer::shutdown() {
     renderTargets.clear();
 }
 
-// --- RESOURCE MANAGEMENT ---
+// --- Rendering & render management ---
+
+void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
+    if (currentWidth == 0 || currentHeight == 0)
+        return;
+
+    frameCount++;
+
+    // 1. Prepare Data
+    flattenScene(scene);
+
+    // TODO: check whats needed    glBindImageTexture(0, outputTexture, 0,
+    // GL_FALSE, 0, GL_WRITE_ONLY,
+    for (auto &pass : shaderPasses) {
+        if (!pass.enabled)
+            continue;
+
+        pass.shader.bind();
+        bindGlobalUniforms(pass.shader, camera);
+        dispatchShaderPass(pass);
+    }
+}
+
+void PathTracer::resize(int newWidth, int newHeight) {
+    if (newWidth == currentWidth && newHeight == currentHeight)
+        return;
+
+    currentWidth = newWidth;
+    currentHeight = newHeight;
+
+    // Rebuild ALL active render targets automatically
+    for (auto &[binding, target] : renderTargets) {
+        if (target.id != 0)
+            glDeleteTextures(1, &target.id);
+        allocateRenderTarget(target);
+        bindRenderTarget(target);
+    }
+
+    frameCount = 1; // Reset progressive rendering on camera/resize change
+}
+
+// --- Render target presenting
+void PathTracer::setDisplayTarget(const std::string &name) {
+    if (renderTargets.find(name) != renderTargets.end()) {
+        currentRenderTarget = name;
+    } else {
+        Logger::warn("RENDERER",
+                     "Attempted to set invalid display target: " + name);
+    }
+}
+
+void PathTracer::present(int width, int height) {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
+
+    // Blit whichever target is currently selected for display
+    const auto it = renderTargets.find(currentRenderTarget);
+    if (it == renderTargets.end())
+        return;
+    const GLuint targetTex = it->second.id;
+
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, targetTex, 0);
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+
+// --- Dynamic RESOURCE MANAGEMENT ---
 
 void PathTracer::addStorageBuffer(const std::string &name, GLuint bindingIndex,
                                   size_t elementSize,
@@ -86,6 +151,16 @@ void PathTracer::addRenderTarget(const std::string &name, GLuint bindingIndex,
     renderTargets[name] = target;
 }
 
+void PathTracer::addShaderPass(const std::string &name,
+                               const char *computeShaderPath) {
+    ShaderPass pass;
+    pass.name = name;
+    pass.shader = Shader(computeShaderPath);
+    shaderPasses.push_back(std::move(pass));
+}
+
+// --- Render target management ---
+
 void PathTracer::allocateRenderTarget(RenderTarget &target) {
     if (target.id != 0)
         glDeleteTextures(1, &target.id);
@@ -104,112 +179,29 @@ void PathTracer::bindRenderTarget(RenderTarget &target) {
                        GL_WRITE_ONLY, target.format);
 }
 
-void PathTracer::addShaderPass(const std::string &name,
-                               const char *computeShaderPath) {
-    ShaderPass pass;
-    pass.name = name;
-    pass.shader = Shader(computeShaderPath);
-    shaderPasses.push_back(std::move(pass));
-}
+// -- Buffer management
 
-void PathTracer::setDisplayTarget(const std::string &name) {
-    if (renderTargets.find(name) != renderTargets.end()) {
-        currentDisplayTarget = name;
-    } else {
-        Logger::warn("RENDERER",
-                     "Attempted to set invalid display target: " + name);
-    }
-}
-
-// --- CORE LOOP ---
-
-void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
-    if (currentWidth == 0 || currentHeight == 0)
+void PathTracer::updateBuffer(const std::string &name, const void *data,
+                              size_t elementCount) {
+    if (elementCount == 0)
         return;
 
-    frameCount++;
-
-    // 1. Prepare Data
-    flattenScene(scene);
-
-    // TODO: check whats needed    glBindImageTexture(0, outputTexture, 0,
-    // GL_FALSE, 0, GL_WRITE_ONLY,
-    for (auto &pass : shaderPasses) {
-        if (!pass.enabled)
-            continue;
-
-        pass.shader.bind();
-        bindGlobalUniforms(pass.shader, camera);
-        dispatchShaderPass(pass);
-    }
-}
-
-void PathTracer::dispatchShaderPass(const ShaderPass &pass) {
-
-    GLuint groupsX =
-        (currentWidth + pass.workgroupSize.x - 1) / pass.workgroupSize.x;
-    GLuint groupsY =
-        (currentHeight + pass.workgroupSize.y - 1) / pass.workgroupSize.y;
-    // TODO: groupsZ
-
-    glDispatchCompute(groupsX, groupsY, pass.workgroupSize.z);
-
-    // Conservative barrier - covers SSBO reads/writes between passes and
-    // image writes feeding the next pass or the present blit.
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
-                    GL_SHADER_STORAGE_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT);
-}
-
-void PathTracer::bindGlobalUniforms(Shader &shader, const Camera &camera) {
-    // TODO: UBO for at least defaults & dynamic uniforms
-    shader.setInt("u_frameNum", frameCount);
-    shader.setVec3("u_cameraPos", camera.position);
-    shader.setFloat("u_FOV", camera.fov);
-    shader.setInt("u_instanceCount", static_cast<int>(instances.size()));
-    shader.setMat4("u_inverseView", glm::inverse(camera.getViewMatrix()));
-}
-
-// --- WINDOW & DISPLAY ---
-
-void PathTracer::resize(int newWidth, int newHeight) {
-    if (newWidth == currentWidth && newHeight == currentHeight)
+    const auto it = storageBuffers.find(name);
+    if (it == storageBuffers.end()) {
+        Logger::error("RENDERER",
+                      "PathTracer::updateBuffer - unknown buffer: " + name);
         return;
-
-    currentWidth = newWidth;
-    currentHeight = newHeight;
-
-    // Rebuild ALL active render targets automatically
-    for (auto &[binding, target] : renderTargets) {
-        if (target.id != 0)
-            glDeleteTextures(1, &target.id);
-        allocateRenderTarget(target);
-        bindRenderTarget(target);
     }
 
-    frameCount = 1; // Reset progressive rendering on camera/resize change
+    PersistentBuffer &buffer = it->second;
+
+    buffer.update(data, elementCount * buffer.elementSize);
 }
 
-void PathTracer::present(int width, int height) {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
-
-    // Blit whichever target is currently selected for display
-    auto it = renderTargets.find(currentDisplayTarget);
-    if (it == renderTargets.end())
-        return;
-    GLuint targetTex = it->second.id;
-
-    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                           GL_TEXTURE_2D, targetTex, 0);
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
-                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
-}
-
-// --- DATA FLATTENING ---
+// --- Scene managemnet ---
 
 void PathTracer::flattenScene(Scene &activeScene) {
-    auto renderables =
+    const auto renderables =
         activeScene.getMatchingEntities<TransformComponent, MeshComponent,
                                         MaterialComponent>();
 
@@ -267,9 +259,7 @@ void PathTracer::flattenScene(Scene &activeScene) {
 
     updateBuffer("instances", instances.data(), instances.size());
     updateBuffer("materials", materialList.data(), materialList.size());
-
-    instanceCount = static_cast<uint32_t>(instances.size());
-} //
+}
 
 void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
     std::vector<GPUVertex> instanceVertices;
@@ -314,21 +304,33 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
     geometryDirty = false;
 }
 
-void PathTracer::updateBuffer(const std::string &name, const void *data,
-                              size_t elementCount) {
-    if (elementCount == 0)
-        return;
+// --- Uniforms ---
 
-    auto it = storageBuffers.find(name);
-    if (it == storageBuffers.end()) {
-        Logger::error("RENDERER",
-                      "PathTracer::updateBuffer - unknown buffer: " + name);
-        return;
-    }
+void PathTracer::bindGlobalUniforms(Shader &shader, const Camera &camera) {
+    // TODO: UBO for at least defaults & dynamic uniforms
+    shader.setInt("u_frameNum", frameCount);
+    shader.setVec3("u_cameraPos", camera.position);
+    shader.setFloat("u_FOV", camera.fov);
+    shader.setInt("u_instanceCount", static_cast<int>(instances.size()));
+    shader.setMat4("u_inverseView", glm::inverse(camera.getViewMatrix()));
+}
 
-    PersistentBuffer &buffer = it->second;
+// --- Shader pass management ---
 
-    buffer.update(data, elementCount * buffer.elementSize);
+void PathTracer::dispatchShaderPass(const ShaderPass &pass) {
+
+    const GLuint groupsX =
+        (currentWidth + pass.workgroupSize.x - 1) / pass.workgroupSize.x;
+    const GLuint groupsY =
+        (currentHeight + pass.workgroupSize.y - 1) / pass.workgroupSize.y;
+    // TODO: groupsZ
+
+    glDispatchCompute(groupsX, groupsY, pass.workgroupSize.z);
+
+    // Conservative barrier - covers SSBO reads/writes between passes and
+    // image writes feeding the next pass or the present blit.
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+                    GL_SHADER_STORAGE_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT);
 }
 
 } // namespace Engine
