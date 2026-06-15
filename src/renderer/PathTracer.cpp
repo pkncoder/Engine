@@ -13,7 +13,11 @@ namespace Engine {
 
 // --- INITIALIZATION & SHUTDOWN ---
 
+// Checking for system compatibility & doing setup
 void PathTracer::init() {
+
+    // Check for compute shader support, and throw an error + exit if not
+    // supported
     if (glDispatchCompute == nullptr) {
         Logger::fatal("RENDERER", "Compute Shaders are not supported!");
         return;
@@ -39,12 +43,16 @@ void PathTracer::init() {
     Logger::info("RENDERER", "Path Tracer initialized");
 }
 
+// Clean up
 void PathTracer::shutdown() {
+
+    // Clean up the buffers
     for (auto &[name, buffer] : storageBuffers) {
         buffer.shutdown();
     }
     storageBuffers.clear();
 
+    // Clean up the textures
     for (auto &[name, target] : renderTargets) {
         if (target.id != 0)
             glDeleteTextures(1, &target.id);
@@ -54,37 +62,53 @@ void PathTracer::shutdown() {
 
 // --- Rendering & render management ---
 
+// Run a full render pass
 void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
+
+    // Check no texture size
     if (currentWidth == 0 || currentHeight == 0)
         return;
 
+    // Increase the tracked frame count
     frameCount++;
 
-    // 1. Prepare Data
+    // Get the data flattened for the buffers
+    // TODO: Rework
     flattenScene(scene);
 
+    // Loop each shader pass
     for (auto &pass : shaderPasses) {
-        if (!pass.enabled)
+        if (!pass.enabled) // If the pass isn't enabled, skip it
             continue;
 
+        // Bind the shader & global uniforms to it
         pass.shader.bind();
         bindGlobalUniforms(pass.shader, camera);
+
+        // Dispatch the shader pass
         dispatchShaderPass(pass);
     }
 }
 
+// Resize the render
 void PathTracer::resize(int newWidth, int newHeight) {
+
+    // If the new size is the same as the old one, do nothing
     if (newWidth == currentWidth && newHeight == currentHeight)
         return;
 
+    // Update the tracked size
     currentWidth = newWidth;
     currentHeight = newHeight;
 
-    // Rebuild ALL active render targets automatically
+    // Rebuild each render target
     for (auto &[name, target] : renderTargets) {
+
+        // TODO: vice-versa?
         if (target.id != 0)
             glDeleteTextures(1, &target.id);
 
+        // Allocate and bind the render target's texture w/ the new size
         allocateRenderTarget(target);
         bindRenderTarget(target);
     }
@@ -92,29 +116,43 @@ void PathTracer::resize(int newWidth, int newHeight) {
 
 // --- Render target presenting ---
 
+// Set the display target based on it's name
 void PathTracer::setDisplayTarget(const std::string &name) {
-    if (renderTargets.find(name) != renderTargets.end()) {
-        currentRenderTarget = name;
-    } else {
+
+    // Check for the passes's existance
+    if (renderTargets.find(name) == renderTargets.end()) {
         Logger::warn("RENDERER",
                      "Attempted to set invalid display target: " + name);
+        return;
     }
+
+    // Set the name for later fetching
+    currentRenderTarget = name;
 }
 
+// Blit the chosen render target to the fbo for presenting
 void PathTracer::present(int width, int height) {
+
+    // Bind the framebuffer for use
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
 
+    // Find the render target for use
     const auto ittr = renderTargets.find(currentRenderTarget);
+
+    // Make sure the target exists
     if (ittr == renderTargets.end()) {
         Logger::error("RENDERER", "Could not find the render target.");
         return;
     }
 
+    // Get the texture from the render target
     const GLuint targetTex = ittr->second.id;
 
+    // Set the fbo's texture to the render target's
     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                            GL_TEXTURE_2D, targetTex, 0);
 
+    // Blit the framebuffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
                       GL_COLOR_BUFFER_BIT, GL_NEAREST);
