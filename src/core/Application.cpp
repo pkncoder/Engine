@@ -184,44 +184,53 @@ void Application::registerSceneComponents(Scene &scene) {
 void Application::setupEntities(Scene &scene) {
     START_PROFILE("Entity Loading");
 
-    // {
-    //     Entity bunny = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                  "assets/models/bunny.obj");
-    //
-    //     bunny.getComponent<TransformComponent>().position =
-    //         glm::vec3(-1.0f, -1.2f, -4.0f);
-    // }
-    //
-    // {
-    //     Entity dragon = EntitySpawner::spawnObjEntity(
-    //         activeScene, "assets/models/dragon.obj");
-    //
-    //     dragon.getComponent<TransformComponent>().position =
-    //         glm::vec3(1.0f, -0.6f, -4.0f);
-    // }
-    //
-    // {
-    //     Entity cat =
-    //         EntitySpawner::spawnObjEntity(activeScene,
-    //         "assets/models/cat.obj");
-    //
-    //     cat.getComponent<TransformComponent>().position =
-    //         glm::vec3(0.0f, -0.6f, -4.0f);
-    // }
-    //
-    // {
-    //     Entity moai = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                 "assets/models/moai.obj");
-    //
-    //     moai.getComponent<TransformComponent>().position =
-    //         glm::vec3(0.0f, 1.3f, -4.0f);
-    //     moai.getComponent<TransformComponent>().rotation =
-    //         glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
-    //     moai.getComponent<TransformComponent>().scale =
-    //         glm::vec3(0.14f, 0.14f, 0.14f);
-    // }
+    if (false) {
+        Entity bunny = EntitySpawner::spawnObjEntity(activeScene,
+                                                     "assets/models/bunny.obj");
 
-    {
+        bunny.getComponent<TransformComponent>().position =
+            glm::vec3(-1.0f, -1.2f, -4.0f);
+    }
+
+    if (false) {
+        Entity dragon = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/dragon.obj");
+
+        dragon.getComponent<TransformComponent>().position =
+            glm::vec3(1.0f, -0.6f, -4.0f);
+    }
+
+    if (false) {
+        Entity cat =
+            EntitySpawner::spawnObjEntity(activeScene, "assets/models/cat.obj");
+
+        cat.getComponent<TransformComponent>().position =
+            glm::vec3(0.0f, -0.6f, -4.0f);
+    }
+
+    if (false) {
+        Entity moai = EntitySpawner::spawnObjEntity(activeScene,
+                                                    "assets/models/moai.obj");
+
+        moai.getComponent<TransformComponent>().position =
+            glm::vec3(0.0f, 1.3f, -4.0f);
+        moai.getComponent<TransformComponent>().rotation =
+            glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
+        moai.getComponent<TransformComponent>().scale =
+            glm::vec3(0.14f, 0.14f, 0.14f);
+    }
+
+    if (false) { // https://sketchfab.com/3d-models/backrooms-vr-d9b98eca8d064d0eafcd7f5484bb61ed
+        Entity backrooms = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/backrooms.obj");
+        backrooms.getComponent<MaterialComponent>().albedo =
+            glm::normalize(glm::vec3(236, 212, 133));
+        backrooms.getComponent<MaterialComponent>().emmissive = glm::vec3(0);
+        backrooms.getComponent<MaterialComponent>().metallic = 0.0;
+        backrooms.getComponent<MaterialComponent>().roughness = 1.0;
+    }
+
+    if (true) {
         Entity cube = EntitySpawner::spawnObjEntity(activeScene,
                                                     "assets/models/cube.obj");
 
@@ -246,7 +255,7 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(1.0);
     }
 
-    {
+    if (true) {
         Entity white = EntitySpawner::spawnObjEntity(activeScene,
                                                      "assets/models/white.obj");
         white.getComponent<MaterialComponent>().metallic = 1.0;
@@ -259,6 +268,21 @@ void Application::setupEntities(Scene &scene) {
                                                     "assets/models/blue.obj");
         blue.getComponent<MaterialComponent>().metallic = 1.0;
         blue.getComponent<MaterialComponent>().roughness = 0.2;
+    }
+
+    if (true) {
+        Entity blue = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/fr_blue.obj");
+        blue.getComponent<TransformComponent>().position +=
+            glm::vec3(8.0f, 0.0f, 2.0f);
+        Entity white = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/fr_white.obj");
+        white.getComponent<TransformComponent>().position +=
+            glm::vec3(8.0f, 0.0f, 2.0f);
+        Entity red = EntitySpawner::spawnObjEntity(activeScene,
+                                                   "assets/models/fr_red.obj");
+        red.getComponent<TransformComponent>().position +=
+            glm::vec3(8.0f, 0.0f, 2.0f);
     }
 
     END_PROFILE_STACKED_LOG("Entity Loading");
