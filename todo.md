@@ -90,6 +90,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Optomization [Small, Tiny unless on HUGE models] -> merge normals together if they are really similar to try and reduce the total vertex count
 - [ ] Non-Euclideon geometry
 - [ ] Marching Spheres
+- [ ] Scene state manager. A class to track the "dirty" flags instead of implementing it into every renderer
 
 ## Steps
 
@@ -101,9 +102,9 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 4. [x] Fix placement of functions
 5. [x] Refactor step by step in code
 6. [x] Rename things
-7. [ ] Add comments
+7. [x] Add comments
 8. [x] Place the \#includes in the right spots
-9. [ ] Fix file tree
+9. [x] Fix file tree
 
 ## Finished Todos
 
