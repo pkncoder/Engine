@@ -70,6 +70,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - [ ] Real-time Ray Caster (Voxels)
 - [ ] Different shader models
   - Ex. Disney BSDF
+- [ ] Legacy OpenGL support
 
 ### Todo - Editor
 

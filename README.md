@@ -40,14 +40,13 @@ Along with these, the user will have the utilities to render out stylized scenes
 ### Planned /  To-Be-Made
 
 - Renderers
-  - Ray Tracer
-  - Ray Marcher
-  - Ray Caster (Voxels)
-  - Marching Cubes?
+  - Ray Tracer \*
+  - Ray Marcher \*
+  - Ray Caster (Voxels) \*
 - Larger material support
 - Full editor for scene and render modifications
-- Multi-render pass support
-- Multi-renderer image outputs (ex. rasterized scene, path traced reflections/shadows, ray marched clouds)
+- Multi-render pass support \*
+- Multi-renderer image outputs (ex. rasterized scene, path traced reflections/shadows, ray marched clouds) \*
 - Multi-threading
 
 \* OpenGL 4.6+ (not MacOS)
@@ -63,9 +62,38 @@ This project has been tested on:
 
 Due to Apple's discontinuation OpenGL, some features are not supported on the OS. Plans for compatibility shaders are wrote down, however not being worked on.
 
-<!-- TODO: Add the dependencies -->
-
 ### Step 1
+
+Download & install cmake.
+
+It is recommend using a package manager for Unix systems (ex. brew for MacOS or dnf for Fedora) or finding a YT video if you are unable/don't want to use a package manager, but here is the cmake's download page if you want to do it the hard way: [Cmake Downloads](https://cmake.org/download/).
+
+### Step 2
+
+Download & install vcpkg.
+
+Copy down the repo & cd into it:
+
+```
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+```
+
+Run the install script based on your system:
+
+- Windows:
+
+```
+.\bootstrap-vcpkg.bat
+```
+
+- MacOS/Linux
+
+```
+./bootstrap-vcpkg.sh
+```
+
+### Step 3
 
 Clone down this repo in the terminal and cd into it:
 
@@ -73,7 +101,7 @@ Clone down this repo in the terminal and cd into it:
 git clone https://github.com/pkncoder/Light-Teachings.git && cd ./Engine/
 ```
 
-### Step 2
+### Step 4
 
 If you are using bash/zsh/similar syntax terminal langauges, you can run the "run" script like this:
 
