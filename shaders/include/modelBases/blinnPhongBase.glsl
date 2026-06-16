@@ -19,7 +19,7 @@ vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3
 
     // Specular (Blinn-Phong)
     float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 16.0); 
-    float specularPower = abs(objectMaterial.roughness - 1.0); // TODO: Fix
+    float specularPower = abs(objectMaterial.roughness - 1.0);
     vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color

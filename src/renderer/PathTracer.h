@@ -95,6 +95,7 @@ class PathTracer : public IRenderer {
 
     // Instance data cache
     std::vector<GPUInstance> instances;
+    const size_t MAX_INSTANCES = 10000; // TODO: renderer settings maybe?
     std::unordered_map<std::string, uint32_t> instanceLookupTable;
     bool geometryDirty = true; // TODO: move tracking elsewhere, this honestly
                                // shouldn'tbe PathTracer's job

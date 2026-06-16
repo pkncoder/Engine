@@ -30,12 +30,7 @@ Entity EntitySpawner::spawnObjEntity(Scene &scene,
     entity.addComponent<MeshComponent>(meshComponent);
 
     // Apply a default spatial transform
-    // TODO: Defaults?
-    entity.addComponent<TransformComponent>({
-        glm::vec3(0.0f),                   // Position
-        glm::quat(1.0f, 0.0f, 0.0f, 0.0f), // Rotation
-        glm::vec3(1.0f)                    // Scale
-    });
+    entity.addComponent<TransformComponent>(TransformComponent());
 
     // Get the material data that was loaded on mesh construction
     const CPUMaterialData *materialData =
@@ -47,14 +42,11 @@ Entity EntitySpawner::spawnObjEntity(Scene &scene,
         entity.addComponent<MaterialComponent>(
             MaterialComponent(*materialData));
     } else { // If it doesn't exist
-        // TODO: Seperate spawner tag?
-        Logger::warn("ASSET",
+        Logger::warn("SPAWNER",
                      "No material found for: " + meshData->materialName);
 
         // Error material
-        // TODO: DEfault?
-        entity.addComponent<MaterialComponent>(MaterialComponent(
-            glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f), 0.5f, 0.0f));
+        entity.addComponent<MaterialComponent>(MaterialComponent());
     }
 
     // Return the final entity

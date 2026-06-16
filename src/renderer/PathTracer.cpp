@@ -25,7 +25,6 @@ void PathTracer::init() {
 
     glGenFramebuffers(1, &presentFBO);
 
-    const size_t MAX_INSTANCES = 10000; // TODO: renderer settings maybe?
     addStorageBuffer("meshEntries", 0, sizeof(GPUMeshEntry),
                      1024);                                   // Mesh Entries
     addStorageBuffer("vertices", 1, sizeof(GPUVertex), 1024); // Vertices
