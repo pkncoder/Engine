@@ -70,3 +70,5 @@ Testing/
 # Custom added ignored files
 assets/models/robotv1.obj
 *.DS_Store
+.obsidian/
+*.canvas

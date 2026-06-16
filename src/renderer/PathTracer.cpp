@@ -35,7 +35,7 @@ void PathTracer::init() {
 
     addRenderTarget("MainColorOutput", 0);
 
-    addShaderPass("renderPass", "shaders/pathTracer/main/pathTracer.comp");
+    addShaderPass("renderPass", "shaders/pathTracing/main/pathTracer.comp");
     addShaderPass("invert", "shaders/compute/invert.comp", false);
 
     // Display the main output by default

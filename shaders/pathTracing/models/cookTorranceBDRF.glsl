@@ -1,4 +1,4 @@
-#include "../../include/modelBases/cookTorranceBdrfBase.glsl"
+#include "../../include/modelBases/cookTorranceBDRFBase.glsl"
 
 vec3 cookTorranceBdrf(inout Ray ray, in HitInfo hit, in GPUMaterial objectMaterial, in float u1, in float u2, out vec3 rayDirection) {
 

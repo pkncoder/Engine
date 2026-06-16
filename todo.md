@@ -47,6 +47,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Fix the flashing compute shader issue + maybe being too slow?
 - [ ] Non-triangle objects
 - [ ] Try to reduce the amount of looping being done on materials / instances etc. Maybe try to use the caches in AssetManager more?
+- [ ] RendererManager, to manage the renderers
 
 ### Todo - Not Code
 

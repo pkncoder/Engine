@@ -15,8 +15,8 @@ namespace Engine {
 void Rasterizer::init() {
 
     // Compile the shader code
-    shader = Shader("shaders/raster/main/raster.vert",
-                    "shaders/raster/main/raster.frag");
+    shader = Shader("shaders/rasterizing/main/raster.vert",
+                    "shaders/rasterizing/main/raster.frag");
 
     Logger::info("RENDERER", "Rasterizer initialized.");
 }
