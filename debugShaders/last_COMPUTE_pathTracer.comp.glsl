@@ -4,7 +4,7 @@
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Common
-// BEGIN INCLUDE: ../include/common.glsl
+// BEGIN INCLUDE: ../../include/common.glsl
 // Numbers
 #define PI 3.14159265359
 #define TWO_PI 6.28318530718
@@ -22,10 +22,10 @@ mat3 getBasis(vec3 n) {
     vec3 b = cross(n, t);
     return mat3(t, b, n);
 }
-// END INCLUDE: ../include/common.glsl
+// END INCLUDE: ../../include/common.glsl
 
 // Shared includes
-// BEGIN INCLUDE: ../include/sharedStructures.glsl
+// BEGIN INCLUDE: ../../include/sharedStructures.glsl
 struct Ray {
     vec3 origin;
     vec3 direction;
@@ -50,18 +50,25 @@ struct Material {
     float roughness;
     float metallic;
 };
-// END INCLUDE: ../include/sharedStructures.glsl
-// BEGIN INCLUDE: ../include/sharedUniforms.glsl
+
+struct GPUMaterial {
+    vec4 albedo;
+    vec4 emissive;
+    float roughness;
+    float metallic;
+};
+// END INCLUDE: ../../include/sharedStructures.glsl
+// BEGIN INCLUDE: ../../include/sharedUniforms.glsl
 // Camera position + inverseView matrix
 uniform vec3 u_cameraPos;
 uniform mat4 u_inverseView;
 
 // Camera FOV
 uniform float u_FOV;
-// END INCLUDE: ../include/sharedUniforms.glsl
+// END INCLUDE: ../../include/sharedUniforms.glsl
 
 // Other utils
-// BEGIN INCLUDE: ../include/utils/random.glsl
+// BEGIN INCLUDE: ../../include/utils/random.glsl
 uint seed; // Global seed
 
 // Backup seed for when the blue noise texture isn't loaded
@@ -92,8 +99,8 @@ vec3 rndUnit(inout uint seed) {
     float r = sqrt(1.0f - z * z);
     return vec3(r * cos(a), r * sin(a), z);
 }
-// END INCLUDE: ../include/utils/random.glsl
-// BEGIN INCLUDE: ../include/utils/srgb.glsl
+// END INCLUDE: ../../include/utils/random.glsl
+// BEGIN INCLUDE: ../../include/utils/srgb.glsl
 vec3 LessThan(vec3 f, float value) {
     return vec3(
         (f.x < value) ? 1.0f : 0.0f,
@@ -119,8 +126,8 @@ vec3 SRGBToLinear(vec3 rgb) {
         LessThan(rgb, 0.04045f)
     );
 }
-// END INCLUDE: ../include/utils/srgb.glsl
-// BEGIN INCLUDE: ../include/utils/toneMapping.glsl
+// END INCLUDE: ../../include/utils/srgb.glsl
+// BEGIN INCLUDE: ../../include/utils/toneMapping.glsl
 vec3 ACESFilm(vec3 x) {
     float a = 2.51f;
     float b = 0.03f;
@@ -129,11 +136,12 @@ vec3 ACESFilm(vec3 x) {
     float e = 0.14f;
     return clamp((x*(a*x + b)) / (x*(c*x + d) + e), 0.0f, 1.0f);
 }
-// END INCLUDE: ../include/utils/toneMapping.glsl
+// END INCLUDE: ../../include/utils/toneMapping.glsl
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
-// BEGIN INCLUDE: ../include/models/cook_torrance_bdrf.glsl
+// BEGIN INCLUDE: ../models/cook_torrance_bdrf.glsl
+// BEGIN INCLUDE: ../../include/modelBases/cook_torrance_bdrf_base.glsl
 // GGX Microfacet sampling (kinda like D)
 vec3 sampleGGXWorld(vec3 normal, float roughness, float u1, float u2) {
     float a = roughness * roughness;
@@ -161,15 +169,83 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     float t2 = t * t;
     return F0 + (vec3(1.0) - F0) * (t2 * t2 * t);
 }
-// END INCLUDE: ../include/models/cook_torrance_bdrf.glsl
+
+// TODO: make a base
+
+vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, GPUMaterial objectMaterial, float u1, float u2) {
+    // Sample GGX world (D)
+    vec3 H = sampleGGXWorld(normal, objectMaterial.roughness, u1, u2);
+
+    // Get NdotL to check for a ray not being visable
+    vec3 bounceDirection = reflect(viewDirection, H);
+    float NdotL = dot(normal, bounceDirection);
+    if (NdotL <= 0.0) {
+        return vec3(0.0);
+    }
+
+    // Values for the next BDRF calculations
+    float NdotV = max(dot(normal, -viewDirection), EPSILON);
+    float NdotH = max(dot(normal, H), EPSILON);
+    float HdotV = max(dot(H, -viewDirection), EPSILON);
+
+    // Get the G & F components
+    float G = smithGeometry(NdotV, NdotL, objectMaterial.roughness);
+    vec3 F = fresnelSchlick(HdotV, objectMaterial.albedo.xyz);
+
+    // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
+    return (F * G * HdotV) / (NdotV * NdotH);
+}
+
+vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, vec3 microfacetNormal, GPUMaterial objectMaterial, float u1, float u2) {
+
+    // Get NdotL to check for a ray not being visable
+    vec3 bounceDirection = reflect(viewDirection, microfacetNormal);
+    float NdotL = dot(normal, bounceDirection);
+    if (NdotL <= 0.0) {
+        return vec3(0.0);
+    }
+
+    // Values for the next BDRF calculations
+    float NdotV = max(dot(normal, -viewDirection), EPSILON);
+    float NdotH = max(dot(normal, microfacetNormal), EPSILON);
+    float HdotV = max(dot(microfacetNormal, -viewDirection), EPSILON);
+
+    // Get the G & F components
+    float G = smithGeometry(NdotV, NdotL, objectMaterial.roughness);
+    vec3 F = fresnelSchlick(HdotV, objectMaterial.albedo.xyz);
+
+    // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
+    return (F * G * HdotV) / (NdotV * NdotH);
+}
+// END INCLUDE: ../../include/modelBases/cook_torrance_bdrf_base.glsl
+
+vec3 cook_torrance_bdrf(inout Ray ray, in HitInfo hit, in GPUMaterial objectMaterial, in float u1, in float u2, out vec3 rayDirection) {
+
+    vec3 originalRayDirection = ray.direction;
+
+    vec3 microfacetNormal = sampleGGXWorld(hit.normal, objectMaterial.roughness, u1, u2);
+
+    // Get NdotL to check for a ray not being visable
+    rayDirection = reflect(ray.direction, microfacetNormal);
+    float NdotL = dot(hit.normal, rayDirection);
+    if (NdotL <= 0.0) {
+        rayDirection = originalRayDirection;
+        return vec3(0.0);
+    }
+
+    return cookTorranceBdrfBase(hit.normal, originalRayDirection, microfacetNormal, objectMaterial, u1, u2);
+}
+// END INCLUDE: ../models/cook_torrance_bdrf.glsl
 
 // Path tracing includes
-// BEGIN INCLUDE: ../include/pathTracing/to_be_uniformed_valeus.glsl
+// BEGIN INCLUDE: ../to_be_uniformed_valeus.glsl
+// TODO: uniform
+
 #define MAX_BOUNCES 3
 #define MIN_BOUNCE_RUSSIAN_ROULETTE 2
 #define SKYBOX_COLOR_MULT 0.3
-// END INCLUDE: ../include/pathTracing/to_be_uniformed_valeus.glsl
-// BEGIN INCLUDE: ../include/pathTracing/structures.glsl
+// END INCLUDE: ../to_be_uniformed_valeus.glsl
+// BEGIN INCLUDE: ../structures.glsl
 struct GPUMeshEntry {
     uint baseVertex;
     uint baseIndex;
@@ -191,15 +267,8 @@ struct GPUInstance {
     uint padding2;
     uint padding3;
 };
-
-struct GPUMaterial {
-    vec4 albedo;
-    vec4 emissive;
-    float roughness;
-    float metallic;
-};
-// END INCLUDE: ../include/pathTracing/structures.glsl
-// BEGIN INCLUDE: ../include/pathTracing/sceneBuffers.glsl
+// END INCLUDE: ../structures.glsl
+// BEGIN INCLUDE: ../sceneBuffers.glsl
 // SSBO buffers
 layout(std430, binding = 0) readonly buffer MeshEntryBuffer { GPUMeshEntry meshEntries[]; };
 layout(std430, binding = 1) readonly buffer VertexBuffer { GPUVertex vertices[]; };
@@ -209,10 +278,10 @@ layout(std430, binding = 4) readonly buffer MaterialBuffer { GPUMaterial materia
 
 // Total instance count
 uniform int u_instanceCount;
-// END INCLUDE: ../include/pathTracing/sceneBuffers.glsl
+// END INCLUDE: ../sceneBuffers.glsl
 
 // Path tracing intersection functions
-// BEGIN INCLUDE: ../include/pathTracing/intersections.glsl
+// BEGIN INCLUDE: ../intersections.glsl
 HitInfo rayTriangle(Ray ray, vec3 v0, vec3 v1, vec3 v2) {
     HitInfo hit;
     hit.hit = false;
@@ -317,15 +386,15 @@ HitInfo rayScene(Ray ray) {
     return closestHit;
 }
 
-// END INCLUDE: ../include/pathTracing/intersections.glsl
+// END INCLUDE: ../intersections.glsl
 
 // Path-tracer specific uniforms
-// BEGIN INCLUDE: ../include/pathTracing/uniforms.glsl
+// BEGIN INCLUDE: ../uniforms.glsl
 uniform int u_frameNum;
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D img_output;
-// END INCLUDE: ../include/pathTracing/uniforms.glsl
+// END INCLUDE: ../uniforms.glsl
 
 // Cosine-weighted hemisphere sampling
 vec3 sampleDiffuse(vec3 normal) {
@@ -343,44 +412,41 @@ vec3 sampleDiffuse(vec3 normal) {
 void processBounceStep(
     inout Ray ray,
     const in HitInfo hit,
-    const in GPUMaterial mat,
+    const in GPUMaterial material,
     inout vec3 colorMult
 ) {
-    // Save the view and normal vectors
-    vec3 V = -ray.direction;
-    vec3 N = hit.normal;
 
     // Lambertion diffuse
-    if (mat.metallic <= 0.5) {
+    if (material.metallic <= 0.5) {
 
         // Sample the diffuse pdf
-        vec3 rayDirection = sampleDiffuse(N);
+        vec3 rayDirection = sampleDiffuse(hit.normal);
 
         // Update the ray information
-        ray.origin = hit.hitPos + N * EPSILON;
+        ray.origin = hit.hitPos + hit.normal * EPSILON;
         ray.direction = rayDirection;
         ray.invDirection = 1.0 / rayDirection;
 
         // Modify the throughput
-        colorMult *= mat.albedo.xyz;
+        colorMult *= material.albedo.xyz;
     }
 
     // Specular diffuse / Metal
-    else if (mat.metallic > 0.5) {
+    else if (material.metallic > 0.5) {
 
         // Perfect reflection (or close enough)
-        if (mat.roughness < 0.01) {
+        if (material.roughness < 0.01) {
 
             // Perfectly reflect the ray
-            vec3 rayDirection = reflect(-V, N);
+            vec3 rayDirection = reflect(ray.direction, hit.normal);
 
             // Update the ray information
-            ray.origin = hit.hitPos + N * EPSILON;
+            ray.origin = hit.hitPos + hit.normal * EPSILON;
             ray.direction = rayDirection;
             ray.invDirection = 1.0 / rayDirection; 
 
             // Modify the throughput
-            colorMult *= fresnelSchlick(max(dot(N, rayDirection), 0.0), mat.albedo.xyz);
+            colorMult *= fresnelSchlick(max(dot(hit.normal, rayDirection), 0.0), material.albedo.xyz);
         }
 
         // Non-perfect reflections
@@ -389,32 +455,16 @@ void processBounceStep(
             // Sample GGX world (D)
             float u1 = rnd1(seed);
             float u2 = rnd1(seed);
-            vec3 H = sampleGGXWorld(N, mat.roughness, u1, u2);
 
-            // Get NdotL to check for a ray not being visable
-            vec3 rayDirection = reflect(-V, H);
-            float NdotL = dot(N, rayDirection);
-            if (NdotL <= 0.0) {
-                colorMult = vec3(0.0);
-                return; 
-            }
+            vec3 newRayDirection;
 
-            // Update ray information
-            ray.origin = hit.hitPos + N * EPSILON;
-            ray.direction = rayDirection;
-            ray.invDirection = 1.0 / rayDirection; 
+            vec3 bdrf = cook_torrance_bdrf(ray, hit, material, u1, u2, newRayDirection);
 
-            // Values for the next BDRF calculations
-            float NdotV = max(dot(N, V), EPSILON);
-            float NdotH = max(dot(N, H), EPSILON);
-            float HdotV = max(dot(H, V), EPSILON);
+            ray.origin = hit.hitPos + hit.normal * EPSILON;
+            ray.direction = newRayDirection;
+            ray.invDirection = 1.0 / newRayDirection; 
 
-            // Get the G & F components
-            float G = smithGeometry(NdotV, NdotL, mat.roughness);
-            vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
-
-            // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
-            colorMult *= (F * G * HdotV) / (NdotV * NdotH);
+            colorMult *= bdrf;
         }
     }
 }

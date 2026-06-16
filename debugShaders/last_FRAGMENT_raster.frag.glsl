@@ -44,6 +44,13 @@ struct Material {
     float roughness;
     float metallic;
 };
+
+struct GPUMaterial {
+    vec4 albedo;
+    vec4 emissive;
+    float roughness;
+    float metallic;
+};
 // END INCLUDE: ../../include/sharedStructures.glsl
 
 // BEGIN INCLUDE: ../uniforms.glsl

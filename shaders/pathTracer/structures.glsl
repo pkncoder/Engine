@@ -19,10 +19,3 @@ struct GPUInstance {
     uint padding2;
     uint padding3;
 };
-
-struct GPUMaterial {
-    vec4 albedo;
-    vec4 emissive;
-    float roughness;
-    float metallic;
-};

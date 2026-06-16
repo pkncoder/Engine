@@ -7,8 +7,8 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 #include "../../include/common.glsl"
 
 // Shared includes
-#include "../include/sharedStructures.glsl"
-#include "../include/sharedUniforms.glsl"
+#include "../../include/sharedStructures.glsl"
+#include "../../include/sharedUniforms.glsl"
 
 // Other utils
 #include "../../include/utils/random.glsl"
@@ -46,44 +46,41 @@ vec3 sampleDiffuse(vec3 normal) {
 void processBounceStep(
     inout Ray ray,
     const in HitInfo hit,
-    const in GPUMaterial mat,
+    const in GPUMaterial material,
     inout vec3 colorMult
 ) {
-    // Save the view and normal vectors
-    vec3 V = ray.direction;
-    vec3 N = hit.normal;
 
     // Lambertion diffuse
-    if (mat.metallic <= 0.5) {
+    if (material.metallic <= 0.5) {
 
         // Sample the diffuse pdf
-        vec3 rayDirection = sampleDiffuse(N);
+        vec3 rayDirection = sampleDiffuse(hit.normal);
 
         // Update the ray information
-        ray.origin = hit.hitPos + N * EPSILON;
+        ray.origin = hit.hitPos + hit.normal * EPSILON;
         ray.direction = rayDirection;
         ray.invDirection = 1.0 / rayDirection;
 
         // Modify the throughput
-        colorMult *= mat.albedo.xyz;
+        colorMult *= material.albedo.xyz;
     }
 
     // Specular diffuse / Metal
-    else if (mat.metallic > 0.5) {
+    else if (material.metallic > 0.5) {
 
         // Perfect reflection (or close enough)
-        if (mat.roughness < 0.01) {
+        if (material.roughness < 0.01) {
 
             // Perfectly reflect the ray
-            vec3 rayDirection = reflect(V, N);
+            vec3 rayDirection = reflect(ray.direction, hit.normal);
 
             // Update the ray information
-            ray.origin = hit.hitPos + N * EPSILON;
+            ray.origin = hit.hitPos + hit.normal * EPSILON;
             ray.direction = rayDirection;
             ray.invDirection = 1.0 / rayDirection; 
 
             // Modify the throughput
-            colorMult *= fresnelSchlick(max(dot(N, rayDirection), 0.0), mat.albedo.xyz);
+            colorMult *= fresnelSchlick(max(dot(hit.normal, rayDirection), 0.0), material.albedo.xyz);
         }
 
         // Non-perfect reflections
@@ -92,38 +89,16 @@ void processBounceStep(
             // Sample GGX world (D)
             float u1 = rnd1(seed);
             float u2 = rnd1(seed);
-            // vec3 H = sampleGGXWorld(N, mat.roughness, u1, u2);
-            //
-            // // Get NdotL to check for a ray not being visable
-            // vec3 rayDirection = reflect(-V, H);
-            // float NdotL = dot(N, rayDirection);
-            // if (NdotL <= 0.0) {
-            //     colorMult = vec3(0.0);
-            //     return; 
-            // }
-            
-            bdrf = cook_torrance_bdrf(ray, hit, material, u1, u2);
+
+            vec3 newRayDirection;
+
+            vec3 bdrf = cook_torrance_bdrf(ray, hit, material, u1, u2, newRayDirection);
+
+            ray.origin = hit.hitPos + hit.normal * EPSILON;
+            ray.direction = newRayDirection;
+            ray.invDirection = 1.0 / newRayDirection; 
 
             colorMult *= bdrf;
-
-            // Update ray information
-            if (length(bdrf) > 0.0) {
-                ray.origin = hit.hitPos + N * EPSILON;
-                ray.direction = rayDirection;
-                ray.invDirection = 1.0 / rayDirection; 
-            }
-
-            // // Values for the next BDRF calculations
-            // float NdotV = max(dot(N, V), EPSILON);
-            // float NdotH = max(dot(N, H), EPSILON);
-            // float HdotV = max(dot(H, V), EPSILON);
-            //
-            // // Get the G & F components
-            // float G = smithGeometry(NdotV, NdotL, mat.roughness);
-            // vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
-            //
-            // // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
-            // colorMult *= (F * G * HdotV) / (NdotV * NdotH);
         }
     }
 }

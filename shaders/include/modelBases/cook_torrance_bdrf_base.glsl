@@ -26,27 +26,49 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (vec3(1.0) - F0) * (t2 * t2 * t);
 }
 
-// TODO: make a base
-
-vec3 cookTorranceBdrfBase(vec3 normal, vec3 incomingViewDirection, Material objectMaterial, float u1, float u2) {
+// TODO: Recreate the implemtation and the base on how this is going to work
+//
+vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, GPUMaterial objectMaterial, float u1, float u2) {
     // Sample GGX world (D)
-    vec3 H = sampleGGXWorld(N, mat.roughness, u1, u2);
+    vec3 H = sampleGGXWorld(normal, objectMaterial.roughness, u1, u2);
 
     // Get NdotL to check for a ray not being visable
-    vec3 rayDirection = reflect(V, H);
-    float NdotL = dot(N, rayDirection);
+    vec3 bounceDirection = reflect(viewDirection, H);
+    float NdotL = dot(normal, bounceDirection);
     if (NdotL <= 0.0) {
         return vec3(0.0);
     }
 
     // Values for the next BDRF calculations
-    float NdotV = max(dot(N, -V), EPSILON);
-    float NdotH = max(dot(N, H), EPSILON);
-    float HdotV = max(dot(H, -V), EPSILON);
+    float NdotV = max(dot(normal, -viewDirection), EPSILON);
+    float NdotH = max(dot(normal, H), EPSILON);
+    float HdotV = max(dot(H, -viewDirection), EPSILON);
 
     // Get the G & F components
-    float G = smithGeometry(NdotV, NdotL, mat.roughness);
-    vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
+    float G = smithGeometry(NdotV, NdotL, objectMaterial.roughness);
+    vec3 F = fresnelSchlick(HdotV, objectMaterial.albedo.xyz);
+
+    // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
+    return (F * G * HdotV) / (NdotV * NdotH);
+}
+
+vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, vec3 microfacetNormal, GPUMaterial objectMaterial, float u1, float u2) {
+
+    // Get NdotL to check for a ray not being visable
+    vec3 bounceDirection = reflect(viewDirection, microfacetNormal);
+    float NdotL = dot(normal, bounceDirection);
+    if (NdotL <= 0.0) {
+        return vec3(0.0);
+    }
+
+    // Values for the next BDRF calculations
+    float NdotV = max(dot(normal, -viewDirection), EPSILON);
+    float NdotH = max(dot(normal, microfacetNormal), EPSILON);
+    float HdotV = max(dot(microfacetNormal, -viewDirection), EPSILON);
+
+    // Get the G & F components
+    float G = smithGeometry(NdotV, NdotL, objectMaterial.roughness);
+    vec3 F = fresnelSchlick(HdotV, objectMaterial.albedo.xyz);
 
     // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
     return (F * G * HdotV) / (NdotV * NdotH);
