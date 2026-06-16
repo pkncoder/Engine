@@ -12,6 +12,7 @@
 #define SUPER_FAR 90.0
 
 // Get the local basis matrix
+// TODO: move
 mat3 getBasis(vec3 n) {
     vec3 up = abs(n.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
     vec3 t = normalize(cross(up, n));
@@ -67,10 +68,10 @@ uniform float u_roughness;
 uniform float u_metallic;
 // END INCLUDE: ../uniforms.glsl
 
-// BEGIN INCLUDE: ../models/blinn_phong.glsl
-// BEGIN INCLUDE: ../../include/modelBases/blinn_phong_base.glsl
+// BEGIN INCLUDE: ../models/blinnPhong.glsl
+// BEGIN INCLUDE: ../../include/modelBases/blinnPhongBase.glsl
 // TODO: Double-check the implementation of this
-vec3 blinnPhongMath(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
+vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
 
     // Basic Properties
     vec3 lightColor = lightMaterial.emmisive;
@@ -99,13 +100,13 @@ vec3 blinnPhongMath(const in vec3 viewPos, const in vec3 worldPos, const in vec3
     // Return the result
     return result;
 }
-// END INCLUDE: ../../include/modelBases/blinn_phong_base.glsl
+// END INCLUDE: ../../include/modelBases/blinnPhongBase.glsl
 
 vec3 blinnPhong(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
     // Pass in the math
-    return blinnPhongMath(viewPos, worldPos, normal, objectMaterial, lightPos, lightMaterial);
+    return blinnPhongBase(viewPos, worldPos, normal, objectMaterial, lightPos, lightMaterial);
 }
-// END INCLUDE: ../models/blinn_phong.glsl
+// END INCLUDE: ../models/blinnPhong.glsl
 
 void main() {
 

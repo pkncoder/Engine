@@ -17,7 +17,7 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
-#include "../models/cook_torrance_bdrf.glsl"
+#include "../models/cookTorranceBdrf.glsl"
 
 // Path tracing includes
 #include "../to_be_uniformed_valeus.glsl"
@@ -92,7 +92,7 @@ void processBounceStep(
 
             vec3 newRayDirection;
 
-            vec3 bdrf = cook_torrance_bdrf(ray, hit, material, u1, u2, newRayDirection);
+            vec3 bdrf = cookTorranceBdrf(ray, hit, material, u1, u2, newRayDirection);
 
             ray.origin = hit.hitPos + hit.normal * EPSILON;
             ray.direction = newRayDirection;
@@ -200,7 +200,7 @@ void main() {
     // Color based on the hit
     vec3 col = colorScene(ray);
 
-    col = LinearToSRGB(ACESFilm(col));
+    col = linearToSRGB(ACESFilm(col));
 
     // Write to the image with the final hit color
     // imageStore(img_output, pixel_coords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));

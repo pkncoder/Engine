@@ -5,7 +5,7 @@
 
 #include "../uniforms.glsl"
 
-#include "../models/blinn_phong.glsl"
+#include "../models/blinnPhong.glsl"
 
 void main() {
 

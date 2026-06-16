@@ -7,7 +7,7 @@ void setSeed(vec2 fragCoord, uint frameNum)
 }
 
 // Hash function for random uint
-uint wang_hash(inout uint seed) {
+uint wangHash(inout uint seed) {
     seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
     seed *= uint(9);
     seed = seed ^ (seed >> 4);
@@ -18,7 +18,7 @@ uint wang_hash(inout uint seed) {
 
 // Random float one from [0-1]
 float rnd1(inout uint seed){
-    return float(wang_hash(seed)) / float(-1u);
+    return float(wangHash(seed)) / float(-1u);
 }
 
 // Random normalized unit vector

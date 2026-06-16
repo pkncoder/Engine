@@ -1,5 +1,5 @@
 // TODO: Double-check the implementation of this
-vec3 blinnPhongMath(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
+vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
 
     // Basic Properties
     vec3 lightColor = lightMaterial.emmisive;

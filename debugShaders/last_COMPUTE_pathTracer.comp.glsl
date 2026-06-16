@@ -16,6 +16,7 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 #define SUPER_FAR 90.0
 
 // Get the local basis matrix
+// TODO: move
 mat3 getBasis(vec3 n) {
     vec3 up = abs(n.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
     vec3 t = normalize(cross(up, n));
@@ -78,7 +79,7 @@ void setSeed(vec2 fragCoord, uint frameNum)
 }
 
 // Hash function for random uint
-uint wang_hash(inout uint seed) {
+uint wangHash(inout uint seed) {
     seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
     seed *= uint(9);
     seed = seed ^ (seed >> 4);
@@ -89,7 +90,7 @@ uint wang_hash(inout uint seed) {
 
 // Random float one from [0-1]
 float rnd1(inout uint seed){
-    return float(wang_hash(seed)) / float(-1u);
+    return float(wangHash(seed)) / float(-1u);
 }
 
 // Random normalized unit vector
@@ -101,7 +102,7 @@ vec3 rndUnit(inout uint seed) {
 }
 // END INCLUDE: ../../include/utils/random.glsl
 // BEGIN INCLUDE: ../../include/utils/srgb.glsl
-vec3 LessThan(vec3 f, float value) {
+vec3 vecLessThan(vec3 f, float value) {
     return vec3(
         (f.x < value) ? 1.0f : 0.0f,
         (f.y < value) ? 1.0f : 0.0f,
@@ -109,12 +110,12 @@ vec3 LessThan(vec3 f, float value) {
     );
 }
 
-vec3 LinearToSRGB(vec3 rgb) {
+vec3 linearToSRGB(vec3 rgb) {
     rgb = clamp(rgb, 0.0f, 1.0f);
     return mix(
         pow(rgb, vec3(1.0f / 2.4f)) * 1.055f - 0.055f,
         rgb * 12.92f,
-        LessThan(rgb, 0.0031308f)
+        vecLessThan(rgb, 0.0031308f)
     );
 }
 
@@ -123,7 +124,7 @@ vec3 SRGBToLinear(vec3 rgb) {
     return mix(
         pow(((rgb + 0.055f) / 1.055f), vec3(2.4f)),
         rgb / 12.92f,
-        LessThan(rgb, 0.04045f)
+        vecLessThan(rgb, 0.04045f)
     );
 }
 // END INCLUDE: ../../include/utils/srgb.glsl
@@ -140,8 +141,8 @@ vec3 ACESFilm(vec3 x) {
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
-// BEGIN INCLUDE: ../models/cook_torrance_bdrf.glsl
-// BEGIN INCLUDE: ../../include/modelBases/cook_torrance_bdrf_base.glsl
+// BEGIN INCLUDE: ../models/cookTorranceBdrf.glsl
+// BEGIN INCLUDE: ../../include/modelBases/cookTorranceBdrfBase.glsl
 // GGX Microfacet sampling (kinda like D)
 vec3 sampleGGXWorld(vec3 normal, float roughness, float u1, float u2) {
     float a = roughness * roughness;
@@ -170,8 +171,8 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (vec3(1.0) - F0) * (t2 * t2 * t);
 }
 
-// TODO: make a base
-
+// TODO: Recreate the implemtation and the base on how this is going to work
+//
 vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, GPUMaterial objectMaterial, float u1, float u2) {
     // Sample GGX world (D)
     vec3 H = sampleGGXWorld(normal, objectMaterial.roughness, u1, u2);
@@ -217,9 +218,9 @@ vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, vec3 microfacetNormal
     // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
     return (F * G * HdotV) / (NdotV * NdotH);
 }
-// END INCLUDE: ../../include/modelBases/cook_torrance_bdrf_base.glsl
+// END INCLUDE: ../../include/modelBases/cookTorranceBdrfBase.glsl
 
-vec3 cook_torrance_bdrf(inout Ray ray, in HitInfo hit, in GPUMaterial objectMaterial, in float u1, in float u2, out vec3 rayDirection) {
+vec3 cookTorranceBdrf(inout Ray ray, in HitInfo hit, in GPUMaterial objectMaterial, in float u1, in float u2, out vec3 rayDirection) {
 
     vec3 originalRayDirection = ray.direction;
 
@@ -235,7 +236,7 @@ vec3 cook_torrance_bdrf(inout Ray ray, in HitInfo hit, in GPUMaterial objectMate
 
     return cookTorranceBdrfBase(hit.normal, originalRayDirection, microfacetNormal, objectMaterial, u1, u2);
 }
-// END INCLUDE: ../models/cook_torrance_bdrf.glsl
+// END INCLUDE: ../models/cookTorranceBdrf.glsl
 
 // Path tracing includes
 // BEGIN INCLUDE: ../to_be_uniformed_valeus.glsl
@@ -458,7 +459,7 @@ void processBounceStep(
 
             vec3 newRayDirection;
 
-            vec3 bdrf = cook_torrance_bdrf(ray, hit, material, u1, u2, newRayDirection);
+            vec3 bdrf = cookTorranceBdrf(ray, hit, material, u1, u2, newRayDirection);
 
             ray.origin = hit.hitPos + hit.normal * EPSILON;
             ray.direction = newRayDirection;
@@ -566,7 +567,7 @@ void main() {
     // Color based on the hit
     vec3 col = colorScene(ray);
 
-    col = LinearToSRGB(ACESFilm(col));
+    col = linearToSRGB(ACESFilm(col));
 
     // Write to the image with the final hit color
     // imageStore(img_output, pixel_coords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));

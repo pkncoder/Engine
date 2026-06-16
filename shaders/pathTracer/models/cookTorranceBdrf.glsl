@@ -1,6 +1,6 @@
-#include "../../include/modelBases/cook_torrance_bdrf_base.glsl"
+#include "../../include/modelBases/cookTorranceBdrfBase.glsl"
 
-vec3 cook_torrance_bdrf(inout Ray ray, in HitInfo hit, in GPUMaterial objectMaterial, in float u1, in float u2, out vec3 rayDirection) {
+vec3 cookTorranceBdrf(inout Ray ray, in HitInfo hit, in GPUMaterial objectMaterial, in float u1, in float u2, out vec3 rayDirection) {
 
     vec3 originalRayDirection = ray.direction;
 
