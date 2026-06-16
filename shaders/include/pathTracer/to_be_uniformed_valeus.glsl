@@ -1,3 +1,5 @@
+// TODO: uniform
+
 #define MAX_BOUNCES 3
 #define MIN_BOUNCE_RUSSIAN_ROULETTE 2
 #define SKYBOX_COLOR_MULT 0.3

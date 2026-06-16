@@ -17,7 +17,7 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
-#include "../include/models/cook_torrance_bdrf.glsl"
+#include "../include/pathTracer/models/cook_torrance_bdrf.glsl"
 
 // Path tracing includes
 #include "../include/pathTracing/to_be_uniformed_valeus.glsl"
