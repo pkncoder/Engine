@@ -27,3 +27,27 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 // TODO: make a base
+
+vec3 cookTorranceBdrfBase(vec3 normal, vec3 incomingViewDirection, Material objectMaterial, float u1, float u2) {
+    // Sample GGX world (D)
+    vec3 H = sampleGGXWorld(N, mat.roughness, u1, u2);
+
+    // Get NdotL to check for a ray not being visable
+    vec3 rayDirection = reflect(V, H);
+    float NdotL = dot(N, rayDirection);
+    if (NdotL <= 0.0) {
+        return vec3(0.0);
+    }
+
+    // Values for the next BDRF calculations
+    float NdotV = max(dot(N, -V), EPSILON);
+    float NdotH = max(dot(N, H), EPSILON);
+    float HdotV = max(dot(H, -V), EPSILON);
+
+    // Get the G & F components
+    float G = smithGeometry(NdotV, NdotL, mat.roughness);
+    vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
+
+    // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
+    return (F * G * HdotV) / (NdotV * NdotH);
+}

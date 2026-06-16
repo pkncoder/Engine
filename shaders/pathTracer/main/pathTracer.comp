@@ -4,31 +4,31 @@
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Common
-#include "../include/common.glsl"
+#include "../../include/common.glsl"
 
 // Shared includes
 #include "../include/sharedStructures.glsl"
 #include "../include/sharedUniforms.glsl"
 
 // Other utils
-#include "../include/utils/random.glsl"
-#include "../include/utils/srgb.glsl"
-#include "../include/utils/toneMapping.glsl"
+#include "../../include/utils/random.glsl"
+#include "../../include/utils/srgb.glsl"
+#include "../../include/utils/toneMapping.glsl"
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
-#include "../include/pathTracer/models/cook_torrance_bdrf.glsl"
+#include "../models/cook_torrance_bdrf.glsl"
 
 // Path tracing includes
-#include "../include/pathTracing/to_be_uniformed_valeus.glsl"
-#include "../include/pathTracing/structures.glsl"
-#include "../include/pathTracing/sceneBuffers.glsl"
+#include "../to_be_uniformed_valeus.glsl"
+#include "../structures.glsl"
+#include "../sceneBuffers.glsl"
 
 // Path tracing intersection functions
-#include "../include/pathTracing/intersections.glsl"
+#include "../intersections.glsl"
 
 // Path-tracer specific uniforms
-#include "../include/pathTracing/uniforms.glsl"
+#include "../uniforms.glsl"
 
 // Cosine-weighted hemisphere sampling
 vec3 sampleDiffuse(vec3 normal) {
@@ -50,7 +50,7 @@ void processBounceStep(
     inout vec3 colorMult
 ) {
     // Save the view and normal vectors
-    vec3 V = -ray.direction;
+    vec3 V = ray.direction;
     vec3 N = hit.normal;
 
     // Lambertion diffuse
@@ -75,7 +75,7 @@ void processBounceStep(
         if (mat.roughness < 0.01) {
 
             // Perfectly reflect the ray
-            vec3 rayDirection = reflect(-V, N);
+            vec3 rayDirection = reflect(V, N);
 
             // Update the ray information
             ray.origin = hit.hitPos + N * EPSILON;
@@ -92,32 +92,38 @@ void processBounceStep(
             // Sample GGX world (D)
             float u1 = rnd1(seed);
             float u2 = rnd1(seed);
-            vec3 H = sampleGGXWorld(N, mat.roughness, u1, u2);
+            // vec3 H = sampleGGXWorld(N, mat.roughness, u1, u2);
+            //
+            // // Get NdotL to check for a ray not being visable
+            // vec3 rayDirection = reflect(-V, H);
+            // float NdotL = dot(N, rayDirection);
+            // if (NdotL <= 0.0) {
+            //     colorMult = vec3(0.0);
+            //     return; 
+            // }
+            
+            bdrf = cook_torrance_bdrf(ray, hit, material, u1, u2);
 
-            // Get NdotL to check for a ray not being visable
-            vec3 rayDirection = reflect(-V, H);
-            float NdotL = dot(N, rayDirection);
-            if (NdotL <= 0.0) {
-                colorMult = vec3(0.0);
-                return; 
-            }
+            colorMult *= bdrf;
 
             // Update ray information
-            ray.origin = hit.hitPos + N * EPSILON;
-            ray.direction = rayDirection;
-            ray.invDirection = 1.0 / rayDirection; 
+            if (length(bdrf) > 0.0) {
+                ray.origin = hit.hitPos + N * EPSILON;
+                ray.direction = rayDirection;
+                ray.invDirection = 1.0 / rayDirection; 
+            }
 
-            // Values for the next BDRF calculations
-            float NdotV = max(dot(N, V), EPSILON);
-            float NdotH = max(dot(N, H), EPSILON);
-            float HdotV = max(dot(H, V), EPSILON);
-
-            // Get the G & F components
-            float G = smithGeometry(NdotV, NdotL, mat.roughness);
-            vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
-
-            // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
-            colorMult *= (F * G * HdotV) / (NdotV * NdotH);
+            // // Values for the next BDRF calculations
+            // float NdotV = max(dot(N, V), EPSILON);
+            // float NdotH = max(dot(N, H), EPSILON);
+            // float HdotV = max(dot(H, V), EPSILON);
+            //
+            // // Get the G & F components
+            // float G = smithGeometry(NdotV, NdotL, mat.roughness);
+            // vec3 F = fresnelSchlick(HdotV, mat.albedo.xyz);
+            //
+            // // Update the color mult (BRDF * cos / PDF simplifies cleanly to this)
+            // colorMult *= (F * G * HdotV) / (NdotV * NdotH);
         }
     }
 }

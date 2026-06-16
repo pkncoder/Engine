@@ -15,8 +15,8 @@ namespace Engine {
 void Rasterizer::init() {
 
     // Compile the shader code
-    shader =
-        Shader("shaders/raster/viewport.vert", "shaders/raster/viewport.frag");
+    shader = Shader("shaders/raster/main/raster.vert",
+                    "shaders/raster/main/raster.frag");
 
     Logger::info("RENDERER", "Rasterizer initialized.");
 }
@@ -71,6 +71,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glBindVertexArray(0);
 }
 
-void Rasterizer::shutdown() {};
+void Rasterizer::shutdown(){};
 
 } // namespace Engine

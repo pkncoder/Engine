@@ -1,11 +1,11 @@
 #version 330 core
 
-#include "../include/common.glsl"
+#include "../../include/common.glsl"
+#include "../../include/sharedStructures.glsl"
 
-#include "../include/raster/uniforms.glsl"
-#include "../include/sharedStructures.glsl"
+#include "../uniforms.glsl"
 
-#include "../include/raster/models/blinn_phong.glsl"
+#include "../models/blinn_phong.glsl"
 
 void main() {
 
