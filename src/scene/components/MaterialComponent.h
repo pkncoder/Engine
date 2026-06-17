@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../../resources/CPUStructs.h"
+#include "MeshComponent.h"
 
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 namespace Engine {
@@ -13,6 +15,8 @@ struct MaterialComponent {
 
     float roughness = 1.0f;
     float metallic = 0.0f;
+
+    GLuint albedoTexture = 0;
 
     // Default Constructors
     MaterialComponent() = default;

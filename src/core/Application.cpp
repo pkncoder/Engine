@@ -208,9 +208,12 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(0.0f, -0.6f, -4.0f);
     }
 
-    if (false) {
+    if (true) {
         Entity moai = EntitySpawner::spawnObjEntity(activeScene,
                                                     "assets/models/moai.obj");
+
+        moai.getComponent<MaterialComponent>().albedoTexture =
+            AssetManager::loadTexture("statue_diffuse.jpg");
 
         moai.getComponent<TransformComponent>().position =
             glm::vec3(0.0f, 1.3f, -4.0f);
@@ -238,6 +241,8 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(0.4f, 0.2f, 0.8f);
         cube.getComponent<MaterialComponent>().roughness = 0.1;
         cube.getComponent<MaterialComponent>().metallic = 1.0;
+        cube.getComponent<MaterialComponent>().albedoTexture =
+            AssetManager::loadTexture("image.png");
 
         cube.getComponent<TransformComponent>().position =
             glm::vec3(-1.5f, 1.3f, -4.0f);

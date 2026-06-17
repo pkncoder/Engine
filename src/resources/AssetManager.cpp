@@ -4,6 +4,7 @@
 #include "CPUStructs.h"
 #include "MaterialLoader.h"
 #include "ModelLoader.h"
+#include "TextureLoader.h"
 
 #include <string>
 
@@ -114,6 +115,22 @@ const void AssetManager::cacheMaterials(const std::string &filepath,
             tempMeshData->materialName = mat.name;
         }
     }
+}
+
+GLuint AssetManager::loadTexture(const std::string &filename) {
+    std::string fullPath = "./assets/images/" + filename;
+
+    // Check cache
+    if (textureCache.find(fullPath) != textureCache.end()) {
+        return textureCache[fullPath];
+    }
+
+    // Load and cache
+    GLuint textureID = TextureLoader::loadTexture(fullPath);
+    if (textureID != 0) {
+        textureCache[fullPath] = textureID;
+    }
+    return textureID;
 }
 
 } // namespace Engine

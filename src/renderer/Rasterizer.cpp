@@ -60,6 +60,16 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         shader.setFloat("u_roughness", material.roughness);
         shader.setFloat("u_metallic", material.metallic);
 
+        if (material.albedoTexture != 0) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, material.albedoTexture);
+            shader.setInt("u_albedoMap",
+                          0); // Tell shader the texture is in unit 0
+            shader.setInt("u_hasAlbedoMap", 1); // Boolean flag for the shader
+        } else {
+            shader.setInt("u_hasAlbedoMap", 0);
+        }
+
         // Give the vertex array
         glBindVertexArray(mesh.vao);
 

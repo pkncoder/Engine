@@ -47,6 +47,11 @@ MeshComponent BufferManager::uploadMesh(const CPUMeshData &meshData) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(CPUVertex),
                           (void *)offsetof(CPUVertex, normal));
 
+    // Vertex attribute setting (normal)
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(CPUVertex),
+                          (void *)offsetof(CPUVertex, texCoords));
+
     // Unbind the vertex array for storage reasongs
     glBindVertexArray(0);
 

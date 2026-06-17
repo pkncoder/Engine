@@ -13,6 +13,13 @@ find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 
+find_package(Stb REQUIRED)
+# Create the missing modern target if it doesn't exist
+if(NOT TARGET stb::stb)
+    add_library(stb::stb INTERFACE IMPORTED)
+    target_include_directories(stb::stb INTERFACE ${Stb_INCLUDE_DIRS})
+endif()
+
 # --- Source Files ---
 # Note: glad.c is now handled by the library, no need to include it manually!
 set(SOURCES
@@ -26,6 +33,7 @@ set(SOURCES
     src/resources/AssetManager.cpp
     src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp
+    src/resources/TextureLoader.cpp
     src/scene/Camera.cpp
     src/scene/EntitySpawner.cpp
     src/scene/Scene.cpp
@@ -44,4 +52,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glad::glad 
     glm::glm
     tinyobjloader::tinyobjloader
+    stb::stb
 )
