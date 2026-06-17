@@ -16,7 +16,7 @@ class AssetManager {
 
     // Load and return a std::optional in case of failed loading
     static const CPUMeshData *loadMesh(const std::string &filepath);
-    static GLuint loadTexture(const std::string &texture);
+    static GLuint loadTexture(const std::string &filepath);
 
     static const CPUMaterialData *getMaterial(const std::string &materialName);
 

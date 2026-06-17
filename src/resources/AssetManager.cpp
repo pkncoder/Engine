@@ -117,18 +117,16 @@ const void AssetManager::cacheMaterials(const std::string &filepath,
     }
 }
 
-GLuint AssetManager::loadTexture(const std::string &filename) {
-    std::string fullPath = "./assets/images/" + filename;
-
+GLuint AssetManager::loadTexture(const std::string &filepath) {
     // Check cache
-    if (textureCache.find(fullPath) != textureCache.end()) {
-        return textureCache[fullPath];
+    if (textureCache.find(filepath) != textureCache.end()) {
+        return textureCache[filepath];
     }
 
     // Load and cache
-    GLuint textureID = TextureLoader::loadTexture(fullPath);
+    GLuint textureID = TextureLoader::loadTexture(filepath);
     if (textureID != 0) {
-        textureCache[fullPath] = textureID;
+        textureCache[filepath] = textureID;
     }
     return textureID;
 }

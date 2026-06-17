@@ -30,8 +30,8 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
 
     // Upload the camera uniforms
-    shader.setMat4("u_viewProjection", proj * view);
-    shader.setVec3("u_viewPos", camera.position);
+    shader.setMat4("uViewProjection", proj * view);
+    shader.setVec3("uViewPos", camera.position);
 
     // Get all of the renderables from the scene
     auto renderables =
@@ -52,22 +52,22 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         model = glm::scale(model, transform.scale);
 
         // Pass the model matrix to the shader
-        shader.setMat4("u_model", model);
+        shader.setMat4("uModel", model);
 
         // Set the material uniforms
-        shader.setVec3("u_albedo", material.albedo);
-        shader.setVec3("u_emmissive", material.emmissive);
-        shader.setFloat("u_roughness", material.roughness);
-        shader.setFloat("u_metallic", material.metallic);
+        shader.setVec3("uAlbedo", material.albedo);
+        shader.setVec3("uEmmissive", material.emmissive);
+        shader.setFloat("uRoughness", material.roughness);
+        shader.setFloat("uMetallic", material.metallic);
 
         if (material.albedoTexture != 0) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, material.albedoTexture);
-            shader.setInt("u_albedoMap",
+            shader.setInt("uAlbedoMap",
                           0); // Tell shader the texture is in unit 0
-            shader.setInt("u_hasAlbedoMap", 1); // Boolean flag for the shader
+            shader.setInt("uHasAlbedoMap", 1); // Boolean flag for the shader
         } else {
-            shader.setInt("u_hasAlbedoMap", 0);
+            shader.setInt("uHasAlbedoMap", 0);
         }
 
         // Give the vertex array

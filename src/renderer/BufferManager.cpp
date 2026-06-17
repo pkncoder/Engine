@@ -47,7 +47,7 @@ MeshComponent BufferManager::uploadMesh(const CPUMeshData &meshData) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(CPUVertex),
                           (void *)offsetof(CPUVertex, normal));
 
-    // Vertex attribute setting (normal)
+    // Vertex attribute setting (texture)
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(CPUVertex),
                           (void *)offsetof(CPUVertex, texCoords));

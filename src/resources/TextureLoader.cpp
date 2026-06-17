@@ -33,7 +33,7 @@ GLuint TextureLoader::loadTexture(const std::string &filepath) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
-        Logger::info("ASSET", "Successfully loaded texture: " + filepath);
+        Logger::info("ASSET", "Successfully loaded texture at: " + filepath);
     } else {
         Logger::error("ASSET", "Failed to load texture at: " + filepath);
         stbi_image_free(data);

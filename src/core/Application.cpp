@@ -213,7 +213,7 @@ void Application::setupEntities(Scene &scene) {
                                                     "assets/models/moai.obj");
 
         moai.getComponent<MaterialComponent>().albedoTexture =
-            AssetManager::loadTexture("statue_diffuse.jpg");
+            AssetManager::loadTexture("assets/textures/statue_diffuse.jpg");
 
         moai.getComponent<TransformComponent>().position =
             glm::vec3(0.0f, 1.3f, -4.0f);
@@ -242,7 +242,7 @@ void Application::setupEntities(Scene &scene) {
         cube.getComponent<MaterialComponent>().roughness = 0.1;
         cube.getComponent<MaterialComponent>().metallic = 1.0;
         cube.getComponent<MaterialComponent>().albedoTexture =
-            AssetManager::loadTexture("image.png");
+            AssetManager::loadTexture("assets/textures/image.png");
 
         cube.getComponent<TransformComponent>().position =
             glm::vec3(-1.5f, 1.3f, -4.0f);

@@ -55,21 +55,21 @@ struct GPUMaterial {
 // END INCLUDE: ../../include/sharedStructures.glsl
 
 // BEGIN INCLUDE: ../uniforms.glsl
-in vec3 v_normal;
-in vec3 v_worldPos;
-in vec2 v_TexCoords;
+in vec3 vNormal;
+in vec3 vWorldPos;
+in vec2 vTexCoords;
 
 out vec4 FragColor;
 
-uniform vec3 u_viewPos;   // The Camera's position in world space
+uniform vec3 uViewPos;   // The Camera's position in world space
 
-uniform vec3 u_albedo;
-uniform sampler2D u_albedoMap;
-uniform int u_hasAlbedoMap;
+uniform vec3 uAlbedo;
+uniform sampler2D uAlbedoMap;
+uniform int uHasAlbedoMap;
 
-uniform vec3 u_emmissive;
-uniform float u_roughness;
-uniform float u_metallic;
+uniform vec3 uEmmissive;
+uniform float uRoughness;
+uniform float uMetallic;
 // END INCLUDE: ../uniforms.glsl
 
 // BEGIN INCLUDE: ../models/blinnPhong.glsl
@@ -114,21 +114,20 @@ vec3 blinnPhong(const in vec3 viewPos, const in vec3 worldPos, const in vec3 nor
 
 void main() {
 
-    if (length(u_emmissive) > 0.01) {
-        FragColor = vec4(u_emmissive, 1.0);
+    if (length(uEmmissive) > 0.01) {
+        FragColor = vec4(uEmmissive, 1.0);
         return;
     }
 
     vec3 baseColor;
-    if (u_hasAlbedoMap == 1) {
-        // Sample texture and multiply by base albedo (allows tinting!)
-        vec4 texColor = texture(u_albedoMap, v_TexCoords);
-        baseColor = texColor.rgb; 
+    if (uHasAlbedoMap == 1) {
+        vec4 texColor = texture(uAlbedoMap, vTexCoords);
+        baseColor = texColor.rgb * uAlbedo;
     } else {
-        baseColor = u_albedo;
+        baseColor = uAlbedo;
     }
 
-    vec3 color = blinnPhong(u_viewPos, v_worldPos, v_normal, Material(baseColor, u_emmissive, u_roughness, u_metallic), u_viewPos, Material(vec3(0.0), vec3(1.0), 0.0, 0.0));
+    vec3 color = blinnPhong(uViewPos, vWorldPos, vNormal, Material(baseColor, uEmmissive, uRoughness, uMetallic), uViewPos, Material(vec3(0.0), vec3(1.0), 0.0, 0.0));
 
     FragColor = vec4(color, 1.0);
 
