@@ -302,7 +302,7 @@ void Application::setupEntities(Scene &scene) {
     //
     // Breakfast room
     if (true) {
-        std::vector<Entity> room = EntitySpawner::spawnObjEntity(
+        Entity room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
     }
 
