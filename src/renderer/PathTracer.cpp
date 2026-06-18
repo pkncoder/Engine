@@ -343,63 +343,65 @@ void PathTracer::flattenScene(Scene &activeScene) {
 // Rebuild the lookup table for geometry; used when geometry is dirty
 void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
 
-    // Save the new vectors for the lookup table
-    std::vector<GPUVertex> instanceVertices;
-    std::vector<uint32_t> instanceIndices;
-    std::vector<GPUMeshEntry> meshEntries;
-
-    // Clear the old data
-    instanceLookupTable.clear();
-
-    // Use a set for unique meshes & duplicate ridding
-    std::set<std::string> uniqueMeshes;
-
-    // Get all of the mesh componentes and loop each id
-    auto renderables = activeScene.getMatchingEntities<MeshComponent>();
-    for (EntityID id : renderables) {
-
-        // Insert into the unique meshes
-        uniqueMeshes.insert(
-            activeScene.getComponent<MeshComponent>(id).assetID);
-    }
-
-    // Loop each asset id in the unique meshes
-    for (const auto &assetID : uniqueMeshes) {
-
-        // Load the mesh data
-        auto meshData = AssetManager::loadMesh(assetID);
-
-        // Create a new mesh entry and set the data
-        GPUMeshEntry entry{};
-        entry.baseVertex = static_cast<uint32_t>(instanceVertices.size());
-        entry.baseIndex = static_cast<uint32_t>(instanceIndices.size());
-        entry.indexCount = static_cast<uint32_t>(meshData->indices.size());
-
-        // Loop each vertex
-        for (const auto &v : meshData->vertices) {
-
-            // Push the vertecies to the instance verts
-            instanceVertices.push_back({glm::vec4(v.position, 1.0f),
-                                        glm::vec4(v.normal, 0.0f),
-                                        glm::vec4(v.texCoords, 0.0f, 0.0f)});
-        }
-
-        // Insert the instanceIndicies
-        instanceIndices.insert(instanceIndices.end(), meshData->indices.begin(),
-                               meshData->indices.end());
-
-        // Set the instance lookup table, indexed by the asset id
-        instanceLookupTable[assetID] =
-            static_cast<uint32_t>(meshEntries.size());
-
-        // Push the new mesh entries
-        meshEntries.push_back(entry);
-    }
-
-    // Update the buffer data
-    updateBuffer("meshEntries", meshEntries.data(), meshEntries.size());
-    updateBuffer("vertices", instanceVertices.data(), instanceVertices.size());
-    updateBuffer("indices", instanceIndices.data(), instanceIndices.size());
+    // // Save the new vectors for the lookup table
+    // std::vector<GPUVertex> instanceVertices;
+    // std::vector<uint32_t> instanceIndices;
+    // std::vector<GPUMeshEntry> meshEntries;
+    //
+    // // Clear the old data
+    // instanceLookupTable.clear();
+    //
+    // // Use a set for unique meshes & duplicate ridding
+    // std::set<std::string> uniqueMeshes;
+    //
+    // // Get all of the mesh componentes and loop each id
+    // auto renderables = activeScene.getMatchingEntities<MeshComponent>();
+    // for (EntityID id : renderables) {
+    //
+    //     // Insert into the unique meshes
+    //     uniqueMeshes.insert(
+    //         activeScene.getComponent<MeshComponent>(id).assetID);
+    // }
+    //
+    // // Loop each asset id in the unique meshes
+    // for (const auto &assetID : uniqueMeshes) {
+    //
+    //     // Load the mesh data
+    //     auto meshData = AssetManager::loadMesh(assetID);
+    //
+    //     // Create a new mesh entry and set the data
+    //     GPUMeshEntry entry{};
+    //     entry.baseVertex = static_cast<uint32_t>(instanceVertices.size());
+    //     entry.baseIndex = static_cast<uint32_t>(instanceIndices.size());
+    //     entry.indexCount = static_cast<uint32_t>(meshData->indices.size());
+    //
+    //     // Loop each vertex
+    //     for (const auto &v : meshData->vertices) {
+    //
+    //         // Push the vertecies to the instance verts
+    //         instanceVertices.push_back({glm::vec4(v.position, 1.0f),
+    //                                     glm::vec4(v.normal, 0.0f),
+    //                                     glm::vec4(v.texCoords, 0.0f, 0.0f)});
+    //     }
+    //
+    //     // Insert the instanceIndicies
+    //     instanceIndices.insert(instanceIndices.end(),
+    //     meshData->indices.begin(),
+    //                            meshData->indices.end());
+    //
+    //     // Set the instance lookup table, indexed by the asset id
+    //     instanceLookupTable[assetID] =
+    //         static_cast<uint32_t>(meshEntries.size());
+    //
+    //     // Push the new mesh entries
+    //     meshEntries.push_back(entry);
+    // }
+    //
+    // // Update the buffer data
+    // updateBuffer("meshEntries", meshEntries.data(), meshEntries.size());
+    // updateBuffer("vertices", instanceVertices.data(),
+    // instanceVertices.size()); updateBuffer("indices", instanceIndices.data(),
+    // instanceIndices.size());
 
     // Set the geometry dirty flag to false
     geometryDirty = false;

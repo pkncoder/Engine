@@ -42,6 +42,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     for (EntityID id : renderables) {
         // Get the components from the entity that are used in rendering
         auto &mesh = activeScene.getComponent<MeshComponent>(id);
+
         auto &transform = activeScene.getComponent<TransformComponent>(id);
         auto &material = activeScene.getComponent<MaterialComponent>(id);
 

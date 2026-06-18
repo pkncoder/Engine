@@ -4,6 +4,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -29,11 +30,20 @@ struct CPUMeshData {
     std::vector<uint32_t> indices;
 };
 
+struct CPUModelData {
+    std::string name;
+    std::string materialPath;
+
+    std::vector<CPUMeshData> meshes;
+};
+
 // Material information
 struct CPUMaterialData {
 
     // Material definition name
     std::string name;
+    std::map<std::string, std::string> textureNames =
+        std::map<std::string, std::string>();
 
     // Colored options (diffuse & light)
     glm::vec3 albedo{1.0f, 0.0f, 1.0f};

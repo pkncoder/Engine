@@ -183,126 +183,105 @@ void Application::registerSceneComponents(Scene &scene) {
 
 void Application::setupEntities(Scene &scene) {
     START_PROFILE("Entity Loading");
-    //
-    // // Bunny
-    // if (false) {
-    //     Entity bunny = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                  "assets/models/bunny.obj");
-    //
-    //     bunny.getComponent<TransformComponent>().position =
-    //         glm::vec3(-1.0f, -1.2f, -4.0f);
-    // }
-    //
-    // // Dragon
-    // if (false) {
-    //     Entity dragon = EntitySpawner::spawnObjEntity(
-    //         activeScene, "assets/models/dragon.obj");
-    //
-    //     dragon.getComponent<TransformComponent>().position =
-    //         glm::vec3(1.0f, -0.6f, -4.0f);
-    // }
-    //
-    // // Cat
-    // if (false) {
-    //     Entity cat =
-    //         EntitySpawner::spawnObjEntity(activeScene,
-    //         "assets/models/cat.obj");
-    //
-    //     cat.getComponent<TransformComponent>().position =
-    //         glm::vec3(0.0f, -0.6f, -4.0f);
-    // }
-    //
-    // // 🗿
-    // if (false) {
-    //     Entity moai = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                 "assets/models/moai.obj");
-    //
-    //     moai.getComponent<MaterialComponent>().albedoTexture =
-    //         AssetManager::loadTexture("assets/textures/statue_diffuse.jpg");
-    //
-    //     moai.getComponent<TransformComponent>().position =
-    //         glm::vec3(0.0f, 1.3f, -4.0f);
-    //     moai.getComponent<TransformComponent>().rotation =
-    //         glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
-    //     moai.getComponent<TransformComponent>().scale =
-    //         glm::vec3(0.14f, 0.14f, 0.14f);
-    // }
-    //
-    // // THE BACKROOMS????
-    // if (false) { //
-    // https://sketchfab.com/3d-models/backrooms-vr-d9b98eca8d064d0eafcd7f5484bb61ed
-    //     Entity backrooms = EntitySpawner::spawnObjEntity(
-    //         activeScene, "assets/models/backrooms.obj");
-    //     backrooms.getComponent<MaterialComponent>().albedo =
-    //         glm::normalize(glm::vec3(236, 212, 133));
-    //     backrooms.getComponent<MaterialComponent>().emmissive = glm::vec3(0);
-    //     backrooms.getComponent<MaterialComponent>().metallic = 0.0;
-    //     backrooms.getComponent<MaterialComponent>().roughness = 1.0;
-    // }
-    //
-    // // Diffuse cube & emmisive cube
-    // if (false) {
-    //     Entity cube = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                 "assets/models/cube.obj");
-    //
-    //     cube.getComponent<MaterialComponent>().albedo =
-    //         glm::vec3(0.4f, 0.2f, 0.8f);
-    //     cube.getComponent<MaterialComponent>().roughness = 0.1;
-    //     cube.getComponent<MaterialComponent>().metallic = 1.0;
-    //     cube.getComponent<MaterialComponent>().albedoTexture =
-    //         AssetManager::loadTexture("assets/textures/image.png");
-    //
-    //     cube.getComponent<TransformComponent>().position =
-    //         glm::vec3(-1.5f, 1.3f, -4.0f);
-    //     cube.getComponent<TransformComponent>().scale =
-    //         glm::vec3(0.4f, 0.4f, 0.4f);
-    //
-    //     Entity emmissiveCube = EntitySpawner::spawnObjEntity(
-    //         activeScene, "assets/models/cube.obj");
-    //
-    //     emmissiveCube.getComponent<TransformComponent>().position =
-    //         glm::vec3(4.0f, 0.0f, 2.0f);
-    //     emmissiveCube.getComponent<MaterialComponent>().albedo =
-    //         glm::vec3(0.0f);
-    //     emmissiveCube.getComponent<MaterialComponent>().emmissive =
-    //         glm::vec3(1.0);
-    // }
-    //
-    // // Trans flag
-    // if (false) {
-    //     Entity white = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                  "assets/models/white.obj");
-    //     white.getComponent<MaterialComponent>().metallic = 1.0;
-    //     white.getComponent<MaterialComponent>().roughness = 0.2;
-    //     Entity pink = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                 "assets/models/pink.obj");
-    //     pink.getComponent<MaterialComponent>().metallic = 1.0;
-    //     pink.getComponent<MaterialComponent>().roughness = 0.2;
-    //     Entity blue = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                 "assets/models/blue.obj");
-    //     blue.getComponent<MaterialComponent>().metallic = 1.0;
-    //     blue.getComponent<MaterialComponent>().roughness = 0.2;
-    // }
-    //
-    // // Franch flag
-    // if (false) {
-    //     Entity blue = EntitySpawner::spawnObjEntity(
-    //         activeScene, "assets/models/fr_blue.obj");
-    //     blue.getComponent<TransformComponent>().position +=
-    //         glm::vec3(8.0f, 0.0f, 2.0f);
-    //     Entity white = EntitySpawner::spawnObjEntity(
-    //         activeScene, "assets/models/fr_white.obj");
-    //     white.getComponent<TransformComponent>().position +=
-    //         glm::vec3(8.0f, 0.0f, 2.0f);
-    //     Entity red = EntitySpawner::spawnObjEntity(activeScene,
-    //                                                "assets/models/fr_red.obj");
-    //     red.getComponent<TransformComponent>().position +=
-    //         glm::vec3(8.0f, 0.0f, 2.0f);
-    // }
-    //
+
+    // Bunny
+    if (false) {
+        std::vector<Entity> bunny = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/bunny.obj");
+
+        bunny[0].getComponent<TransformComponent>().position =
+            glm::vec3(-1.0f, -1.2f, -4.0f);
+    }
+
+    // Dragon
+    if (false) {
+        std::vector<Entity> dragon = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/dragon.obj");
+
+        dragon[0].getComponent<TransformComponent>().position =
+            glm::vec3(1.0f, -0.6f, -4.0f);
+    }
+
+    // Cat
+    if (false) {
+        std::vector<Entity> cat =
+            EntitySpawner::spawnObjEntity(activeScene, "assets/models/cat.obj");
+
+        cat[0].getComponent<TransformComponent>().position =
+            glm::vec3(0.0f, -0.6f, -4.0f);
+    }
+
+    // 🗿
+    if (false) {
+        std::vector<Entity> moai = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/moai.obj");
+
+        moai[0].getComponent<TransformComponent>().position =
+            glm::vec3(0.0f, 1.3f, -4.0f);
+        moai[0].getComponent<TransformComponent>().rotation =
+            glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
+        moai[0].getComponent<TransformComponent>().scale =
+            glm::vec3(0.14f, 0.14f, 0.14f);
+    }
+
+    // Diffuse cube & emmisive cube
+    if (false) {
+        std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/cube.obj");
+
+        cube[0].getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.4f, 0.2f, 0.8f);
+        cube[0].getComponent<MaterialComponent>().roughness = 0.1;
+        cube[0].getComponent<MaterialComponent>().metallic = 1.0;
+
+        cube[0].getComponent<TransformComponent>().position =
+            glm::vec3(-1.5f, 1.3f, -4.0f);
+        cube[0].getComponent<TransformComponent>().scale =
+            glm::vec3(0.4f, 0.4f, 0.4f);
+
+        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/cube.obj");
+
+        emmissiveCube[0].getComponent<TransformComponent>().position =
+            glm::vec3(4.0f, 0.0f, 2.0f);
+        emmissiveCube[0].getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.0f);
+        emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
+            glm::vec3(1.0);
+    }
+
+    // Trans flag
+    if (false) {
+        std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/trans.obj");
+
+        for (Entity entity : trans) {
+            entity.getComponent<TransformComponent>().position +=
+                glm::vec3(-1.0f, 0.0f, 0.0f);
+        }
+    }
+
+    // Franch flag
+    if (false) {
+        std::vector<Entity> french = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/french.obj");
+
+        for (Entity entity : french) {
+            entity.getComponent<TransformComponent>().position +=
+                glm::vec3(8.0f, 0.0f, 2.0f);
+        }
+    }
+
+    // THE BACKROOMS????
+    if (false) {
+        // https://sketchfab.com/3d-models/backrooms-vr-d9b98eca8d064d0eafcd7f5484bb61ed
+        std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/backrooms.obj");
+    }
+
     // Breakfast room
     if (true) {
-        Entity room = EntitySpawner::spawnObjEntity(
+        std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
     }
 

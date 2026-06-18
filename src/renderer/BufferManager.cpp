@@ -8,10 +8,12 @@ namespace Engine {
 // Takes CPU data, pushes to VRAM, returns ECS-ready component
 MeshComponent BufferManager::uploadMesh(const CPUMeshData &meshData) {
 
-    if (gpuMeshCache.find(meshData.name) != gpuMeshCache.end()) {
-        return gpuMeshCache[meshData.name]; // Return the existing VAO/VBO/EBO
-                                            // handles
-    }
+    // if (gpuMeshCache.find(meshData.name) != gpuMeshCache.end()) {
+    //     return gpuMeshCache[meshData.name]; // Return the existing
+    //     // VAO/VBO/EBO
+    //     // handles
+    // }
+    // TODO: re-implement caching
 
     // Create the new mesh component and set the index count
     MeshComponent comp;

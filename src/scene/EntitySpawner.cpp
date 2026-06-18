@@ -9,48 +9,69 @@
 
 namespace Engine {
 
-Entity EntitySpawner::spawnObjEntity(Scene &scene,
-                                     const std::string &filepath) {
+std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
+                                                  const std::string &filepath) {
+
+    std::vector<Entity> entities;
 
     // Get the mesh data & check for it's existace
-    const CPUMeshData *meshData = AssetManager::loadMesh(filepath);
-    if (!meshData) {
-        Logger::error("ASSET",
-                      "Failed to load mesh data for asset: " + filepath);
-        return Entity(NULL_ENTITY,
-                      nullptr); // Return an invalid handle on failure
+    const CPUModelData *modelData = AssetManager::loadModel(filepath);
+    if (!modelData) {
+        Logger::error("ASSET", "Failed to load model at: " + filepath);
+        return entities; // Return an invalid handle on failure
     }
 
-    // Allocate an ID and instantiate it into an entity
-    EntityID entityId = scene.createEntity();
-    Entity entity(entityId, &scene);
+    Logger::info("ASSET",
+                 "Mesh length: " + std::to_string(modelData->meshes.size()));
 
-    // Upload raw geometry to VRAM and bind the Mesh Component
-    MeshComponent meshComponent = BufferManager::uploadMesh(*meshData);
-    entity.addComponent<MeshComponent>(meshComponent);
+    for (auto &mesh : modelData->meshes) {
 
-    // Apply a default spatial transform
-    entity.addComponent<TransformComponent>(TransformComponent());
+        // Allocate an ID and instantiate it into an entity
+        EntityID entityId = scene.createEntity();
+        Entity entity(entityId, &scene);
 
-    // Get the material data that was loaded on mesh construction
-    const CPUMaterialData *materialData =
-        AssetManager::getMaterial(meshData->materialName);
+        // Upload raw geometry to VRAM and bind the Mesh Component
+        MeshComponent meshComponent = BufferManager::uploadMesh(mesh);
+        entity.addComponent<MeshComponent>(meshComponent);
 
-    // Add the new material component
-    if (materialData != nullptr) {
-        // Use the CPUMaterialData -> MaterialComponent constructor
-        entity.addComponent<MaterialComponent>(
-            MaterialComponent(*materialData));
-    } else { // If it doesn't exist
-        Logger::warn("SPAWNER",
-                     "No material found for: " + meshData->materialName);
+        // Apply a default spatial transform
+        entity.addComponent<TransformComponent>(TransformComponent());
 
-        // Error material
-        entity.addComponent<MaterialComponent>(MaterialComponent());
+        // Get the material data that was loaded on mesh construction
+        const CPUMaterialData *materialData =
+            AssetManager::getMaterial(mesh.materialName);
+
+        // Add the new material component
+        if (materialData != nullptr) {
+            // Use the CPUMaterialData -> MaterialComponent constructor
+            entity.addComponent<MaterialComponent>(
+                MaterialComponent(*materialData));
+
+            // TODO: temp
+            if (materialData->textureNames.find("diffuse") !=
+                materialData->textureNames.end()) {
+
+                entity.getComponent<MaterialComponent>().albedoTexture =
+                    AssetManager::loadTexture(
+                        "assets/textures/" +
+                        materialData->textureNames.find("diffuse")->second);
+                entity.getComponent<MaterialComponent>().albedo =
+                    glm::vec3(1.0f);
+            }
+
+        } else { // If it doesn't exist
+            Logger::warn("SPAWNER",
+                         "No material found for: " + mesh.materialName);
+
+            // Error material
+            entity.addComponent<MaterialComponent>(MaterialComponent());
+        }
+
+        entities.push_back(entity);
     }
 
     // Return the final entity
-    return entity;
+    return entities;
 }
 
 } // namespace Engine

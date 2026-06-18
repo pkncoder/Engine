@@ -6,78 +6,43 @@
 #include "ModelLoader.h"
 #include "TextureLoader.h"
 
+#include <__config>
+#include <cstddef>
 #include <string>
 
 namespace Engine {
 
-// AssetManager initilaization
 void AssetManager::init() {
 
-    // Setup an initial material in the cache for objects that don't have any
-    // material listed
-    // TODO: defaults
-    materialCache["ENG_Default"] = CPUMaterialData{
-        "ENG_Default", glm::vec3(0.9f), glm::vec3(0.0f), 1.0f, 0.0f};
+    // Load a default material
+    materialCache["ENG_Default"] = CPUMaterialData();
 
     Logger::info("ASSET", "AssetManager Initialized."); // Logging
 }
 
-// Load a mesh + optional for error catching
-const CPUMeshData *AssetManager::loadMesh(const std::string &filepath) {
+const CPUModelData *AssetManager::loadModel(const std::string &filepath) {
 
-    // Check if we already loaded this OBJ
-    if (meshCache.find(filepath) != meshCache.end()) {
+    if (modelCache.find(filepath) != modelCache.end()) {
         Logger::info("ASSET", "Returning cached mesh: " + filepath);
-        return &meshCache[filepath]; // Instantly return the cached
-                                     // data
+        return &modelCache[filepath];
     }
 
-    Logger::line();
-    Logger::info("ASSET", "Starting to load mesh: " + filepath);
+    CPUModelData model = ModelLoader::loadOBJ(filepath);
 
-    // 2. If not, load it via tinyobjloader
-    CPUMeshData newMesh;
-    std::string mtlFilename;
+    if (!model.meshes.empty()) {
 
-    if (ModelLoader::loadOBJ(filepath, newMesh, mtlFilename)) {
-
-        // Make sure to check the mtlFilename's existance
-        if (!mtlFilename.empty()) {
-
-            // Get the base directory path
-            std::string base_dir =
-                filepath.substr(0, filepath.find_last_of('/') + 1);
-
-            // Find where the models/ part of the base_dir is so we can cut that
-            // out
-            size_t modelFolderPos = base_dir.find("models/");
-            if (modelFolderPos != std::string::npos) { // Safety check
-
-                // Replace "models/" (7 characters) with "materials/"
-                base_dir.replace(modelFolderPos, 7, "materials/");
-            } else {
-
-                // Filepath is not as expected
-                Logger::warn(
-                    "ASSET",
-                    "'models/' directory not found in path: " + filepath +
-                        ". Falling back to default directory.");
-            }
-
-            // Get the full path
-            std::string fullMtlPath = base_dir + mtlFilename;
-
-            // Cache the materials
-            cacheMaterials(fullMtlPath, &newMesh);
+        // Load materials
+        if (!model.materialPath.empty()) {
+            cacheMaterials("assets/materials/" + model.materialPath);
         }
 
-        Logger::info("ASSET", "Successfully loaded mesh: " + filepath + " (" +
-                                  std::to_string(newMesh.vertices.size()) +
-                                  " vertices)");
+        Logger::info("ASSET", "Successfully loaded model at: " + filepath +
+                                  " (" + std::to_string(model.meshes.size()) +
+                                  " meshes)");
         Logger::space();
 
-        meshCache[filepath] = newMesh;
-        return &meshCache[filepath];
+        modelCache[filepath] = model;
+        return &modelCache[filepath];
     }
 
     Logger::error("ASSET", "AssetManager Failed to load mesh at: " + filepath);
@@ -91,8 +56,7 @@ AssetManager::getMaterial(const std::string &materialName) {
     auto it = materialCache.find(materialName);
     if (it != materialCache.end()) {
         Logger::info("ASSET", "Returning cached material: " + materialName);
-        return &it->second; // Safely return the memory address of the cached
-                            // value
+        return &it->second;
     }
 
     Logger::error("ASSET",
@@ -100,19 +64,16 @@ AssetManager::getMaterial(const std::string &materialName) {
     return nullptr;
 }
 
-const void AssetManager::cacheMaterials(const std::string &filepath,
-                                        CPUMeshData *tempMeshData) {
-    std::vector<CPUMaterialData> newMaterials;
+const void AssetManager::cacheMaterials(const std::string &filepath) {
+    std::vector<CPUMaterialData> materials = MaterialLoader::loadMTL(filepath);
 
-    if (MaterialLoader::loadMTL(filepath, newMaterials)) {
-        for (auto &mat : newMaterials) {
+    if (!materials.empty()) {
+        for (auto &material : materials) {
+
+            materialCache[material.name] = material;
 
             Logger::info("ASSET",
                          "Successfully cached material at: " + filepath);
-
-            materialCache[mat.name] = mat;
-
-            tempMeshData->materialName = mat.name;
         }
     }
 }
@@ -124,6 +85,7 @@ GLuint AssetManager::loadTexture(const std::string &filepath) {
     }
 
     // Load and cache
+    // TODO: Swap to handles
     GLuint textureID = TextureLoader::loadTexture(filepath);
     if (textureID != 0) {
         textureCache[filepath] = textureID;
