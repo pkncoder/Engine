@@ -6,8 +6,6 @@
 #include "ModelLoader.h"
 #include "TextureLoader.h"
 
-#include <__config>
-#include <cstddef>
 #include <string>
 
 namespace Engine {
