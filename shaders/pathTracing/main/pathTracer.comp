@@ -17,12 +17,12 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
-#include "../models/cookTorranceBdrf.glsl"
+#include "../models/cookTorranceBDRF.glsl"
 
 // Path tracing includes
 #include "../to_be_uniformed_valeus.glsl"
 #include "../structures.glsl"
-#include "../sceneBuffers.glsl"
+#include "../buffers.glsl"
 
 // Path tracing intersection functions
 #include "../intersections.glsl"
@@ -92,7 +92,7 @@ void processBounceStep(
 
             vec3 newRayDirection;
 
-            vec3 bdrf = cookTorranceBdrf(ray, hit, material, u1, u2, newRayDirection);
+            vec3 bdrf = cookTorranceBDRF(ray, hit, material, u1, u2, newRayDirection);
 
             ray.origin = hit.hitPos + hit.normal * EPSILON;
             ray.direction = newRayDirection;
@@ -171,28 +171,28 @@ vec3 colorScene(const in Ray cameraRay) {
 void main() {
 
     // Calculate pixel uv
-    const ivec2  pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-    const ivec2 img_size = imageSize(img_output);
+    const ivec2  pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    const ivec2 imgSize = imageSize(imgOutput);
 
     // TODO: Make the uniform a uint
-    setSeed(pixel_coords, uint(u_frameNum));
+    setSeed(pixelCoords, uint(uFrameNum));
 
     // Error check on image size
-    if (pixel_coords.x >= img_size.x || pixel_coords.y >= img_size.y) return;
+    if (pixelCoords.x >= imgSize.x || pixelCoords.y >= imgSize.y) return;
 
     // Get screen space coords
-    const vec2 uv = (vec2(pixel_coords) + 0.5) / vec2(img_size) * 2.0 - 1.0;
+    const vec2 uv = (vec2(pixelCoords) + 0.5) / vec2(imgSize) * 2.0 - 1.0;
 
     // Get the aspect ratio
-    const float aspectRatio = float(img_size.x) / float(img_size.y);
+    const float aspectRatio = float(imgSize.x) / float(imgSize.y);
 
     // Get the ray direction that's in view space and put it into world space
-    const float tanHalfFOV = tan(radians(u_FOV * 0.5)); // Helper value
+    const float tanHalfFOV = tan(radians(uFOV * 0.5)); // Helper value
     const vec3 rayDirView = normalize(vec3(uv, -1.0) * vec3(aspectRatio * tanHalfFOV, tanHalfFOV, 1.0));
-    const vec3 rayDirWorld = normalize((u_inverseView * vec4(rayDirView, 0.0)).xyz);
+    const vec3 rayDirWorld = normalize((uInverseView * vec4(rayDirView, 0.0)).xyz);
 
     // Construct the final ray
-    const Ray ray = Ray(u_cameraPos, rayDirWorld, 1.0 / rayDirWorld);
+    const Ray ray = Ray(uCameraPos, rayDirWorld, 1.0 / rayDirWorld);
 
     // // Find the hit in the scene
     // const HitInfo hit = rayScene(ray);
@@ -203,6 +203,6 @@ void main() {
     col = linearToSRGB(ACESFilm(col));
 
     // Write to the image with the final hit color
-    // imageStore(img_output, pixel_coords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));
-    imageStore(img_output, pixel_coords, vec4(col, 1.0));
+    // imageStore(imgOutput, pixelCoords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));
+    imageStore(imgOutput, pixelCoords, vec4(col, 1.0));
 }

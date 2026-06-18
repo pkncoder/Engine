@@ -208,7 +208,7 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(0.0f, -0.6f, -4.0f);
     }
 
-    if (true) {
+    if (false) {
         Entity moai = EntitySpawner::spawnObjEntity(activeScene,
                                                     "assets/models/moai.obj");
 

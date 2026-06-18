@@ -1,6 +1,6 @@
 // Camera position + inverseView matrix
-uniform vec3 u_cameraPos;
-uniform mat4 u_inverseView;
+uniform vec3 uCameraPos;
+uniform mat4 uInverseView;
 
 // Camera FOV
-uniform float u_FOV;
+uniform float uFOV;

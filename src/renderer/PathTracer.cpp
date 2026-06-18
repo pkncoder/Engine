@@ -411,11 +411,11 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
 // TODO: Move to a UBO / reimplement it
 void PathTracer::bindGlobalUniforms(Shader &shader, const Camera &camera) {
     // TODO: UBO for at least defaults & dynamic uniforms
-    shader.setInt("u_frameNum", frameCount);
-    shader.setVec3("u_cameraPos", camera.position);
-    shader.setFloat("u_FOV", camera.fov);
-    shader.setInt("u_instanceCount", static_cast<int>(instances.size()));
-    shader.setMat4("u_inverseView", glm::inverse(camera.getViewMatrix()));
+    shader.setInt("uFrameNum", frameCount);
+    shader.setVec3("uCameraPos", camera.position);
+    shader.setFloat("uFOV", camera.fov);
+    shader.setInt("uInstanceCount", static_cast<int>(instances.size()));
+    shader.setMat4("uInverseView", glm::inverse(camera.getViewMatrix()));
 }
 
 // --- Shader pass management ---

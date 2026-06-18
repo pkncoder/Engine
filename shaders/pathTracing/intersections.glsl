@@ -38,7 +38,7 @@ HitInfo rayScene(Ray ray) {
     closestHit.dist = REALLY_FAR;
 
     // Loop every instance
-    for (int instID = 0; instID < u_instanceCount; instID++) {
+    for (int instID = 0; instID < uInstanceCount; instID++) {
 
         // Get the current instance
         const GPUInstance instance = instances[instID];

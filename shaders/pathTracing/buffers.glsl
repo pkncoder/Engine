@@ -6,4 +6,4 @@ layout(std430, binding = 3) readonly buffer InstanceBuffer { GPUInstance instanc
 layout(std430, binding = 4) readonly buffer MaterialBuffer { GPUMaterial materials[]; };
 
 // Total instance count
-uniform int u_instanceCount;
+uniform int uInstanceCount;

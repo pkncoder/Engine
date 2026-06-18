@@ -15,6 +15,7 @@ struct HitInfo {
     uint materialIndex;
 };
 
+// TODO: Merge
 struct Material {
     vec3 albedo;
     vec3 emmisive;

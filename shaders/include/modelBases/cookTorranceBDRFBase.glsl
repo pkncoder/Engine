@@ -28,7 +28,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 
 // TODO: Recreate the implemtation and the base on how this is going to work
 //
-vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, GPUMaterial objectMaterial, float u1, float u2) {
+vec3 cookTorranceBDRFBase(vec3 normal, vec3 viewDirection, GPUMaterial objectMaterial, float u1, float u2) {
     // Sample GGX world (D)
     vec3 H = sampleGGXWorld(normal, objectMaterial.roughness, u1, u2);
 
@@ -52,7 +52,7 @@ vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, GPUMaterial objectMat
     return (F * G * HdotV) / (NdotV * NdotH);
 }
 
-vec3 cookTorranceBdrfBase(vec3 normal, vec3 viewDirection, vec3 microfacetNormal, GPUMaterial objectMaterial, float u1, float u2) {
+vec3 cookTorranceBDRFBase(vec3 normal, vec3 viewDirection, vec3 microfacetNormal, GPUMaterial objectMaterial, float u1, float u2) {
 
     // Get NdotL to check for a ray not being visable
     vec3 bounceDirection = reflect(viewDirection, microfacetNormal);
