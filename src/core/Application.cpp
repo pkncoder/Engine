@@ -212,7 +212,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // 🗿
-    if (false) {
+    if (true) {
         std::vector<Entity> moai = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/moai.obj");
 
@@ -273,7 +273,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (true) {
+    if (false) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
@@ -283,6 +283,17 @@ void Application::setupEntities(Scene &scene) {
     if (false) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
+    }
+
+    // Sponza
+    if (true) {
+        std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/sponza.obj");
+    }
+
+    if (false) {
+        std::vector<Entity> lostEmpire = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/lost_empire.obj");
     }
 
     if (false) {
