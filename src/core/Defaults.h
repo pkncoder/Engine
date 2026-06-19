@@ -15,8 +15,8 @@ const glm::vec3 START_POSITION = glm::vec3(0.0f, 0.0f, 3.0f);
 namespace Window {
 
 // Widow height
-const int START_WIDTH = 400;
-const int START_HEIGHT = 400;
+const int START_WIDTH = 700;
+const int START_HEIGHT = 700;
 
 // Start title
 inline constexpr const char *START_TITLE = "Engine";
