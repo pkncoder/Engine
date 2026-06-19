@@ -273,16 +273,21 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (false) {
-        // https://sketchfab.com/3d-models/backrooms-vr-d9b98eca8d064d0eafcd7f5484bb61ed
-        std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/backrooms.obj");
+    if (true) {
+        // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
+        EntitySpawner::spawnObjEntity(activeScene,
+                                      "assets/models/backrooms_level1.obj");
     }
 
     // Breakfast room
-    if (true) {
+    if (false) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
+    }
+
+    if (false) {
+        std::vector<Entity> oiiaioooooiai = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/oiiaioooooiai.obj");
     }
 
     END_PROFILE_STACKED_LOG("Entity Loading");
