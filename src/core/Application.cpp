@@ -275,8 +275,12 @@ void Application::setupEntities(Scene &scene) {
     // THE BACKROOMS????
     if (true) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
-        EntitySpawner::spawnObjEntity(activeScene,
-                                      "assets/models/backrooms_level1.obj");
+        std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/backrooms_level1.obj");
+
+        backrooms[backrooms.size() - 2]
+            .getComponent<TransformComponent>()
+            .rotation = glm::quat(0.965926, 0.0f, -0.258819, 0.0);
     }
 
     // Breakfast room

@@ -19,9 +19,9 @@ anisor 0.000000
 
 newmtl ceiling
 Kd 0.800000 0.800000 0.800000
-map_Kd ceiling_tiles_color.png
+map_Kd ceiling_tiles_color_3.png
 Ks 0.500000 0.500000 0.500000
-Ke 40.299995 40.299995 40.299995
+Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 3
