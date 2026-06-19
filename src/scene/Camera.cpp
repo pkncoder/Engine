@@ -31,7 +31,7 @@ glm::mat4 Camera::getViewMatrix() const {
 
 // Calc (short for calculate) the projection matrix
 glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
-    return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 1000.0f);
 }
 
 // Camera movement

@@ -2,6 +2,7 @@
 #include "../services/Logger.h"
 #include "CPUStructs.h"
 
+#include <cstddef>
 #include <tiny_obj_loader.h>
 
 #include <fstream>
@@ -60,59 +61,83 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
     // Loop each shape
     for (const auto &shape : shapes) {
 
-        CPUMeshData meshData;
+        std::unordered_map<int, CPUMeshData> subMeshes;
 
         // Avoid sending duplicated verticies by tracking unique ones, and
         // indexing any duplicates
-        std::unordered_map<CPUVertex, uint32_t> uniqueVertices{};
+        std::unordered_map<int, std::unordered_map<CPUVertex, uint32_t>>
+            uniqueMaterialVerticies;
+
+        size_t indexOffset = 0;
 
         // Loop each index in the shape
-        for (const auto &index : shape.mesh.indices) {
-            // Initialize a temp vertex
-            CPUVertex vertex{};
+        for (size_t faceIndex = 0;
+             faceIndex < shape.mesh.num_face_vertices.size(); faceIndex++) {
 
-            vertex.position = {attrib.vertices[3 * index.vertex_index + 0],
-                               attrib.vertices[3 * index.vertex_index + 1],
-                               attrib.vertices[3 * index.vertex_index + 2]};
+            size_t vertexNumber =
+                size_t(shape.mesh.num_face_vertices[faceIndex]);
 
-            if (index.normal_index >= 0) {
-                vertex.normal = {attrib.normals[3 * index.normal_index + 0],
-                                 attrib.normals[3 * index.normal_index + 1],
-                                 attrib.normals[3 * index.normal_index + 2]};
+            int materialID = shape.mesh.material_ids.empty()
+                                 ? -1
+                                 : shape.mesh.material_ids[faceIndex];
+
+            // Get references to the specific sub-mesh and deduplication map for
+            // this material
+            auto &meshData = subMeshes[materialID];
+            auto &uniqueVertices = uniqueMaterialVerticies[materialID];
+
+            for (size_t vertexIndex = 0; vertexIndex < vertexNumber;
+                 vertexIndex++) {
+
+                tinyobj::index_t index =
+                    shape.mesh.indices[indexOffset + vertexIndex];
+
+                // Initialize a temp vertex
+                CPUVertex vertex{};
+
+                vertex.position = {attrib.vertices[3 * index.vertex_index + 0],
+                                   attrib.vertices[3 * index.vertex_index + 1],
+                                   attrib.vertices[3 * index.vertex_index + 2]};
+
+                if (index.normal_index >= 0) {
+                    vertex.normal = {
+                        attrib.normals[3 * index.normal_index + 0],
+                        attrib.normals[3 * index.normal_index + 1],
+                        attrib.normals[3 * index.normal_index + 2]};
+                }
+
+                if (index.texcoord_index >= 0) {
+                    vertex.texCoords = {
+                        attrib.texcoords[2 * index.texcoord_index + 0],
+                        attrib.texcoords[2 * index.texcoord_index + 1]};
+                }
+
+                if (uniqueVertices.count(vertex) == 0) {
+
+                    uniqueVertices[vertex] =
+                        static_cast<uint32_t>(meshData.vertices.size());
+
+                    meshData.vertices.push_back(vertex);
+                }
+
+                meshData.indices.push_back(uniqueVertices[vertex]);
             }
 
-            if (index.texcoord_index >= 0) {
-                vertex.texCoords = {
-                    attrib.texcoords[2 * index.texcoord_index + 0],
-                    attrib.texcoords[2 * index.texcoord_index + 1]};
-            }
-
-            if (uniqueVertices.count(vertex) == 0) {
-
-                uniqueVertices[vertex] =
-                    static_cast<uint32_t>(meshData.vertices.size());
-
-                meshData.vertices.push_back(vertex);
-            }
-
-            meshData.indices.push_back(uniqueVertices[vertex]);
+            indexOffset += vertexNumber;
         }
 
-        if (!shape.mesh.material_ids.empty()) {
-            // TODO: Per-face materials
-            int materialID = shape.mesh.material_ids[0];
+        for (auto &[matID, meshData] : subMeshes) {
 
-            if (materialID >= 0 && materialID < materials.size()) {
-                meshData.materialName = materials[materialID].name;
+            // Assign the name from the parsed materials list
+            if (matID >= 0 && matID < materials.size()) {
+                meshData.materialName = materials[matID].name;
+            } else {
+                meshData.materialName = "ENG_Default";
             }
-        }
 
-        if (meshData.materialName.empty()) {
-            // TODO: Constants.h name
-            meshData.materialName = "ENG_Default";
+            // Add this sub-mesh chunk to the model
+            model.meshes.push_back(meshData);
         }
-
-        model.meshes.push_back(meshData);
     }
 
     return model;
