@@ -273,14 +273,14 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (false) {
+    if (true) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
     }
 
     // Breakfast room
-    if (true) {
+    if (false) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
     }
