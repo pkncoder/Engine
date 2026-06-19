@@ -291,11 +291,13 @@ void Application::setupEntities(Scene &scene) {
             activeScene, "assets/models/sponza.obj");
     }
 
+    // Lost empire (Minecraft)
     if (false) {
         std::vector<Entity> lostEmpire = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/lost_empire.obj");
     }
 
+    // oiiaioooooiai (broken texture)
     if (false) {
         std::vector<Entity> oiiaioooooiai = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/oiiaioooooiai.obj");
