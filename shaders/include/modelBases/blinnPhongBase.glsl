@@ -18,8 +18,11 @@ vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3
     vec3 halfwayDir = normalize(lightDir + viewDir); 
 
     // Specular (Blinn-Phong)
-    float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), 128.0); 
-    float specularPower = abs(objectMaterial.roughness - 1.0);
+    float shininess = max(1.0, (1.0 - objectMaterial.roughness) * 256.0);
+    float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), shininess); 
+    
+    // Scale specular strength down as it gets rougher
+    float specularPower = 1.0 - objectMaterial.roughness;
     vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color

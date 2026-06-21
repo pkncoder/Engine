@@ -8,7 +8,7 @@ namespace Engine {
 
 class ModelLoader {
   public:
-    // Load a mesh, return true for sucess, false for error
+    // Load a .obj file, setting the .mtl filepath along the way
     static CPUModelData loadOBJ(const std::string &filepath);
 };
 

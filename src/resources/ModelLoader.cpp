@@ -73,7 +73,7 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
             uniqueMaterialVerticies;
 
         // Keep an offset for each index to calculate vertex array indexes
-        size_t indexOffset = 0;
+        size_t vertexIndexOffset = 0;
 
         // Loop each index in the shape
         for (size_t faceIndex = 0;
@@ -98,7 +98,7 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
 
                 // Get the index of this vertex
                 tinyobj::index_t index =
-                    shape.mesh.indices[indexOffset + vertexIndex];
+                    shape.mesh.indices[vertexIndexOffset + vertexIndex];
 
                 // Initialize a temp vertex
                 CPUVertex vertex{};
@@ -124,6 +124,8 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
                     vertex.texCoords = {
                         attrib.texcoords[2 * index.texcoord_index + 0],
                         attrib.texcoords[2 * index.texcoord_index + 1]};
+                } else {
+                    vertex.texCoords = glm::vec2(0.0f, 0.0f);
                 }
 
                 // Make sure data was loaded
@@ -143,7 +145,7 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
 
             // Increase the index offset
             // TODO: rename
-            indexOffset += vertexNumber;
+            vertexIndexOffset += vertexNumber;
         }
 
         // Loop the final material id & meshdata from each sub mesh

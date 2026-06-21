@@ -9,7 +9,7 @@ namespace Engine {
 
 class MaterialLoader {
   public:
-    // Load a mesh, return true for sucess, false for error
+    // Load a .mtl file; returns an array of materials + texture paths
     static std::vector<CPUMaterialData> loadMTL(const std::string &filepath);
 };
 

@@ -17,6 +17,12 @@ struct MaterialComponent {
     float metallic = 0.0f;
 
     GLuint albedoTexture = 0;
+    GLuint emissiveTexture = 0;
+    GLuint metallicTexture = 0;
+    GLuint roughnessTexture = 0;
+
+    GLuint normalTexture = 0;
+    bool isBumpMap = false;
 
     // Default Constructors
     MaterialComponent() = default;

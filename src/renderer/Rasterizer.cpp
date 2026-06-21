@@ -5,7 +5,6 @@
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
 
-#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
@@ -17,6 +16,30 @@ void Rasterizer::init() {
     // Compile the shader code
     shader = Shader("shaders/rasterizing/main/raster.vert",
                     "shaders/rasterizing/main/raster.frag");
+
+    /* --- TODO: TEMP --- */
+
+    // Create a 1x1 White Texture (For Albedo, Emissive)
+    glGenTextures(1, &defaultWhiteTexture);
+    glBindTexture(GL_TEXTURE_2D, defaultWhiteTexture);
+    unsigned char whitePixel[] = {255, 255, 255, 255};
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 whitePixel);
+
+    // Create a 1x1 black texture (for roughness / metallic)
+    glGenTextures(1, &defaultBlackTexture);
+    glBindTexture(GL_TEXTURE_2D, defaultBlackTexture);
+    unsigned char blackPixel[] = {0, 0, 0, 255};
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 blackPixel);
+
+    // Create a 1x1 Flat Normal Texture (For Normal Maps)
+    // Flat normal is pointing straight up: RGB(128, 128, 255)
+    glGenTextures(1, &defaultNormalTexture);
+    glBindTexture(GL_TEXTURE_2D, defaultNormalTexture);
+    unsigned char flatNormalPixel[] = {128, 128, 255, 255};
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 flatNormalPixel);
 
     Logger::info("RENDERER", "Rasterizer initialized.");
 }
@@ -54,6 +77,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
         // Pass the model matrix to the shader
         shader.setMat4("uModel", model);
+        shader.setInt("uIsBumpMap", material.isBumpMap);
 
         // Set the material uniforms
         shader.setVec3("uAlbedo", material.albedo);
@@ -61,15 +85,38 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         shader.setFloat("uRoughness", material.roughness);
         shader.setFloat("uMetallic", material.metallic);
 
-        if (material.albedoTexture != 0) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, material.albedoTexture);
-            shader.setInt("uAlbedoMap",
-                          0); // Tell shader the texture is in unit 0
-            shader.setInt("uHasAlbedoMap", 1); // Boolean flag for the shader
-        } else {
-            shader.setInt("uHasAlbedoMap", 0);
-        }
+        // Default uniform values
+        // shader.setInt("uAlbedoMap", 0);
+        // shader.setInt("uNormalMap", 1);
+
+        // Keep track of which texture slot we are currently filling
+        int currentTextureUnit = 0;
+
+        // --- NEW: Helper Lambda for Binding ---
+        // Captures the shader, currentTextureUnit, and active fallback textures
+        // by reference
+        auto bindMap = [&](GLuint texID, const std::string &uniformName,
+                           GLuint fallbackID) {
+            glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
+
+            // If the texture exists, bind it. Otherwise, bind the fallback
+            // dummy texture.
+            glBindTexture(GL_TEXTURE_2D, texID != 0 ? texID : fallbackID);
+
+            // Tell the shader which slot to look in (ONLY ONE UNIFORM!)
+            shader.setInt(uniformName, currentTextureUnit);
+
+            // Increment the slot for the next texture map
+            currentTextureUnit++;
+        };
+
+        bindMap(material.albedoTexture, "uAlbedoMap", defaultWhiteTexture);
+        bindMap(material.emissiveTexture, "uEmissiveMap", defaultBlackTexture);
+        bindMap(material.roughnessTexture, "uRoughnessMap",
+                defaultWhiteTexture);
+        bindMap(material.metallicTexture, "uMetallicMap", defaultWhiteTexture);
+
+        bindMap(material.normalTexture, "uNormalMap", defaultNormalTexture);
 
         // Give the vertex array
         glBindVertexArray(mesh.vao);

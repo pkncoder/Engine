@@ -9,7 +9,7 @@ namespace Engine {
 
 class EntitySpawner {
   public:
-    // Spawn a new entity based on a .obj file
+    // Spawn new entites from a .obj model file
     static std::vector<Entity> spawnObjEntity(Scene &scene,
                                               const std::string &filepath);
 };

@@ -5,6 +5,8 @@
 #include "IRenderer.h"
 #include "Shader.h"
 
+#include <glad/glad.h>
+
 namespace Engine {
 
 class Rasterizer : public IRenderer {
@@ -19,6 +21,12 @@ class Rasterizer : public IRenderer {
   private:
     // Shader code
     Shader shader;
+
+    // Default textures
+    // TODO: temp
+    GLuint defaultWhiteTexture = 0;
+    GLuint defaultBlackTexture = 0;
+    GLuint defaultNormalTexture = 0;
 };
 
 } // namespace Engine

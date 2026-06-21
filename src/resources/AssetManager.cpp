@@ -70,7 +70,8 @@ AssetManager::getMaterial(const std::string &materialName) {
 }
 
 // Load a texture from a filepath
-GLuint AssetManager::loadTexture(const std::string &filepath) {
+GLuint AssetManager::loadTexture(const std::string &filepath,
+                                 bool &bumpTexture) {
     // Check cache, if it is already cached, return it
     if (textureCache.find(filepath) != textureCache.end()) {
         return textureCache[filepath];
@@ -78,7 +79,7 @@ GLuint AssetManager::loadTexture(const std::string &filepath) {
 
     // Load and cache the texture
     // TODO: Swap to handles
-    GLuint textureID = TextureLoader::loadTexture(filepath);
+    GLuint textureID = TextureLoader::loadTexture(filepath, bumpTexture);
     if (textureID != 0) {
         textureCache[filepath] = textureID;
     }

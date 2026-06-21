@@ -16,12 +16,14 @@ Pc 0.000000
 Pcr 0.030000
 aniso 0.000000
 anisor 0.000000
+norm carpet_normal_4.png
 
 newmtl ceiling
 Kd 0.800000 0.800000 0.800000
 map_Kd ceiling_tiles_color_3.png
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
+map_Ke ceiling_tiles_emisive_1.png
 Ni 1.450000
 d 1.000000
 illum 3
@@ -32,6 +34,7 @@ Pc 0.000000
 Pcr 0.030000
 aniso 0.000000
 anisor 0.000000
+norm ceiling_tiles_normal_2.png
 
 newmtl wallpaper_yellow
 Kd 0.800000 0.800000 0.800000
@@ -64,3 +67,4 @@ Pc 0.000000
 Pcr 0.030000
 aniso 0.000000
 anisor 0.000000
+norm wood_normal_6.png

@@ -34,7 +34,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
 - [ ] Fix the periodic timer to work with: one-second intervals, fractional intervals, and make sure that it isn't skipping intervals (or clear it)
-- [ ] Move the loadMesh from Application into Rasterizer (Look at PathTracer.cpp for example)
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 - [ ] Multi-materials
 - [ ] Sub-object entities
@@ -48,6 +47,9 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Non-triangle objects
 - [ ] Try to reduce the amount of looping being done on materials / instances etc. Maybe try to use the caches in AssetManager more?
 - [ ] RendererManager, to manage the renderers
+- [ ] Missing texture for failed loads default
+- [ ] Go through and remove GPU memory access where it shouldn't be
+- [ ] Check to see if roughness & metallic maps are working
 
 ### Todo - Not Code
 

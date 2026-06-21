@@ -43,23 +43,45 @@ std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
 
         // Add the new material component
         if (materialData != nullptr) {
-            // Use the CPUMaterialData -> MaterialComponent constructor
-            entity.addComponent<MaterialComponent>(
+
+            // 1. Add the component and grab a reference to it immediately
+            auto &material = entity.addComponent<MaterialComponent>(
                 MaterialComponent(*materialData));
 
-            // TODO: temp
-            if (materialData->textureNames.find("diffuse") !=
-                materialData->textureNames.end()) {
+            // 2. Define our lambda helper
+            // It takes the dictionary key ("albedo", "normal") and a REFERENCE
+            // to the target variable
+            auto loadTextureMap = [&](const std::string &mapKey,
+                                      GLuint &targetVariable) {
+                // Use an iterator to avoid searching the map twice
+                auto it = materialData->textureNames.find(mapKey);
 
-                entity.getComponent<MaterialComponent>().albedoTexture =
-                    AssetManager::loadTexture(
-                        "assets/textures/" +
-                        materialData->textureNames.find("diffuse")->second);
-                entity.getComponent<MaterialComponent>().albedo =
-                    glm::vec3(1.0f);
+                if (it != materialData->textureNames.end()) {
+                    targetVariable = AssetManager::loadTexture(
+                        "assets/textures/" + it->second, material.isBumpMap);
+                }
+            };
+
+            // 3. Process all the maps!
+            loadTextureMap("albedo", material.albedoTexture);
+            loadTextureMap("emissive", material.emissiveTexture);
+            loadTextureMap("metallic", material.metallicTexture);
+            loadTextureMap("roughness", material.roughnessTexture);
+            loadTextureMap("normal", material.normalTexture);
+
+            // 4. Handle the albedo color fallback
+            if (material.albedoTexture != 0 &&
+                glm::length(material.albedo) <= 0.001f) {
+                material.albedo = glm::vec3(1.0f);
             }
 
-        } else { // If it doesn't exist
+            if (material.emissiveTexture != 0 &&
+                glm::length(material.emmissive) <= 0.001f) {
+                material.emmissive = glm::vec3(1.0f);
+            }
+        }
+
+        else { // If it doesn't exist
             Logger::warn("SPAWNER",
                          "No material found for: " + mesh.materialName);
 

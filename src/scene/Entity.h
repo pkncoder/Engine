@@ -20,8 +20,9 @@ class Entity {
     }
 
     // Wrapper methods that talk to the Scene
-    template <typename T> void addComponent(T component) {
+    template <typename T> T &addComponent(T component) {
         attachedScene->addComponent<T>(ID, component);
+        return attachedScene->getComponent<T>(ID);
     }
     template <typename T> T &getComponent() {
         return attachedScene->getComponent<T>(ID);
