@@ -85,7 +85,7 @@ Ks 0.50 0.50 0.50
 Ns 18.00
 newmtl breakfast_room:Paint___Black_Satin
 illum 4
-Kd 0.00 0.00 0.00
+Kd 0.20 0.20 0.20
 Ka 1.00 1.00 1.00
 Tf 1.00 1.00 1.00
 Ni 1.00

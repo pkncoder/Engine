@@ -86,7 +86,7 @@ newmtl Stationary_Lava
 # Ka 0.2 0.2 0.2
 Kd 1 1 1
 Ks 0 0 0
-Ke 0 0 0
+Ke 1 1 1
 # map_Ka lost_empire-RGB.png
 # for G3D, to make textures look blocky:
 interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
@@ -329,7 +329,7 @@ newmtl Torch
 # Ka 0.2 0.2 0.2
 Kd 1 1 1
 Ks 0 0 0
-Ke 0 0 0
+Ke 1 1 1
 # map_Ka lost_empire-RGBA.png
 # for G3D, to make textures look blocky:
 interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
@@ -532,7 +532,7 @@ newmtl Redstone_Torch_(active)
 # Ka 0.2 0.2 0.2
 Kd 1 1 1
 Ks 0 0 0
-Ke 0 0 0
+Ke 1 1 1
 # map_Ka lost_empire-RGBA.png
 # for G3D, to make textures look blocky:
 interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
@@ -574,7 +574,7 @@ newmtl Nether_Portal
 # Ka 0.2 0.2 0.2
 Kd 1 1 1
 Ks 0.03 0.03 0.03
-Ke 0 0 0
+Ke 1 1 1
 # map_Ka lost_empire-RGBA.png
 # for G3D, to make textures look blocky:
 interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
