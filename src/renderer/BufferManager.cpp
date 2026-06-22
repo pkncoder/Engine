@@ -1,6 +1,7 @@
 #include "BufferManager.h"
 
 #include "../services/Logger.h"
+
 #include <cstring> // for memcpy
 
 namespace Engine {
