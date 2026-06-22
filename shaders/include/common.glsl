@@ -7,12 +7,3 @@
 #define FAR 25.0
 #define REALLY_FAR 50.0
 #define SUPER_FAR 90.0
-
-// Get the local basis matrix
-// TODO: move
-mat3 getBasis(vec3 n) {
-    vec3 up = abs(n.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
-    vec3 t = normalize(cross(up, n));
-    vec3 b = cross(n, t);
-    return mat3(t, b, n);
-}
