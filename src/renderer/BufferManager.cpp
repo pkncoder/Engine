@@ -9,11 +9,10 @@ namespace Engine {
 MeshComponent BufferManager::uploadMesh(const CPUMeshData &meshData) {
 
     // if (gpuMeshCache.find(meshData.name) != gpuMeshCache.end()) {
-    //     return gpuMeshCache[meshData.name]; // Return the existing
-    //     // VAO/VBO/EBO
-    //     // handles
+    //     // Return the existing mesh component
+    //     return gpuMeshCache[meshData.name];
     // }
-    // TODO: re-implement caching
+    // TODO: reimplement caching
 
     // Create the new mesh component and set the index count
     MeshComponent comp;

@@ -91,6 +91,9 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
             auto &meshData = subMeshes[materialID];
             auto &uniqueVertices = uniqueMaterialVerticies[materialID];
 
+            meshData.materialName =
+                shape.name + "_Mn" + std::to_string(materialID);
+
             // Loop each vertex
             for (size_t vertexIndex = 0; vertexIndex < vertexNumber;
                  vertexIndex++) {

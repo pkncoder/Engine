@@ -280,13 +280,13 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Breakfast room
-    if (false) {
+    if (true) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
     }
 
     // Sponza
-    if (true) {
+    if (false) {
         std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/sponza.obj");
     }
