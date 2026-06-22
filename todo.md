@@ -94,6 +94,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Non-Euclideon geometry
 - [ ] Marching Spheres
 - [ ] Scene state manager. A class to track the "dirty" flags instead of implementing it into every renderer
+- [ ] Plan out the texture handle nonsense
 
 ## Steps
 
@@ -103,11 +104,11 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 2. [x] Fix public vs. private
 3. [x] Make variables & functions const when needed
 4. [x] Fix placement of functions
-5. [ ] Refactor step by step in code
-6. [ ] Rename things
-7. [ ] Add comments
-8. [ ] Place the \#includes in the right spots
-9. [ ] Fix file tree
+5. [x] Refactor step by step in code
+6. [x] Rename things
+7. [x] Add comments
+8. [x] Place the \#includes in the right spots
+9. [x] Fix file tree
 
 ## Finished Todos
 

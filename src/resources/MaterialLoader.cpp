@@ -5,7 +5,6 @@
 #include "tiny_obj_loader.h"
 
 #include <fstream>
-#include <vector>
 
 namespace Engine {
 std::vector<CPUMaterialData>

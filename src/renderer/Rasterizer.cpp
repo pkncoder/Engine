@@ -86,16 +86,9 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         shader.setFloat("uRoughness", material.roughness);
         shader.setFloat("uMetallic", material.metallic);
 
-        // Default uniform values
-        // shader.setInt("uAlbedoMap", 0);
-        // shader.setInt("uNormalMap", 1);
-
         // Keep track of which texture slot we are currently filling
         int currentTextureUnit = 0;
 
-        // --- NEW: Helper Lambda for Binding ---
-        // Captures the shader, currentTextureUnit, and active fallback textures
-        // by reference
         auto bindMap = [&](GLuint texID, const std::string &uniformName,
                            GLuint fallbackID) {
             glActiveTexture(GL_TEXTURE0 + currentTextureUnit);

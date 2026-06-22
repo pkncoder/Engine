@@ -6,7 +6,6 @@
 #include <tiny_obj_loader.h>
 
 #include <fstream>
-#include <string>
 #include <unordered_map>
 
 namespace Engine {

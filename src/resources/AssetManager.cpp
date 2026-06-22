@@ -6,8 +6,6 @@
 #include "ModelLoader.h"
 #include "TextureLoader.h"
 
-#include <string>
-
 namespace Engine {
 
 void AssetManager::init() {
@@ -58,7 +56,7 @@ const CPUModelData *AssetManager::loadModel(const std::string &filepath) {
 const CPUMaterialData *
 AssetManager::getMaterial(const std::string &materialName) {
 
-    auto it = materialCache.find(materialName);
+    const auto it = materialCache.find(materialName);
     if (it != materialCache.end()) {
         Logger::info("ASSET", "Returning cached material: " + materialName);
         return &it->second;
@@ -78,7 +76,6 @@ GLuint AssetManager::loadTexture(const std::string &filepath,
     }
 
     // Load and cache the texture
-    // TODO: Swap to handles
     const GLuint textureID = TextureLoader::loadTexture(filepath, bumpTexture);
     if (textureID != 0) {
         textureCache[filepath] = textureID;
