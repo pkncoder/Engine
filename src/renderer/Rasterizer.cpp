@@ -106,7 +106,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         };
 
         bindMap(material.albedoTexture, "uAlbedoMap", defaultWhiteTexture);
-        bindMap(material.emissiveTexture, "uEmissiveMap", defaultBlackTexture);
+        bindMap(material.emissiveTexture, "uEmissiveMap", defaultWhiteTexture);
         bindMap(material.roughnessTexture, "uRoughnessMap",
                 defaultWhiteTexture);
         bindMap(material.metallicTexture, "uMetallicMap", defaultWhiteTexture);
@@ -124,6 +124,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glBindVertexArray(0);
 }
 
-void Rasterizer::shutdown(){};
+void Rasterizer::shutdown() {};
 
 } // namespace Engine

@@ -78,18 +78,26 @@ void main() {
     float roughness = texture(uRoughnessMap, vTexCoords).r * uRoughness;
     float metallic = texture(uMetallicMap, vTexCoords).r * uMetallic;
 
+    if (length(emissive) > 0.0) {
+        FragColor = vec4(emissive, 0.0);
+        return;
+    }
+
     // Get the material struct
     Material mat = Material(vec4(albedo, 0.0), vec4(emissive, 0.0), roughness, metallic);
 
     // Get the dummy-light material
-    Material lightMat = Material(vec4(0.0), vec4(1.0), 0.0, 0.0); 
+    Material lightMat = Material(vec4(0.0), vec4(1.0) * 3.0, 0.0, 0.0); 
 
     // Get the light color
-    // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+    vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+    // vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
 
     // Add the emissive glow to the color
     color += emissive;
+
+    // Add an ambient amount
+    color += albedo * 0.1;
 
     // Output final fragment color
     FragColor = vec4(color, 1.0);

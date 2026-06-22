@@ -46,7 +46,7 @@ vec3 sampleDiffuse(vec3 normal) {
 void processBounceStep(
     inout Ray ray,
     const in HitInfo hit,
-    const in GPUMaterial material,
+    const in Material material,
     inout vec3 colorMult
 ) {
 
@@ -126,7 +126,7 @@ vec3 colorSky(Ray ray) {
 vec3 colorScene(const in Ray cameraRay) {
     // Set higher-scope mutable structs
     Ray ray = cameraRay;
-    GPUMaterial material;
+    Material material;
     HitInfo hit;
 
     // Color & throughput

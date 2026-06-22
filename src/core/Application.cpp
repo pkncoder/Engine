@@ -13,6 +13,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
+#include <type_traits>
 
 namespace Engine {
 
@@ -225,14 +226,14 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Diffuse cube & emmisive cube
-    if (false) {
+    if (true) {
         std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
         cube[0].getComponent<MaterialComponent>().albedo =
             glm::vec3(0.4f, 0.2f, 0.8f);
         cube[0].getComponent<MaterialComponent>().roughness = 0.1;
-        cube[0].getComponent<MaterialComponent>().metallic = 1.0;
+        cube[0].getComponent<MaterialComponent>().metallic = 0.0;
 
         cube[0].getComponent<TransformComponent>().position =
             glm::vec3(-1.5f, 1.3f, -4.0f);
@@ -251,7 +252,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Trans flag
-    if (false) {
+    if (true) {
         std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/trans.obj");
 
@@ -262,7 +263,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Franch flag
-    if (false) {
+    if (true) {
         std::vector<Entity> french = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/french.obj");
 
@@ -280,7 +281,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Breakfast room
-    if (true) {
+    if (false) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
     }
