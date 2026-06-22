@@ -49,25 +49,26 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
                         float aspectRatio) {
     shader.bind(); // glUseProgram under the hood
 
-    glm::mat4 view = camera.getViewMatrix();
-    glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
+    const glm::mat4 view = camera.getViewMatrix();
+    const glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
 
     // Upload the camera uniforms
     shader.setMat4("uViewProjection", proj * view);
     shader.setVec3("uViewPos", camera.position);
 
     // Get all of the renderables from the scene
-    auto renderables =
+    const auto renderables =
         activeScene.getMatchingEntities<TransformComponent, MeshComponent,
                                         MaterialComponent>();
 
     // Loop every one to draw
     for (EntityID id : renderables) {
         // Get the components from the entity that are used in rendering
-        auto &mesh = activeScene.getComponent<MeshComponent>(id);
+        const auto &mesh = activeScene.getComponent<MeshComponent>(id);
 
-        auto &transform = activeScene.getComponent<TransformComponent>(id);
-        auto &material = activeScene.getComponent<MaterialComponent>(id);
+        const auto &transform =
+            activeScene.getComponent<TransformComponent>(id);
+        const auto &material = activeScene.getComponent<MaterialComponent>(id);
 
         // Calculate Model Matrix (Rasterizer handles the math)
         glm::mat4 model = glm::mat4(1.0f);

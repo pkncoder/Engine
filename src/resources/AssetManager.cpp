@@ -79,7 +79,7 @@ GLuint AssetManager::loadTexture(const std::string &filepath,
 
     // Load and cache the texture
     // TODO: Swap to handles
-    GLuint textureID = TextureLoader::loadTexture(filepath, bumpTexture);
+    const GLuint textureID = TextureLoader::loadTexture(filepath, bumpTexture);
     if (textureID != 0) {
         textureCache[filepath] = textureID;
     }

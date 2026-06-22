@@ -1,6 +1,5 @@
 #include "MaterialLoader.h"
 
-#include "../services/Logger.h"
 #include "CPUStructs.h"
 
 #include "tiny_obj_loader.h"
@@ -65,14 +64,6 @@ MaterialLoader::loadMTL(const std::string &filepath) {
         assignTexture(material.emissive_texname, "emissive");
         assignTexture(material.roughness_texname, "roughness");
         assignTexture(material.metallic_texname, "metallic");
-
-        // if (material.roughness_texname != "") {
-        //     Logger::warn("DEBUG", "ROUGHNESS");
-        // }
-        //
-        // if (material.metallic_texname != "") {
-        //     Logger::warn("DEBUG", "ROUGHNESS");
-        // }
 
         // Check both normal_texname & bump_texname
         assignTexture(material.normal_texname, "normal");

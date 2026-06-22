@@ -27,11 +27,11 @@ std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
     for (auto &mesh : modelData->meshes) {
 
         // Allocate an ID and instantiate it into an entity
-        EntityID entityId = scene.createEntity();
+        const EntityID entityId = scene.createEntity();
         Entity entity(entityId, &scene);
 
         // Upload raw geometry to VRAM and bind the Mesh Component
-        MeshComponent meshComponent = BufferManager::uploadMesh(mesh);
+        const MeshComponent meshComponent = BufferManager::uploadMesh(mesh);
         entity.addComponent<MeshComponent>(meshComponent);
 
         // Apply a default spatial transform
@@ -54,7 +54,7 @@ std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
             auto loadTextureMap = [&](const std::string &mapKey,
                                       GLuint &targetVariable) {
                 // Use an iterator to avoid searching the map twice
-                auto it = materialData->textureNames.find(mapKey);
+                const auto it = materialData->textureNames.find(mapKey);
 
                 if (it != materialData->textureNames.end()) {
                     targetVariable = AssetManager::loadTexture(

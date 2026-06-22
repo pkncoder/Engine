@@ -21,9 +21,9 @@ GLuint TextureLoader::loadTexture(const std::string &filepath,
         return 0;
     }
 
-    GLenum format = (channels == 1)   ? GL_RED
-                    : (channels == 4) ? GL_RGBA
-                                      : GL_RGB;
+    const GLenum format = (channels == 1)   ? GL_RED
+                          : (channels == 4) ? GL_RGBA
+                                            : GL_RGB;
     bumpTexture = channels == 1;
 
     glBindTexture(GL_TEXTURE_2D, textureID);

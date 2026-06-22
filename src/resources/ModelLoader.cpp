@@ -144,7 +144,6 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
             }
 
             // Increase the index offset
-            // TODO: rename
             vertexIndexOffset += vertexNumber;
         }
 
