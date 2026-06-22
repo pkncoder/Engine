@@ -50,6 +50,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Missing texture for failed loads default
 - [ ] Go through and remove GPU memory access where it shouldn't be
 - [ ] Check to see if roughness & metallic maps are working
+- [ ] Rework rasterizer
+- [ ] Get the shared uniforms file filled in and finished
 
 ### Todo - Not Code
 
