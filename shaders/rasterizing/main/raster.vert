@@ -12,11 +12,14 @@ out vec3 vWorldPos;
 out vec2 vTexCoords;
 
 void main() {
+
+    // Set the world coords & tex coords
     vWorldPos = vec3(uModel * vec4(aPos, 1.0));
     vTexCoords = aTexCoords;
 
+    // Set the normal
     vNormal = normalize(mat3(uModel) * aNormal);
 
-    // 3. Final clip-space position
+    // Set the position
     gl_Position = uViewProjection * vec4(vWorldPos, 1.0);
 }

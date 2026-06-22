@@ -54,7 +54,8 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
     // Upload the camera uniforms
     shader.setMat4("uViewProjection", proj * view);
-    shader.setVec3("uViewPos", camera.position);
+    shader.setVec3("uCameraPos", camera.position);
+    shader.setFloat("uFOV", camera.fov);
 
     // Get all of the renderables from the scene
     const auto renderables =

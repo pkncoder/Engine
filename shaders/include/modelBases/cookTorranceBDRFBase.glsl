@@ -37,6 +37,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 // Fixed Rasterizer analytical PBR baseline
+// TODO: Rework?
 vec3 cookTorranceBDRFBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial) {
     vec3 N = normalize(normal);
     vec3 V = normalize(viewPos - worldPos);
@@ -48,7 +49,7 @@ vec3 cookTorranceBDRFBase(const in vec3 viewPos, const in vec3 worldPos, const i
 
     // Calculate base reflectivity F0 (Dielectrics use ~0.04 baseline, metals use their Albedo)
     vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, objectMaterial.albedo, objectMaterial.metallic);
+    F0 = mix(F0, objectMaterial.albedo.rgb, objectMaterial.metallic);
 
     // Evaluate Cook-Torrance Microfacet Loop
     float D = DistributionGGX(N, H, objectMaterial.roughness);
@@ -66,11 +67,11 @@ vec3 cookTorranceBDRFBase(const in vec3 viewPos, const in vec3 worldPos, const i
     kD *= 1.0 - objectMaterial.metallic; // Metallic surfaces have zero diffuse light refraction
 
     // Final analytical light accumulation
-    vec3 lightColor = lightMaterial.emmisive; // Using emitter parameters as light source color
-    vec3 diffuse = objectMaterial.albedo / PI;
+    vec3 lightColor = lightMaterial.emissive.rgb; // Using emitter parameters as light source color
+    vec3 diffuse = objectMaterial.albedo.rgb / PI;
 
     // Simple default global Ambient baseline
-    vec3 ambient = 0.03 * objectMaterial.albedo;
+    vec3 ambient = 0.03 * objectMaterial.albedo.rgb;
 
     return ambient + (kD * diffuse + specular) * lightColor * NdotL;
 }

@@ -2,16 +2,12 @@
 
 #include "../../include/common.glsl"
 #include "../../include/sharedStructures.glsl"
+#include "../../include/sharedUniforms.glsl"
+
 #include "../uniforms.glsl"
 
 #include "../models/blinnPhong.glsl"
 #include "../models/cookTorranceBDRF.glsl"
-
-uniform sampler2D uEmissiveMap;
-uniform sampler2D uNormalMap;
-uniform sampler2D uRoughnessMap; // NEW: Roughness map sampler
-uniform sampler2D uMetallicMap;  // NEW: Metallic map sampler
-uniform int uIsBumpMap;
 
 mat3 calculateTBN(vec3 N, vec3 p, vec2 uv) {
     vec3 dp1 = dFdx(p);
@@ -61,9 +57,11 @@ vec3 bumpToTangentNormal(sampler2D heightMap, vec2 uv, vec3 worldPos, float heig
 }
 
 void main() {
-    // 1. Compute World Space Normal Map / Bump Map
+
+    // Get the world space normalizer matrix
     mat3 TBN = calculateTBN(normalize(vNormal), vWorldPos, vTexCoords);
 
+    // Find the local normal through the texture
     vec3 localNormal;
     if (uIsBumpMap == 1) {
         localNormal = bumpToTangentNormal(uNormalMap, vTexCoords, vWorldPos, 0.02);
@@ -71,25 +69,26 @@ void main() {
         localNormal = normalize(texture(uNormalMap, vTexCoords).rgb * 2.0 - 1.0);
     }
 
+    // Calculate the world normal
     vec3 worldNormal = normalize(TBN * localNormal);
 
-    // 2. Sample and modulate PBR Map Values
+    // Sample & get the material values
     vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
     vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;
     float roughness = texture(uRoughnessMap, vTexCoords).r * uRoughness;
     float metallic = texture(uMetallicMap, vTexCoords).r * uMetallic;
 
-    // 3. Assemble our Material Structure
-    Material mat = Material(albedo, emissive, roughness, metallic);
-    
-    // Setting up a dummy light right at the camera's location ("Headlight setup")
-    Material lightMat = Material(vec3(0.0), vec3(1.0) * 3.0, 0.0, 0.0); 
+    // Get the material struct
+    Material mat = Material(vec4(albedo, 0.0), vec4(emissive, 0.0), roughness, metallic);
 
-    // 4. Evaluate lighting equations
-    vec3 color = cookTorranceBDRF(uViewPos, vWorldPos, worldNormal, mat, uViewPos, lightMat);
-    // vec3 color = blinnPhong(uViewPos, vWorldPos, worldNormal, mat, uViewPos, lightMat);
+    // Get the dummy-light material
+    Material lightMat = Material(vec4(0.0), vec4(1.0), 0.0, 0.0); 
 
-    // 5. Add Emissive Glow on top of the calculated lighting
+    // Get the light color
+    // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+
+    // Add the emissive glow to the color
     color += emissive;
 
     // Output final fragment color

@@ -1,9 +1,8 @@
-// TODO: Double-check the implementation of this
-vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
+vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial) {
 
     // Basic Properties
-    vec3 lightColor = lightMaterial.emmisive;
-    vec3 objectColor = objectMaterial.albedo;
+    vec3 lightColor = lightMaterial.emissive.rgb;
+    vec3 objectColor = objectMaterial.albedo.rgb;
 
     // Ambient
     vec3 ambient = 0.15 * lightColor * objectColor;
@@ -20,7 +19,7 @@ vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3
     // Specular (Blinn-Phong)
     float shininess = max(1.0, (1.0 - objectMaterial.roughness) * 256.0);
     float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), shininess); 
-    
+
     // Scale specular strength down as it gets rougher
     float specularPower = 1.0 - objectMaterial.roughness;
     vec3 specular = lightColor * specularPower * specularStrength; 

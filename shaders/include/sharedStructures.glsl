@@ -15,16 +15,7 @@ struct HitInfo {
     uint materialIndex;
 };
 
-// TODO: Merge
 struct Material {
-    vec3 albedo;
-    vec3 emmisive;
-
-    float roughness;
-    float metallic;
-};
-
-struct GPUMaterial {
     vec4 albedo;
     vec4 emissive;
     float roughness;
