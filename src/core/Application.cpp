@@ -222,7 +222,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Diffuse cube & emmisive cube
-    if (false) {
+    if (true) {
         std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
@@ -248,7 +248,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Trans flag
-    if (false) {
+    if (true) {
         std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/trans.obj");
 
@@ -259,7 +259,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Franch flag
-    if (false) {
+    if (true) {
         std::vector<Entity> french = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/french.obj");
 
@@ -283,7 +283,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Sponza
-    if (true) {
+    if (false) {
         std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/sponza.obj");
     }
