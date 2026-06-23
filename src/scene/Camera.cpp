@@ -8,15 +8,13 @@
 namespace Engine {
 
 // Constructor
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-    : front(glm::vec3(0.0f, 0.0f, -1.0f)), mouseSensitivity(SENSITIVITY),
-      movementSpeed(SPEED), fov(FOV) {
+Camera::Camera(glm::vec3 _position, glm::vec3 _up, glm::vec3 _right, float _yaw,
+               float _pitch, float _fov, float _sensitivity,
+               float _movementSpeed)
+    : position(_position), up(_up), right(_right), yaw(_yaw), pitch(_pitch),
+      fov(_fov), sensitivity(_sensitivity), movementSpeed(_movementSpeed) {
 
-    // Set values
-    this->position = position;
-    worldUp = up;
-    this->yaw = yaw;
-    this->pitch = pitch;
+    this->worldUp = up;
 
     // Intialize the camera vectors
     updateCameraVectors();
@@ -63,8 +61,8 @@ void Camera::processLookingDirectionMovement(float xoffset, float yoffset,
                                              bool constrainPitch) {
 
     // Change the x & y offset
-    xoffset *= mouseSensitivity;
-    yoffset *= mouseSensitivity;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
 
     // Modify pitch and yaw
     yaw += xoffset;

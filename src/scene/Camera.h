@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Defaults.h"
+
 #include <glm/glm.hpp>
 
 namespace Engine {
@@ -9,18 +11,18 @@ namespace Engine {
 enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 
 // Default camera values
-const float YAW = -90.0f;
-const float PITCH = 0.0f;
-const float SPEED = 20.0f;
-const float SENSITIVITY = 0.25f;
-const float FOV = 45.0f;
 
 class Camera {
   public:
     // Constructor with vectors
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
-           glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW,
-           float pitch = PITCH);
+    Camera(glm::vec3 _position = Defaults::Camera::POSITION,
+           glm::vec3 _up = glm::vec3(0.0f, 1.0f, 0.0f),
+           glm::vec3 _right = glm::vec3(1.0f, 0.0f, 0.0f),
+           float _yaw = Defaults::Camera::YAW,
+           float _pitch = Defaults::Camera::PITCH,
+           float _fov = Defaults::Camera::FOV,
+           float _sensitivity = Defaults::Camera::SENSITIVITY,
+           float _movementSpeed = Defaults::Camera::MOVEMENT_SPEED);
 
     // Calculates and returns the view matrix
     glm::mat4 getViewMatrix() const;
@@ -36,21 +38,25 @@ class Camera {
                                          bool constrainPitch = true);
 
   public:
-    // Camera Attributes
+    // Camera position
     glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 up;
-    glm::vec3 right;
+
+    // World positioning
     glm::vec3 worldUp;
 
-    // Euler Angles
+    // Camera vectors
+    glm::vec3 up;
+    glm::vec3 right;
+    glm::vec3 front;
+
+    // Camera Angles
     float yaw;
     float pitch;
+    float fov;
 
     // Camera options
-    float mouseSensitivity;
+    float sensitivity;
     float movementSpeed;
-    float fov;
 
   private:
     // Update the front, right, and up camera vectors

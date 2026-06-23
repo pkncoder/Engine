@@ -91,6 +91,7 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
             auto &meshData = subMeshes[materialID];
             auto &uniqueVertices = uniqueMaterialVerticies[materialID];
 
+            // TODO: Constant
             meshData.materialName =
                 shape.name + "_Mn" + std::to_string(materialID);
 

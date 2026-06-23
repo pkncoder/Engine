@@ -11,6 +11,7 @@ namespace Engine {
 void AssetManager::init() {
 
     // Load a default material
+    // TODO: constant
     materialCache["ENG_Default"] = CPUMaterialData();
 
     Logger::info("ASSET", "AssetManager Initialized."); // Logging

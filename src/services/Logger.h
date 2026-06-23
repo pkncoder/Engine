@@ -79,6 +79,7 @@ class Logger {
     static inline int lastDashboardLogCount = 0;
 
     // Cap of how many logs are stored to wait to be printed
+    // TODO: constant
     static inline int MAX_STACKED_PENDING = 100;
     static inline int MAX_IN_PLACE_PENDING = 30;
 

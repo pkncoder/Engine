@@ -8,10 +8,10 @@ namespace Engine {
 // Entity ID typedef and settings
 using EntityID = uint32_t;
 const EntityID NULL_ENTITY = 0;
-const EntityID MAX_ENTITIES = 10000;
+const EntityID MAX_ENTITIES = 10000; // TODO: Constant
 
 // Components max num
-const uint8_t MAX_COMPONENTS = 32;
+const uint8_t MAX_COMPONENTS = 32; // TODO: Constant
 
 // Signature typedef (bitset)
 using Signature = std::bitset<MAX_COMPONENTS>;

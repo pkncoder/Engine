@@ -1,7 +1,7 @@
 #include "Window.h"
 
+#include "../Defaults.h"
 #include "../services/Logger.h"
-#include "Defaults.h"
 
 namespace Engine {
 
