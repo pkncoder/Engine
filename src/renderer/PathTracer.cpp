@@ -1,13 +1,11 @@
 #include "PathTracer.h"
 
-#include "../resources/AssetManager.h"
+#include "../Constants.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
 #include "BufferManager.h"
-
-#include <set>
 
 namespace Engine {
 
@@ -29,8 +27,10 @@ void PathTracer::init() {
                      1024);                                   // Mesh Entries
     addStorageBuffer("vertices", 1, sizeof(GPUVertex), 1024); // Vertices
     addStorageBuffer("indices", 2, sizeof(uint32_t), 1024);   // Indices
-    addStorageBuffer("instances", 3, sizeof(GPUInstance), MAX_INSTANCES);
-    addStorageBuffer("materials", 4, sizeof(GPUMaterial), MAX_INSTANCES);
+    addStorageBuffer("instances", 3, sizeof(GPUInstance),
+                     Constants::PathTracer::MAX_INSTANCES);
+    addStorageBuffer("materials", 4, sizeof(GPUMaterial),
+                     Constants::PathTracer::MAX_INSTANCES);
 
     addRenderTarget("MainColorOutput", 0);
 

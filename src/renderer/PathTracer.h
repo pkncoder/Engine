@@ -28,7 +28,7 @@ struct ShaderPass {
     std::string name;
     Shader shader;
 
-    // TODO: Constant
+    // TODO: Constant?
     glm::ivec3 workgroupSize{8, 8, 1};
 
     // TODO: dispatch size overide
@@ -96,8 +96,6 @@ class PathTracer : public IRenderer {
 
     // Instance data cache
     std::vector<GPUInstance> instances;
-    const size_t MAX_INSTANCES =
-        10000; // TODO: renderer settings maybe? TODO: Constant
     std::unordered_map<std::string, uint32_t> instanceLookupTable;
     bool geometryDirty = true; // TODO: move tracking elsewhere, this honestly
                                // shouldn'tbe PathTracer's job

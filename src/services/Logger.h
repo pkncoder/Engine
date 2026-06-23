@@ -78,11 +78,6 @@ class Logger {
     // Count of the length of the dashboard so it can be overwritten
     static inline int lastDashboardLogCount = 0;
 
-    // Cap of how many logs are stored to wait to be printed
-    // TODO: constant
-    static inline int MAX_STACKED_PENDING = 100;
-    static inline int MAX_IN_PLACE_PENDING = 30;
-
     // Log file
     static inline std::ofstream logFile;
 };

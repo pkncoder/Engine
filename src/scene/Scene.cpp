@@ -17,7 +17,7 @@ Scene::~Scene() {}
 
 // Propogating a new entity id (returning a new id)
 EntityID Scene::createEntity() {
-    assert(livingEntityCount < MAX_ENTITIES &&
+    assert(livingEntityCount < Constants::Entity::MAX_ENTITIES &&
            "Too many entities in existence."); // Error check
 
     // Grab the next available ID

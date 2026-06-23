@@ -1,5 +1,6 @@
 #include "AssetManager.h"
 
+#include "../Constants.h"
 #include "../services/Logger.h"
 #include "CPUStructs.h"
 #include "MaterialLoader.h"
@@ -11,8 +12,7 @@ namespace Engine {
 void AssetManager::init() {
 
     // Load a default material
-    // TODO: constant
-    materialCache["ENG_Default"] = CPUMaterialData();
+    materialCache[Constants::Asset::DEFAULT_MATERIAL_NAME] = CPUMaterialData();
 
     Logger::info("ASSET", "AssetManager Initialized."); // Logging
 }

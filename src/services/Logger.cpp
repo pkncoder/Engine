@@ -1,5 +1,7 @@
 #include "Logger.h"
 
+#include "../Constants.h"
+
 #include <iostream>
 #include <string>
 
@@ -38,9 +40,10 @@ void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
 
     // If the pending list is to long, pop off the front
     if (type == LogType::STACKED &&
-        pendingLogsByType[type].size() > MAX_STACKED_PENDING)
+        pendingLogsByType[type].size() > Constants::Logger::MAX_STACKED_PENDING)
         pendingLogsByType[type].pop_front();
-    else if (pendingLogsByType[type].size() > MAX_IN_PLACE_PENDING)
+    else if (pendingLogsByType[type].size() >
+             Constants::Logger::MAX_IN_PLACE_PENDING)
         pendingLogsByType[type].pop_front();
 
     if (no_periodic_wait) {

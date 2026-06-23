@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 
+#include "../Constants.h"
 #include "../services/Logger.h"
 #include "CPUStructs.h"
 
@@ -28,8 +29,8 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
                 1); // Strip off extras
 
             // Append the material file loaction
-            // TODO: constant
-            model.materialPath = "assets/materials/" + model.materialPath;
+            model.materialPath = Constants::Asset::MATERIAL_ROOT_RELATIVE_PATH +
+                                 model.materialPath;
             break;
         }
     }
@@ -38,7 +39,8 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
     // tinyobjloader obj file reader config
     tinyobj::ObjReaderConfig readerConfig;
     readerConfig.triangulate = true; // For converting quads to triangles
-    readerConfig.mtl_search_path = "assets/materials"; // TODO: constant
+    readerConfig.mtl_search_path =
+        Constants::Asset::MATERIAL_ROOT_RELATIVE_PATH;
 
     // Get a tinyobjloader readerkl
     tinyobj::ObjReader reader;
@@ -91,9 +93,9 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
             auto &meshData = subMeshes[materialID];
             auto &uniqueVertices = uniqueMaterialVerticies[materialID];
 
-            // TODO: Constant
-            meshData.materialName =
-                shape.name + "_Mn" + std::to_string(materialID);
+            meshData.materialName = shape.name +
+                                    Constants::Asset::MATERIAL_ID_PREFIX +
+                                    std::to_string(materialID);
 
             // Loop each vertex
             for (size_t vertexIndex = 0; vertexIndex < vertexNumber;
@@ -158,7 +160,7 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
                 meshData.materialName = materials[matID].name;
             } else {
                 // Default to the default material
-                meshData.materialName = "ENG_Default";
+                meshData.materialName = Constants::Asset::DEFAULT_MATERIAL_NAME;
             }
 
             // Add this sub-mesh chunk to the model

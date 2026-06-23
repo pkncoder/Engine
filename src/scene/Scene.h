@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Constants.h"
 #include "ECS.h"
 
 #include <array>
@@ -24,7 +25,7 @@ template <typename T> class ComponentPool : public IPool {
     T *data;
 
     // Constructor & deconstructor
-    ComponentPool() { data = new T[MAX_ENTITIES]; }
+    ComponentPool() { data = new T[Constants::Entity::MAX_ENTITIES]; }
     ~ComponentPool() override { delete[] data; }
 };
 
@@ -110,7 +111,7 @@ class Scene {
     EntityID livingEntityCount = 1; // Start at 1, so 0 remains NULL_ENTITY
 
     // Component and signature pool
-    std::array<Signature, MAX_ENTITIES> signatures;
+    std::array<Signature, Constants::Entity::MAX_ENTITIES> signatures;
     std::unordered_map<ComponentType, std::shared_ptr<IPool>> componentPools;
 };
 
