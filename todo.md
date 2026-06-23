@@ -29,20 +29,15 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ### Todo - Code
 
-- [ ] Extend and use Defaults.h more
 - [ ] Figure out how getting all of the "renderables" will work
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
 - [ ] Fix the periodic timer to work with: one-second intervals, fractional intervals, and make sure that it isn't skipping intervals (or clear it)
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
-- [ ] Multi-materials
-- [ ] Sub-object entities
-- [ ] Redo the temp rasterizer & path tracer shaders
 - [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
 - [ ] Make dirty mesh/camera flags
 - [ ] Material Index in GPUInstance
-- [ ] Change MaterialComponent to GPU glad handles?
 - [ ] Fix the flashing compute shader issue + maybe being too slow?
 - [ ] Non-triangle objects
 - [ ] Try to reduce the amount of looping being done on materials / instances etc. Maybe try to use the caches in AssetManager more?
@@ -156,3 +151,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Make all basic inits inlines
 - [x] Get rid of all of the "magic numbers" in the renderers
 - [x] Redo all of pathTracer.cpp for struct passing (like idk, materials)
+- [x] Extend and use Defaults.h more
+- [x] Multi-materials
+- [x] Sub-object entities
+- [x] Redo the temp rasterizer & path tracer shaders
