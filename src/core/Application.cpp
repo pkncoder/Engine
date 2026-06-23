@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include "../Defaults.h"
 #include "../resources/AssetManager.h"
 #include "../scene/Entity.h"
 #include "../scene/EntitySpawner.h"
@@ -28,9 +27,7 @@ void Application::init() {
     Logger::setNoPendingLogs(true);
 
     // Create the window
-    window = std::make_unique<Window>(Defaults::Window::WIDTH,
-                                      Defaults::Window::HEIGHT,
-                                      Defaults::Window::TITLE);
+    window = std::make_unique<Window>();
 
     // Init the input service
     Input::init(window->getNativeWindow());

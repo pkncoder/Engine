@@ -1,6 +1,5 @@
 #include "Window.h"
 
-#include "../Defaults.h"
 #include "../services/Logger.h"
 
 namespace Engine {
@@ -11,8 +10,8 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-Window::Window(int width, int height, const std::string &title)
-    : width(width), height(height), title(title) {
+Window::Window(const std::string &_title, int _width, int _height)
+    : title(_title), width(_width), height(_height) {
 
     // Initialize & check for error for glfw
     if (!glfwInit()) {
