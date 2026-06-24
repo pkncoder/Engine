@@ -29,6 +29,7 @@ set(SOURCES
     src/renderer/BufferManager.cpp
     src/renderer/PathTracer.cpp
     src/renderer/Rasterizer.cpp
+    src/renderer/RendererManager.cpp
     src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
     src/resources/MaterialLoader.cpp

@@ -47,6 +47,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Check to see if roughness & metallic maps are working
 - [ ] Rework rasterizer
 - [ ] Get the shared uniforms file filled in and finished
+- [ ] Rename to RenderManager from RendererManager
 
 ### Todo - Not Code
 

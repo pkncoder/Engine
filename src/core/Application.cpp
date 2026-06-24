@@ -1,5 +1,6 @@
 #include "Application.h"
 
+#include "../renderer/RendererManager.h"
 #include "../resources/AssetManager.h"
 #include "../scene/Entity.h"
 #include "../scene/EntitySpawner.h"
@@ -44,25 +45,12 @@ void Application::init() {
     // Initialize the scene
     activeScene = Scene();
 
+    RendererManager::init();
+
     // Register the scene components and load the scene
     // TODO: temp
     this->registerSceneComponents(activeScene);
     this->setupEntities(activeScene);
-
-    // Construct the rasterizer and init it
-    rasterizer = std::make_unique<Rasterizer>();
-    rasterizer->init();
-
-    GLint major, minor;
-    glGetIntegerv(GL_MAJOR_VERSION, &major);
-    glGetIntegerv(GL_MINOR_VERSION, &minor);
-
-    if (major > 4 || (major == 4 && minor >= 6)) {
-        pathTracer = std::make_unique<PathTracer>();
-        pathTracer->init();
-    }
-
-    activeRenderer = rasterizer.get();
 
     Logger::info("APPLICATION", "Application init complete");
     Logger::setNoPendingLogs(false);
@@ -90,17 +78,18 @@ void Application::run() {
         START_PROFILE("Render"); // Start timer for renderer
         // rasterizer->render(camera, activeScene,
         // window->getAspectRatio());
-        activeRenderer->render(camera, activeScene, window->getAspectRatio());
+        RendererManager::getActiveRenderer()->render(camera, activeScene,
+                                                     window->getAspectRatio());
         END_PROFILE("Render"); // End Timer for renderer
 
         START_PROFILE("Blit"); // Blit profiler
         int width, height;
         window->getSize(width, height);
-        activeRenderer->resize(width, height);
+        RendererManager::getActiveRenderer()->resize(width, height);
         END_PROFILE("Blit"); // Blit profiler
 
         // 2. Present the compute texture to the main window
-        activeRenderer->present(width, height);
+        RendererManager::getActiveRenderer()->present(width, height);
 
         // Do things like event polling & buffer swapping
         window->postFrame();
@@ -142,27 +131,17 @@ void Application::handleInputs() {
 
     if (swapActiveRendererMark && !swapActiveRendererLock) {
 
-        GLint major, minor;
-        glGetIntegerv(GL_MAJOR_VERSION, &major);
-        glGetIntegerv(GL_MINOR_VERSION, &minor);
-
-        if (activeRenderer == rasterizer.get()) {
-
-            if (major > 4 || (major == 4 && minor >= 6)) {
-                activeRenderer = pathTracer.get();
-                Logger::info("RENDERER", "Swapped to Path Tracer");
-            } else {
-                Logger::error("RENDERER",
-                              "Path Tracer is not supported on this system.");
-            }
-        } else {
-            activeRenderer = rasterizer.get();
-            Logger::info("RENDERER", "Swapped to Rasterizer");
+        switch (RendererManager::getRenderChoice()) {
+        case RenderChoice::RASTERIZER:
+            RendererManager::swapActiveRenderer(RenderChoice::PATH_TRACER);
+        case RenderChoice::PATH_TRACER:
+            RendererManager::swapActiveRenderer(RenderChoice::RASTERIZER);
         }
 
         swapActiveRendererLock = true;
     }
 
+    // TODO: change to using held & let go flags
     if (Input::isKeyPressed(GLFW_KEY_R)) {
         swapActiveRendererMark = true;
     } else {
