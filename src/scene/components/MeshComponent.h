@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../resources/CPUStructs.h"
+
 #include <glad/glad.h>
 
 #include <string>
@@ -10,6 +12,8 @@ namespace Engine {
 struct MeshComponent {
 
     std::string assetID = "";
+
+    CPUMeshData meshData;
 
     GLuint vao = 0;
     GLuint vbo = 0;

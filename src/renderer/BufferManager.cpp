@@ -19,6 +19,7 @@ MeshComponent BufferManager::uploadMesh(const CPUMeshData &meshData) {
     MeshComponent comp;
     comp.indexCount = meshData.indices.size();
     comp.assetID = meshData.name;
+    comp.meshData = meshData;
 
     // Generating arrays and buffers
     glGenVertexArrays(1, &comp.vao);

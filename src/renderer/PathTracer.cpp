@@ -1,14 +1,11 @@
 #include "PathTracer.h"
 
 #include "../Constants.h"
-#include "../resources/AssetManager.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
 #include "BufferManager.h"
-
-#include <set>
 
 namespace Engine {
 
@@ -299,8 +296,6 @@ void PathTracer::flattenScene(Scene &activeScene) {
     materialList.clear();
     materialList.reserve(renderables.size());
 
-    // Loop each renderable
-    // TODO: Another loop?
     for (EntityID id : renderables) {
 
         // Get each component for rendering
@@ -353,51 +348,43 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
     // Clear the old data
     instanceLookupTable.clear();
 
-    // Use a set for unique meshes & duplicate ridding
-    std::set<std::string> uniqueMeshes;
-
     // Get all of the mesh componentes and loop each id
     auto renderables = activeScene.getMatchingEntities<MeshComponent>();
-    for (EntityID id : renderables) {
-
-        // Insert into the unique meshes
-        uniqueMeshes.insert(
-            activeScene.getComponent<MeshComponent>(id).assetID);
-    }
 
     // Loop each asset id in the unique meshes
-    for (const auto &assetID : uniqueMeshes) {
+    for (const auto &entityID : renderables) {
+
+        Logger::check();
 
         // Load the mesh data
-        auto modelData = AssetManager::loadModel(assetID);
+        auto meshData =
+            activeScene.getComponent<MeshComponent>(entityID).meshData;
 
-        for (auto &mesh : modelData->meshes) {
-            // Create a new mesh entry and set the data
-            GPUMeshEntry entry{};
-            entry.baseVertex = static_cast<uint32_t>(instanceVertices.size());
-            entry.baseIndex = static_cast<uint32_t>(instanceIndices.size());
-            entry.indexCount = static_cast<uint32_t>(mesh.indices.size());
+        // Create a new mesh entry and set the data
+        GPUMeshEntry entry{};
+        entry.baseVertex = static_cast<uint32_t>(instanceVertices.size());
+        entry.baseIndex = static_cast<uint32_t>(instanceIndices.size());
+        entry.indexCount = static_cast<uint32_t>(meshData.indices.size());
 
-            // Loop each vertex
-            for (const auto &v : mesh.vertices) {
+        // Loop each vertex
+        for (const auto &v : meshData.vertices) {
 
-                // Push the vertecies to the instance verts
-                instanceVertices.push_back(
-                    {glm::vec4(v.position, 1.0f), glm::vec4(v.normal, 0.0f),
-                     glm::vec4(v.texCoords, 0.0f, 0.0f)});
-            }
-
-            // Insert the instanceIndicies
-            instanceIndices.insert(instanceIndices.end(), mesh.indices.begin(),
-                                   mesh.indices.end());
-
-            // Set the instance lookup table, indexed by the asset id
-            instanceLookupTable[assetID] =
-                static_cast<uint32_t>(meshEntries.size());
-
-            // Push the new mesh entries
-            meshEntries.push_back(entry);
+            // Push the vertecies to the instance verts
+            instanceVertices.push_back({glm::vec4(v.position, 1.0f),
+                                        glm::vec4(v.normal, 0.0f),
+                                        glm::vec4(v.texCoords, 0.0f, 0.0f)});
         }
+
+        // Insert the instanceIndicies
+        instanceIndices.insert(instanceIndices.end(), meshData.indices.begin(),
+                               meshData.indices.end());
+
+        // Set the instance lookup table, indexed by the asset id
+        instanceLookupTable[meshData.name] =
+            static_cast<uint32_t>(meshEntries.size());
+
+        // Push the new mesh entries
+        meshEntries.push_back(entry);
     }
 
     // Update the buffer data
