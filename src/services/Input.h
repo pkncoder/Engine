@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+// TODO: add key held & let go flags
+
 namespace Engine {
 
 class Input {
