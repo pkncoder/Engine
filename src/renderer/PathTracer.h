@@ -19,7 +19,9 @@ namespace Engine {
 struct RenderTarget {
     std::string name;
     GLuint id = 0;
+
     GLuint bindingIndex = 0;
+
     GLenum format = GL_RGBA32F;
 };
 

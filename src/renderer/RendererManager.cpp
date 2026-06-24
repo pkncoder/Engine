@@ -1,6 +1,7 @@
 #include "RendererManager.h"
 
 #include "../services/Logger.h"
+#include "../services/Timer.h"
 
 namespace Engine {
 
@@ -34,6 +35,15 @@ void RendererManager::init() {
     Logger::info("RENDERER", "Renderer Manager initialized.");
 }
 
+void RendererManager::shutdown() {
+    activeRenderer = nullptr;
+
+    if (rasterizer)
+        rasterizer->shutdown();
+    if (pathTracer)
+        pathTracer->shutdown();
+}
+
 void RendererManager::swapActiveRenderer(RenderChoice choice) {
     switch (choice) {
     case RenderChoice::RASTERIZER:
@@ -49,6 +59,21 @@ void RendererManager::swapActiveRenderer(RenderChoice choice) {
                           "Path Tracer is not supported on this system.");
         }
     }
+}
+
+void RendererManager::render(const Window &window, class Scene &scene,
+                             const Camera &camera) {
+    // Render the scene
+    START_PROFILE("Render"); // Start timer for render
+    activeRenderer->render(camera, scene, window.getAspectRatio());
+    END_PROFILE("Render"); // End Timer for render
+
+    int width, height;
+    window.getSize(width, height);
+    activeRenderer->resize(width, height);
+
+    // 2. Present the compute texture to the main window
+    activeRenderer->present(width, height);
 }
 
 } // namespace Engine

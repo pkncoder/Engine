@@ -26,13 +26,6 @@ void Rasterizer::init() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  whitePixel);
 
-    // Create a 1x1 black texture (for roughness / metallic)
-    glGenTextures(1, &defaultBlackTexture);
-    glBindTexture(GL_TEXTURE_2D, defaultBlackTexture);
-    unsigned char blackPixel[] = {0, 0, 0, 255};
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 blackPixel);
-
     // Create a 1x1 Flat Normal Texture (For Normal Maps)
     // Flat normal is pointing straight up: RGB(128, 128, 255)
     glGenTextures(1, &defaultNormalTexture);
@@ -124,6 +117,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glBindVertexArray(0);
 }
 
-void Rasterizer::shutdown() {};
+void Rasterizer::shutdown(){};
 
 } // namespace Engine

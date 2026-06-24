@@ -18,7 +18,10 @@ namespace Engine {
 
 // Constructor & Deconstructor
 Application::Application() {}
-Application::~Application() { Logger::shutdown(); }
+Application::~Application() {
+    Logger::shutdown();
+    RendererManager::shutdown();
+}
 
 // Init the window, camera, etc.
 void Application::init() {
@@ -74,22 +77,8 @@ void Application::run() {
         // Clear Screen
         window->preFrame();
 
-        // Render the scene
-        START_PROFILE("Render"); // Start timer for renderer
-        // rasterizer->render(camera, activeScene,
-        // window->getAspectRatio());
-        RendererManager::getActiveRenderer()->render(camera, activeScene,
-                                                     window->getAspectRatio());
-        END_PROFILE("Render"); // End Timer for renderer
-
-        START_PROFILE("Blit"); // Blit profiler
-        int width, height;
-        window->getSize(width, height);
-        RendererManager::getActiveRenderer()->resize(width, height);
-        END_PROFILE("Blit"); // Blit profiler
-
-        // 2. Present the compute texture to the main window
-        RendererManager::getActiveRenderer()->present(width, height);
+        // Render
+        RendererManager::render(*window, activeScene, camera);
 
         // Do things like event polling & buffer swapping
         window->postFrame();

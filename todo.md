@@ -41,17 +41,14 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Fix the flashing compute shader issue + maybe being too slow?
 - [ ] Non-triangle objects
 - [ ] Try to reduce the amount of looping being done on materials / instances etc. Maybe try to use the caches in AssetManager more?
-- [ ] RendererManager, to manage the renderers
 - [ ] Missing texture for failed loads default
 - [ ] Go through and remove GPU memory access where it shouldn't be
 - [ ] Check to see if roughness & metallic maps are working
-- [ ] Rework rasterizer
 - [ ] Get the shared uniforms file filled in and finished
-- [ ] Rename to RenderManager from RendererManager
+- [ ] Add a SceneManager
 
 ### Todo - Not Code
 
-- [ ] Change the plan for the scene.h into a new directory
 - [ ] Finish the readme
 
 ### Todo - Future Todos
@@ -107,6 +104,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 7. [ ] Add comments
 8. [ ] Place the \#includes in the right spots
 9. [ ] Fix file tree
+10. [ ] Update the obsidian canvas & png
 
 ## Finished Todos
 
@@ -155,4 +153,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Extend and use Defaults.h more
 - [x] Multi-materials
 - [x] Sub-object entities
-- [x] Redo the temp rasterizer & path tracer shaders
+- [x] Redo the temp rasterizer & path tracer shaders (pt 1.)
+- [x] RendererManager, to manage the renderers
+- [x] Rework rasterizer (pt. 1)
+- [x] RenderManager or RendererManager? (yes this is very important)

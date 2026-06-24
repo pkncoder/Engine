@@ -1,9 +1,9 @@
+#include "../core/Window.h"
+#include "../scene/Camera.h"
 #include "IRenderer.h"
-
 #include "PathTracer.h"
 #include "Rasterizer.h"
 
-#include <c++/v1/__config>
 #include <cstdlib>
 #include <memory>
 
@@ -14,6 +14,7 @@ enum RenderChoice { RASTERIZER, PATH_TRACER };
 class RendererManager {
   public:
     static void init();
+    static void shutdown();
 
     static inline IRenderer *getActiveRenderer() { return activeRenderer; }
     static inline const RenderChoice getRenderChoice() {
@@ -24,6 +25,9 @@ class RendererManager {
     }
 
     static void swapActiveRenderer(RenderChoice choice);
+
+    static void render(const Window &window, class Scene &scene,
+                       const Camera &camera);
 
   private:
     static inline GLint openGlMajorVersion = 0;

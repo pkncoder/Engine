@@ -25,7 +25,6 @@ class Rasterizer : public IRenderer {
     // Default textures
     // TODO: temp
     GLuint defaultWhiteTexture = 0;
-    GLuint defaultBlackTexture = 0;
     GLuint defaultNormalTexture = 0;
 };
 
