@@ -380,11 +380,11 @@ void main() {
     Material mat = Material(vec4(albedo, 0.0), vec4(emissive, 0.0), roughness, metallic);
 
     // Get the dummy-light material
-    Material lightMat = Material(vec4(0.0), vec4(1.0) * 3.0, 0.0, 0.0); 
+    Material lightMat = Material(vec4(0.0), vec4(1.0) * 1.0, 0.0, 0.0); 
 
     // Get the light color
-    vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    // vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+    // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
 
     // Add the emissive glow to the color
     color += emissive;
