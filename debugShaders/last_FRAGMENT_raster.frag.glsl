@@ -34,6 +34,7 @@ struct HitInfo {
     vec3 hitPos;
     vec3 normal;
 
+    // TODO: this is stupid
     int objectIndex;
     uint materialIndex;
 };

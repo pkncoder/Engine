@@ -361,8 +361,6 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
     // Loop each asset id in the unique meshes
     for (const auto &entityID : renderables) {
 
-        Logger::check();
-
         // Load the mesh data
         auto meshData =
             activeScene.getComponent<MeshComponent>(entityID).meshData;

@@ -68,9 +68,10 @@ void main() {
     const Material material = materials[hit.materialIndex];
 
     // Hit image data
-    imageStore(Normals, pixelCoords, vec4(hit.normal * 0.5 + 0.5, 1.0));
-    imageStore(Depth, pixelCoords, vec4(vec3(hit.hit), 1.0));
-    imageStore(Hit, pixelCoords, vec4(vec3(hit.dist / 20.0), 1.0));
+    // TODO: Figure out how to deal with debug visulizations in things like normal & depth
+    imageStore(Hit, pixelCoords, vec4(hit.materialIndex, hit.materialIndex, 0.0, hit.hit));
+    imageStore(Depth, pixelCoords, vec4(vec3(hit.dist), 1.0));
+    imageStore(Normals, pixelCoords, vec4(hit.normal, 1.0));
 
     // Material hit image data
     imageStore(Albedo, pixelCoords, vec4(material.albedo.rgb, 1.0));

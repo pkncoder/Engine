@@ -40,6 +40,7 @@ struct HitInfo {
     vec3 hitPos;
     vec3 normal;
 
+    // TODO: this is stupid
     int objectIndex;
     uint materialIndex;
 };
@@ -563,6 +564,23 @@ void processBounceStep(
     }
 }
 
+HitInfo getGBufferHit(const in Ray ray, ivec2 pixelCoords) {
+    HitInfo hit;
+
+    vec4 hitBuffer = imageLoad(Hit, pixelCoords);
+
+    hit.hit = bool(hitBuffer.a);
+    hit.dist = imageLoad(Depth, pixelCoords).r;
+
+    hit.hitPos = ray.origin + ray.direction * hit.dist;
+    hit.normal = imageLoad(Normals, pixelCoords).rgb; // TODO: rename Normals -> Normal
+
+    hit.objectIndex = int(hitBuffer.r);
+    hit.materialIndex = uint(hitBuffer.g);
+
+    return hit;
+}
+
 
 /* ----------------- COLORING FUNCTIONS ----------------- */
 
@@ -583,7 +601,7 @@ vec3 colorSky(Ray ray) {
 }
 
 // Main color function / "render" function
-vec3 colorScene(const in Ray cameraRay) {
+vec3 colorScene(const in Ray cameraRay, ivec2 pixelCoords) {
     // Set higher-scope mutable structs
     Ray ray = cameraRay;
     Material material;
@@ -594,7 +612,13 @@ vec3 colorScene(const in Ray cameraRay) {
     vec3 colorMult = vec3(1.0);
 
     for (int bounce = 0; bounce < MAX_BOUNCES; bounce++) {
-        hit = rayScene(ray);
+
+        // TODO: first hit outside, rest at the bottom of the loop
+        if (bounce == 0) {
+            hit = getGBufferHit(ray, pixelCoords);
+        } else {
+            hit = rayScene(ray);
+        }
 
         if (!hit.hit) {
             color += colorSky(ray) * colorMult;
@@ -658,7 +682,7 @@ void main() {
     // const HitInfo hit = rayScene(ray);
 
     // Color based on the hit
-    vec3 col = colorScene(ray);
+    vec3 col = colorScene(ray, pixelCoords);
 
     col = linearToSRGB(ACESFilm(col));
 
