@@ -192,7 +192,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Diffuse cube & emmisive cube
-    if (1) {
+    if (0) {
         std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
@@ -218,7 +218,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Trans flag
-    if (1) {
+    if (0) {
         std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/trans.obj");
 
@@ -229,7 +229,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Franch flag
-    if (1) {
+    if (0) {
         std::vector<Entity> french = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/french.obj");
 
@@ -240,7 +240,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (0) {
+    if (1) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
