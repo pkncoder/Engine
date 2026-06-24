@@ -152,7 +152,7 @@ void Application::setupEntities(Scene &scene) {
     START_PROFILE("Entity Loading");
 
     // Bunny
-    if (false) {
+    if (0) {
         std::vector<Entity> bunny = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/bunny.obj");
 
@@ -161,7 +161,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Dragon
-    if (false) {
+    if (0) {
         std::vector<Entity> dragon = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/dragon.obj");
 
@@ -170,7 +170,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Cat
-    if (false) {
+    if (0) {
         std::vector<Entity> cat =
             EntitySpawner::spawnObjEntity(activeScene, "assets/models/cat.obj");
 
@@ -179,7 +179,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // 🗿
-    if (false) {
+    if (0) {
         std::vector<Entity> moai = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/moai.obj");
 
@@ -192,7 +192,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Diffuse cube & emmisive cube
-    if (true) {
+    if (1) {
         std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
@@ -218,7 +218,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Trans flag
-    if (false) {
+    if (1) {
         std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/trans.obj");
 
@@ -229,7 +229,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Franch flag
-    if (false) {
+    if (1) {
         std::vector<Entity> french = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/french.obj");
 
@@ -240,32 +240,32 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (false) {
+    if (0) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
     }
 
     // Breakfast room
-    if (false) {
+    if (0) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
     }
 
     // Sponza
-    if (false) {
+    if (0) {
         std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/sponza.obj");
     }
 
     // Lost empire (Minecraft)
-    if (false) {
+    if (0) {
         std::vector<Entity> lostEmpire = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/lost_empire.obj");
     }
 
     // oiiaioooooiai (broken texture)
-    if (false) {
+    if (0) {
         std::vector<Entity> oiiaioooooiai = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/oiiaioooooiai.obj");
     }
