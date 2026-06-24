@@ -123,8 +123,10 @@ void Application::handleInputs() {
         switch (RendererManager::getRenderChoice()) {
         case RenderChoice::RASTERIZER:
             RendererManager::swapActiveRenderer(RenderChoice::PATH_TRACER);
+            break;
         case RenderChoice::PATH_TRACER:
             RendererManager::swapActiveRenderer(RenderChoice::RASTERIZER);
+            break;
         }
 
         swapActiveRendererLock = true;
