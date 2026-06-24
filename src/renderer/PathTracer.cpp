@@ -33,7 +33,14 @@ void PathTracer::init() {
                      Constants::PathTracer::MAX_INSTANCES);
 
     addRenderTarget("MainColorOutput", 0);
+    addRenderTarget("Normals", 1);
+    addRenderTarget("Albedo", 2);
+    addRenderTarget("Emissive", 3);
+    addRenderTarget("IMR", 4);
+    addRenderTarget("Depth", 5);
+    addRenderTarget("Hit", 6);
 
+    addShaderPass("gbuffer", "shaders/pathTracing/main/gbuffer.comp");
     addShaderPass("renderPass", "shaders/pathTracing/main/pathTracer.comp");
     addShaderPass("invert", "shaders/compute/invert.comp", false);
 

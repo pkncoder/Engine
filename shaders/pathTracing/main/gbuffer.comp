@@ -1,0 +1,81 @@
+#version 460 core
+
+// Compute shader blocks
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+// Common
+#include "../../include/common.glsl"
+
+// Shared includes
+#include "../../include/sharedStructures.glsl"
+#include "../../include/sharedUniforms.glsl"
+
+// Coloring models
+
+// Path tracing includes
+#include "../structures.glsl"
+#include "../buffers.glsl"
+
+// Path tracing intersection functions
+#include "../intersections.glsl"
+
+// Path-tracer specific uniforms
+#include "../uniforms.glsl"
+
+/* ----------------- COLORING FUNCTIONS ----------------- */
+
+void main() {
+
+    // Calculate pixel uv
+    const ivec2  pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    const ivec2 imgSize = imageSize(MainColorOutput);
+
+    // Error check on image size
+    if (pixelCoords.x >= imgSize.x || pixelCoords.y >= imgSize.y) return;
+
+    // Get screen space coords
+    const vec2 uv = (vec2(pixelCoords) + 0.5) / vec2(imgSize) * 2.0 - 1.0;
+
+    // Get the aspect ratio
+    const float aspectRatio = float(imgSize.x) / float(imgSize.y);
+
+    // Get the ray direction that's in view space and put it into world space
+    const float tanHalfFOV = tan(radians(uFOV * 0.5)); // Helper value
+    const vec3 rayDirView = normalize(vec3(uv, -1.0) * vec3(aspectRatio * tanHalfFOV, tanHalfFOV, 1.0));
+    const vec3 rayDirWorld = normalize((uInverseView * vec4(rayDirView, 0.0)).xyz);
+
+    // Construct the final ray
+    const Ray ray = Ray(uCameraPos, rayDirWorld, 1.0 / rayDirWorld);
+
+    // Find the hit in the scene
+    const HitInfo hit = rayScene(ray);
+
+    if (!hit.hit) {
+
+        // Hit image data
+        imageStore(Normals, pixelCoords, vec4(0.0));
+        imageStore(Depth, pixelCoords, vec4(0.0));
+        imageStore(Hit, pixelCoords, vec4(0.0));
+
+        // Material hit image data
+        imageStore(Albedo, pixelCoords, vec4(0.0));
+        imageStore(Emissive, pixelCoords, vec4(0.0));
+        imageStore(IMR, pixelCoords, vec4(0.0));
+
+        return;
+    }
+
+    const Material material = materials[hit.materialIndex];
+
+    // Hit image data
+    imageStore(Normals, pixelCoords, vec4(hit.normal * 0.5 + 0.5, 1.0));
+    imageStore(Depth, pixelCoords, vec4(vec3(hit.hit), 1.0));
+    imageStore(Hit, pixelCoords, vec4(vec3(hit.dist / 20.0), 1.0));
+
+    // Material hit image data
+    imageStore(Albedo, pixelCoords, vec4(material.albedo.rgb, 1.0));
+    imageStore(Emissive, pixelCoords, vec4(material.emissive.rgb, 1.0));
+    imageStore(IMR, pixelCoords, vec4(0.0, material.metallic, material.roughness, 1.0));
+
+}
+
