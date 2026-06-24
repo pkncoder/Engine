@@ -479,7 +479,7 @@ HitInfo rayScene(Ray ray) {
 
 // Path-tracer specific uniforms
 // BEGIN INCLUDE: ../uniforms.glsl
-uniform int uFrameNum;
+uniform uint uFrameNum;
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D MainColorOutput;
@@ -611,21 +611,15 @@ vec3 colorScene(const in Ray cameraRay, ivec2 pixelCoords) {
     vec3 color = vec3(0.0);
     vec3 colorMult = vec3(1.0);
 
-    for (int bounce = 0; bounce < MAX_BOUNCES; bounce++) {
+    hit = getGBufferHit(ray, pixelCoords);
 
-        // TODO: first hit outside, rest at the bottom of the loop
-        if (bounce == 0) {
-            hit = getGBufferHit(ray, pixelCoords);
-        } else {
-            hit = rayScene(ray);
-        }
+    for (int bounce = 1; bounce < MAX_BOUNCES; bounce++) {
 
         if (!hit.hit) {
             color += colorSky(ray) * colorMult;
             break;
         }
 
-        // TODO: replace
         material = materials[hit.materialIndex];
 
         if (length(material.emissive.xyz) > EPSILON) {
@@ -647,6 +641,8 @@ vec3 colorScene(const in Ray cameraRay, ivec2 pixelCoords) {
             // Account for lost energy
             colorMult /= p;
         }
+
+        hit = rayScene(ray);
     }
 
     return color;
@@ -658,8 +654,7 @@ void main() {
     const ivec2  pixelCoords = ivec2(gl_GlobalInvocationID.xy);
     const ivec2 imgSize = imageSize(MainColorOutput);
 
-    // TODO: Make the uniform a uint
-    setSeed(pixelCoords, uint(uFrameNum));
+    setSeed(pixelCoords, uFrameNum);
 
     // Error check on image size
     if (pixelCoords.x >= imgSize.x || pixelCoords.y >= imgSize.y) return;
@@ -677,9 +672,6 @@ void main() {
 
     // Construct the final ray
     const Ray ray = Ray(uCameraPos, rayDirWorld, 1.0 / rayDirWorld);
-
-    // // Find the hit in the scene
-    // const HitInfo hit = rayScene(ray);
 
     // Color based on the hit
     vec3 col = colorScene(ray, pixelCoords);

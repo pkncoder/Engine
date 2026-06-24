@@ -407,7 +407,7 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
 // TODO: Move to a UBO / reimplement it
 void PathTracer::bindGlobalUniforms(Shader &shader, const Camera &camera) {
     // TODO: UBO for at least defaults & dynamic uniforms
-    shader.setInt("uFrameNum", frameCount);
+    shader.setUInt("uFrameNum", frameCount);
     shader.setVec3("uCameraPos", camera.position);
     shader.setFloat("uFOV", camera.fov);
     shader.setInt("uInstanceCount", static_cast<int>(instances.size()));
