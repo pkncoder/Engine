@@ -26,6 +26,8 @@ void RendererManager::init() {
         // Path tracer inizialization
         pathTracer = std::make_unique<PathTracer>();
         pathTracer->init();
+    } else {
+        Logger::warn("RENDERER", "Path Tracer not supported on this system.");
     }
 
     // Set the active renderer

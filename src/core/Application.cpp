@@ -190,7 +190,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Diffuse cube & emmisive cube
-    if (false) {
+    if (true) {
         std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
@@ -251,7 +251,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Sponza
-    if (true) {
+    if (false) {
         std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/sponza.obj");
     }
