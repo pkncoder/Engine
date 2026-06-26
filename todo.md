@@ -47,6 +47,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Get the shared uniforms file filled in and finished
 - [ ] Add a SceneManager
 - [ ] UUID models & mesh names
+- [ ] Redo the shader pass & render target sytem to increase scope
 
 ### Todo - Not Code
 
