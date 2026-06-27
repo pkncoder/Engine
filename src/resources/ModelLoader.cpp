@@ -45,8 +45,6 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
     // Get a tinyobjloader readerkl
     tinyobj::ObjReader reader;
 
-    Logger::warn("DEBUG", filepath);
-
     // Try to read from the file and check for erros
     if (!reader.ParseFromFile(filepath, readerConfig)) { // Error
         if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
@@ -94,11 +92,6 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
             // Get the mesh data & vertice cache for this material id
             auto &meshData = subMeshes[materialID];
             auto &uniqueVertices = uniqueMaterialVerticies[materialID];
-
-            // TODO: is this needed?
-            meshData.materialName = shape.name +
-                                    Constants::Asset::MATERIAL_ID_PREFIX +
-                                    std::to_string(materialID);
 
             // Loop each vertex
             for (size_t vertexIndex = 0; vertexIndex < vertexNumber;
