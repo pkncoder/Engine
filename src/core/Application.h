@@ -45,12 +45,6 @@ class Application {
 
     // Camera object
     Camera camera;
-
-    GLuint presentFBO = 0;
-
-    // TODO: temp
-    bool swapActiveRendererMark = false;
-    bool swapActiveRendererLock = false;
 };
 
 } // namespace Engine

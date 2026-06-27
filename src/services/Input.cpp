@@ -1,15 +1,27 @@
 #include "Input.h"
 #include "Logger.h"
+#include <cstring> // for std::memcpy
 
 namespace Engine {
 
-// Input "service" init
 void Input::init(GLFWwindow *window_ptr) {
 
-    // Save the window pointer
+    // Save the window
     window = window_ptr;
 
-    // Initialize mouse position so the first delta isn't a massive jump
+    // Zero out out the state tables
+    keysRealtime.fill(false);
+    keysCurrent.fill(false);
+    keysPrevious.fill(false);
+    buttonsRealtime.fill(false);
+    buttonsCurrent.fill(false);
+    buttonsPrevious.fill(false);
+
+    // Register the callbacks to our input methods
+    glfwSetKeyCallback(window, keyCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+
+    // Get the initial mouse pos
     double x, y;
     glfwGetCursorPos(window, &x, &y);
     lastMousePos = {(float)x, (float)y};
@@ -17,35 +29,104 @@ void Input::init(GLFWwindow *window_ptr) {
     Logger::info("SYSTEM", "Input service initialized.");
 }
 
-// Update information per-frame
 void Input::update() {
+    // Roll back the cycle history arrays
+    keysPrevious = keysCurrent;
+    buttonsPrevious = buttonsCurrent;
 
-    // Get current position
+    // Snapshot the real-time callback arrays into the stable cycle arrays
+    keysCurrent = keysRealtime;
+    buttonsCurrent = buttonsRealtime;
+
+    // 3. Process mouse tracking metrics
     glm::vec2 currentPos = getMousePosition();
-
-    // Calculate how much the mouse moved since the last frame & save
     mouseDelta = currentPos - lastMousePos;
     lastMousePos = currentPos;
 }
 
+void Input::keyCallback(GLFWwindow *window, int key, int scancode, int action,
+                        int mods) {
+    // Check key button bounds
+    if (key >= 0 && key <= GLFW_KEY_LAST) {
+        if (action == GLFW_PRESS)
+            keysRealtime[key] = true;
+        if (action == GLFW_RELEASE)
+            keysRealtime[key] = false;
+    }
+}
+
+void Input::mouseButtonCallback(GLFWwindow *window, int button, int action,
+                                int mods) {
+    // Check mouse button bounds
+    if (button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST) {
+        if (action == GLFW_PRESS)
+            buttonsRealtime[button] = true;
+        if (action == GLFW_RELEASE)
+            buttonsRealtime[button] = false;
+    }
+}
+
+// Return true if a key is currently pressed
 bool Input::isKeyPressed(int keycode) {
-    int state = glfwGetKey(window, keycode);
-    return state == GLFW_PRESS || state == GLFW_REPEAT;
+    if (keycode < 0 || keycode > GLFW_KEY_LAST)
+        return false;
+    return keysCurrent[keycode];
 }
 
+// Return true if a key has been pressed this cycle
+bool Input::isKeyJustPressed(int keycode) {
+    if (keycode < 0 || keycode > GLFW_KEY_LAST)
+        return false;
+    return keysCurrent[keycode] && !keysPrevious[keycode];
+}
+
+// Return true if a key has been pressed last cycle & is pressed
+bool Input::isKeyHeld(int keycode) {
+    if (keycode < 0 || keycode > GLFW_KEY_LAST)
+        return false;
+    return keysCurrent[keycode] && keysPrevious[keycode];
+}
+
+// Return true if a key stopped being pressed this cycle
+bool Input::isKeyLetGo(int keycode) {
+    if (keycode < 0 || keycode > GLFW_KEY_LAST)
+        return false;
+    return !keysCurrent[keycode] && keysPrevious[keycode];
+}
+
+// Return true if a mouse button is currently pressed
 bool Input::isMouseButtonPressed(int button) {
-    int state = glfwGetMouseButton(window, button);
-    return state == GLFW_PRESS;
+    if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
+        return false;
+    return buttonsCurrent[button];
 }
 
-glm::vec2 Input::getMousePosition() {
+// Return true if a mouse button has been pressed this cycle
+bool Input::isMouseButtonJustPressed(int button) {
+    if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
+        return false;
+    return buttonsCurrent[button] && !buttonsPrevious[button];
+}
 
+// Return true if a mouse button has been pressend & is pressed this cycle
+bool Input::isButtonHeld(int button) {
+    if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
+        return false;
+    return buttonsCurrent[button] && buttonsPrevious[button];
+}
+
+// Return true if a button has been let go this cycle
+bool Input::isMouseButtonLetGo(int button) {
+    if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
+        return false;
+    return !buttonsCurrent[button] && buttonsPrevious[button];
+}
+
+// Get current mouse pos
+glm::vec2 Input::getMousePosition() {
     double x, y;
     glfwGetCursorPos(window, &x, &y);
-
     return {(float)x, (float)y};
 }
-
-glm::vec2 Input::getMouseDelta() { return mouseDelta; }
 
 } // namespace Engine

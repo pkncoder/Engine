@@ -118,7 +118,7 @@ void Application::handleInputs() {
     if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
         camera.processMovement(DOWN);
 
-    if (swapActiveRendererMark && !swapActiveRendererLock) {
+    if (Input::isKeyJustPressed(GLFW_KEY_R)) {
 
         switch (RendererManager::getRenderChoice()) {
         case RenderChoice::RASTERIZER:
@@ -128,16 +128,6 @@ void Application::handleInputs() {
             RendererManager::swapActiveRenderer(RenderChoice::RASTERIZER);
             break;
         }
-
-        swapActiveRendererLock = true;
-    }
-
-    // TODO: change to using held & let go flags
-    if (Input::isKeyPressed(GLFW_KEY_R)) {
-        swapActiveRendererMark = true;
-    } else {
-        swapActiveRendererMark = false;
-        swapActiveRendererLock = false;
     }
 }
 
