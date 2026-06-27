@@ -33,7 +33,7 @@ void PathTracer::init() {
                      Constants::PathTracer::MAX_INSTANCES);
 
     addRenderTarget("MainColorOutput", 0);
-    addRenderTarget("Normals", 1);
+    addRenderTarget("Normal", 1);
     addRenderTarget("Albedo", 2);
     addRenderTarget("Emissive", 3);
     addRenderTarget("IMR", 4);

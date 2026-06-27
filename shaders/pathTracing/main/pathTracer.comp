@@ -112,9 +112,9 @@ HitInfo getGBufferHit(const in Ray ray, ivec2 pixelCoords) {
     hit.dist = imageLoad(Depth, pixelCoords).r;
 
     hit.hitPos = ray.origin + ray.direction * hit.dist;
-    hit.normal = imageLoad(Normals, pixelCoords).rgb; // TODO: rename Normals -> Normal
+    hit.normal = imageLoad(Normal, pixelCoords).rgb;
 
-    hit.objectIndex = int(hitBuffer.r);
+    hit.objectIndex = uint(hitBuffer.r);
     hit.materialIndex = uint(hitBuffer.g);
 
     return hit;

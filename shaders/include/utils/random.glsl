@@ -8,8 +8,8 @@ void setSeed(vec2 fragCoord, uint frameNum)
 
 // Hash function for random uint
 uint wangHash(inout uint seed) {
-    seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
-    seed *= uint(9);
+    seed = (seed ^ 61u) ^ (seed >> 16u);
+    seed *= 9u;
     seed = seed ^ (seed >> 4);
     seed *= uint(0x27d4eb2d);
     seed = seed ^ (seed >> 15);
