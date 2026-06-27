@@ -29,7 +29,7 @@ class Application {
     void handleInputs();
 
     // Registering components
-    // TODO: temp?
+    // TODO: temp
     void registerSceneComponents(Scene &scene);
 
     // Loading the models + allocating the entities
