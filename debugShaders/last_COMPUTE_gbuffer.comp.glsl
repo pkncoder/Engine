@@ -40,8 +40,7 @@ struct HitInfo {
     vec3 hitPos;
     vec3 normal;
 
-    // TODO: this is stupid
-    int objectIndex;
+    uint objectIndex;
     uint materialIndex;
 };
 
@@ -141,7 +140,7 @@ HitInfo rayScene(Ray ray) {
     closestHit.dist = REALLY_FAR;
 
     // Loop every instance
-    for (int instID = 0; instID < uInstanceCount; instID++) {
+    for (uint instID = 0; instID < uInstanceCount; instID++) {
 
         // Get the current instance
         const GPUInstance instance = instances[instID];
@@ -213,7 +212,7 @@ uniform uint uFrameNum;
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D MainColorOutput;
-layout(rgba32f, binding = 1) uniform image2D Normals;
+layout(rgba32f, binding = 1) uniform image2D Normal;
 layout(rgba32f, binding = 2) uniform image2D Albedo;
 layout(rgba32f, binding = 3) uniform image2D Emissive;
 layout(rgba32f, binding = 4) uniform image2D IMR;
@@ -252,7 +251,7 @@ void main() {
     if (!hit.hit) {
 
         // Hit image data
-        imageStore(Normals, pixelCoords, vec4(0.0));
+        imageStore(Normal, pixelCoords, vec4(0.0));
         imageStore(Depth, pixelCoords, vec4(0.0));
         imageStore(Hit, pixelCoords, vec4(0.0));
 
@@ -270,7 +269,7 @@ void main() {
     // TODO: Figure out how to deal with debug visulizations in things like normal & depth
     imageStore(Hit, pixelCoords, vec4(hit.materialIndex, hit.materialIndex, 0.0, hit.hit));
     imageStore(Depth, pixelCoords, vec4(vec3(hit.dist), 1.0));
-    imageStore(Normals, pixelCoords, vec4(hit.normal, 1.0));
+    imageStore(Normal, pixelCoords, vec4(hit.normal, 1.0));
 
     // Material hit image data
     imageStore(Albedo, pixelCoords, vec4(material.albedo.rgb, 1.0));

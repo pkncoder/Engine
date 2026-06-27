@@ -40,8 +40,7 @@ struct HitInfo {
     vec3 hitPos;
     vec3 normal;
 
-    // TODO: this is stupid
-    int objectIndex;
+    uint objectIndex;
     uint materialIndex;
 };
 
@@ -73,8 +72,8 @@ void setSeed(vec2 fragCoord, uint frameNum)
 
 // Hash function for random uint
 uint wangHash(inout uint seed) {
-    seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
-    seed *= uint(9);
+    seed = (seed ^ 61u) ^ (seed >> 16u);
+    seed *= 9u;
     seed = seed ^ (seed >> 4);
     seed *= uint(0x27d4eb2d);
     seed = seed ^ (seed >> 15);
@@ -411,7 +410,7 @@ HitInfo rayScene(Ray ray) {
     closestHit.dist = REALLY_FAR;
 
     // Loop every instance
-    for (int instID = 0; instID < uInstanceCount; instID++) {
+    for (uint instID = 0; instID < uInstanceCount; instID++) {
 
         // Get the current instance
         const GPUInstance instance = instances[instID];
@@ -483,7 +482,7 @@ uniform uint uFrameNum;
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D MainColorOutput;
-layout(rgba32f, binding = 1) uniform image2D Normals;
+layout(rgba32f, binding = 1) uniform image2D Normal;
 layout(rgba32f, binding = 2) uniform image2D Albedo;
 layout(rgba32f, binding = 3) uniform image2D Emissive;
 layout(rgba32f, binding = 4) uniform image2D IMR;
@@ -573,9 +572,9 @@ HitInfo getGBufferHit(const in Ray ray, ivec2 pixelCoords) {
     hit.dist = imageLoad(Depth, pixelCoords).r;
 
     hit.hitPos = ray.origin + ray.direction * hit.dist;
-    hit.normal = imageLoad(Normals, pixelCoords).rgb; // TODO: rename Normals -> Normal
+    hit.normal = imageLoad(Normal, pixelCoords).rgb;
 
-    hit.objectIndex = int(hitBuffer.r);
+    hit.objectIndex = uint(hitBuffer.r);
     hit.materialIndex = uint(hitBuffer.g);
 
     return hit;
