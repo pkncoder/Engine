@@ -32,7 +32,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out how getting all of the "renderables" will work
   - Some maynot have materials, some may not be lights
   - Force them to have these, exclude lights?
-- [ ] Fix the periodic timer to work with: one-second intervals, fractional intervals, and make sure that it isn't skipping intervals (or clear it)
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 - [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
@@ -160,3 +159,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] RendererManager, to manage the renderers
 - [x] Rework rasterizer (pt. 1)
 - [x] RenderManager or RendererManager? (yes this is very important)
+- [x] Fix the periodic timer to work with: one-second intervals, fractional intervals, and make sure that it isn't skipping intervals (or clear it)

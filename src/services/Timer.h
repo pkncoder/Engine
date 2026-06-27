@@ -32,7 +32,11 @@ class Timer {
     static void beginProfile(const std::string &name);
     static void endProfile(const std::string &name,
                            const LogType logType = LogType::IN_PLACE);
-    static void periodicRun(int period, std::function<void()> function);
+
+    // Periodic run logic
+    static void periodicRun(const std::string &id, float period,
+                            std::function<void()> function);
+    static void removePeriodicTask(const std::string &id);
 
     // Output relevant data to console
     static void logPerformance(bool clearTerminal = true);
@@ -52,6 +56,10 @@ class Timer {
     // Periodic printing logic lock
     static inline bool periodPrintLock = false;
 
+    // Periodic run map for tracking
+    static inline std::unordered_map<std::string, double>
+        periodicTimerRegistry{};
+
     // Profile results
     static inline std::map<std::string, double> profileResults;
     static inline std::unordered_map<std::string, double> activeProfiles;
@@ -64,7 +72,7 @@ struct ScopedProfiler {
 
     ScopedProfiler(const std::string &name) : name(name) {
         Timer::beginProfile(name);
-    } // Constructor - Starts timer
+    }                                              // Constructor - Starts timer
     ~ScopedProfiler() { Timer::endProfile(name); } // Deconstructor - Ends timer
 };
 
