@@ -1,33 +1,56 @@
 .
 ├── assets/                                 # Scenes, models, textures, and HDRI maps
-├── debugShaders/                          # The last compiled fully concatenated shaders from the #includes (in text)
-│   ├── last_COMPUTE.glsl                       # Final compute shader
-│   ├── last_FRAGMENT.cpp                       # Final fragment shader
-│   └── last_VERTEX.cpp                         # Final vertex shader
+│   ├── materials/                             # Material files (.mat)
+│   ├── models/                                # Model files (.obj)
+│   └── textures/                              # Texture files (seperated into directories matching the model file name)
+├── debugShaders/                           # The last compiled fully concatenated shaders from the #includes (in text)
+│   ├── last_COMPUTE_gbuffer.comp.glsl          # Final compute shader
+│   ├── last_COMPUTE_invert.comp.glsl           # Final compute shader
+│   ├── last_COMPUTE_pathTracer.comp.glsl       # Final compute shader
+│   ├── last_FRAGMENT_raster.frag.glsl          # Final fragment shader
+│   └── last_VERTEX_raster.vert.glsl            # Final vertex shader
 ├── build/                                  # Generated build files (gitignored)
 ├── shaders/                                # GPU-Code
 │   ├── compute/                                # Ray-Based Rendering shaders (.comp)
-│   │   ├── pathTracer.comp                         # Uses BVH + Triangles (Physics-based)
-│   │   ├── rayTracer.comp                          # Standard Whitted-style (Clean, non-noisy)
-│   │   ├── rayMarcher.comp                         # Uses Signed Distance Fields (SDFs)
-│   │   └── rayCaster.comp                          # Uses a 3D Texture or SVO (Sparse Voxel Octree)
-│   ├── raster/                                 # Raterized shaders (.vert/frag)
-│   │   ├── viewport.vert/frag                      # Standard shaders for the modeling "grid" & wireframes
-│   │   ├── ui_overlay.vert/frag                    # Shaders for UI elements or gizmos (if not handled by ImGui)
-│   │   └── background.vert/frag                    # For rendering an HDRI skybox in the background
-│   └── include/                                # Shared "library" files (.glsl)
-│       ├── common.glsl                             # Constants (PI, EPSILON) and Utility functions
-│       ├── structures.glsl                         # Struct definitions for Material, Light, Vertex
-│       ├── pbr_brdf.glsl                           # Math for Physically Based Rendering (Fresnel, Smith, etc.)
-│       └── sampling.glsl                           # Random number generation and Blue Noise functions
+│   │   └── invert.comp                             # Testing post-processing effect for shader passes
+│   ├── include/                                # Shared "library" files (.glsl)
+│   │   ├── modelBases/                             # Base math for each shading model + a base function to get the final color
+│   │   │   ├── blinnPhongBase.glsl                     # Blinn phong base model
+│   │   │   └── cookTorranceBDRFBase.h                  # Cook-Torrance BDRF base model
+│   │   ├── utils/                                  # Utility functions
+│   │   │   ├── SRGB.glsl                               # SRGB translation functions
+│   │   │   ├── random.glsl                             # Random lib utility
+│   │   │   └── toneMapping.h                           # Tone mapping functions
+│   │   ├── common.glsl                             # Common definitions, usually for things like PI & EPSILON
+│   │   ├── sharedStructures.glsl                   # Structures shared throughout every renderer
+│   │   └── sharedUniforms.glsl                     # Uniforms shared throughout every renderer
+│   ├── pathTracing/                            # Path tracer renderer
+│   │   ├── main/                                   # Shader files that the renderers connect with
+│   │   │   ├── gbuffer.comp                            # First hit data saving
+│   │   │   └── pathTracer.comp                         # Main render file for the path tracer
+│   │   ├── models/                                 # Translation files from path tracing data to base function models
+│   │   │   ├── blinnPhong.glsl                         # Main entry Blinn-Phong function to translate path tracing data to the base
+│   │   │   └── cookTorranceBDRF.glsl                   # Main entry BDRF function to translate path tracing data to the base
+│   │   ├── buffers.glsl                            # Data buffers
+│   │   ├── intersections.glsl                      # Ray-Intersection functions
+│   │   ├── structures.glsl                         # Structure definitions
+│   │   ├── to_be_uniformed_valeus.glsl             # Temporary file for definitions that will eventually be uniforms
+│   │   └── uniforms.glsl                           # Uniforms
+│   └── rasterizing/                           # Rasterizer renderer
+│       ├── main/                                   # Shader files that the renderers connect with
+│       │   ├── raster.frag                             # Vertex shader for the rasterizer
+│       │   └── raster.vert                             # Fragment shader for the rasterizer
+│       ├── models/                                 # Translation files from rasterization data to base function models
+│       │   ├── blinnPhong.glsl                         # Main entry Blinn-Phong function to translate rasterization data to the base
+│       │   └── cookTorranceBDRF.glsl                   # Main entry BDRF function to translate rasterization data to the base
+│       └── uniforms.glsl                           # Uniforms
 ├── src/                                    # CPU-Code
 │   ├── acceleration/                           # Memory Optomization Structures
 │   │   ├── IAccelerationStructure.h                # Base Interface
-│   │   ├── BVHBuilder.cpp/h                        # Surface Area Heuristic (SAH) logic
-│   │   ├── Octree.cpp/h                            # For Ray Marching/SDFs
+│   │   ├── BVH.cpp/h                        # Surface Area Heuristic (SAH) logic
+│   │   ├── SVO.cpp/h                            # For Ray Marching/SDFs
 │   ├── core/                                   # Engine internals
 │   │   ├── Application.cpp/h                       # Main loop & layer management
-│   │   ├── Defaults.h                              # Default values
 │   │   └── Window.cpp/h                            # GLFW abstraction
 │   ├── renderer/                               # Rendering Logic & GPU Data handling
 │   │   ├── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
@@ -35,6 +58,7 @@
 │   │   ├── IRenderer.h                             # Base interface for a renderer
 │   │   ├── PathTracer.cpp/h                        # GPU Path Tracing
 │   │   ├── Rasterizer.cpp/h                        # GPU Rasterizer
+│   │   ├── RendererManager.cpp/h                   # Renderer management
 │   │   └── Shader.cpp/h                            # OpenGL shader and program compilation & usage
 │   ├── resources/                              # Resource loaders & managers
 │   │   ├── AssetManager.cpp/h                      # The "Central Hub" / Cache logic
@@ -51,8 +75,7 @@
 │   │   ├── ECS.h                                   # Entity ID typdefs & component registering
 │   │   ├── Entity.h                                # Entity wrapper for ease of use
 │   │   ├── EntitySpawner.h                         # Helper header file for spawning specific entity types (ex. renderable)
-│   │   ├── Scene.cpp/h                             # The "Registry" (manages the list of entities)
-│   │   └── System.h                                # Base class for logic (PhysicsSystem, etc.) TODO: change
+│   │   └── Scene.cpp/h                             # The "Registry" (manages the list of entities)
 │   ├── services/                               # Static classes that provide services
 │   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling
 │   │   ├── Logger.cpp/h                            # Engine-wide static logger for anything required
@@ -66,6 +89,8 @@
 │   │   │    └── SettingsPanel.cpp/h                    # Render settings (Samples per pixel, Ray depth)
 │   │   ├── IPanel.h                                    # Real-time modeling view
 │   │   └── UIController.cpp/h                      # ImGui setup/docking logic
+│   ├── Constants.h                             # Constant values
+│   ├── Defaults.h                              # Default values
 │   └── main.cpp                                # Entry point
 ├── CMakeLists.txt                          # Main build script
 └── vcpkg.json                              # Package manager
