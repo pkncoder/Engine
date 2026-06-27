@@ -52,6 +52,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 ### Todo - Not Code
 
 - [ ] Finish the readme
+- [ ] Update P_III_Archetecture to the style of P_IV_Planned_Archetecture
 
 ### Todo - Future Todos
 
