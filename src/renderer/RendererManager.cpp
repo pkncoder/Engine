@@ -51,12 +51,14 @@ void RendererManager::swapActiveRenderer(RenderChoice choice) {
     case RenderChoice::RASTERIZER:
         activeRenderer = rasterizer.get();
         currentRenderChoice = RenderChoice::RASTERIZER;
+        Logger::info("RENDERER", "Swapped to Rasterizer.");
         break;
     case RenderChoice::PATH_TRACER:
         // Make sure to check for compatibility
         if (systemComputeShaderCompatability) {
             activeRenderer = pathTracer.get();
             currentRenderChoice = RenderChoice::PATH_TRACER;
+            Logger::info("RENDERER", "Swapped to Path Tracer.");
         } else {
             Logger::error("RENDERER",
                           "Path Tracer is not supported on this system.");
