@@ -237,7 +237,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (0) {
+    if (1) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
@@ -254,11 +254,14 @@ void Application::setupEntities(Scene &scene) {
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
             glm::vec3(2.0);
 
-        // Albedo: 0.5
+        // 1.5 vinette radius; 0.9 softness
+        // 0.5 exposure
+        // 0.1, 0.1, 0.1 clear color
+        // 0.02 fog density; 0.5, 0.4, 0.1 fog color
     }
 
     // Breakfast room
-    if (1) {
+    if (0) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
 

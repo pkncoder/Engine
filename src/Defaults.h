@@ -34,8 +34,8 @@ inline constexpr const char *TITLE = "Engine";
 
 // Clear color values
 const float CLEAR_RED = 0.1f;
-const float CLEAR_GREEN = 0.3f;
-const float CLEAR_BLUE = 0.5f;
+const float CLEAR_GREEN = 0.1f;
+const float CLEAR_BLUE = 0.1f;
 const float CLEAR_ALPHA = 1.0f;
 
 } // namespace Window

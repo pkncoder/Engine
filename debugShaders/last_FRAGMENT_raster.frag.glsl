@@ -340,7 +340,7 @@ vec3 cookTorranceBDRF(const in vec3 viewPos, const in vec3 worldPos, const in ve
 // END INCLUDE: ../models/cookTorranceBDRF.glsl
 
 // TODO: move
-#define EXPOSURE 0.7
+#define EXPOSURE 0.5
 
 uniform samplerCube uShadowCubeMap;
 uniform float       uShadowFarPlane;
@@ -350,7 +350,7 @@ uniform vec2 uResolution;
 const float uVignetteRadius = 1.5;
 const float uVignetteSoftness = 0.9;
 
-const vec3  uFogColor = vec3(0.3, 0.3, 0.3);
+const vec3  uFogColor = vec3(0.5, 0.4, 0.1);
 const float uFogDensity = 0.02;
 
 // Add worldPos parameter
@@ -489,11 +489,11 @@ void main() {
     color = mix(uFogColor, color, fogFactor);
 
     // Vigette
-    // vec2 uv = gl_FragCoord.xy / uResolution;
-    // vec2 centerCoord = uv * 2.0 - 1.0;
-    // float centerDist = length(centerCoord);
-    // float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
-    // color *= vignette;
+    vec2 uv = gl_FragCoord.xy / uResolution;
+    vec2 centerCoord = uv * 2.0 - 1.0;
+    float centerDist = length(centerCoord);
+    float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
+    color *= vignette;
 
     // Output final fragment color
     FragColor = vec4(color, 1.0);
