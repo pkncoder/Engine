@@ -16,7 +16,6 @@ void Rasterizer::init() {
     shader = Shader("shaders/rasterizing/main/raster.vert",
                     "shaders/rasterizing/main/raster.frag");
 
-    // NEW: Shadow depth shader
     shadowShader = Shader("shaders/rasterizing/main/shadow.vert",
                           "shaders/rasterizing/main/shadow.frag");
 
@@ -48,22 +47,23 @@ void Rasterizer::init() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    // Depth renderbuffer — needed so depth testing works during each face
-    // render
+    // Generate the shadow render buffer & attach the width & height
     glGenRenderbuffers(1, &shadowDepthRBO);
     glBindRenderbuffer(GL_RENDERBUFFER, shadowDepthRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, SHADOW_WIDTH,
                           SHADOW_HEIGHT);
 
-    // FBO — color attachment is swapped per-face at render time
+    // Generate the shadow fbo + attach the render buffer
     glGenFramebuffers(1, &shadowFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                               GL_RENDERBUFFER, shadowDepthRBO);
 
+    // Check to make sure it generated
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         Logger::error("RENDERER", "Shadow cube map FBO incomplete!");
 
+    // Un-bind the the fbo and rbo
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -78,8 +78,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         activeScene.getMatchingEntities<TransformComponent, MeshComponent,
                                         MaterialComponent>();
 
-    // Helper: build model matrix from a transform (avoids duplicating this in
-    // both passes)
+    // Model matrix helper lamba function
     auto buildModel = [](const TransformComponent &t) {
         glm::mat4 m = glm::mat4(1.0f);
         m = glm::translate(m, t.position);
@@ -88,10 +87,8 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         return m;
     };
 
-    // ----------------------------------------------------------------
-    // Find the primary light: the most emissive object in the scene.
-    // Falls back to the camera position if nothing emits.
-    // ----------------------------------------------------------------
+    // Get the brightest light, and then shadow map that one
+    // TODO: temp
     glm::vec3 lightPos = camera.position;
     float bestEmissive = 0.0f;
     for (EntityID id : renderables) {
@@ -104,40 +101,44 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         }
     }
 
+    // Offsets for the shadow map
     const glm::vec3 faceDirections[6] = {{1, 0, 0},  {-1, 0, 0}, {0, 1, 0},
                                          {0, -1, 0}, {0, 0, 1},  {0, 0, -1}};
     const glm::vec3 faceUps[6] = {{0, -1, 0}, {0, -1, 0}, {0, 0, 1},
                                   {0, 0, -1}, {0, -1, 0}, {0, -1, 0}};
 
-    // 90 degree FOV, square aspect — exactly covers one cube face
+    // Shadow map projection matrix
     glm::mat4 shadowProj =
         glm::perspective(glm::radians(90.0f), 1.0f, SHADOW_NEAR, SHADOW_FAR);
-    // ================================================================
-    // PASS 1 — Shadow Map
-    // Render depth from the light's point of view
-    // ================================================================
 
+    // Get the render dimentions & pre-shadow mapping
     GLint savedViewport[4];
     glGetIntegerv(GL_VIEWPORT, savedViewport);
+
+    // Change the size of theviewport & bind the shadow FBO
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 
+    // Bind the shadow map shader & upload uniforms
     shadowShader.bind();
     shadowShader.setVec3("uLightPos", lightPos);
     shadowShader.setFloat("uFarPlane", SHADOW_FAR);
 
+    // Loop each face for the mapping
     for (int face = 0; face < 6; face++) {
-        // Point the FBO color output at this cube face
+        // Point the FBO color output at this cube face and attach settings
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
                                shadowCubeMap, 0);
         glDrawBuffer(GL_COLOR_ATTACHMENT0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Get the light view mat, and upload the new viewProjection matrix
         glm::mat4 lightView = glm::lookAt(
             lightPos, lightPos + faceDirections[face], faceUps[face]);
         shadowShader.setMat4("uLightSpaceMatrix", shadowProj * lightView);
 
+        // Loop each renderable & and shadow map it
         for (EntityID id : renderables) {
             const auto &mesh = activeScene.getComponent<MeshComponent>(id);
             const auto &transform =
@@ -148,42 +149,49 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         }
     }
 
+    // Un-bind the framebuffer and re-enstate the new viewport
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(savedViewport[0], savedViewport[1], savedViewport[2],
                savedViewport[3]);
-    // ================================================================
-    // PASS 2 — Main Raster Pass
-    // ================================================================
 
+    // Bind the main shader
     shader.bind();
 
+    // Get the viewProjection matrix values
     const glm::mat4 view = camera.getViewMatrix();
     const glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
 
+    // Upload the uniforms for base rendering
     shader.setMat4("uViewProjection", proj * view);
     shader.setVec3("uCameraPos", camera.position);
     shader.setFloat("uFOV", camera.fov);
     shader.setVec2("uResolution", glm::vec2(currentWidth, currentHeight));
 
-    // NEW: pass shadow data to the main shader
+    // Upload shadow mapping uniforms
     shader.setVec3("uLightPos", lightPos);
     shader.setFloat("uShadowFarPlane",
                     SHADOW_FAR); // new — replaces uLightSpaceMatrix
 
+    // Loop each renderablable
     for (EntityID id : renderables) {
+
+        // Get the important components
         const auto &mesh = activeScene.getComponent<MeshComponent>(id);
         const auto &transform =
             activeScene.getComponent<TransformComponent>(id);
         const auto &material = activeScene.getComponent<MaterialComponent>(id);
 
+        // Per-model uniforms
         shader.setMat4("uModel", buildModel(transform));
         shader.setInt("uIsBumpMap", material.isBumpMap);
 
+        // Per-model unifroms for materials
         shader.setVec3("uAlbedo", material.albedo);
         shader.setVec3("uEmmissive", material.emmissive);
         shader.setFloat("uRoughness", material.roughness);
         shader.setFloat("uMetallic", material.metallic);
 
+        // Texture map binding
         int currentTextureUnit = 0;
         auto bindMap = [&](GLuint texID, const std::string &uniformName,
                            GLuint fallbackID) {
@@ -200,13 +208,16 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         bindMap(material.metallicTexture, "uMetallicMap", defaultWhiteTexture);
         bindMap(material.normalTexture, "uNormalMap", defaultNormalTexture);
 
-        // NEW: Shadow map goes into the next free slot (unit 5)
+        // Get the atctive textureslot & bind the shadow map (cubemap)
         glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
         glBindTexture(GL_TEXTURE_CUBE_MAP,
                       shadowCubeMap); // cube map, not TEXTURE_2D
+        //
+        // Set the shadow map cubemat & increase currentTextureUnit
         shader.setInt("uShadowCubeMap", currentTextureUnit);
         currentTextureUnit++;
 
+        // Bind the vao and draw the triangles
         glBindVertexArray(mesh.vao);
         glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
     }

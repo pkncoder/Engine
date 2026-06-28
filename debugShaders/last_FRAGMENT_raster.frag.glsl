@@ -342,6 +342,7 @@ vec3 cookTorranceBDRF(const in vec3 viewPos, const in vec3 worldPos, const in ve
 // TODO: move
 #define EXPOSURE 0.12
 #define FOG_END 20.0
+#define SATURATION_AMOUNT 0.7
 
 uniform samplerCube uShadowCubeMap;
 uniform float       uShadowFarPlane;
@@ -470,6 +471,7 @@ void main() {
     // Add the emissive glow to the color
     color += emissive;
 
+    color = mix(vec3(color), vec3(color.g), SATURATION_AMOUNT);
     color *= EXPOSURE;
     color = (ACESFilm(color));
 
