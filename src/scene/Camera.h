@@ -31,7 +31,8 @@ class Camera {
     glm::mat4 getProjectionMatrix(float aspectRatio) const;
 
     // Processes input received from any keyboard-like input system
-    void processMovement(Camera_Movement direction);
+    void processMovement(Camera_Movement direction,
+                         float movementModifier = 1.0);
 
     // Processes the change to where the camera is looking
     void processLookingDirectionMovement(float xoffset, float yoffset,

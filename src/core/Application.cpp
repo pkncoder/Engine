@@ -123,6 +123,20 @@ void Application::handleInputs() {
     if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
         camera.processMovement(DOWN);
 
+    // Move the camera origin slowly
+    if (Input::isKeyPressed(GLFW_KEY_UP))
+        camera.processMovement(FORWARD, 0.1);
+    if (Input::isKeyPressed(GLFW_KEY_DOWN))
+        camera.processMovement(BACKWARD, 0.1);
+    if (Input::isKeyPressed(GLFW_KEY_LEFT))
+        camera.processMovement(LEFT, 0.1);
+    if (Input::isKeyPressed(GLFW_KEY_RIGHT))
+        camera.processMovement(RIGHT, 0.1);
+    if (Input::isKeyPressed(GLFW_KEY_ENTER))
+        camera.processMovement(UP, 0.1);
+    if (Input::isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
+        camera.processMovement(DOWN, 0.1);
+
     if (Input::isKeyJustPressed(GLFW_KEY_R)) {
 
         switch (RendererManager::getRenderChoice()) {
@@ -254,10 +268,10 @@ void Application::setupEntities(Scene &scene) {
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
             glm::vec3(2.0);
 
-        // 1.5 vinette radius; 0.9 softness
         // 0.5 exposure
-        // 0.1, 0.1, 0.1 clear color
         // 0.02 fog density; 0.5, 0.4, 0.1 fog color
+        // 1.5 vinette radius; 0.9 softness
+        // 0.1, 0.1, 0.1 clear color
     }
 
     // Breakfast room
@@ -277,10 +291,10 @@ void Application::setupEntities(Scene &scene) {
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
             glm::vec3(0.8f, 0.7f, 0.2f);
 
-        // No vinette
         // 0.7 exposure
-        // 0.1, 0.3, 0.5 clear color
         // 0.02 fog density; 0.3, 0.3, 0.3 fog color
+        // No vinette
+        // 0.1, 0.3, 0.5 clear color
     }
 
     // Sponza
@@ -300,10 +314,10 @@ void Application::setupEntities(Scene &scene) {
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
             glm::vec3(2.0);
 
-        // 1.5 vinette radius; 0.9 softness
         // 0.15 exposure
-        // 0.1, 0.1, 0.1 clear color
         // 0.02 fog density; 0.3, 0.3, 0.3 fog color
+        // 1.5 vinette radius; 0.9 softness
+        // 0.1, 0.1, 0.1 clear color
     }
 
     // Lost empire (Minecraft)
@@ -322,6 +336,11 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(0.0f);
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
             glm::vec3(2.0);
+
+        // 0.7 exposure
+        // 0.02 fog density; 0.7, 0.85, 0.98 fog color
+        // 1.74 vinette radius; 0.9 softness
+        // 0.1, 0.1, 0.1 clear color
     }
 
     // oiiaioooooiai (broken texture)

@@ -87,6 +87,16 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         return m;
     };
 
+    // Lambda for binding texture maps
+    int currentTextureUnit = 0;
+    auto bindMap = [&](GLuint texID, const std::string &uniformName,
+                       GLuint fallbackID) {
+        glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
+        glBindTexture(GL_TEXTURE_2D, texID != 0 ? texID : fallbackID);
+        shader.setInt(uniformName, currentTextureUnit);
+        currentTextureUnit++;
+    };
+
     // Get the brightest light, and then shadow map that one
     // TODO: temp
     glm::vec3 lightPos = camera.position;
@@ -143,7 +153,12 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
             const auto &mesh = activeScene.getComponent<MeshComponent>(id);
             const auto &transform =
                 activeScene.getComponent<TransformComponent>(id);
+            const auto &material =
+                activeScene.getComponent<MaterialComponent>(id);
+
             shadowShader.setMat4("uModel", buildModel(transform));
+            bindMap(material.alphaTexture, "uAlphaMap", defaultWhiteTexture);
+
             glBindVertexArray(mesh.vao);
             glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
         }
@@ -153,6 +168,12 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(savedViewport[0], savedViewport[1], savedViewport[2],
                savedViewport[3]);
+
+    /* ----------------- Pass 2 ----------------- */
+
+    // Enable the alpha channel
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Bind the main shader
     shader.bind();
@@ -192,20 +213,14 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
         shader.setFloat("uMetallic", material.metallic);
 
         // Texture map binding
-        int currentTextureUnit = 0;
-        auto bindMap = [&](GLuint texID, const std::string &uniformName,
-                           GLuint fallbackID) {
-            glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
-            glBindTexture(GL_TEXTURE_2D, texID != 0 ? texID : fallbackID);
-            shader.setInt(uniformName, currentTextureUnit);
-            currentTextureUnit++;
-        };
+        currentTextureUnit = 0;
 
         bindMap(material.albedoTexture, "uAlbedoMap", defaultWhiteTexture);
         bindMap(material.emissiveTexture, "uEmissiveMap", defaultWhiteTexture);
         bindMap(material.roughnessTexture, "uRoughnessMap",
                 defaultWhiteTexture);
         bindMap(material.metallicTexture, "uMetallicMap", defaultWhiteTexture);
+        bindMap(material.alphaTexture, "uAlphaMap", defaultWhiteTexture);
         bindMap(material.normalTexture, "uNormalMap", defaultNormalTexture);
 
         // Get the atctive textureslot & bind the shadow map (cubemap)
@@ -223,6 +238,7 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     }
 
     glBindVertexArray(0);
+    glDisable(GL_BLEND);
 }
 
 void Rasterizer::resize(const int newWidth, const int newHeight) {

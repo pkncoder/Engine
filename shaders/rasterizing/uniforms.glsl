@@ -18,6 +18,7 @@ uniform sampler2D uAlbedoMap;
 uniform sampler2D uEmissiveMap;
 uniform sampler2D uRoughnessMap;
 uniform sampler2D uMetallicMap;
+uniform sampler2D uAlphaMap;
 
 // Normal map + uniform for bump map detection
 uniform sampler2D uNormalMap;

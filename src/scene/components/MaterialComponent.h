@@ -20,6 +20,7 @@ struct MaterialComponent {
     GLuint emissiveTexture = 0;
     GLuint metallicTexture = 0;
     GLuint roughnessTexture = 0;
+    GLuint alphaTexture = 0;
 
     GLuint normalTexture = 0;
     bool isBumpMap = false;

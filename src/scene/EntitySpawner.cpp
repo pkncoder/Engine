@@ -68,6 +68,7 @@ std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
             loadTextureMap("emissive", material.emissiveTexture);
             loadTextureMap("metallic", material.metallicTexture);
             loadTextureMap("roughness", material.roughnessTexture);
+            loadTextureMap("alpha", material.alphaTexture);
             loadTextureMap("normal", material.normalTexture);
 
             // Handle albedo texture fallback

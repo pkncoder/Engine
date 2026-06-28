@@ -33,13 +33,14 @@ glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
 }
 
 // Camera movement
-void Camera::processMovement(Camera_Movement direction) {
+void Camera::processMovement(Camera_Movement direction,
+                             float movementModifier) {
 
     // Get deltaTime from the timer
     float deltaTime = Engine::Timer::getDeltaTime();
 
     // Calculate the velocity of the camera
-    float velocity = movementSpeed * deltaTime;
+    float velocity = movementSpeed * deltaTime * movementModifier;
 
     // Parse movement
     if (direction == FORWARD)

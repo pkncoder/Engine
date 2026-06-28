@@ -112,6 +112,7 @@ uniform sampler2D uAlbedoMap;
 uniform sampler2D uEmissiveMap;
 uniform sampler2D uRoughnessMap;
 uniform sampler2D uMetallicMap;
+uniform sampler2D uAlphaMap;
 
 // Normal map + uniform for bump map detection
 uniform sampler2D uNormalMap;
@@ -340,14 +341,16 @@ vec3 cookTorranceBDRF(const in vec3 viewPos, const in vec3 worldPos, const in ve
 // END INCLUDE: ../models/cookTorranceBDRF.glsl
 
 // TODO: move
-#define EXPOSURE 0.5
+#define EXPOSURE 0.7
+
+const float alphaCuttoff = 0.2;
 
 uniform samplerCube uShadowCubeMap;
 uniform float       uShadowFarPlane;
 uniform vec3      uLightPos;
 
 uniform vec2 uResolution;
-const float uVignetteRadius = 1.58;
+const float uVignetteRadius = 1.74;
 const float uVignetteSoftness = 0.9;
 
 const vec3  uFogColor = vec3(0.7, 0.85, 0.98);
@@ -457,9 +460,19 @@ void main() {
     vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;
     float roughness = texture(uRoughnessMap, vTexCoords).r * uRoughness;
     float metallic = texture(uMetallicMap, vTexCoords).r * uMetallic;
+    float alpha = texture(uAlphaMap, vTexCoords).r;
+
+    if (alpha < alphaCuttoff) {
+        discard;
+    }
 
     if (length(emissive) > 0.0) {
-        FragColor = vec4(emissive, 0.0);
+        float fogDist = length(uCameraPos - vWorldPos);
+        float fogFactor = exp(-pow(fogDist * uFogDensity, 2.0));
+        fogFactor = clamp(fogFactor, 0.0, 1.0);
+        vec3 color = mix(uFogColor, emissive, fogFactor);
+
+        FragColor = vec4(color, 1.0);
         return;
     }
 
@@ -496,5 +509,5 @@ void main() {
     color *= vignette;
 
     // Output final fragment color
-    FragColor = vec4(color, 0.0);
+    FragColor = vec4(color, 1.0);
 }

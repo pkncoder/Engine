@@ -63,6 +63,7 @@ MaterialLoader::loadMTL(const std::string &filepath) {
         assignTexture(material.emissive_texname, "emissive");
         assignTexture(material.roughness_texname, "roughness");
         assignTexture(material.metallic_texname, "metallic");
+        assignTexture(material.alpha_texname, "alpha");
 
         // Check both normal_texname & bump_texname
         assignTexture(material.normal_texname, "normal");
