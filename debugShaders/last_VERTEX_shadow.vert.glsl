@@ -15,5 +15,5 @@ void main() {
     vFragWorldPos     = worldPos.xyz;
     vTexCoords = aTexCoords;
 
-    gl_Position       = uLightSpaceMatrix * worldPos;
+    gl_Position = uLightSpaceMatrix * worldPos;
 }

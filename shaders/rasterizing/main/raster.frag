@@ -7,53 +7,37 @@
 #include "../../include/utils/toneMapping.glsl"
 
 #include "../uniforms.glsl"
+#include "../stylizing.glsl"
 
 #include "../models/blinnPhong.glsl"
 #include "../models/cookTorranceBDRF.glsl"
 
-// TODO: move
-#define EXPOSURE 0.7
-
-const float alphaCuttoff = 0.2;
-
-uniform samplerCube uShadowCubeMap;
-uniform float       uShadowFarPlane;
-uniform vec3      uLightPos;
-
-uniform vec2 uResolution;
-const float uVignetteRadius = 1.74;
-const float uVignetteSoftness = 0.9;
-
-const vec3  uFogColor = vec3(0.7, 0.85, 0.98);
-const float uFogDensity = 0.013;
-
 // Add worldPos parameter
 float calcShadow(vec3 worldPos, vec3 normal) {
     // Get the distance
-    vec3  fragToLight = worldPos - uLightPos;
+    vec3 fragToLight = worldPos - uLightPos;
     float currentDist = length(fragToLight) / uShadowFarPlane;
 
     // Find the light dir and bias the NdotL
-    vec3  lightDir = normalize(-fragToLight);
-    float bias     = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
+    vec3 lightDir = normalize(-fragToLight);
+    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
 
     // 20-tap 3D PCF — offsets spread around a sphere for smooth penumbra
     vec3 sampleOffsets[20] = vec3[](
-        vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
-        vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
-        vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
-        vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
-        vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+        vec3(1, 1, 1), vec3(1,-1, 1), vec3(-1, -1,  1), vec3(-1, 1, 1),
+        vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+        vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+        vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+        vec3(0, 1, 1), vec3( 0, -1, 1), vec3(0, -1, -1), vec3( 0, 1, -1)
     );
 
     // Saved values
-    float shadow     = 0.0;
-    const float diskRadius = 0.05; // TODO: move
+    float shadow = 0.0;
 
     // Loop the PCF
     for (int i = 0; i < 20; i++) {
         float closestDist = texture(uShadowCubeMap,
-                                    fragToLight + sampleOffsets[i] * diskRadius).r;
+                                fragToLight + sampleOffsets[i] * shadowDiskRadius).r;
         shadow += (currentDist - bias > closestDist) ? 1.0 : 0.0;
     }
 
@@ -72,7 +56,7 @@ mat3 calculateTBN(vec3 N, vec3 p, vec2 uv) {
     vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
     vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;
 
-    // --- FIXED: Secure against division-by-zero / NaN ---
+    // Make sure we don't devide by zero
     float denom = max(dot(T, T), dot(B, B));
     if (denom < EPSILON) {
         // Fallback: Create a clean procedural basis if the face has broken UVs
@@ -137,16 +121,6 @@ void main() {
         discard;
     }
 
-    if (length(emissive) > 0.0) {
-        float fogDist = length(uCameraPos - vWorldPos);
-        float fogFactor = exp(-pow(fogDist * uFogDensity, 2.0));
-        fogFactor = clamp(fogFactor, 0.0, 1.0);
-        vec3 color = mix(uFogColor, emissive, fogFactor);
-
-        FragColor = vec4(color, 1.0);
-        return;
-    }
-
     // Get the material struct
     Material mat = Material(vec4(albedo, 0.0), vec4(emissive, 0.0), roughness, metallic);
 
@@ -161,23 +135,29 @@ void main() {
     color += emissive;
 
     // Exposure
-    color *= EXPOSURE;
+    color *= exposure;
 
-    // Tone mapping
-    color = (ACESFilm(color));
+    if (toneMap) {
+        // Tone mapping
+        color = (ACESFilm(color));
+    }
 
-    // Fog
-    float fogDist = length(uCameraPos - vWorldPos);
-    float fogFactor = exp(-pow(fogDist * uFogDensity, 2.0));
-    fogFactor = clamp(fogFactor, 0.0, 1.0);
-    color = mix(uFogColor, color, fogFactor);
+    if (fog) {
+        // Fog
+        float fogDist = length(uCameraPos - vWorldPos);
+        float fogFactor = exp(-pow(fogDist * fogDensity, 2.0));
+        fogFactor = clamp(fogFactor, 0.0, 1.0);
+        color = mix(fogColor, color, fogFactor);
+    }
 
-    // Vigette
-    vec2 uv = gl_FragCoord.xy / uResolution;
-    vec2 centerCoord = uv * 2.0 - 1.0;
-    float centerDist = length(centerCoord);
-    float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
-    color *= vignette;
+    if (vignette) {
+        // Vigette
+        vec2 uv = gl_FragCoord.xy / uResolution;
+        vec2 centerCoord = uv * 2.0 - 1.0;
+        float centerDist = length(centerCoord);
+        float vignette = smoothstep(vignetteRadius, vignetteRadius - vignetteSoftness, centerDist);
+        color *= vignette;
+    }
 
     // Output final fragment color
     FragColor = vec4(color, 1.0);

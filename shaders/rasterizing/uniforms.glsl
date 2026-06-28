@@ -7,6 +7,9 @@ in vec2 vTexCoords;
 // Final color output
 out vec4 FragColor;
 
+// Render resolution
+uniform vec2 uResolution;
+
 // Base material values
 uniform vec3 uAlbedo;
 uniform vec3 uEmmissive;
@@ -23,3 +26,8 @@ uniform sampler2D uAlphaMap;
 // Normal map + uniform for bump map detection
 uniform sampler2D uNormalMap;
 uniform int uIsBumpMap;
+
+// Shadow mapping
+uniform samplerCube uShadowCubeMap;
+uniform float uShadowFarPlane;
+uniform vec3 uLightPos;

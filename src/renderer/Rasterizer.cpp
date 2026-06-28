@@ -171,10 +171,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
     /* ----------------- Pass 2 ----------------- */
 
-    // Enable the alpha channel
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     // Bind the main shader
     shader.bind();
 
@@ -238,7 +234,6 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     }
 
     glBindVertexArray(0);
-    glDisable(GL_BLEND);
 }
 
 void Rasterizer::resize(const int newWidth, const int newHeight) {
