@@ -25,6 +25,33 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ## Mission Statements
 
+## Development Phases
+
+- [x] Phase I
+  - [x] Project Setup
+  - [x] First Window
+- [x] Phase II
+  - [x] Hello Triangle
+- [x] Phase III
+  - [x] Basic Scene
+  - [x] Basic Asset Manager
+  - [x] Basic Rasterizer & Path Tracer
+    - [x] Renderer
+    - [x] Shaders
+- [ ] Phase IV
+  - [ ] Scene Manager
+  - [ ] Advanced Renderers & Shaders
+    - [ ] Rasterizer
+    - [ ] Ray Tracer
+    - [ ] Path Tracer
+    - [ ] Ray Marcher
+  - [ ] Acceleration Structures
+  - [ ] Scene & Render Exporting
+- [ ] Phase V
+  - [ ] UI/UX
+- [ ] Phase VI
+  - Rewire
+
 ## Todos
 
 ### Todo - Code
