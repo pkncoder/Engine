@@ -251,7 +251,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (0) {
+    if (1) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
@@ -259,8 +259,10 @@ void Application::setupEntities(Scene &scene) {
         std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
+        // emmissiveCube[0].getComponent<TransformComponent>().position =
+        //     glm::vec3(80.2f, 6.5f, -116.7f);
         emmissiveCube[0].getComponent<TransformComponent>().position =
-            glm::vec3(80.2f, 6.5f, -116.7f);
+            glm::vec3(47.1f, 8.1f, -50.8f);
         emmissiveCube[0].getComponent<TransformComponent>().scale =
             glm::vec3(0.2f);
         emmissiveCube[0].getComponent<MaterialComponent>().albedo =
@@ -268,8 +270,8 @@ void Application::setupEntities(Scene &scene) {
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
             glm::vec3(2.0);
 
-        // 0.5 exposure
-        // 0.02 fog density; 0.5, 0.4, 0.1 fog color
+        // 0.5/0.3 exposure
+        // 0.02/0.015 fog density; 0.5, 0.4, 0.1 fog color
         // 1.5 vinette radius; 0.9 softness
         // 0.1, 0.1, 0.1 clear color
     }
@@ -315,13 +317,13 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(2.0);
 
         // 0.15 exposure
-        // 0.02 fog density; 0.3, 0.3, 0.3 fog color
+        // 0.02 fog density; 0.5, 0.4, 0.1 fog color
         // 1.5 vinette radius; 0.9 softness
         // 0.1, 0.1, 0.1 clear color
     }
 
     // Lost empire (Minecraft)
-    if (1) {
+    if (0) {
         std::vector<Entity> lostEmpire = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/lost_empire.obj");
 
