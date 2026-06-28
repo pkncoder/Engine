@@ -1,11 +1,11 @@
-vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial) {
+vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial, const in float shadow) {
 
     // Basic Properties
     vec3 lightColor = lightMaterial.emissive.rgb;
     vec3 objectColor = objectMaterial.albedo.rgb;
 
     // Ambient
-    vec3 ambient = 0.15 * lightColor * objectColor;
+    vec3 ambient = 0.50 * lightColor * objectColor;
 
     // Diffuse
     vec3 lightDir = normalize(lightPos - worldPos);
@@ -25,7 +25,7 @@ vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3
     vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color
-    vec3 result = ambient + diffuse + specular;
+    vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
 
     // Return the result
     return result;

@@ -53,6 +53,43 @@ uniform mat4 uInverseView;
 // Camera FOV
 uniform float uFOV;
 // END INCLUDE: ../../include/sharedUniforms.glsl
+// BEGIN INCLUDE: ../../include/utils/srgb.glsl
+vec3 vecLessThan(vec3 f, float value) {
+    return vec3(
+        (f.x < value) ? 1.0f : 0.0f,
+        (f.y < value) ? 1.0f : 0.0f,
+        (f.z < value) ? 1.0f : 0.0f
+    );
+}
+
+vec3 linearToSRGB(vec3 rgb) {
+    rgb = clamp(rgb, 0.0f, 1.0f);
+    return mix(
+        pow(rgb, vec3(1.0f / 2.4f)) * 1.055f - 0.055f,
+        rgb * 12.92f,
+        vecLessThan(rgb, 0.0031308f)
+    );
+}
+
+vec3 SRGBToLinear(vec3 rgb) {
+    rgb = clamp(rgb, 0.0f, 1.0f);
+    return mix(
+        pow(((rgb + 0.055f) / 1.055f), vec3(2.4f)),
+        rgb / 12.92f,
+        vecLessThan(rgb, 0.04045f)
+    );
+}
+// END INCLUDE: ../../include/utils/srgb.glsl
+// BEGIN INCLUDE: ../../include/utils/toneMapping.glsl
+vec3 ACESFilm(vec3 x) {
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((x*(a*x + b)) / (x*(c*x + d) + e), 0.0f, 1.0f);
+}
+// END INCLUDE: ../../include/utils/toneMapping.glsl
 
 // BEGIN INCLUDE: ../uniforms.glsl
 
@@ -83,14 +120,14 @@ uniform int uIsBumpMap;
 
 // BEGIN INCLUDE: ../models/blinnPhong.glsl
 // BEGIN INCLUDE: ../../include/modelBases/blinnPhongBase.glsl
-vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial) {
+vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in Material lightMaterial, const in float shadow) {
 
     // Basic Properties
     vec3 lightColor = lightMaterial.emissive.rgb;
     vec3 objectColor = objectMaterial.albedo.rgb;
 
     // Ambient
-    vec3 ambient = 0.15 * lightColor * objectColor;
+    vec3 ambient = 0.50 * lightColor * objectColor;
 
     // Diffuse
     vec3 lightDir = normalize(lightPos - worldPos);
@@ -110,16 +147,16 @@ vec3 blinnPhongBase(const in vec3 viewPos, const in vec3 worldPos, const in vec3
     vec3 specular = lightColor * specularPower * specularStrength; 
 
     // Final color
-    vec3 result = ambient + diffuse + specular;
+    vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
 
     // Return the result
     return result;
 }
 // END INCLUDE: ../../include/modelBases/blinnPhongBase.glsl
 
-vec3 blinnPhong(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial) {
+vec3 blinnPhong(const in vec3 viewPos, const in vec3 worldPos, const in vec3 normal, const in Material objectMaterial, const in vec3 lightPos, const in  Material lightMaterial, const in float shadow) {
     // Pass in the math
-    return blinnPhongBase(viewPos, worldPos, normal, objectMaterial, lightPos, lightMaterial);
+    return blinnPhongBase(viewPos, worldPos, normal, objectMaterial, lightPos, lightMaterial, shadow);
 }
 // END INCLUDE: ../models/blinnPhong.glsl
 // BEGIN INCLUDE: ../models/cookTorranceBDRF.glsl
@@ -302,6 +339,48 @@ vec3 cookTorranceBDRF(const in vec3 viewPos, const in vec3 worldPos, const in ve
 
 // END INCLUDE: ../models/cookTorranceBDRF.glsl
 
+// TODO: move
+#define EXPOSURE 0.12
+#define FOG_END 20.0
+
+uniform samplerCube uShadowCubeMap;
+uniform float       uShadowFarPlane;
+uniform vec3      uLightPos;
+
+uniform vec2 uResolution; // Pass your window/viewport width and height here
+const float uVignetteRadius = 1.5; // Controls the size of the clear center area (lower = larger vignette)
+const float uVignetteSoftness = 0.9; // Controls the softness of the fade transition
+
+const vec3  uFogColor   = vec3(0.3, 0.3, 0.3); // Change to your desired fog color (e.g., light gray/blue)
+const float uFogDensity = 0.02;
+
+// Add worldPos parameter
+float calcShadow(vec3 worldPos, vec3 normal) {
+    vec3  fragToLight = worldPos - uLightPos;
+    float currentDist = length(fragToLight) / uShadowFarPlane;
+
+    vec3  lightDir = normalize(-fragToLight);
+    float bias     = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
+
+    // 20-tap 3D PCF — offsets spread around a sphere for smooth penumbra
+    vec3 sampleOffsets[20] = vec3[](
+        vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
+        vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+        vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+        vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+        vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+    );
+
+    float shadow     = 0.0;
+    float diskRadius = 0.05; // tune for harder/softer edges
+    for (int i = 0; i < 20; i++) {
+        float closestDist = texture(uShadowCubeMap,
+                                    fragToLight + sampleOffsets[i] * diskRadius).r;
+        shadow += (currentDist - bias > closestDist) ? 1.0 : 0.0;
+    }
+    return shadow / 20.0;
+}
+
 mat3 calculateTBN(vec3 N, vec3 p, vec2 uv) {
     vec3 dp1 = dFdx(p);
     vec3 dp2 = dFdy(p);
@@ -365,6 +444,8 @@ void main() {
     // Calculate the world normal
     vec3 worldNormal = normalize(TBN * localNormal);
 
+    float shadow = calcShadow(vWorldPos, worldNormal);
+
     // Sample & get the material values
     vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
     vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;
@@ -384,13 +465,25 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
 
     // Add the emissive glow to the color
     color += emissive;
 
-    // Add an ambient amount
-    color += albedo * 0.1;
+    color *= EXPOSURE;
+    color = (ACESFilm(color));
+
+    float fogDist = length(uCameraPos - vWorldPos);
+    float fogFactor = exp(-pow(fogDist * uFogDensity, 2.0));
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+    color = mix(uFogColor, color, fogFactor);
+
+    vec2 uv = gl_FragCoord.xy / uResolution;
+    vec2 centerCoord = uv * 2.0 - 1.0;
+    float centerDist = length(centerCoord);
+    float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
+
+    color *= vignette;
 
     // Output final fragment color
     FragColor = vec4(color, 1.0);

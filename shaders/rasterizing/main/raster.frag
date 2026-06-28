@@ -3,11 +3,55 @@
 #include "../../include/common.glsl"
 #include "../../include/sharedStructures.glsl"
 #include "../../include/sharedUniforms.glsl"
+#include "../../include/utils/srgb.glsl"
+#include "../../include/utils/toneMapping.glsl"
 
 #include "../uniforms.glsl"
 
 #include "../models/blinnPhong.glsl"
 #include "../models/cookTorranceBDRF.glsl"
+
+// TODO: move
+#define EXPOSURE 0.12
+#define FOG_END 20.0
+
+uniform samplerCube uShadowCubeMap;
+uniform float       uShadowFarPlane;
+uniform vec3      uLightPos;
+
+uniform vec2 uResolution; // Pass your window/viewport width and height here
+const float uVignetteRadius = 1.5; // Controls the size of the clear center area (lower = larger vignette)
+const float uVignetteSoftness = 0.9; // Controls the softness of the fade transition
+
+const vec3  uFogColor   = vec3(0.3, 0.3, 0.3); // Change to your desired fog color (e.g., light gray/blue)
+const float uFogDensity = 0.02;
+
+// Add worldPos parameter
+float calcShadow(vec3 worldPos, vec3 normal) {
+    vec3  fragToLight = worldPos - uLightPos;
+    float currentDist = length(fragToLight) / uShadowFarPlane;
+
+    vec3  lightDir = normalize(-fragToLight);
+    float bias     = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
+
+    // 20-tap 3D PCF — offsets spread around a sphere for smooth penumbra
+    vec3 sampleOffsets[20] = vec3[](
+        vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
+        vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+        vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+        vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+        vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+    );
+
+    float shadow     = 0.0;
+    float diskRadius = 0.05; // tune for harder/softer edges
+    for (int i = 0; i < 20; i++) {
+        float closestDist = texture(uShadowCubeMap,
+                                    fragToLight + sampleOffsets[i] * diskRadius).r;
+        shadow += (currentDist - bias > closestDist) ? 1.0 : 0.0;
+    }
+    return shadow / 20.0;
+}
 
 mat3 calculateTBN(vec3 N, vec3 p, vec2 uv) {
     vec3 dp1 = dFdx(p);
@@ -72,6 +116,8 @@ void main() {
     // Calculate the world normal
     vec3 worldNormal = normalize(TBN * localNormal);
 
+    float shadow = calcShadow(vWorldPos, worldNormal);
+
     // Sample & get the material values
     vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
     vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;
@@ -91,13 +137,25 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
+    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
 
     // Add the emissive glow to the color
     color += emissive;
 
-    // Add an ambient amount
-    color += albedo * 0.1;
+    color *= EXPOSURE;
+    color = (ACESFilm(color));
+
+    float fogDist = length(uCameraPos - vWorldPos);
+    float fogFactor = exp(-pow(fogDist * uFogDensity, 2.0));
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+    color = mix(uFogColor, color, fogFactor);
+
+    vec2 uv = gl_FragCoord.xy / uResolution;
+    vec2 centerCoord = uv * 2.0 - 1.0;
+    float centerDist = length(centerCoord);
+    float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
+
+    color *= vignette;
 
     // Output final fragment color
     FragColor = vec4(color, 1.0);

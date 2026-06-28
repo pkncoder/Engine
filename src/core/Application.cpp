@@ -88,6 +88,11 @@ void Application::run() {
         Logger::info("PROFILE",
                      "Average FPS: " + std::to_string(Timer::getAverageFPS()),
                      LogType::IN_PLACE);
+        Logger::info("CAMERA",
+                     "X: " + std::to_string(camera.position.x) +
+                         "Y: " + std::to_string(camera.position.y) +
+                         "Z: " + std::to_string(camera.position.z),
+                     LogType::IN_PLACE);
 
         END_PROFILE("Run Loop"); // End timer for run loop
 
@@ -182,7 +187,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Diffuse cube & emmisive cube
-    if (1) {
+    if (0) {
         std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/cube.obj");
 
@@ -200,15 +205,17 @@ void Application::setupEntities(Scene &scene) {
             activeScene, "assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
-            glm::vec3(4.0f, 0.0f, 2.0f);
+            glm::vec3(1.3f, 8.4f, -0.2f);
+        emmissiveCube[0].getComponent<TransformComponent>().scale =
+            glm::vec3(0.2f);
         emmissiveCube[0].getComponent<MaterialComponent>().albedo =
             glm::vec3(0.0f);
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
-            glm::vec3(1.0);
+            glm::vec3(2.0);
     }
 
     // Trans flag
-    if (1) {
+    if (0) {
         std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/trans.obj");
 
@@ -219,7 +226,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Franch flag
-    if (1) {
+    if (0) {
         std::vector<Entity> french = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/french.obj");
 
@@ -234,6 +241,20 @@ void Application::setupEntities(Scene &scene) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
+
+        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/cube.obj");
+
+        emmissiveCube[0].getComponent<TransformComponent>().position =
+            glm::vec3(80.2f, 6.5f, -116.7f);
+        emmissiveCube[0].getComponent<TransformComponent>().scale =
+            glm::vec3(0.2f);
+        emmissiveCube[0].getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.0f);
+        emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
+            glm::vec3(2.0);
+
+        // Albedo: 0.5
     }
 
     // Breakfast room
@@ -243,9 +264,21 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Sponza
-    if (0) {
+    if (1) {
         std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/sponza.obj");
+
+        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/cube.obj");
+
+        emmissiveCube[0].getComponent<TransformComponent>().position =
+            glm::vec3(1.3f, 8.4f, -0.2f);
+        emmissiveCube[0].getComponent<TransformComponent>().scale =
+            glm::vec3(0.05f);
+        emmissiveCube[0].getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.0f);
+        emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
+            glm::vec3(2.0);
     }
 
     // Lost empire (Minecraft)
