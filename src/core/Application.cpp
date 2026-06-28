@@ -237,7 +237,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (1) {
+    if (0) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");
@@ -307,9 +307,21 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Lost empire (Minecraft)
-    if (0) {
+    if (1) {
         std::vector<Entity> lostEmpire = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/lost_empire.obj");
+
+        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/cube.obj");
+
+        emmissiveCube[0].getComponent<TransformComponent>().position =
+            glm::vec3(-10.7f, 22.4f, 3.1f);
+        emmissiveCube[0].getComponent<TransformComponent>().scale =
+            glm::vec3(0.05f);
+        emmissiveCube[0].getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.0f);
+        emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
+            glm::vec3(2.0);
     }
 
     // oiiaioooooiai (broken texture)

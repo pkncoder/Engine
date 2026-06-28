@@ -347,11 +347,11 @@ uniform float       uShadowFarPlane;
 uniform vec3      uLightPos;
 
 uniform vec2 uResolution;
-const float uVignetteRadius = 1.5;
+const float uVignetteRadius = 1.58;
 const float uVignetteSoftness = 0.9;
 
-const vec3  uFogColor = vec3(0.5, 0.4, 0.1);
-const float uFogDensity = 0.02;
+const vec3  uFogColor = vec3(0.7, 0.85, 0.98);
+const float uFogDensity = 0.013;
 
 // Add worldPos parameter
 float calcShadow(vec3 worldPos, vec3 normal) {
@@ -496,5 +496,5 @@ void main() {
     color *= vignette;
 
     // Output final fragment color
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(color, 0.0);
 }
