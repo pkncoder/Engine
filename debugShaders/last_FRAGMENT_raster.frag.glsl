@@ -340,26 +340,26 @@ vec3 cookTorranceBDRF(const in vec3 viewPos, const in vec3 worldPos, const in ve
 // END INCLUDE: ../models/cookTorranceBDRF.glsl
 
 // TODO: move
-#define EXPOSURE 0.12
-#define FOG_END 20.0
-#define SATURATION_AMOUNT 0.7
+#define EXPOSURE 0.7
 
 uniform samplerCube uShadowCubeMap;
 uniform float       uShadowFarPlane;
 uniform vec3      uLightPos;
 
-uniform vec2 uResolution; // Pass your window/viewport width and height here
-const float uVignetteRadius = 1.5; // Controls the size of the clear center area (lower = larger vignette)
-const float uVignetteSoftness = 0.9; // Controls the softness of the fade transition
+uniform vec2 uResolution;
+const float uVignetteRadius = 1.5;
+const float uVignetteSoftness = 0.9;
 
-const vec3  uFogColor   = vec3(0.3, 0.3, 0.3); // Change to your desired fog color (e.g., light gray/blue)
+const vec3  uFogColor = vec3(0.3, 0.3, 0.3);
 const float uFogDensity = 0.02;
 
 // Add worldPos parameter
 float calcShadow(vec3 worldPos, vec3 normal) {
+    // Get the distance
     vec3  fragToLight = worldPos - uLightPos;
     float currentDist = length(fragToLight) / uShadowFarPlane;
 
+    // Find the light dir and bias the NdotL
     vec3  lightDir = normalize(-fragToLight);
     float bias     = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
 
@@ -372,13 +372,18 @@ float calcShadow(vec3 worldPos, vec3 normal) {
         vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
     );
 
+    // Saved values
     float shadow     = 0.0;
-    float diskRadius = 0.05; // tune for harder/softer edges
+    const float diskRadius = 0.05; // TODO: move
+
+    // Loop the PCF
     for (int i = 0; i < 20; i++) {
         float closestDist = texture(uShadowCubeMap,
                                     fragToLight + sampleOffsets[i] * diskRadius).r;
         shadow += (currentDist - bias > closestDist) ? 1.0 : 0.0;
     }
+
+    // Averge the shadow value
     return shadow / 20.0;
 }
 
@@ -471,21 +476,24 @@ void main() {
     // Add the emissive glow to the color
     color += emissive;
 
-    color = mix(vec3(color), vec3(color.g), SATURATION_AMOUNT);
+    // Exposure
     color *= EXPOSURE;
+
+    // Tone mapping
     color = (ACESFilm(color));
 
+    // Fog
     float fogDist = length(uCameraPos - vWorldPos);
     float fogFactor = exp(-pow(fogDist * uFogDensity, 2.0));
     fogFactor = clamp(fogFactor, 0.0, 1.0);
     color = mix(uFogColor, color, fogFactor);
 
-    vec2 uv = gl_FragCoord.xy / uResolution;
-    vec2 centerCoord = uv * 2.0 - 1.0;
-    float centerDist = length(centerCoord);
-    float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
-
-    color *= vignette;
+    // Vigette
+    // vec2 uv = gl_FragCoord.xy / uResolution;
+    // vec2 centerCoord = uv * 2.0 - 1.0;
+    // float centerDist = length(centerCoord);
+    // float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
+    // color *= vignette;
 
     // Output final fragment color
     FragColor = vec4(color, 1.0);

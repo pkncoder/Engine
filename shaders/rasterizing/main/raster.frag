@@ -12,8 +12,7 @@
 #include "../models/cookTorranceBDRF.glsl"
 
 // TODO: move
-#define EXPOSURE 0.12
-#define FOG_END 20.0
+#define EXPOSURE 0.7
 
 uniform samplerCube uShadowCubeMap;
 uniform float       uShadowFarPlane;
@@ -162,11 +161,11 @@ void main() {
     color = mix(uFogColor, color, fogFactor);
 
     // Vigette
-    vec2 uv = gl_FragCoord.xy / uResolution;
-    vec2 centerCoord = uv * 2.0 - 1.0;
-    float centerDist = length(centerCoord);
-    float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
-    color *= vignette;
+    // vec2 uv = gl_FragCoord.xy / uResolution;
+    // vec2 centerCoord = uv * 2.0 - 1.0;
+    // float centerDist = length(centerCoord);
+    // float vignette = smoothstep(uVignetteRadius, uVignetteRadius - uVignetteSoftness, centerDist);
+    // color *= vignette;
 
     // Output final fragment color
     FragColor = vec4(color, 1.0);

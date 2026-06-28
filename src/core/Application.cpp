@@ -258,13 +258,30 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // Breakfast room
-    if (0) {
+    if (1) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/breakfast_room.obj");
+
+        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/cube.obj");
+
+        emmissiveCube[0].getComponent<TransformComponent>().position =
+            glm::vec3(-2.2f, 3.8f, -1.9f);
+        emmissiveCube[0].getComponent<TransformComponent>().scale =
+            glm::vec3(0.05f);
+        emmissiveCube[0].getComponent<MaterialComponent>().albedo =
+            glm::vec3(0.0f);
+        emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
+            glm::vec3(0.8f, 0.7f, 0.2f);
+
+        // No vinette
+        // 0.7 exposure
+        // 0.1, 0.3, 0.5 clear color
+        // 0.02 fog density; 0.3, 0.3, 0.3 fog color
     }
 
     // Sponza
-    if (1) {
+    if (0) {
         std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/sponza.obj");
 
@@ -279,6 +296,11 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(0.0f);
         emmissiveCube[0].getComponent<MaterialComponent>().emmissive =
             glm::vec3(2.0);
+
+        // 1.5 vinette radius; 0.9 softness
+        // 0.15 exposure
+        // 0.1, 0.1, 0.1 clear color
+        // 0.02 fog density; 0.3, 0.3, 0.3 fog color
     }
 
     // Lost empire (Minecraft)
