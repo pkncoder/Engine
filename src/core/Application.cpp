@@ -83,6 +83,8 @@ void Application::run() {
         // Do things like event polling & buffer swapping
         window->postFrame();
 
+        camera.cameraDirty = false;
+
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()),
                      LogType::IN_PLACE);
         Logger::info("PROFILE",
@@ -228,6 +230,17 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(2.0);
     }
 
+    // Gay Room (me)
+    if (1) {
+        std::vector<Entity> room = EntitySpawner::spawnObjEntity(
+            activeScene, "assets/models/gayRoom.obj");
+
+        for (Entity entity : room) {
+            entity.getComponent<MaterialComponent>().emmissive *=
+                glm::vec3(1.0f);
+        }
+    }
+
     // Trans flag
     if (0) {
         std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
@@ -251,7 +264,7 @@ void Application::setupEntities(Scene &scene) {
     }
 
     // THE BACKROOMS????
-    if (1) {
+    if (0) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
             activeScene, "assets/models/backrooms_level1.obj");

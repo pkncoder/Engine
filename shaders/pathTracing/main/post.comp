@@ -1,0 +1,25 @@
+#version 460 core
+
+// Compute shader blocks
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+#include "../../include/utils/srgb.glsl"
+#include "../../include/utils/toneMapping.glsl"
+
+// Path-tracer specific uniforms
+#include "../uniforms.glsl"
+
+void main() {
+
+   // Calculate pixel uv
+   const ivec2  pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+   const ivec2 imgSize = imageSize(PostProcessedOutput);
+
+   // Error check on image size
+   if (pixelCoords.x >= imgSize.x || pixelCoords.y >= imgSize.y) return;
+
+   vec3 pixelColor = imageLoad(MainColorOutput, pixelCoords).rgb;
+   vec3 col = linearToSRGB(ACESFilm(pixelColor));
+
+   imageStore(PostProcessedOutput, pixelCoords, vec4(col, 1.0));
+}

@@ -33,19 +33,21 @@ void PathTracer::init() {
                      Constants::PathTracer::MAX_INSTANCES);
 
     addRenderTarget("MainColorOutput", 0);
-    addRenderTarget("Normal", 1);
+    addRenderTarget("PostProcessedOutput", 1);
+    addRenderTarget("Normal", 2);
     addRenderTarget("Albedo", 2);
-    addRenderTarget("Emissive", 3);
-    addRenderTarget("IMR", 4);
-    addRenderTarget("Depth", 5);
-    addRenderTarget("Hit", 6);
+    addRenderTarget("Emissive", 4);
+    addRenderTarget("IMR", 5);
+    addRenderTarget("Depth", 6);
+    addRenderTarget("Hit", 7);
 
     addShaderPass("gbuffer", "shaders/pathTracing/main/gbuffer.comp");
     addShaderPass("renderPass", "shaders/pathTracing/main/pathTracer.comp");
+    addShaderPass("post", "shaders/pathTracing/main/post.comp");
     addShaderPass("invert", "shaders/compute/invert.comp", false);
 
     // Display the main output by default
-    setDisplayTarget("MainColorOutput");
+    setDisplayTarget("PostProcessedOutput");
 
     Logger::info("RENDERER", "Path Tracer initialized");
 }
@@ -75,6 +77,10 @@ void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
     // Check no texture size
     if (currentWidth == 0 || currentHeight == 0)
         return;
+
+    if (camera.cameraDirty) {
+        frameCount = 0;
+    }
 
     // Increase the tracked frame count
     frameCount++;

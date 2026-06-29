@@ -55,6 +55,8 @@ void Camera::processMovement(Camera_Movement direction,
         position += up * velocity;
     if (direction == DOWN)
         position -= up * velocity;
+
+    cameraDirty = true;
 }
 
 // Pitch and yaw modifications
@@ -79,6 +81,8 @@ void Camera::processLookingDirectionMovement(float xoffset, float yoffset,
 
     // Update the camera vectors with new pitch & yaw
     updateCameraVectors();
+
+    cameraDirty = true;
 }
 
 // Update the front, right, and up vectors

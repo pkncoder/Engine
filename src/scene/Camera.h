@@ -59,6 +59,9 @@ class Camera {
     float sensitivity;
     float movementSpeed;
 
+    // Camera states
+    float cameraDirty = false;
+
   private:
     // Update the front, right, and up camera vectors
     void updateCameraVectors();

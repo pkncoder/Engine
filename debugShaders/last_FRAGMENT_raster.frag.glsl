@@ -133,7 +133,7 @@ const float shadowDiskRadius = 0.05;
 
 const float exposure = 0.3;
 
-const bool toneMap = false;
+const bool toneMap = true;
 
 const vec3  fogColor = vec3(0.5, 0.4, 0.1);
 const float fogDensity = 0.015;

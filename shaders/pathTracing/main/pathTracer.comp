@@ -12,8 +12,6 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Other utils
 #include "../../include/utils/random.glsl"
-#include "../../include/utils/srgb.glsl"
-#include "../../include/utils/toneMapping.glsl"
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
@@ -125,7 +123,7 @@ HitInfo getGBufferHit(const in Ray ray, ivec2 pixelCoords) {
 
 // Sky color
 vec3 colorSky(Ray ray) {
-    vec3 sunDir = normalize(vec3(0.4, 0.8, 0.3));
+    vec3 sunDir = normalize(vec3(0.2, 0.6, 0.7));
     float sunDot = max(dot(ray.direction, sunDir), 0.0);
 
     // Horizon/zenith gradient
@@ -212,10 +210,22 @@ void main() {
     // Construct the final ray
     const Ray ray = Ray(uCameraPos, rayDirWorld, 1.0 / rayDirWorld);
 
-    // Color based on the hit
-    vec3 col = colorScene(ray, pixelCoords);
+    int samples = 5;
 
-    col = linearToSRGB(ACESFilm(col));
+    // Color based on the hit
+    vec3 col = vec3(0.0);
+    for (int i = 0; i < samples; i++) {
+        col += colorScene(ray, pixelCoords);
+    }
+
+    col /= samples;
+
+    // Fetch stored color history
+    vec3 prev_color = imageLoad(MainColorOutput, pixelCoords).rgb;
+    
+    // Progressive temporal blend formula: 1/N accumulation
+    float weight = 1.0 / float(uFrameNum + 1u);
+    col = mix(prev_color, col, weight);
 
     // Write to the image with the final hit color
     // imageStore(MainColorOutput, pixelCoords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));

@@ -93,43 +93,6 @@ vec3 rndUnit(inout uint seed) {
     return vec3(r * cos(a), r * sin(a), z);
 }
 // END INCLUDE: ../../include/utils/random.glsl
-// BEGIN INCLUDE: ../../include/utils/srgb.glsl
-vec3 vecLessThan(vec3 f, float value) {
-    return vec3(
-        (f.x < value) ? 1.0f : 0.0f,
-        (f.y < value) ? 1.0f : 0.0f,
-        (f.z < value) ? 1.0f : 0.0f
-    );
-}
-
-vec3 linearToSRGB(vec3 rgb) {
-    rgb = clamp(rgb, 0.0f, 1.0f);
-    return mix(
-        pow(rgb, vec3(1.0f / 2.4f)) * 1.055f - 0.055f,
-        rgb * 12.92f,
-        vecLessThan(rgb, 0.0031308f)
-    );
-}
-
-vec3 SRGBToLinear(vec3 rgb) {
-    rgb = clamp(rgb, 0.0f, 1.0f);
-    return mix(
-        pow(((rgb + 0.055f) / 1.055f), vec3(2.4f)),
-        rgb / 12.92f,
-        vecLessThan(rgb, 0.04045f)
-    );
-}
-// END INCLUDE: ../../include/utils/srgb.glsl
-// BEGIN INCLUDE: ../../include/utils/toneMapping.glsl
-vec3 ACESFilm(vec3 x) {
-    float a = 2.51f;
-    float b = 0.03f;
-    float c = 2.43f;
-    float d = 0.59f;
-    float e = 0.14f;
-    return clamp((x*(a*x + b)) / (x*(c*x + d) + e), 0.0f, 1.0f);
-}
-// END INCLUDE: ../../include/utils/toneMapping.glsl
 
 // Coloring models
 // #include "../include/models/blinn_phong.glsl"
@@ -329,9 +292,9 @@ vec3 cookTorranceBDRF(inout Ray ray, in HitInfo hit, in Material objectMaterial,
 // BEGIN INCLUDE: ../to_be_uniformed_valeus.glsl
 // TODO: uniform
 
-#define MAX_BOUNCES 3
+#define MAX_BOUNCES 8
 #define MIN_BOUNCE_RUSSIAN_ROULETTE 2
-#define SKYBOX_COLOR_MULT 0.3
+#define SKYBOX_COLOR_MULT 0.5
 // END INCLUDE: ../to_be_uniformed_valeus.glsl
 // BEGIN INCLUDE: ../structures.glsl
 struct GPUMeshEntry {
@@ -482,12 +445,13 @@ uniform uint uFrameNum;
 
 // Final image writeout
 layout(rgba32f, binding = 0) uniform image2D MainColorOutput;
-layout(rgba32f, binding = 1) uniform image2D Normal;
-layout(rgba32f, binding = 2) uniform image2D Albedo;
-layout(rgba32f, binding = 3) uniform image2D Emissive;
-layout(rgba32f, binding = 4) uniform image2D IMR;
-layout(rgba32f, binding = 5) uniform image2D Depth;
-layout(rgba32f, binding = 6) uniform image2D Hit;
+layout(rgba32f, binding = 1) uniform image2D PostProcessedOutput;
+layout(rgba32f, binding = 2) uniform image2D Normal;
+layout(rgba32f, binding = 3) uniform image2D Albedo;
+layout(rgba32f, binding = 4) uniform image2D Emissive;
+layout(rgba32f, binding = 5) uniform image2D IMR;
+layout(rgba32f, binding = 6) uniform image2D Depth;
+layout(rgba32f, binding = 7) uniform image2D Hit;
 // END INCLUDE: ../uniforms.glsl
 
 // Cosine-weighted hemisphere sampling
@@ -585,7 +549,7 @@ HitInfo getGBufferHit(const in Ray ray, ivec2 pixelCoords) {
 
 // Sky color
 vec3 colorSky(Ray ray) {
-    vec3 sunDir = normalize(vec3(0.4, 0.8, 0.3));
+    vec3 sunDir = normalize(vec3(0.2, 0.6, 0.7));
     float sunDot = max(dot(ray.direction, sunDir), 0.0);
 
     // Horizon/zenith gradient
@@ -672,10 +636,22 @@ void main() {
     // Construct the final ray
     const Ray ray = Ray(uCameraPos, rayDirWorld, 1.0 / rayDirWorld);
 
-    // Color based on the hit
-    vec3 col = colorScene(ray, pixelCoords);
+    int samples = 5;
 
-    col = linearToSRGB(ACESFilm(col));
+    // Color based on the hit
+    vec3 col = vec3(0.0);
+    for (int i = 0; i < samples; i++) {
+        col += colorScene(ray, pixelCoords);
+    }
+
+    col /= samples;
+
+    // Fetch stored color history
+    vec3 prev_color = imageLoad(MainColorOutput, pixelCoords).rgb;
+    
+    // Progressive temporal blend formula: 1/N accumulation
+    float weight = 1.0 / float(uFrameNum + 1u);
+    col = mix(prev_color, col, weight);
 
     // Write to the image with the final hit color
     // imageStore(MainColorOutput, pixelCoords, vec4(rnd1(seed), rnd1(seed), rnd1(seed), 1.0));
