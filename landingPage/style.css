@@ -1,56 +1,81 @@
 /* Global CSS Design Variables Workspace */
 :root {
     /* Layout Framework Foundations */
-    --bg-main: #0b0c10;
-    --bg-card: #16161a;
-    --bg-card-hover: #1e1e24;
-    --border-color: #2a2a32;
+    --bg-main: #312E3D;                /* Your Main Background */
+    --bg-card: #524e64;                /* Elevated variation for visual hierarchy */
+    --bg-card-hover: #5f5a74;          /* Distinct hover separation */
+    --border-color: #6a6483;           /* Balanced structural border lines */
     
     /* Branding Assets & Accents */
-    --brand-red: #de3e4b;
-    --brand-red-hover: #ff5261;
+    --brand-red: #8783D1;              /* Your Secondary 2 (Periwinkle Accent Focus) */
+    --brand-red-hover: #a3a0df;        /* Brightened interactive focus state */
     
     /* Core Typography Matrix */
-    --text-primary-custom: #f3f3f6;
-    --text-secondary-custom: #9496a1;
+    --text-primary-custom: #F1E4F3;    /* Your Primary Color (Highly readable off-white) */
+    --text-secondary-custom: #c5bcc7;  /* High-contrast muted mauve-gray for paragraphs */
     
-    /* Flowchart/Demo Phase Operational States */
-    --state-done: #2ec4b6;
-    --state-active: #ff9f1c;
-    --state-planned: #6c757d;
-    --state-not-ported: #e71d36;
+    /* Flowchart/Demo Phase Operational States (Color Theory Additions) */
+    --state-done: #89A894;              /* Your Main Accent (Sage green for completion success) */
+    --state-active: #F4BBD3;            /* Your Secondary 1 (Pastel pink for active/in-progress focus) */
+    --state-planned: #75718a;           /* Harmonic muted slate-mauve for upcoming milestones */
+    --state-not-ported: #cf6b84;        /* Softened crimson/coral for warning states */
     
-    /* New Explicit Customization Variable Extensions */
-    --pfp-border-color: #de3e4b;
-    --pfp-shadow-color: rgba(69, 162, 158, 0.2);
-    --tech-pill-bg: rgba(69, 162, 158, 0.1);
-    --tech-pill-text: #66fcf1;
-    --modal-overlay-bg: #151a22;
-    --scroll-shadow-color: rgba(0, 0, 0, 0.85);
-    --gallery-edge-fade: #0b0c10;
+    /* Explicit Customization Variable Extensions */
+    --pfp-border-color: #8783D1;       /* Cohesive link with branding accents */
+    --pfp-shadow-color: rgba(135, 131, 209, 0.25);
+
+    --tech-pill-bg: rgba(137, 168, 148, 0.12); /* Semi-transparent sage tint */
+    --tech-pill-text: #b2cbb9;          /* Readable contrast variation of sage green */
+
+    --modal-overlay-bg: #2c2937;        /* Ultra-deep backdrop layer for focus control */
+    --scroll-shadow-color: rgba(22, 21, 28, 0.6);
+
+    --gallery-edge-fade: #444054;       /* Must match --bg-main for a perfect seamless blend */
+
+    /* Matrix Box */
+    --matrix-originality-bg: #283E2D;
+    --matrix-technicality-bg: #39406A;
+    --matrix-usability-bg: #812D22;
+    --matrix-storytelling-bg: #7A442A;
+
+    --matrix-originality-border: #A8C7B0;
+    --matrix-technicality-border: #B0B6D4;
+    --matrix-usability-border: #EFC7C2;
+    --matrix-storytelling-border: #E5C4B3;
 }
 
+/* Globals */
+.bg-main { background-color: var(--bg-main) !important; }
 .text-primary-custom { color: var(--text-primary-custom); }
 .text-secondary-custom { color: var(--text-secondary-custom); }
 
+/* TODO: temp */
 .text-brand-red { color: var(--brand-red) !important; }
 .brand-red-link { color: var(--brand-red) !important; }
 .brand-red-link:hover { color: var(--brand-red-hover) !important; }
-
 .title-icon-red { color: var(--brand-red); }
 
+/* TODO: temp */
 .card-border-custom { border-color: var(--border-color) !important; }
 .modal-border-custom { border: 1px solid var(--border-color) !important; }
 
 .text-done-custom { color: var(--state-done) !important; }
 .text-active-custom { color: var(--state-active) !important; }
+.text-planned { color: var(--state-planned) !important; }
+.text-not-ported { color: var(--state-not-ported) !important; }
 
-.metric-box-originality { background-color: rgba(46, 196, 182, 0.04); border: 1px solid rgba(46, 196, 182, 0.15); }
-.metric-box-technicality { background-color: rgba(255, 159, 28, 0.04); border: 1px solid rgba(255, 159, 28, 0.15); }
-.metric-box-usability { background-color: rgba(222, 62, 75, 0.04); border: 1px solid rgba(222, 62, 75, 0.15); }
-.metric-box-storytelling { background-color: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); }
+/* Matrix Box */
+.matrix-box-originality { background-color: var(--matrix-originality-bg); border: 1px solid var(--matrix-originality-border); }
+.matrix-box-technicality { background-color: var(--matrix-technicality-bg); border: 1px solid var(--matrix-technicality-border); }
+.matrix-box-usibility { background-color: var(--matrix-usability-bg); border: 1px solid var(--matrix-usability-border); }
+.matrix-box-storytelling { background-color: var(--matrix-storytelling-bg); border: 1px solid var(--matrix-storytelling-border); }
+
+.matrix-originality-color { color: var(--matrix-originality-border); }
+.matrix-technicality-color { color: var(--matrix-technicality-border); }
+.matrix-usability-color { color: var(--matrix-usability-border); }
+.matrix-storytelling-color { color: var(--matrix-storytelling-border); }
+
 .style-modal-bg { background-color: var(--modal-overlay-bg) !important; }
-.bg-main { background-color: var(--bg-main) !important; }
 .footer-link-list a { color: var(--text-secondary-custom); text-decoration: none; }
 .footer-link-list a:hover { color: var(--text-primary); text-decoration: underline; }
 
