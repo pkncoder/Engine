@@ -42,6 +42,9 @@
     --matrix-technicality-border: #B0B6D4;
     --matrix-usability-border: #EFC7C2;
     --matrix-storytelling-border: #E5C4B3;
+
+    /* Footer */
+    --footer-bg: #1C1A23;
 }
 
 /* Globals */
@@ -372,7 +375,7 @@ body {
 /* Footer */
 
 footer {
-    background-color: #050506;
+    background-color: var(--footer-bg);
     border-top: 1px solid var(--border-color);
 }
 footer a {
