@@ -45,10 +45,6 @@
 │       │   └── cookTorranceBDRF.glsl                   # Main entry BDRF function to translate rasterization data to the base
 │       └── uniforms.glsl                           # Uniforms
 ├── src/                                    # CPU-Code
-│   ├── acceleration/                           # Memory Optomization Structures
-│   │   ├── IAccelerationStructure.h                # Base Interface
-│   │   ├── BVH.cpp/h                        # Surface Area Heuristic (SAH) logic
-│   │   ├── SVO.cpp/h                            # For Ray Marching/SDFs
 │   ├── core/                                   # Engine internals
 │   │   ├── Application.cpp/h                       # Main loop & layer management
 │   │   └── Window.cpp/h                            # GLFW abstraction
@@ -80,15 +76,6 @@
 │   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling
 │   │   ├── Logger.cpp/h                            # Engine-wide static logger for anything required
 │   │   └── Timer.ccp/h                             # FPS, profiling, and anything time-based service
-│   ├── ui/                                     # UI/UX Layer
-│   │   ├── Panels/                                 # Individual windows (Properties, Hierarchy)
-│   │   │    ├── ViewportPanel.cpp/h                    # Shows the actual rendered image/texture
-│   │   │    ├── SceneHierarchy.cpp/h                   # List of objects in the scene
-│   │   │    ├── InspectorPanel.cpp/h                   # Tweaking variables/materials of selected objects
-│   │   │    ├── ConsolePanel.cpp/h                     # Logging and engine status
-│   │   │    └── SettingsPanel.cpp/h                    # Render settings (Samples per pixel, Ray depth)
-│   │   ├── IPanel.h                                    # Real-time modeling view
-│   │   └── UIController.cpp/h                      # ImGui setup/docking logic
 │   ├── Constants.h                             # Constant values
 │   ├── Defaults.h                              # Default values
 │   └── main.cpp                                # Entry point
