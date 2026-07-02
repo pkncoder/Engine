@@ -8,9 +8,9 @@ namespace Engine {
 
 struct EngineState {
   public:
-    WindowState windowState = WindowState();
-    RendererState rendererState = RendererState();
-    SceneState sceneState = SceneState();
+    WindowState window = WindowState();
+    RendererState renderer = RendererState();
+    SceneState scene = SceneState();
 };
 
 } // namespace Engine
