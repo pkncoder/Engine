@@ -1,4 +1,5 @@
 #include "../core/Window.h"
+#include "../core/states/RendererState.h"
 #include "../scene/Camera.h"
 #include "IRenderer.h"
 #include "PathTracer.h"
@@ -9,20 +10,12 @@
 
 namespace Engine {
 
-enum RenderChoice { RASTERIZER, PATH_TRACER };
-
 class RendererManager {
   public:
-    static void init();
+    static void init(RendererState &state);
     static void shutdown();
 
     static inline IRenderer *getActiveRenderer() { return activeRenderer; }
-    static inline const RenderChoice getRenderChoice() {
-        return currentRenderChoice;
-    }
-    static inline const bool getComputeShaderCompatibility() {
-        return systemComputeShaderCompatability;
-    }
 
     static void swapActiveRenderer(RenderChoice choice);
 
@@ -30,15 +23,8 @@ class RendererManager {
                        const Camera &camera);
 
   private:
-    static inline GLint openGlMajorVersion = 0;
-    static inline GLint openGlMinorVersion = 0;
-
-    static inline bool systemComputeShaderCompatability = false;
-
     static inline std::unique_ptr<Rasterizer> rasterizer = nullptr;
     static inline std::unique_ptr<PathTracer> pathTracer = nullptr;
-
-    static inline RenderChoice currentRenderChoice;
 
     static inline IRenderer *activeRenderer = nullptr;
 };

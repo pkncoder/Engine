@@ -15,7 +15,7 @@ enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 class Camera {
   public:
     // Constructors
-    Camera() = default;
+    Camera() = default; // TODO: whyyy
     Camera(CameraState &state);
 
     // Calculates and returns the view matrix

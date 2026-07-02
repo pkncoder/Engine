@@ -5,23 +5,23 @@
 
 namespace Engine {
 
-// TODO: Add a param for what to default the active renderer to
-void RendererManager::init() {
+void RendererManager::init(RendererState &state) {
 
     // Rasterizer inizialization
     rasterizer = std::make_unique<Rasterizer>();
     rasterizer->init();
 
     // Check for OpenGL compatibility
-    glGetIntegerv(GL_MAJOR_VERSION, &openGlMajorVersion);
-    glGetIntegerv(GL_MINOR_VERSION, &openGlMinorVersion);
+    glGetIntegerv(GL_MAJOR_VERSION, &state.settings.openGlMajorVersion);
+    glGetIntegerv(GL_MINOR_VERSION, &state.settings.openGlMinorVersion);
 
     // Check for compute shader compatibility
-    if (openGlMajorVersion > 4 ||
-        (openGlMajorVersion == 4 && openGlMinorVersion >= 6)) {
+    if (state.settings.openGlMajorVersion > 4 ||
+        (state.settings.openGlMajorVersion == 4 &&
+         state.settings.openGlMinorVersion >= 6)) {
 
         // Set compute shader compatible
-        systemComputeShaderCompatability = true;
+        state.settings.systemComputeShaderCompatability = true;
 
         // Path tracer inizialization
         pathTracer = std::make_unique<PathTracer>();
@@ -32,7 +32,7 @@ void RendererManager::init() {
 
     // Set the active renderer
     activeRenderer = rasterizer.get();
-    currentRenderChoice = RenderChoice::RASTERIZER;
+    state.settings.currentRenderChoice = RenderChoice::RASTERIZER;
 
     Logger::info("RENDERER", "Renderer Manager initialized.");
 }
@@ -50,23 +50,17 @@ void RendererManager::swapActiveRenderer(RenderChoice choice) {
     switch (choice) {
     case RenderChoice::RASTERIZER:
         activeRenderer = rasterizer.get();
-        currentRenderChoice = RenderChoice::RASTERIZER;
         Logger::info("RENDERER", "Swapped to Rasterizer.");
         break;
     case RenderChoice::PATH_TRACER:
         // Make sure to check for compatibility
-        if (systemComputeShaderCompatability) {
-            activeRenderer = pathTracer.get();
-            currentRenderChoice = RenderChoice::PATH_TRACER;
-            Logger::info("RENDERER", "Swapped to Path Tracer.");
-        } else {
-            Logger::error("RENDERER",
-                          "Path Tracer is not supported on this system.");
-        }
+        activeRenderer = pathTracer.get();
+        Logger::info("RENDERER", "Swapped to Path Tracer.");
         break;
     }
 }
 
+// TODO: replace with context
 void RendererManager::render(const Window &window, class Scene &scene,
                              const Camera &camera) {
     // Render the scene

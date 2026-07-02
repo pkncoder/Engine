@@ -10,6 +10,7 @@
 #include "../services/Input.h"
 #include "../services/Logger.h"
 #include "../services/Timer.h"
+#include "states/RendererSettings.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
@@ -47,7 +48,7 @@ void Application::init() {
     // Initialize the scene
     activeScene = Scene();
 
-    RendererManager::init();
+    RendererManager::init(engineState.rendererState);
 
     // Register the scene components and load the scene
     // TODO: temp
@@ -140,12 +141,31 @@ void Application::handleInputs() {
 
     if (Input::isKeyJustPressed(GLFW_KEY_R)) {
 
-        switch (RendererManager::getRenderChoice()) {
+        switch (engineState.rendererState.settings.currentRenderChoice) {
         case RenderChoice::RASTERIZER:
-            RendererManager::swapActiveRenderer(RenderChoice::PATH_TRACER);
+
+            // Check to see if compute shaders are compatable with this system
+            if (engineState.rendererState.settings
+                    .systemComputeShaderCompatability) {
+
+                // If they are, swap the render choice and set it in the engine
+                // state
+                RendererManager::swapActiveRenderer(RenderChoice::PATH_TRACER);
+                engineState.rendererState.settings.currentRenderChoice =
+                    RenderChoice::PATH_TRACER;
+            } else {
+
+                // Else, send an error
+                Logger::error("RENDERER",
+                              "Path Tracer not supported on this system.");
+            }
             break;
         case RenderChoice::PATH_TRACER:
+
+            // Swap to rasterizer & set the render choice
             RendererManager::swapActiveRenderer(RenderChoice::RASTERIZER);
+            engineState.rendererState.settings.currentRenderChoice =
+                RenderChoice::RASTERIZER;
             break;
         }
     }

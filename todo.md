@@ -116,6 +116,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Marching Spheres
 - [ ] Scene state manager. A class to track the "dirty" flags instead of implementing it into every renderer
 - [ ] Allow for NeRFs (Neural Radience Feilds)
+- [ ] "Version Bitfield Signatures" for very quick updates
+  - Ex. RendererSettings has the active render updated, so it changes it's bit on the signature. Instead of the onEvent going through each change to see if a version matches, do a bitwise or (or something) to find the exact updated thing
 
 ## Steps
 
