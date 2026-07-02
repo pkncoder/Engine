@@ -34,13 +34,13 @@ void Application::init() {
     engineState = EngineState();
 
     // Create the window & relating services
-    window = std::make_unique<Window>(engineState.windowState);
+    window = std::make_unique<Window>(engineState.window);
 
     Input::init(window->getNativeWindow());
     Timer::init();
 
     // Init the camera at a starting pos
-    camera = Camera(engineState.sceneState.camera);
+    camera = Camera(engineState.scene.camera);
 
     // Initialize the asset manager
     AssetManager::init();
@@ -48,7 +48,7 @@ void Application::init() {
     // Initialize the scene
     activeScene = Scene();
 
-    RendererManager::init(engineState.rendererState);
+    RendererManager::init(engineState.renderer);
 
     // Register the scene components and load the scene
     // TODO: temp
@@ -141,17 +141,17 @@ void Application::handleInputs() {
 
     if (Input::isKeyJustPressed(GLFW_KEY_R)) {
 
-        switch (engineState.rendererState.settings.currentRenderChoice) {
+        switch (engineState.renderer.settings.currentRenderChoice) {
         case RenderChoice::RASTERIZER:
 
             // Check to see if compute shaders are compatable with this system
-            if (engineState.rendererState.settings
+            if (engineState.renderer.settings
                     .systemComputeShaderCompatability) {
 
                 // If they are, swap the render choice and set it in the engine
                 // state
                 RendererManager::swapActiveRenderer(RenderChoice::PATH_TRACER);
-                engineState.rendererState.settings.currentRenderChoice =
+                engineState.renderer.settings.currentRenderChoice =
                     RenderChoice::PATH_TRACER;
             } else {
 
@@ -164,7 +164,7 @@ void Application::handleInputs() {
 
             // Swap to rasterizer & set the render choice
             RendererManager::swapActiveRenderer(RenderChoice::RASTERIZER);
-            engineState.rendererState.settings.currentRenderChoice =
+            engineState.renderer.settings.currentRenderChoice =
                 RenderChoice::RASTERIZER;
             break;
         }

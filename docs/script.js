@@ -20,7 +20,7 @@ const developmentalPipelineData = [
     {
         phase: "Phase III",
         status: "done",
-        badgeText: "Exited",
+        badgeText: "Done",
         items: ["Basic Scene handling framework", "Asset Manager instantiation", "Base Rasterizer & Path Tracer engine tests"]
     },
     {

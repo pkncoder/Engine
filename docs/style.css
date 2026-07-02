@@ -7,8 +7,11 @@
     --border-color: #6a6483;           /* Balanced structural border lines */
     
     /* Branding Assets & Accents */
-    --brand-red: #8783D1;              /* Your Secondary 2 (Periwinkle Accent Focus) */
-    --brand-red-hover: #a3a0df;        /* Brightened interactive focus state */
+    --accent-one: #8783D1;              /* Your Secondary 2 (Periwinkle Accent Focus) */
+    --accent-one-hover: #a3a0df;        /* Brightened interactive focus state */
+
+    --accent-two: #F4BBD3;              /* Your Secondary 2 (Periwinkle Accent Focus) */
+    --accent-two-hover: #E873A4;        /* Brightened interactive focus state */
     
     /* Core Typography Matrix */
     --text-primary-custom: #F1E4F3;    /* Your Primary Color (Highly readable off-white) */
@@ -52,11 +55,16 @@
 .text-primary-custom { color: var(--text-primary-custom); }
 .text-secondary-custom { color: var(--text-secondary-custom); }
 
-/* TODO: temp */
-.text-brand-red { color: var(--brand-red) !important; }
-.brand-red-link { color: var(--brand-red) !important; }
-.brand-red-link:hover { color: var(--brand-red-hover) !important; }
-.title-icon-red { color: var(--brand-red); }
+/* Accent Colors */
+.accent-one { color: var(--accent-one) !important; }
+.accent-one-hover { color: var(--accent-one-hover) !important; }
+.bg-accent-one { background-color: var(--accent-one) !important; }
+
+.accent-two { color: var(--accent-two) !important; }
+.bg-accent-two { background-color: var(--accent-two) !important; }
+
+
+.title-icon { color: var(--accent-one); }
 
 /* TODO: temp */
 .card-border-custom { border-color: var(--border-color) !important; }
@@ -106,7 +114,7 @@ body {
 .squiggly-error {
     text-decoration: underline;
     text-decoration-style: wavy;
-    text-decoration-color: var(--brand-red);
+    text-decoration-color: var(--accent-one);
     text-underline-offset: 6px;
     text-decoration-thickness: 2px;
 }
@@ -138,7 +146,7 @@ body {
 }
 
 .repository-badge {
-    background-color: var(--brand-red) !important;
+    background-color: var(--accent-one) !important;
     border: 1px solid var(--border-color) !important;
     font-weight: 500;
     color: var(--text-primary-custom) !important;
@@ -273,8 +281,8 @@ body {
 /* Evaluation Box */
 
 .reviewer-guide-badge {
-    background-color: rgba(222, 62, 75, 0.1);
-    color: var(--brand-red) !important;
+    background-color: var(--state-active) !important;
+    color: var(--bg-main);
     border: 1px solid rgba(222, 62, 75, 0.25);
 }
 
