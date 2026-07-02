@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Defaults.h"
+#include "../core/states/CameraState.h"
 
 #include <glm/glm.hpp>
 
@@ -14,15 +14,9 @@ enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 
 class Camera {
   public:
-    // Constructor with vectors
-    Camera(glm::vec3 _position = Defaults::Camera::POSITION,
-           glm::vec3 _up = glm::vec3(0.0f, 1.0f, 0.0f),
-           glm::vec3 _right = glm::vec3(1.0f, 0.0f, 0.0f),
-           float _yaw = Defaults::Camera::YAW,
-           float _pitch = Defaults::Camera::PITCH,
-           float _fov = Defaults::Camera::FOV,
-           float _sensitivity = Defaults::Camera::SENSITIVITY,
-           float _movementSpeed = Defaults::Camera::MOVEMENT_SPEED);
+    // Constructors
+    Camera() = default;
+    Camera(CameraState &state);
 
     // Calculates and returns the view matrix
     glm::mat4 getViewMatrix() const;

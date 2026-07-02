@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../Defaults.h"
-
 #include "glad/glad.h"
+#include "states/WindowState.h"
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -11,9 +10,7 @@ namespace Engine {
 class Window {
   public:
     // Constructor & Deconstructor
-    Window(const std::string &_title = Defaults::Window::TITLE,
-           int _width = Defaults::Window::WIDTH,
-           int _height = Defaults::Window::HEIGHT);
+    Window(WindowState &state);
     ~Window();
 
     // OpenGL settings function

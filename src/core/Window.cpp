@@ -10,8 +10,7 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-Window::Window(const std::string &_title, int _width, int _height)
-    : title(_title), width(_width), height(_height) {
+Window::Window(WindowState &state) {
 
     // Initialize & check for error for glfw
     if (!glfwInit()) {
@@ -33,7 +32,8 @@ Window::Window(const std::string &_title, int _width, int _height)
 #endif
 
     // Create the GLFW window and give it to our wrapper
-    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(state.width, state.height, state.title.c_str(),
+                              nullptr, nullptr);
 
     // Check to make sure the window actually got made
     if (!window) {
@@ -60,6 +60,9 @@ Window::Window(const std::string &_title, int _width, int _height)
     int bufferWidth, bufferHeight;
     glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
     glViewport(0, 0, bufferWidth, bufferHeight);
+
+    glClearColor(state.clear_red, state.clear_green, state.clear_blue,
+                 state.clear_alpha);
 }
 
 // Deconstructor - Kill glfw
@@ -93,8 +96,6 @@ void Window::swapBuffers() const { glfwSwapBuffers(window); }
 
 // Pre-frame window steps
 void Window::preFrame() const {
-    glClearColor(Defaults::Window::CLEAR_RED, Defaults::Window::CLEAR_GREEN,
-                 Defaults::Window::CLEAR_BLUE, Defaults::Window::CLEAR_ALPHA);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

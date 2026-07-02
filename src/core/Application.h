@@ -2,6 +2,7 @@
 
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
+#include "./states/EngineState.h"
 #include "Window.h"
 
 #include <memory>
@@ -37,6 +38,9 @@ class Application {
     void setupEntities(Scene &scene);
 
   private:
+    // Engine state
+    EngineState engineState;
+
     // Window information
     std::unique_ptr<Window> window;
 

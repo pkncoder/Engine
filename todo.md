@@ -115,7 +115,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Non-Euclideon geometry
 - [ ] Marching Spheres
 - [ ] Scene state manager. A class to track the "dirty" flags instead of implementing it into every renderer
-- [ ] Plan out the texture handle nonsense
+- [ ] Allow for NeRFs (Neural Radience Feilds)
 
 ## Steps
 
@@ -185,3 +185,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] RenderManager or RendererManager? (yes this is very important)
 - [x] Fix the periodic timer to work with: one-second intervals, fractional intervals, and make sure that it isn't skipping intervals (or clear it)
 - [x] Try to reduce the amount of looping being done on materials / instances etc. Maybe try to use the caches in AssetManager more?
+- [x] Plan out the texture handle nonsense

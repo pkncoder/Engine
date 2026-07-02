@@ -30,17 +30,16 @@ void Application::init() {
     Logger::init();
     Logger::setNoPendingLogs(true);
 
-    // Create the window
-    window = std::make_unique<Window>();
+    engineState = EngineState();
 
-    // Init the input service
+    // Create the window & relating services
+    window = std::make_unique<Window>(engineState.windowState);
+
     Input::init(window->getNativeWindow());
-
-    // Init the timer service
     Timer::init();
 
     // Init the camera at a starting pos
-    camera = Camera();
+    camera = Camera(engineState.sceneState.camera);
 
     // Initialize the asset manager
     AssetManager::init();

@@ -8,11 +8,11 @@
 namespace Engine {
 
 // Constructor
-Camera::Camera(glm::vec3 _position, glm::vec3 _up, glm::vec3 _right, float _yaw,
-               float _pitch, float _fov, float _sensitivity,
-               float _movementSpeed)
-    : position(_position), up(_up), right(_right), yaw(_yaw), pitch(_pitch),
-      fov(_fov), sensitivity(_sensitivity), movementSpeed(_movementSpeed) {
+Camera::Camera(CameraState &state)
+    : position(state.position), up(state.up), right(state.right),
+      yaw(state.yaw), pitch(state.pitch), fov(state.fov),
+      sensitivity(state.settings.sensitivity),
+      movementSpeed(state.settings.movementSpeed) {
 
     this->worldUp = up;
 

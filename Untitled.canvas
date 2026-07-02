@@ -1,7 +1,7 @@
 {
 	"nodes":[
 		{"id":"31b6ff5dfe424ba8","type":"group","x":320,"y":-2011,"width":1560,"height":1720,"color":"5","label":"shaders"},
-		{"id":"37de8218d2fc5437","type":"group","x":-572,"y":-143,"width":1285,"height":877,"color":"1","label":"Core"},
+		{"id":"37de8218d2fc5437","type":"group","x":-572,"y":-143,"width":1285,"height":923,"color":"1","label":"Core"},
 		{"id":"489655f991e14f27","type":"group","x":793,"y":-200,"width":718,"height":950,"color":"4","label":"Renderer"},
 		{"id":"121207b29e40d502","type":"group","x":-1580,"y":-418,"width":800,"height":698,"color":"2","label":"Scene"},
 		{"id":"19d5dcfecc8e56fa","type":"group","x":1125,"y":-1595,"width":720,"height":574,"color":"5","label":"rayTracer"},
@@ -9,8 +9,8 @@
 		{"id":"3b23ad430582c2a5","type":"group","x":360,"y":-927,"width":706,"height":574,"color":"1","label":"pathTracer"},
 		{"id":"f70d60976e9f6996","type":"group","x":360,"y":-1595,"width":706,"height":574,"color":"2","label":"rasterizing"},
 		{"id":"3e2ce843ec4f3de0","type":"group","x":-629,"y":-733,"width":830,"height":418,"color":"3","label":"Resources"},
+		{"id":"e1edb4e2281e6658","type":"group","x":-523,"y":307,"width":483,"height":453,"color":"2","label":"State"},
 		{"id":"a077b58774b5c154","type":"group","x":360,"y":-1911,"width":852,"height":240,"color":"3","label":"include"},
-		{"id":"e1edb4e2281e6658","type":"group","x":-523,"y":307,"width":469,"height":355,"color":"2","label":"State"},
 		{"id":"5dc6b72ac938f7a4","type":"group","x":160,"y":334,"width":513,"height":312,"color":"2","label":"Layers"},
 		{"id":"7df1f50204488208","type":"group","x":822,"y":-110,"width":651,"height":245,"color":"5","label":"Acceleration"},
 		{"id":"aed276dbf4c7d6db","type":"group","x":117,"y":-13,"width":528,"height":270,"color":"2","label":"Events"},
@@ -138,7 +138,8 @@
 		{"id":"af089c50be05ca76","type":"text","text":"### Camera.cpp","x":-1128,"y":-101,"width":153,"height":50},
 		{"id":"df8c0da17691d949","type":"text","text":"## Defaults.h","x":140,"y":660,"width":153,"height":50},
 		{"id":"73787b46cde67cf4","type":"text","text":"### IEvent.h","x":468,"y":5,"width":119,"height":50,"color":"#ff00ff"},
-		{"id":"761e7555334b947f","type":"text","text":"### IEventDispatcher.h","x":405,"y":194,"width":226,"height":50,"color":"#ff00ff"}
+		{"id":"761e7555334b947f","type":"text","text":"### IEventDispatcher.h","x":405,"y":194,"width":226,"height":50,"color":"#ff00ff"},
+		{"id":"c2c98269e657f400","type":"text","text":"### RendererSettings.cpp","x":-504,"y":685,"width":249,"height":50,"color":"#ff00ff"}
 	],
 	"edges":[
 		{"id":"9b90bfd0e940403b","fromNode":"84b0a8b86a0ecad9","fromSide":"top","toNode":"2c482cf1ab5e1d0d","toSide":"bottom","color":"3"},
@@ -236,6 +237,7 @@
 		{"id":"26d9508828d81ca1","fromNode":"73787b46cde67cf4","fromSide":"left","toNode":"9af7078339861364","toSide":"right","color":"2"},
 		{"id":"1dd6bdf5c7b0a06f","fromNode":"73787b46cde67cf4","fromSide":"left","toNode":"e164ca194eb88d5d","toSide":"right","color":"2"},
 		{"id":"2031215dd18e7a3e","fromNode":"761e7555334b947f","fromSide":"top","toNode":"73787b46cde67cf4","toSide":"bottom","color":"2"},
-		{"id":"997a4e2f3912ed7b","fromNode":"b677ac7fe5208f37","fromSide":"right","toNode":"761e7555334b947f","toSide":"bottom","color":"2"}
+		{"id":"997a4e2f3912ed7b","fromNode":"b677ac7fe5208f37","fromSide":"right","toNode":"761e7555334b947f","toSide":"bottom","color":"2"},
+		{"id":"980889ee4a045977","fromNode":"4b2ab385e18f0870","fromSide":"left","toNode":"c2c98269e657f400","toSide":"top","color":"2"}
 	]
 }
