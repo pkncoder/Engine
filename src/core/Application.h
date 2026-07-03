@@ -3,6 +3,7 @@
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
 #include "./states/EngineState.h"
+#include "EngineContext.h"
 #include "Window.h"
 
 #include <memory>
@@ -39,13 +40,11 @@ class Application {
 
   private:
     // Engine state
+    std::unique_ptr<EngineContext> engineContext;
     EngineState engineState;
 
     // Window information
     std::unique_ptr<Window> window;
-
-    // Scene object
-    Scene activeScene;
 
     // Camera object
     Camera camera;

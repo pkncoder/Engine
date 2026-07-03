@@ -25,6 +25,7 @@ endif()
 set(SOURCES
     src/main.cpp
     src/core/Application.cpp
+    src/core/EngineContext.cpp
     src/core/Window.cpp
     src/renderer/BufferManager.cpp
     src/renderer/PathTracer.cpp

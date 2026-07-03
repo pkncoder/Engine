@@ -1,9 +1,9 @@
 #include "Application.h"
 
 #include "../renderer/RendererManager.h"
-#include "../resources/AssetManager.h"
 #include "../scene/Entity.h"
 #include "../scene/EntitySpawner.h"
+#include "../scene/Scene.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
@@ -15,14 +15,13 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
 
+#include <memory>
+
 namespace Engine {
 
 // Constructor & Deconstructor
 Application::Application() {}
-Application::~Application() {
-    Logger::shutdown();
-    RendererManager::shutdown();
-}
+Application::~Application() { Logger::shutdown(); }
 
 // Init the window, camera, etc.
 void Application::init() {
@@ -42,18 +41,13 @@ void Application::init() {
     // Init the camera at a starting pos
     camera = Camera(engineState.scene.camera);
 
-    // Initialize the asset manager
-    AssetManager::init();
-
-    // Initialize the scene
-    activeScene = Scene();
-
-    RendererManager::init(engineState.renderer);
+    engineContext = std::make_unique<EngineContext>();
+    engineContext->init(engineState);
 
     // Register the scene components and load the scene
     // TODO: temp
-    this->registerSceneComponents(activeScene);
-    this->setupEntities(activeScene);
+    this->registerSceneComponents(engineContext->getScene());
+    this->setupEntities(engineContext->getScene());
 
     Logger::info("APPLICATION", "Application init complete");
     Logger::setNoPendingLogs(false);
@@ -78,7 +72,7 @@ void Application::run() {
         window->preFrame();
 
         // Render
-        RendererManager::render(*window, activeScene, camera);
+        engineContext->getRenderer().render(*window, camera);
 
         // Do things like event polling & buffer swapping
         window->postFrame();
@@ -150,7 +144,8 @@ void Application::handleInputs() {
 
                 // If they are, swap the render choice and set it in the engine
                 // state
-                RendererManager::swapActiveRenderer(RenderChoice::PATH_TRACER);
+                engineContext->getRenderer().swapActiveRenderer(
+                    RenderChoice::PATH_TRACER);
                 engineState.renderer.settings.currentRenderChoice =
                     RenderChoice::PATH_TRACER;
             } else {
@@ -163,7 +158,8 @@ void Application::handleInputs() {
         case RenderChoice::PATH_TRACER:
 
             // Swap to rasterizer & set the render choice
-            RendererManager::swapActiveRenderer(RenderChoice::RASTERIZER);
+            engineContext->getRenderer().swapActiveRenderer(
+                RenderChoice::RASTERIZER);
             engineState.renderer.settings.currentRenderChoice =
                 RenderChoice::RASTERIZER;
             break;
@@ -184,7 +180,8 @@ void Application::setupEntities(Scene &scene) {
     // Bunny
     if (0) {
         std::vector<Entity> bunny = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/bunny.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/bunny.obj");
 
         bunny[0].getComponent<TransformComponent>().position =
             glm::vec3(-1.0f, -1.2f, -4.0f);
@@ -193,7 +190,8 @@ void Application::setupEntities(Scene &scene) {
     // Dragon
     if (0) {
         std::vector<Entity> dragon = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/dragon.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/dragon.obj");
 
         dragon[0].getComponent<TransformComponent>().position =
             glm::vec3(1.0f, -0.6f, -4.0f);
@@ -201,8 +199,9 @@ void Application::setupEntities(Scene &scene) {
 
     // Cat
     if (0) {
-        std::vector<Entity> cat =
-            EntitySpawner::spawnObjEntity(activeScene, "assets/models/cat.obj");
+        std::vector<Entity> cat = EntitySpawner::spawnObjEntity(
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/cat.obj");
 
         cat[0].getComponent<TransformComponent>().position =
             glm::vec3(0.0f, -0.6f, -4.0f);
@@ -211,7 +210,8 @@ void Application::setupEntities(Scene &scene) {
     // 🗿
     if (0) {
         std::vector<Entity> moai = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/moai.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/moai.obj");
 
         moai[0].getComponent<TransformComponent>().position =
             glm::vec3(0.0f, 1.3f, -4.0f);
@@ -224,7 +224,8 @@ void Application::setupEntities(Scene &scene) {
     // Diffuse cube & emmisive cube
     if (0) {
         std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/cube.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/cube.obj");
 
         cube[0].getComponent<MaterialComponent>().albedo =
             glm::vec3(0.4f, 0.2f, 0.8f);
@@ -237,7 +238,8 @@ void Application::setupEntities(Scene &scene) {
             glm::vec3(0.4f, 0.4f, 0.4f);
 
         std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/cube.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(1.3f, 8.4f, -0.2f);
@@ -252,7 +254,8 @@ void Application::setupEntities(Scene &scene) {
     // Gay Room (me)
     if (1) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/gayRoom.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/gayRoom.obj");
 
         for (Entity entity : room) {
             entity.getComponent<MaterialComponent>().emmissive *=
@@ -263,7 +266,8 @@ void Application::setupEntities(Scene &scene) {
     // Trans flag
     if (0) {
         std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/trans.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/trans.obj");
 
         for (Entity entity : trans) {
             entity.getComponent<TransformComponent>().position +=
@@ -274,7 +278,8 @@ void Application::setupEntities(Scene &scene) {
     // Franch flag
     if (0) {
         std::vector<Entity> french = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/french.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/french.obj");
 
         for (Entity entity : french) {
             entity.getComponent<TransformComponent>().position +=
@@ -286,10 +291,12 @@ void Application::setupEntities(Scene &scene) {
     if (0) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/backrooms_level1.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/backrooms_level1.obj");
 
         std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/cube.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/cube.obj");
 
         // emmissiveCube[0].getComponent<TransformComponent>().position =
         //     glm::vec3(80.2f, 6.5f, -116.7f);
@@ -311,10 +318,12 @@ void Application::setupEntities(Scene &scene) {
     // Breakfast room
     if (0) {
         std::vector<Entity> room = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/breakfast_room.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/breakfast_room.obj");
 
         std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/cube.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(-2.2f, 3.8f, -1.9f);
@@ -334,10 +343,12 @@ void Application::setupEntities(Scene &scene) {
     // Sponza
     if (0) {
         std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/sponza.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/sponza.obj");
 
         std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/cube.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(1.3f, 8.4f, -0.2f);
@@ -357,10 +368,12 @@ void Application::setupEntities(Scene &scene) {
     // Lost empire (Minecraft)
     if (0) {
         std::vector<Entity> lostEmpire = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/lost_empire.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/lost_empire.obj");
 
         std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/cube.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(-10.7f, 22.4f, 3.1f);
@@ -380,7 +393,8 @@ void Application::setupEntities(Scene &scene) {
     // oiiaioooooiai (broken texture)
     if (0) {
         std::vector<Entity> oiiaioooooiai = EntitySpawner::spawnObjEntity(
-            activeScene, "assets/models/oiiaioooooiai.obj");
+            engineContext->getScene(), engineContext->getAsset(),
+            "assets/models/oiiaioooooiai.obj");
     }
 
     END_PROFILE_STACKED_LOG("Entity Loading");

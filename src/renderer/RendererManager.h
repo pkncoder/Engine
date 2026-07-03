@@ -1,3 +1,4 @@
+#include "../core/EngineContext.h"
 #include "../core/Window.h"
 #include "../core/states/RendererState.h"
 #include "../scene/Camera.h"
@@ -12,21 +13,22 @@ namespace Engine {
 
 class RendererManager {
   public:
-    static void init(RendererState &state);
-    static void shutdown();
+    RendererManager(EngineContext &engineContext, RendererState &state);
+    ~RendererManager();
 
-    static inline IRenderer *getActiveRenderer() { return activeRenderer; }
+    IRenderer *getActiveRenderer() { return activeRenderer; }
 
-    static void swapActiveRenderer(RenderChoice choice);
+    void swapActiveRenderer(RenderChoice choice);
 
-    static void render(const Window &window, class Scene &scene,
-                       const Camera &camera);
+    void render(const Window &window, const Camera &camera);
 
   private:
-    static inline std::unique_ptr<Rasterizer> rasterizer = nullptr;
-    static inline std::unique_ptr<PathTracer> pathTracer = nullptr;
+    EngineContext &engineContext;
 
-    static inline IRenderer *activeRenderer = nullptr;
+    std::unique_ptr<Rasterizer> rasterizer = nullptr;
+    std::unique_ptr<PathTracer> pathTracer = nullptr;
+
+    IRenderer *activeRenderer = nullptr;
 };
 
 } // namespace Engine

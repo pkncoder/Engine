@@ -1,7 +1,6 @@
 #include "EntitySpawner.h"
 
 #include "../renderer/BufferManager.h"
-#include "../resources/AssetManager.h"
 #include "../services/Logger.h"
 #include "components/MaterialComponent.h"
 #include "components/MeshComponent.h"
@@ -10,13 +9,14 @@
 namespace Engine {
 
 std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
+                                                  AssetManager &assetManager,
                                                   const std::string &filepath) {
 
     // Collection of all the new entities
     std::vector<Entity> entities;
 
     // Get the mesh data & check to make sure that it loaded right
-    const CPUModelData *modelData = AssetManager::loadModel(filepath);
+    const CPUModelData *modelData = assetManager.loadModel(filepath);
     if (!modelData) {
         Logger::error("ASSET", "Failed to load model at: " + filepath);
         return entities; // Return an invalid handle on failure
@@ -41,7 +41,7 @@ std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
 
         // Get the material data that was loaded on mesh construction
         const CPUMaterialData *materialData =
-            AssetManager::getMaterial(mesh.materialName);
+            assetManager.getMaterial(mesh.materialName);
 
         // Add the new material component
         if (materialData != nullptr) {
@@ -58,7 +58,7 @@ std::vector<Entity> EntitySpawner::spawnObjEntity(Scene &scene,
                 const auto it = materialData->textureNames.find(mapKey);
 
                 if (it != materialData->textureNames.end()) {
-                    targetVariable = AssetManager::loadTexture(
+                    targetVariable = assetManager.loadTexture(
                         "assets/textures/" + it->second, material.isBumpMap);
                 }
             };

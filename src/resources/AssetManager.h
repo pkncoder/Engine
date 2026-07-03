@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../core/EngineContext.h"
 #include "CPUStructs.h"
 
 #include <glad/glad.h>
@@ -12,22 +13,24 @@ namespace Engine {
 class AssetManager {
   public:
     // Initialize the manager
-    static void init();
+    AssetManager(EngineContext &engineContext);
+    ~AssetManager() = default;
 
     // Getters and loaders
-    static const CPUModelData *loadModel(const std::string &filepath);
-    static const CPUMaterialData *getMaterial(const std::string &materialName);
-    static GLuint loadTexture(const std::string &filepath, bool &bumpTexture);
+    const CPUModelData *loadModel(const std::string &filepath);
+    const CPUMaterialData *getMaterial(const std::string &materialName);
+    GLuint loadTexture(const std::string &filepath, bool &bumpTexture);
 
   private:
+    EngineContext &engineContext;
+
     // Asset caches
-    static inline std::unordered_map<std::string, CPUModelData> modelCache;
-    static inline std::unordered_map<std::string, CPUMaterialData>
-        materialCache;
-    static inline std::unordered_map<std::string, GLuint> textureCache;
+    std::unordered_map<std::string, CPUModelData> modelCache;
+    std::unordered_map<std::string, CPUMaterialData> materialCache;
+    std::unordered_map<std::string, GLuint> textureCache;
 
     // Cache materials to be fetched later
-    static const void cacheMaterials(const std::string &filepath);
+    void cacheMaterials(const std::string &filepath);
 };
 
 } // namespace Engine

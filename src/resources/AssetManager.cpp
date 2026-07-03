@@ -9,7 +9,8 @@
 
 namespace Engine {
 
-void AssetManager::init() {
+AssetManager::AssetManager(EngineContext &engineContext)
+    : engineContext(engineContext) {
 
     // Load a default material
     materialCache[Constants::Asset::DEFAULT_MATERIAL_NAME] = CPUMaterialData();
@@ -86,7 +87,7 @@ GLuint AssetManager::loadTexture(const std::string &filepath,
 }
 
 // Cache materials from the found filepath
-const void AssetManager::cacheMaterials(const std::string &filepath) {
+void AssetManager::cacheMaterials(const std::string &filepath) {
 
     // Get each material
     std::vector<CPUMaterialData> materials = MaterialLoader::loadMTL(filepath);

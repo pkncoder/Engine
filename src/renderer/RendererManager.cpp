@@ -5,7 +5,9 @@
 
 namespace Engine {
 
-void RendererManager::init(RendererState &state) {
+RendererManager::RendererManager(EngineContext &engineContext,
+                                 RendererState &state)
+    : engineContext(engineContext) {
 
     // Rasterizer inizialization
     rasterizer = std::make_unique<Rasterizer>();
@@ -37,7 +39,7 @@ void RendererManager::init(RendererState &state) {
     Logger::info("RENDERER", "Renderer Manager initialized.");
 }
 
-void RendererManager::shutdown() {
+RendererManager::~RendererManager() {
     activeRenderer = nullptr;
 
     if (rasterizer)
@@ -61,11 +63,11 @@ void RendererManager::swapActiveRenderer(RenderChoice choice) {
 }
 
 // TODO: replace with context
-void RendererManager::render(const Window &window, class Scene &scene,
-                             const Camera &camera) {
+void RendererManager::render(const Window &window, const Camera &camera) {
     // Render the scene
     START_PROFILE("Render"); // Start timer for render
-    activeRenderer->render(camera, scene, window.getAspectRatio());
+    activeRenderer->render(camera, engineContext.getScene(),
+                           window.getAspectRatio());
     END_PROFILE("Render"); // End Timer for render
 
     int width, height;
