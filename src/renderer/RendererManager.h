@@ -1,7 +1,6 @@
 #include "../core/EngineContext.h"
 #include "../core/Window.h"
 #include "../core/states/RendererState.h"
-#include "../scene/Camera.h"
 #include "IRenderer.h"
 #include "PathTracer.h"
 #include "Rasterizer.h"
@@ -20,7 +19,7 @@ class RendererManager {
 
     void swapActiveRenderer(RenderChoice choice);
 
-    void render(const Window &window, const Camera &camera);
+    void render(const Window &window);
 
   private:
     EngineContext &engineContext;

@@ -39,6 +39,7 @@ set(SOURCES
     src/scene/Camera.cpp
     src/scene/EntitySpawner.cpp
     src/scene/Scene.cpp
+    src/scene/SceneManager.cpp
     src/services/Input.cpp
     src/services/Logger.cpp
     src/services/Timer.cpp

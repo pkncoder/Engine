@@ -1,5 +1,6 @@
 #include "RendererManager.h"
 
+#include "../scene/SceneManager.h"
 #include "../services/Logger.h"
 #include "../services/Timer.h"
 
@@ -63,10 +64,11 @@ void RendererManager::swapActiveRenderer(RenderChoice choice) {
 }
 
 // TODO: replace with context
-void RendererManager::render(const Window &window, const Camera &camera) {
+void RendererManager::render(const Window &window) {
     // Render the scene
     START_PROFILE("Render"); // Start timer for render
-    activeRenderer->render(camera, engineContext.getScene(),
+    activeRenderer->render(engineContext.getScene().camera,
+                           engineContext.getScene().scene,
                            window.getAspectRatio());
     END_PROFILE("Render"); // End Timer for render
 

@@ -1,9 +1,11 @@
 #include "Application.h"
 
 #include "../renderer/RendererManager.h"
+#include "../scene/Camera.h"
 #include "../scene/Entity.h"
 #include "../scene/EntitySpawner.h"
 #include "../scene/Scene.h"
+#include "../scene/SceneManager.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
@@ -38,16 +40,10 @@ void Application::init() {
     Input::init(window->getNativeWindow());
     Timer::init();
 
-    // Init the camera at a starting pos
-    camera = Camera(engineState.scene.camera);
-
     engineContext = std::make_unique<EngineContext>();
     engineContext->init(engineState);
 
-    // Register the scene components and load the scene
-    // TODO: temp
-    this->registerSceneComponents(engineContext->getScene());
-    this->setupEntities(engineContext->getScene());
+    setupEntities();
 
     Logger::info("APPLICATION", "Application init complete");
     Logger::setNoPendingLogs(false);
@@ -72,23 +68,25 @@ void Application::run() {
         window->preFrame();
 
         // Render
-        engineContext->getRenderer().render(*window, camera);
+        engineContext->getRenderer().render(*window);
 
         // Do things like event polling & buffer swapping
         window->postFrame();
 
-        camera.cameraDirty = false;
+        // TODO: temp
+        // engineState.scene.camera.cameraDirty = false;
 
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()),
                      LogType::IN_PLACE);
         Logger::info("PROFILE",
                      "Average FPS: " + std::to_string(Timer::getAverageFPS()),
                      LogType::IN_PLACE);
-        Logger::info("CAMERA",
-                     "X: " + std::to_string(camera.position.x) +
-                         "Y: " + std::to_string(camera.position.y) +
-                         "Z: " + std::to_string(camera.position.z),
-                     LogType::IN_PLACE);
+        Logger::info(
+            "CAMERA",
+            "X: " + std::to_string(engineState.scene.camera.position.x) +
+                "Y: " + std::to_string(engineState.scene.camera.position.y) +
+                "Z: " + std::to_string(engineState.scene.camera.position.z),
+            LogType::IN_PLACE);
 
         END_PROFILE("Run Loop"); // End timer for run loop
 
@@ -98,6 +96,8 @@ void Application::run() {
 
 // Handle any inputs that come in this frame
 void Application::handleInputs() {
+
+    auto &camera = engineContext->getScene().camera;
 
     // Moving camera look at direction
     if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
@@ -167,21 +167,16 @@ void Application::handleInputs() {
     }
 }
 
-void Application::registerSceneComponents(Scene &scene) {
-    // Register components
-    scene.registerComponent<TransformComponent>();
-    scene.registerComponent<MeshComponent>();
-    scene.registerComponent<MaterialComponent>();
-}
-
-void Application::setupEntities(Scene &scene) {
+void Application::setupEntities() {
     START_PROFILE("Entity Loading");
+
+    auto &sceneManager = engineContext->getScene();
 
     // Bunny
     if (0) {
-        std::vector<Entity> bunny = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/bunny.obj");
+
+        std::vector<Entity> bunny =
+            sceneManager.loadObjScene("assets/models/bunny.obj");
 
         bunny[0].getComponent<TransformComponent>().position =
             glm::vec3(-1.0f, -1.2f, -4.0f);
@@ -189,9 +184,8 @@ void Application::setupEntities(Scene &scene) {
 
     // Dragon
     if (0) {
-        std::vector<Entity> dragon = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/dragon.obj");
+        std::vector<Entity> dragon =
+            sceneManager.loadObjScene("assets/models/dragon.obj");
 
         dragon[0].getComponent<TransformComponent>().position =
             glm::vec3(1.0f, -0.6f, -4.0f);
@@ -199,9 +193,8 @@ void Application::setupEntities(Scene &scene) {
 
     // Cat
     if (0) {
-        std::vector<Entity> cat = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/cat.obj");
+        std::vector<Entity> cat =
+            sceneManager.loadObjScene("assets/models/cat.obj");
 
         cat[0].getComponent<TransformComponent>().position =
             glm::vec3(0.0f, -0.6f, -4.0f);
@@ -209,9 +202,8 @@ void Application::setupEntities(Scene &scene) {
 
     // 🗿
     if (0) {
-        std::vector<Entity> moai = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/moai.obj");
+        std::vector<Entity> moai =
+            sceneManager.loadObjScene("assets/models/moai.obj");
 
         moai[0].getComponent<TransformComponent>().position =
             glm::vec3(0.0f, 1.3f, -4.0f);
@@ -223,9 +215,8 @@ void Application::setupEntities(Scene &scene) {
 
     // Diffuse cube & emmisive cube
     if (0) {
-        std::vector<Entity> cube = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/cube.obj");
+        std::vector<Entity> cube =
+            sceneManager.loadObjScene("assets/models/cube.obj");
 
         cube[0].getComponent<MaterialComponent>().albedo =
             glm::vec3(0.4f, 0.2f, 0.8f);
@@ -237,9 +228,8 @@ void Application::setupEntities(Scene &scene) {
         cube[0].getComponent<TransformComponent>().scale =
             glm::vec3(0.4f, 0.4f, 0.4f);
 
-        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/cube.obj");
+        std::vector<Entity> emmissiveCube =
+            sceneManager.loadObjScene("assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(1.3f, 8.4f, -0.2f);
@@ -253,9 +243,8 @@ void Application::setupEntities(Scene &scene) {
 
     // Gay Room (me)
     if (1) {
-        std::vector<Entity> room = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/gayRoom.obj");
+        std::vector<Entity> room =
+            sceneManager.loadObjScene("assets/models/gayRoom.obj");
 
         for (Entity entity : room) {
             entity.getComponent<MaterialComponent>().emmissive *=
@@ -265,9 +254,8 @@ void Application::setupEntities(Scene &scene) {
 
     // Trans flag
     if (0) {
-        std::vector<Entity> trans = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/trans.obj");
+        std::vector<Entity> trans =
+            sceneManager.loadObjScene("assets/models/trans.obj");
 
         for (Entity entity : trans) {
             entity.getComponent<TransformComponent>().position +=
@@ -277,9 +265,8 @@ void Application::setupEntities(Scene &scene) {
 
     // Franch flag
     if (0) {
-        std::vector<Entity> french = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/french.obj");
+        std::vector<Entity> french =
+            sceneManager.loadObjScene("assets/models/french.obj");
 
         for (Entity entity : french) {
             entity.getComponent<TransformComponent>().position +=
@@ -290,13 +277,11 @@ void Application::setupEntities(Scene &scene) {
     // THE BACKROOMS????
     if (0) {
         // https://sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
-        std::vector<Entity> backrooms = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/backrooms_level1.obj");
+        std::vector<Entity> backrooms =
+            sceneManager.loadObjScene("assets/models/backrooms_level1.obj");
 
-        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/cube.obj");
+        std::vector<Entity> emmissiveCube =
+            sceneManager.loadObjScene("assets/models/cube.obj");
 
         // emmissiveCube[0].getComponent<TransformComponent>().position =
         //     glm::vec3(80.2f, 6.5f, -116.7f);
@@ -317,13 +302,11 @@ void Application::setupEntities(Scene &scene) {
 
     // Breakfast room
     if (0) {
-        std::vector<Entity> room = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/breakfast_room.obj");
+        std::vector<Entity> room =
+            sceneManager.loadObjScene("assets/models/breakfast_room.obj");
 
-        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/cube.obj");
+        std::vector<Entity> emmissiveCube =
+            sceneManager.loadObjScene("assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(-2.2f, 3.8f, -1.9f);
@@ -342,13 +325,11 @@ void Application::setupEntities(Scene &scene) {
 
     // Sponza
     if (0) {
-        std::vector<Entity> sponza = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/sponza.obj");
+        std::vector<Entity> sponza =
+            sceneManager.loadObjScene("assets/models/sponza.obj");
 
-        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/cube.obj");
+        std::vector<Entity> emmissiveCube =
+            sceneManager.loadObjScene("assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(1.3f, 8.4f, -0.2f);
@@ -367,13 +348,11 @@ void Application::setupEntities(Scene &scene) {
 
     // Lost empire (Minecraft)
     if (0) {
-        std::vector<Entity> lostEmpire = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/lost_empire.obj");
+        std::vector<Entity> lostEmpire =
+            sceneManager.loadObjScene("assets/models/lost_empire.obj");
 
-        std::vector<Entity> emmissiveCube = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/cube.obj");
+        std::vector<Entity> emmissiveCube =
+            sceneManager.loadObjScene("assets/models/cube.obj");
 
         emmissiveCube[0].getComponent<TransformComponent>().position =
             glm::vec3(-10.7f, 22.4f, 3.1f);
@@ -392,9 +371,8 @@ void Application::setupEntities(Scene &scene) {
 
     // oiiaioooooiai (broken texture)
     if (0) {
-        std::vector<Entity> oiiaioooooiai = EntitySpawner::spawnObjEntity(
-            engineContext->getScene(), engineContext->getAsset(),
-            "assets/models/oiiaioooooiai.obj");
+        std::vector<Entity> oiiaioooooiai =
+            sceneManager.loadObjScene("assets/models/oiiaioooooiai.obj");
     }
 
     END_PROFILE_STACKED_LOG("Entity Loading");

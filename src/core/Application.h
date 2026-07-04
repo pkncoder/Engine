@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../scene/Camera.h"
 #include "../scene/Scene.h"
 #include "./states/EngineState.h"
 #include "EngineContext.h"
@@ -30,13 +29,9 @@ class Application {
     // Handling inputs
     void handleInputs();
 
-    // Registering components
-    // TODO: temp
-    void registerSceneComponents(Scene &scene);
-
     // Loading the models + allocating the entities
     // TODO: temp
-    void setupEntities(Scene &scene);
+    void setupEntities();
 
   private:
     // Engine state
@@ -45,9 +40,6 @@ class Application {
 
     // Window information
     std::unique_ptr<Window> window;
-
-    // Camera object
-    Camera camera;
 };
 
 } // namespace Engine
