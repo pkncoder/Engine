@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../scene/Scene.h"
 #include "./states/EngineState.h"
 #include "EngineContext.h"
 #include "Window.h"
