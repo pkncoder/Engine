@@ -10,7 +10,7 @@ namespace Engine {
 // Constructor
 Camera::Camera(CameraState &state)
     : position(state.position), up(state.up), right(state.right),
-      yaw(state.yaw), pitch(state.pitch), fov(state.fov),
+      front(state.front), yaw(state.yaw), pitch(state.pitch), fov(state.fov),
       sensitivity(state.settings.sensitivity),
       movementSpeed(state.settings.movementSpeed) {
 

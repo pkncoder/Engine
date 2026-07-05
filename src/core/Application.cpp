@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include "../renderer/RendererManager.h"
 #include "../scene/Camera.h"
 #include "../scene/Entity.h"
 #include "../scene/SceneManager.h"
@@ -40,6 +39,16 @@ void Application::init() {
     engineContext = std::make_unique<EngineContext>();
     engineContext->init(engineState);
 
+    layerStack = LayerStack();
+
+    sceneUpdateLayer = std::make_shared<SceneUpdateLayer>(
+        std::make_shared<SceneManager>(engineContext->getScene()));
+    layerStack.pushLayer(sceneUpdateLayer);
+
+    rendererLayer = std::make_shared<RendererLayer>(
+        engineContext->getRenderer(), *window.get());
+    layerStack.pushLayer(rendererLayer);
+
     setupEntities();
 
     Logger::info("APPLICATION", "Application init complete");
@@ -64,8 +73,7 @@ void Application::run() {
         // Clear Screen
         window->preFrame();
 
-        // Render
-        engineContext->getRenderer().render(*window);
+        layerStack.dispatchStack(engineState);
 
         // Do things like event polling & buffer swapping
         window->postFrame();
