@@ -40,8 +40,8 @@ set(SOURCES
     src/resources/ModelLoader.cpp
     src/resources/TextureLoader.cpp
     src/scene/Camera.cpp
-    src/scene/EntitySpawner.cpp
     src/scene/Scene.cpp
+    src/scene/SceneLoader.cpp
     src/scene/SceneManager.cpp
     src/services/Input.cpp
     src/services/Logger.cpp

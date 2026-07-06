@@ -1,4 +1,4 @@
-#include "EntitySpawner.h"
+#include "SceneLoader.h"
 
 #include "../renderer/BufferManager.h"
 #include "../resources/AssetManager.h"
@@ -9,11 +9,9 @@
 
 namespace Engine {
 
-std::vector<Entity>
-EntitySpawner::spawnObjEntity(Scene &scene, const std::string &filepath,
-                              EngineContext &engineContext) {
-
-    auto &assetManager = engineContext.getAsset();
+std::vector<Entity> SceneLoader::spawnObjEntity(Scene &scene,
+                                                AssetManager &assetManager,
+                                                const std::string &filepath) {
 
     // Collection of all the new entities
     std::vector<Entity> entities;

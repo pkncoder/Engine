@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/EngineContext.h"
+#include "../resources/AssetManager.h"
 #include "Entity.h"
 #include "Scene.h"
 
@@ -8,12 +9,12 @@
 
 namespace Engine {
 
-class EntitySpawner {
+class SceneLoader {
   public:
     // Spawn new entites from a .obj model file
     static std::vector<Entity> spawnObjEntity(Scene &scene,
-                                              const std::string &filepath,
-                                              EngineContext &engineContext);
+                                              AssetManager &assetManager,
+                                              const std::string &filepath);
 };
 
 } // namespace Engine
