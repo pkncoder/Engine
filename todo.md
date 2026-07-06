@@ -60,7 +60,6 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
 - [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
-- [ ] Make dirty mesh/camera flags
 - [ ] Material Index in GPUInstance
 - [ ] Fix the flashing compute shader issue + maybe being too slow?
 - [ ] Non-triangle objects
@@ -68,9 +67,10 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Go through and remove GPU memory access where it shouldn't be
 - [ ] Check to see if roughness & metallic maps are working
 - [ ] Get the shared uniforms file filled in and finished
-- [ ] Add a SceneManager
 - [ ] UUID models & mesh names
 - [ ] Redo the shader pass & render target sytem to increase scope
+- [ ] Texture data
+- [ ] Create multiple I... files for compute shaders, textures, etc.
 
 ### Todo - Not Code
 
@@ -95,6 +95,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Different shader models
   - Ex. Disney BSDF
 - [ ] Legacy OpenGL support
+- [ ] Move camera to ECS w/ CameraComponent, and move the camera class to the system directory
 
 ### Todo - Editor
 
@@ -118,6 +119,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Allow for NeRFs (Neural Radience Feilds)
 - [ ] "Version Bitfield Signatures" for very quick updates
   - Ex. RendererSettings has the active render updated, so it changes it's bit on the signature. Instead of the onEvent going through each change to see if a version matches, do a bitwise or (or something) to find the exact updated thing
+- [ ] Multiple windows
 
 ## Steps
 
@@ -188,3 +190,5 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Fix the periodic timer to work with: one-second intervals, fractional intervals, and make sure that it isn't skipping intervals (or clear it)
 - [x] Try to reduce the amount of looping being done on materials / instances etc. Maybe try to use the caches in AssetManager more?
 - [x] Plan out the texture handle nonsense
+- [x] Add a SceneManager
+- [x] Make dirty mesh/camera flags (REWORKED)
