@@ -12,7 +12,7 @@
 
 namespace Engine {
 
-void Rasterizer::init() {
+void Rasterizer::init(EngineState &state) {
 
     shader = Shader("shaders/rasterizing/main/raster.vert",
                     "shaders/rasterizing/main/raster.frag");
@@ -40,7 +40,9 @@ void Rasterizer::init() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubeMap);
     for (int i = 0; i < 6; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_R32F,
-                     SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_RED, GL_FLOAT, nullptr);
+                     state.renderer.settings.shadowWidth,
+                     state.renderer.settings.shadowHeight, 0, GL_RED, GL_FLOAT,
+                     nullptr);
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -51,8 +53,9 @@ void Rasterizer::init() {
     // Generate the shadow render buffer & attach the width & height
     glGenRenderbuffers(1, &shadowDepthRBO);
     glBindRenderbuffer(GL_RENDERBUFFER, shadowDepthRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, SHADOW_WIDTH,
-                          SHADOW_HEIGHT);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
+                          state.renderer.settings.shadowWidth,
+                          state.renderer.settings.shadowHeight);
 
     // Generate the shadow fbo + attach the render buffer
     glGenFramebuffers(1, &shadowFBO);
@@ -120,21 +123,23 @@ void Rasterizer::render(EngineState &state) {
                                   {0, 0, -1}, {0, -1, 0}, {0, -1, 0}};
 
     // Shadow map projection matrix
-    glm::mat4 shadowProj =
-        glm::perspective(glm::radians(90.0f), 1.0f, SHADOW_NEAR, SHADOW_FAR);
+    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f,
+                                            state.renderer.settings.shadowNear,
+                                            state.renderer.settings.shadowFar);
 
     // Get the render dimentions & pre-shadow mapping
     GLint savedViewport[4];
     glGetIntegerv(GL_VIEWPORT, savedViewport);
 
     // Change the size of theviewport & bind the shadow FBO
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glViewport(0, 0, state.renderer.settings.shadowHeight,
+               state.renderer.settings.shadowHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 
     // Bind the shadow map shader & upload uniforms
     shadowShader.bind();
     shadowShader.setVec3("uLightPos", lightPos);
-    shadowShader.setFloat("uFarPlane", SHADOW_FAR);
+    shadowShader.setFloat("uFarPlane", state.renderer.settings.shadowFar);
 
     // Loop each face for the mapping
     for (int face = 0; face < 6; face++) {
@@ -177,7 +182,7 @@ void Rasterizer::render(EngineState &state) {
     // Get the viewProjection matrix values
     const glm::mat4 view = engineContext.getScene().camera.getViewMatrix();
     const glm::mat4 proj = engineContext.getScene().camera.getProjectionMatrix(
-        state.window.width / (float)state.window.height);
+        state.window.aspectRatio);
 
     // Upload the uniforms for base rendering
     shader.setMat4("uViewProjection", proj * view);
@@ -187,8 +192,9 @@ void Rasterizer::render(EngineState &state) {
 
     // Upload shadow mapping uniforms
     shader.setVec3("uLightPos", lightPos);
-    shader.setFloat("uShadowFarPlane",
-                    SHADOW_FAR); // new — replaces uLightSpaceMatrix
+    shader.setFloat(
+        "uShadowFarPlane",
+        state.renderer.settings.shadowFar); // new — replaces uLightSpaceMatrix
 
     // Loop each renderablable
     for (EntityID id : renderables) {

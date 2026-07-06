@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/EngineContext.h"
+#include "../core/states/EngineState.h"
 #include "IRenderer.h"
 #include "Shader.h"
 
@@ -13,7 +14,7 @@ class Rasterizer : public IRenderer {
     inline Rasterizer(EngineContext &engineContext)
         : engineContext(engineContext){};
 
-    void init();
+    void init(EngineState &state);
     void render(EngineState &state) override;
     void resize(const int newWidth, const int newHeight) override;
     void shutdown() override;
@@ -35,11 +36,6 @@ class Rasterizer : public IRenderer {
     GLuint shadowCubeMap = 0; // replaces shadowDepthTexture
     GLuint shadowDepthRBO =
         0; // depth renderbuffer for shadow pass depth testing
-
-    static constexpr int SHADOW_WIDTH = 1024;
-    static constexpr int SHADOW_HEIGHT = 1024;
-    static constexpr float SHADOW_NEAR = 0.5f;
-    static constexpr float SHADOW_FAR = 100.0f;
 };
 
 } // namespace Engine

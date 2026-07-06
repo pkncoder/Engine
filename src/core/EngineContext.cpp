@@ -12,7 +12,7 @@ EngineContext::~EngineContext() = default;
 void EngineContext::init(EngineState &state) {
     assetManager = std::make_unique<AssetManager>(*this);
     sceneManager = std::make_unique<SceneManager>(*this, state);
-    rendererManager = std::make_unique<RendererManager>(*this, state.renderer);
+    rendererManager = std::make_unique<RendererManager>(*this, state);
 }
 
 } // namespace Engine

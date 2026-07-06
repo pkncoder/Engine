@@ -95,7 +95,8 @@ class PathTracer : public IRenderer {
     EngineContext &engineContext;
 
     // State tracking
-    int frameCount = 0; // TODO: Use the "Timer" service
+    int frameCount =
+        0; // TODO: Use the "Timer" service & add an "accumulatedFrames"
 
     // Dynamic resource information
     std::unordered_map<std::string, PersistentBuffer> storageBuffers;
@@ -109,8 +110,6 @@ class PathTracer : public IRenderer {
     // Instance data cache
     std::vector<GPUInstance> instances;
     std::unordered_map<std::string, uint32_t> instanceLookupTable;
-    bool geometryDirty = true; // TODO: move tracking elsewhere, this honestly
-                               // shouldn'tbe PathTracer's job
 
     // Material data cache
     std::vector<GPUMaterial> materialList;

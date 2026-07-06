@@ -298,9 +298,6 @@ void PathTracer::flattenScene() {
         auto &meshComp = activeScene.getComponent<MeshComponent>(id);
         if (instanceLookupTable.find(meshComp.assetID) ==
             instanceLookupTable.end()) {
-            // If it did change, set the geometry dirty flag and break out to
-            // redo everything
-            geometryDirty = true;
             rebuildGeometryLookupTable(activeScene);
             break;
         }
@@ -407,9 +404,6 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
     updateBuffer("meshEntries", meshEntries.data(), meshEntries.size());
     updateBuffer("vertices", instanceVertices.data(), instanceVertices.size());
     updateBuffer("indices", instanceIndices.data(), instanceIndices.size());
-
-    // Set the geometry dirty flag to false
-    geometryDirty = false;
 }
 
 // --- Uniforms ---

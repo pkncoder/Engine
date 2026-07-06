@@ -1,5 +1,5 @@
 #include "../core/EngineContext.h"
-#include "../core/states/RendererState.h"
+#include "../core/states/EngineState.h"
 #include "IRenderer.h"
 #include "PathTracer.h"
 #include "Rasterizer.h"
@@ -11,7 +11,7 @@ namespace Engine {
 
 class RendererManager {
   public:
-    RendererManager(EngineContext &engineContext, RendererState &state);
+    RendererManager(EngineContext &engineContext, EngineState &state);
     ~RendererManager();
 
     IRenderer *getActiveRenderer() { return activeRenderer; }

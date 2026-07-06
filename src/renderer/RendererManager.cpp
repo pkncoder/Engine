@@ -6,24 +6,26 @@
 namespace Engine {
 
 RendererManager::RendererManager(EngineContext &engineContext,
-                                 RendererState &state)
+                                 EngineState &state)
     : engineContext(engineContext) {
 
     // Rasterizer inizialization
     rasterizer = std::make_unique<Rasterizer>(engineContext);
-    rasterizer->init();
+    rasterizer->init(state);
 
     // Check for OpenGL compatibility
-    glGetIntegerv(GL_MAJOR_VERSION, &state.settings.openGlMajorVersion);
-    glGetIntegerv(GL_MINOR_VERSION, &state.settings.openGlMinorVersion);
+    glGetIntegerv(GL_MAJOR_VERSION,
+                  &state.renderer.settings.openGlMajorVersion);
+    glGetIntegerv(GL_MINOR_VERSION,
+                  &state.renderer.settings.openGlMinorVersion);
 
     // Check for compute shader compatibility
-    if (state.settings.openGlMajorVersion > 4 ||
-        (state.settings.openGlMajorVersion == 4 &&
-         state.settings.openGlMinorVersion >= 6)) {
+    if (state.renderer.settings.openGlMajorVersion > 4 ||
+        (state.renderer.settings.openGlMajorVersion == 4 &&
+         state.renderer.settings.openGlMinorVersion >= 6)) {
 
         // Set compute shader compatible
-        state.settings.systemComputeShaderCompatability = true;
+        state.renderer.settings.systemComputeShaderCompatability = true;
 
         // Path tracer inizialization
         pathTracer = std::make_unique<PathTracer>(engineContext);
@@ -34,7 +36,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
 
     // Set the active renderer
     activeRenderer = rasterizer.get();
-    state.settings.currentRenderChoice = RenderChoice::RASTERIZER;
+    state.renderer.settings.currentRenderChoice = RenderChoice::RASTERIZER;
 
     Logger::info("RENDERER", "Renderer Manager initialized.");
 }
