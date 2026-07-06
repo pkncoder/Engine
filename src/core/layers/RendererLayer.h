@@ -1,17 +1,14 @@
 #pragma once
 
 #include "../../renderer/RendererManager.h"
-#include "../Window.h"
 #include "ILayer.h"
-
-#include <memory>
 
 namespace Engine {
 
 class RendererLayer : public ILayer {
 
   public:
-    RendererLayer(RendererManager &rendererManager, Window &window);
+    RendererLayer(RendererManager &rendererManager);
     ~RendererLayer() = default;
 
     void onAttach(EngineState &state) override;
@@ -20,7 +17,6 @@ class RendererLayer : public ILayer {
 
   private:
     RendererManager &rendererManager;
-    Window &window;
 };
 
 } // namespace Engine

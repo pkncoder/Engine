@@ -3,8 +3,8 @@
 #include "glad/glad.h"
 #include "states/WindowState.h"
 #include <GLFW/glfw3.h>
-
-#include <string>
+#include <c++/v1/__config>
+#include <cstddef>
 
 namespace Engine {
 class Window {
@@ -14,34 +14,28 @@ class Window {
     ~Window();
 
     // OpenGL settings function
-    void setSettings() const;
+    void setSettings();
 
     // Check to see if the window is marked for death
-    bool shouldClose() const;
+    bool shouldClose();
 
     // Polling, and swapping
-    void pollEvents() const;
-    void swapBuffers() const;
+    void pollEvents();
+    void swapBuffers();
 
     // Pre and post frame actions
-    void preFrame() const;
-    void postFrame() const;
+    void preFrame();
+    void postFrame();
 
     // Return the GLFW window (not our wrapper)
-    GLFWwindow *getNativeWindow() const { return window; }
-
-    // Size & aspect ratio
-    void getSize(int &width, int &height) const;
-    float getAspectRatio() const;
+    GLFWwindow *getNativeWindow() { return window; }
 
   private:
     // GLFW Window
-    GLFWwindow *window;
+    GLFWwindow *window = nullptr;
+    WindowState *windowState = nullptr;
 
-    // Width & height of window
-    int width, height;
-
-    // Title of window
-    std::string title;
+    static void framebufferSizeCallback(GLFWwindow *window, int width,
+                                        int height);
 };
 } // namespace Engine

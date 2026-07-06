@@ -1,5 +1,4 @@
 #include "../core/EngineContext.h"
-#include "../core/Window.h"
 #include "../core/states/RendererState.h"
 #include "IRenderer.h"
 #include "PathTracer.h"
@@ -19,7 +18,7 @@ class RendererManager {
 
     void swapActiveRenderer(RenderChoice choice);
 
-    void render(const Window &window);
+    void render(EngineState &state);
 
   private:
     EngineContext &engineContext;

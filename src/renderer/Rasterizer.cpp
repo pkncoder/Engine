@@ -1,5 +1,6 @@
 #include "Rasterizer.h"
 
+#include "../scene/SceneManager.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
@@ -70,13 +71,15 @@ void Rasterizer::init() {
     Logger::info("RENDERER", "Rasterizer initialized.");
 }
 
-void Rasterizer::render(const Camera &camera, Scene &activeScene,
-                        float aspectRatio) {
+void Rasterizer::render(EngineState &state) {
+
+    Scene scene = engineContext.getScene().scene;
+    CameraState cameraState = state.scene.camera;
 
     // Pull renderables once — used in both passes
     const auto renderables =
-        activeScene.getMatchingEntities<TransformComponent, MeshComponent,
-                                        MaterialComponent>();
+        scene.getMatchingEntities<TransformComponent, MeshComponent,
+                                  MaterialComponent>();
 
     // Model matrix helper lamba function
     auto buildModel = [](const TransformComponent &t) {
@@ -99,15 +102,14 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
     // Get the brightest light, and then shadow map that one
     // TODO: temp
-    glm::vec3 lightPos = camera.position;
+    glm::vec3 lightPos = cameraState.position;
     float bestEmissive = 0.0f;
     for (EntityID id : renderables) {
-        const auto &mat = activeScene.getComponent<MaterialComponent>(id);
+        const auto &mat = scene.getComponent<MaterialComponent>(id);
         float strength = glm::length(mat.emmissive);
         if (strength > bestEmissive) {
             bestEmissive = strength;
-            lightPos =
-                activeScene.getComponent<TransformComponent>(id).position;
+            lightPos = scene.getComponent<TransformComponent>(id).position;
         }
     }
 
@@ -150,11 +152,9 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
 
         // Loop each renderable & and shadow map it
         for (EntityID id : renderables) {
-            const auto &mesh = activeScene.getComponent<MeshComponent>(id);
-            const auto &transform =
-                activeScene.getComponent<TransformComponent>(id);
-            const auto &material =
-                activeScene.getComponent<MaterialComponent>(id);
+            const auto &mesh = scene.getComponent<MeshComponent>(id);
+            const auto &transform = scene.getComponent<TransformComponent>(id);
+            const auto &material = scene.getComponent<MaterialComponent>(id);
 
             shadowShader.setMat4("uModel", buildModel(transform));
             bindMap(material.alphaTexture, "uAlphaMap", defaultWhiteTexture);
@@ -175,13 +175,14 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     shader.bind();
 
     // Get the viewProjection matrix values
-    const glm::mat4 view = camera.getViewMatrix();
-    const glm::mat4 proj = camera.getProjectionMatrix(aspectRatio);
+    const glm::mat4 view = engineContext.getScene().camera.getViewMatrix();
+    const glm::mat4 proj = engineContext.getScene().camera.getProjectionMatrix(
+        state.window.width / (float)state.window.height);
 
     // Upload the uniforms for base rendering
     shader.setMat4("uViewProjection", proj * view);
-    shader.setVec3("uCameraPos", camera.position);
-    shader.setFloat("uFOV", camera.fov);
+    shader.setVec3("uCameraPos", cameraState.position);
+    shader.setFloat("uFOV", cameraState.fov);
     shader.setVec2("uResolution", glm::vec2(currentWidth, currentHeight));
 
     // Upload shadow mapping uniforms
@@ -193,10 +194,9 @@ void Rasterizer::render(const Camera &camera, Scene &activeScene,
     for (EntityID id : renderables) {
 
         // Get the important components
-        const auto &mesh = activeScene.getComponent<MeshComponent>(id);
-        const auto &transform =
-            activeScene.getComponent<TransformComponent>(id);
-        const auto &material = activeScene.getComponent<MaterialComponent>(id);
+        const auto &mesh = scene.getComponent<MeshComponent>(id);
+        const auto &transform = scene.getComponent<TransformComponent>(id);
+        const auto &material = scene.getComponent<MaterialComponent>(id);
 
         // Per-model uniforms
         shader.setMat4("uModel", buildModel(transform));

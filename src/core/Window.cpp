@@ -1,16 +1,28 @@
 #include "Window.h"
 
 #include "../services/Logger.h"
+#include "states/WindowState.h"
 
 namespace Engine {
 
 // Code ran when window size is changed
-void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
+void Window::framebufferSizeCallback(GLFWwindow *window, int width,
+                                     int height) {
     // Change the viewport size
     glViewport(0, 0, width, height);
+
+    Window *windowWrapperInstance =
+        static_cast<Window *>(glfwGetWindowUserPointer(window));
+
+    if (windowWrapperInstance && windowWrapperInstance->windowState) {
+        windowWrapperInstance->windowState->width = width;
+        windowWrapperInstance->windowState->height = height;
+    }
 }
 
 Window::Window(WindowState &state) {
+
+    windowState = &state;
 
     // Initialize & check for error for glfw
     if (!glfwInit()) {
@@ -32,8 +44,8 @@ Window::Window(WindowState &state) {
 #endif
 
     // Create the GLFW window and give it to our wrapper
-    window = glfwCreateWindow(state.width, state.height, state.title.c_str(),
-                              nullptr, nullptr);
+    window = glfwCreateWindow(windowState->width, windowState->height,
+                              windowState->title.c_str(), nullptr, nullptr);
 
     // Check to make sure the window actually got made
     if (!window) {
@@ -44,6 +56,8 @@ Window::Window(WindowState &state) {
 
     // Set the window context to our current window
     glfwMakeContextCurrent(window);
+
+    glfwSetWindowUserPointer(window, this);
 
     // Initialize & check GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -57,22 +71,23 @@ Window::Window(WindowState &state) {
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     // Set the intial window size
-    int bufferWidth, bufferHeight;
-    glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-    glViewport(0, 0, bufferWidth, bufferHeight);
+    glfwGetFramebufferSize(window, &windowState->width, &windowState->height);
+    glViewport(0, 0, windowState->width, windowState->height);
 
-    glClearColor(state.clear_red, state.clear_green, state.clear_blue,
-                 state.clear_alpha);
+    glClearColor(windowState->clear_red, windowState->clear_green,
+                 windowState->clear_blue, windowState->clear_alpha);
 }
 
 // Deconstructor - Kill glfw
 Window::~Window() {
-    glfwDestroyWindow(window);
+    if (window) {
+        glfwDestroyWindow(window);
+    }
     glfwTerminate();
 }
 
 // Wrapper to clean up constructor, sets the settings
-void Window::setSettings() const {
+void Window::setSettings() {
 
     // Turn off VSCNC
     glfwSwapInterval(0);
@@ -88,41 +103,19 @@ void Window::setSettings() const {
 }
 
 // Checking for closing the window
-bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
+bool Window::shouldClose() { return glfwWindowShouldClose(window); }
 
 // Polling & swapping buffers
-void Window::pollEvents() const { glfwPollEvents(); }
-void Window::swapBuffers() const { glfwSwapBuffers(window); }
+void Window::pollEvents() { glfwPollEvents(); }
+void Window::swapBuffers() { glfwSwapBuffers(window); }
 
 // Pre-frame window steps
-void Window::preFrame() const {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
+void Window::preFrame() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
 // Window update
-void Window::postFrame() const {
-    this->swapBuffers();
-    this->pollEvents();
-}
-
-// Get the framebuffer size
-void Window::getSize(int &width, int &height) const {
-    // We use FramebufferSize because on Retina displays,
-    // WindowSize != PixelSize. This fixes your "cut off" bug.
-    glfwGetFramebufferSize(window, &width, &height);
-}
-
-// Get the framebuffer aspect ratio
-float Window::getAspectRatio() const {
-
-    int width, height;
-    this->getSize(width,
-                  height); // Now width and height will actually be updated
-
-    if (height == 0)
-        return 1.0f; // Safety check to avoid dividing by zero
-
-    return (float)width / (float)height;
+void Window::postFrame() {
+    swapBuffers();
+    pollEvents();
 }
 
 } // namespace Engine

@@ -45,8 +45,8 @@ void Application::init() {
         std::make_shared<SceneManager>(engineContext->getScene()));
     layerStack.pushLayer(sceneUpdateLayer);
 
-    rendererLayer = std::make_shared<RendererLayer>(
-        engineContext->getRenderer(), *window.get());
+    rendererLayer =
+        std::make_shared<RendererLayer>(engineContext->getRenderer());
     layerStack.pushLayer(rendererLayer);
 
     setupEntities();
@@ -107,36 +107,37 @@ void Application::handleInputs() {
     // Moving camera look at direction
     if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
         glm::vec2 delta = Input::getMouseDelta();
-        camera.processLookingDirectionMovement(delta.x, -delta.y);
+        camera.processLookingDirectionMovement(engineState.scene.camera,
+                                               delta.x, -delta.y);
     }
 
     // Move the camera origin on movement
     if (Input::isKeyPressed(GLFW_KEY_W))
-        camera.processMovement(FORWARD);
+        camera.processMovement(engineState.scene.camera, FORWARD);
     if (Input::isKeyPressed(GLFW_KEY_S))
-        camera.processMovement(BACKWARD);
+        camera.processMovement(engineState.scene.camera, BACKWARD);
     if (Input::isKeyPressed(GLFW_KEY_A))
-        camera.processMovement(LEFT);
+        camera.processMovement(engineState.scene.camera, LEFT);
     if (Input::isKeyPressed(GLFW_KEY_D))
-        camera.processMovement(RIGHT);
+        camera.processMovement(engineState.scene.camera, RIGHT);
     if (Input::isKeyPressed(GLFW_KEY_SPACE))
-        camera.processMovement(UP);
+        camera.processMovement(engineState.scene.camera, UP);
     if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-        camera.processMovement(DOWN);
+        camera.processMovement(engineState.scene.camera, DOWN);
 
     // Move the camera origin slowly
     if (Input::isKeyPressed(GLFW_KEY_UP))
-        camera.processMovement(FORWARD, 0.1);
+        camera.processMovement(engineState.scene.camera, FORWARD, 0.1);
     if (Input::isKeyPressed(GLFW_KEY_DOWN))
-        camera.processMovement(BACKWARD, 0.1);
+        camera.processMovement(engineState.scene.camera, BACKWARD, 0.1);
     if (Input::isKeyPressed(GLFW_KEY_LEFT))
-        camera.processMovement(LEFT, 0.1);
+        camera.processMovement(engineState.scene.camera, LEFT, 0.1);
     if (Input::isKeyPressed(GLFW_KEY_RIGHT))
-        camera.processMovement(RIGHT, 0.1);
+        camera.processMovement(engineState.scene.camera, RIGHT, 0.1);
     if (Input::isKeyPressed(GLFW_KEY_ENTER))
-        camera.processMovement(UP, 0.1);
+        camera.processMovement(engineState.scene.camera, UP, 0.1);
     if (Input::isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
-        camera.processMovement(DOWN, 0.1);
+        camera.processMovement(engineState.scene.camera, DOWN, 0.1);
 
     if (Input::isKeyJustPressed(GLFW_KEY_R)) {
 

@@ -1,6 +1,5 @@
 #include "RendererManager.h"
 
-#include "../scene/SceneManager.h"
 #include "../services/Logger.h"
 #include "../services/Timer.h"
 
@@ -11,7 +10,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
     : engineContext(engineContext) {
 
     // Rasterizer inizialization
-    rasterizer = std::make_unique<Rasterizer>();
+    rasterizer = std::make_unique<Rasterizer>(engineContext);
     rasterizer->init();
 
     // Check for OpenGL compatibility
@@ -27,7 +26,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
         state.settings.systemComputeShaderCompatability = true;
 
         // Path tracer inizialization
-        pathTracer = std::make_unique<PathTracer>();
+        pathTracer = std::make_unique<PathTracer>(engineContext);
         pathTracer->init();
     } else {
         Logger::warn("RENDERER", "Path Tracer not supported on this system.");
@@ -64,20 +63,16 @@ void RendererManager::swapActiveRenderer(RenderChoice choice) {
 }
 
 // TODO: replace with context
-void RendererManager::render(const Window &window) {
+void RendererManager::render(EngineState &state) {
     // Render the scene
     START_PROFILE("Render"); // Start timer for render
-    activeRenderer->render(engineContext.getScene().camera,
-                           engineContext.getScene().scene,
-                           window.getAspectRatio());
+    activeRenderer->render(state);
     END_PROFILE("Render"); // End Timer for render
 
-    int width, height;
-    window.getSize(width, height);
-    activeRenderer->resize(width, height);
+    activeRenderer->resize(state.window.width, state.window.height);
 
     // 2. Present the compute texture to the main window
-    activeRenderer->present(width, height);
+    activeRenderer->present(state.window.width, state.window.height);
 }
 
 } // namespace Engine

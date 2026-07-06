@@ -12,8 +12,8 @@ struct WindowState {
     std::string title = Defaults::Window::TITLE;
 
     // Window size
-    unsigned int width = Defaults::Window::WIDTH;
-    unsigned int height = Defaults::Window::HEIGHT;
+    int width = Defaults::Window::WIDTH;
+    int height = Defaults::Window::HEIGHT;
 
     // Clear color values
     float clear_red = Defaults::Window::CLEAR_RED;

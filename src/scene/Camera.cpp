@@ -9,12 +9,12 @@ namespace Engine {
 
 // Constructor
 Camera::Camera(CameraState &state)
-    : position(state.position), up(state.up), right(state.right),
-      front(state.front), yaw(state.yaw), pitch(state.pitch), fov(state.fov),
-      sensitivity(state.settings.sensitivity),
+    : position(state.position), yaw(state.yaw), pitch(state.pitch),
+      fov(state.fov), sensitivity(state.settings.sensitivity),
       movementSpeed(state.settings.movementSpeed) {
 
-    this->worldUp = up;
+    // TODO: temp
+    this->worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
     // Intialize the camera vectors
     updateCameraVectors();
@@ -33,11 +33,11 @@ glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
 }
 
 // Camera movement
-void Camera::processMovement(Camera_Movement direction,
+void Camera::processMovement(CameraState &state, Camera_Movement direction,
                              float movementModifier) {
 
     // Get deltaTime from the timer
-    float deltaTime = Engine::Timer::getDeltaTime();
+    float deltaTime = Timer::getDeltaTime();
 
     // Calculate the velocity of the camera
     float velocity = movementSpeed * deltaTime * movementModifier;
@@ -56,11 +56,13 @@ void Camera::processMovement(Camera_Movement direction,
     if (direction == DOWN)
         position -= up * velocity;
 
-    cameraDirty = true;
+    state.position = position;
+    state.cameraDirty = true;
 }
 
 // Pitch and yaw modifications
-void Camera::processLookingDirectionMovement(float xoffset, float yoffset,
+void Camera::processLookingDirectionMovement(CameraState &state, float xoffset,
+                                             float yoffset,
                                              bool constrainPitch) {
 
     // Change the x & y offset
@@ -82,7 +84,9 @@ void Camera::processLookingDirectionMovement(float xoffset, float yoffset,
     // Update the camera vectors with new pitch & yaw
     updateCameraVectors();
 
-    cameraDirty = true;
+    state.yaw = yaw;
+    state.pitch = pitch;
+    state.cameraDirty = true;
 }
 
 // Update the front, right, and up vectors
@@ -97,8 +101,8 @@ void Camera::updateCameraVectors() {
 
     // Update the front, right, and up vectors
     this->front = glm::normalize(front);
-    right = glm::normalize(glm::cross(front, worldUp));
-    up = glm::normalize(glm::cross(right, front));
+    this->right = glm::normalize(glm::cross(front, worldUp));
+    this->up = glm::normalize(glm::cross(right, front));
 }
 
 } // namespace Engine

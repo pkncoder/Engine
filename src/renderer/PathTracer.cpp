@@ -1,6 +1,7 @@
 #include "PathTracer.h"
 
 #include "../Constants.h"
+#include "../scene/SceneManager.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
 #include "../scene/components/TransformComponent.h"
@@ -72,13 +73,15 @@ void PathTracer::shutdown() {
 // --- Rendering & render management ---
 
 // Run a full render pass
-void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
+void PathTracer::render(EngineState &state) {
+
+    CameraState cameraState = state.scene.camera;
 
     // Check no texture size
     if (currentWidth == 0 || currentHeight == 0)
         return;
 
-    if (camera.cameraDirty) {
+    if (cameraState.cameraDirty) {
         frameCount = 0;
     }
 
@@ -87,7 +90,7 @@ void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
 
     // Get the data flattened for the buffers
     // TODO: Rework
-    flattenScene(scene);
+    flattenScene();
 
     // Loop each shader pass
     for (auto &pass : shaderPasses) {
@@ -96,7 +99,7 @@ void PathTracer::render(const Camera &camera, Scene &scene, float aspectRatio) {
 
         // Bind the shader & global uniforms to it
         pass.shader.bind();
-        bindGlobalUniforms(pass.shader, camera);
+        bindGlobalUniforms(pass.shader, cameraState);
 
         // Dispatch the shader pass
         dispatchShaderPass(pass);
@@ -278,7 +281,9 @@ void PathTracer::updateBuffer(const std::string &name, const void *data,
 // --- Scene managemnet ---
 
 // Flatten the active scene data for use
-void PathTracer::flattenScene(Scene &activeScene) {
+void PathTracer::flattenScene() {
+
+    Scene activeScene = engineContext.getScene().scene;
 
     // Grab all of the renderables from the scene
     const auto renderables =

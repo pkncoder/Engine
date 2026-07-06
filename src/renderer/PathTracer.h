@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../core/EngineContext.h"
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
 #include "BufferManager.h"
@@ -44,13 +45,15 @@ struct ShaderPass {
 
 class PathTracer : public IRenderer {
   public:
+    inline PathTracer(EngineContext &engineContext)
+        : engineContext(engineContext){};
+
     // Init & shutdown
-    void init() override;
+    void init();
     void shutdown() override;
 
     // Rendering & render management
-    void render(const Camera &camera, Scene &activeScene,
-                float aspectRatio) override;
+    void render(EngineState &state) override;
     void resize(int newWidth, int newHeight) override;
 
     // Presenting rendering target
@@ -75,7 +78,7 @@ class PathTracer : public IRenderer {
                       size_t elementCount);
 
     // Scene management
-    void flattenScene(Scene &activeScene);
+    void flattenScene();
     void rebuildGeometryLookupTable(Scene &activeScene);
 
     // Uniforms
@@ -88,6 +91,8 @@ class PathTracer : public IRenderer {
     // Render size information
     int currentWidth = 0;
     int currentHeight = 0;
+
+    EngineContext &engineContext;
 
     // State tracking
     int frameCount = 0; // TODO: Use the "Timer" service

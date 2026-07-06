@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../scene/Camera.h"
-#include "../scene/Scene.h"
+#include "../core/EngineContext.h"
 #include "IRenderer.h"
 #include "Shader.h"
 
@@ -11,12 +10,17 @@ namespace Engine {
 
 class Rasterizer : public IRenderer {
   public:
-    void init() override;
-    void render(const Camera &camera, Scene &scene, float aspectRatio) override;
+    inline Rasterizer(EngineContext &engineContext)
+        : engineContext(engineContext){};
+
+    void init();
+    void render(EngineState &state) override;
     void resize(const int newWidth, const int newHeight) override;
     void shutdown() override;
 
   private:
+    EngineContext &engineContext;
+
     // Render size information
     int currentWidth = 0;
     int currentHeight = 0;
