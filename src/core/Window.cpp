@@ -17,6 +17,8 @@ void Window::framebufferSizeCallback(GLFWwindow *window, int width,
     if (windowWrapperInstance && windowWrapperInstance->windowState) {
         windowWrapperInstance->windowState->width = width;
         windowWrapperInstance->windowState->height = height;
+
+        windowWrapperInstance->windowState->aspectRatio = width / (float)height;
     }
 }
 
@@ -44,8 +46,9 @@ Window::Window(WindowState &state) {
 #endif
 
     // Create the GLFW window and give it to our wrapper
-    window = glfwCreateWindow(windowState->width, windowState->height,
-                              windowState->title.c_str(), nullptr, nullptr);
+    window =
+        glfwCreateWindow(windowState->width, windowState->height,
+                         windowState->settings.title.c_str(), nullptr, nullptr);
 
     // Check to make sure the window actually got made
     if (!window) {
@@ -74,8 +77,9 @@ Window::Window(WindowState &state) {
     glfwGetFramebufferSize(window, &windowState->width, &windowState->height);
     glViewport(0, 0, windowState->width, windowState->height);
 
-    glClearColor(windowState->clear_red, windowState->clear_green,
-                 windowState->clear_blue, windowState->clear_alpha);
+    glClearColor(
+        windowState->settings.clear_red, windowState->settings.clear_green,
+        windowState->settings.clear_blue, windowState->settings.clear_alpha);
 }
 
 // Deconstructor - Kill glfw
