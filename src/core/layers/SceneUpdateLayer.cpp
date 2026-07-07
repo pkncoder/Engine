@@ -12,4 +12,6 @@ void SceneUpdateLayer::onAttach(EngineState &engineState) {
     // sceneManager.init();
 }
 
+void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event) {}
+
 } // namespace Engine

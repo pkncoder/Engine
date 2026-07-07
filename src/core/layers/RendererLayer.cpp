@@ -17,4 +17,6 @@ void RendererLayer::onDetach() {
     rendererManager.getActiveRenderer()->shutdown();
 }
 
+void RendererLayer::onEvent(std::shared_ptr<IEvent> event) {}
+
 } // namespace Engine

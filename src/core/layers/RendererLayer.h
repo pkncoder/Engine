@@ -14,6 +14,7 @@ class RendererLayer : public ILayer {
     void onAttach(EngineState &state) override;
     void onUpdate(EngineState &state) override;
     void onDetach() override;
+    void onEvent(std::shared_ptr<IEvent> event) override;
 
   private:
     RendererManager &rendererManager;

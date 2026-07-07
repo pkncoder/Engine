@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../events/IEventDispatcher.h"
 #include "ILayer.h"
 
 #include <memory>
@@ -7,7 +8,7 @@
 
 namespace Engine {
 
-class LayerStack {
+class LayerStack : IEventDispatcher {
 
   public:
     LayerStack() = default;
@@ -19,6 +20,7 @@ class LayerStack {
     inline void popLayer() { layers.pop_back(); };
 
     void dispatchStack(EngineState &engineState);
+    void dispatchEvent(std::shared_ptr<IEvent> event);
 
   private:
     std::vector<std::shared_ptr<ILayer>> layers;
