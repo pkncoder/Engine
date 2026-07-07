@@ -8,7 +8,7 @@
 
 namespace Engine {
 
-class LayerStack : IEventDispatcher {
+class LayerStack : public IEventDispatcher {
 
   public:
     LayerStack() = default;

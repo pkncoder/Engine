@@ -28,18 +28,17 @@ void Application::init() {
     Logger::init();
     Logger::setNoPendingLogs(true);
 
+    layerStack = LayerStack();
+
     engineState = EngineState();
 
     // Create the window & relating services
-    window = std::make_unique<Window>(engineState.window);
+    window = std::make_unique<Window>(engineState.window, layerStack);
 
-    Input::init(window->getNativeWindow());
     Timer::init();
 
     engineContext = std::make_unique<EngineContext>();
     engineContext->init(engineState);
-
-    layerStack = LayerStack();
 
     sceneUpdateLayer = std::make_shared<SceneUpdateLayer>(
         std::make_shared<SceneManager>(engineContext->getScene()));
@@ -65,10 +64,6 @@ void Application::run() {
 
         // Update the timer service and run the log function
         Timer::update();
-
-        // Poll inputs, and then handle them
-        Input::update();
-        handleInputs();
 
         // Clear Screen
         window->preFrame();
