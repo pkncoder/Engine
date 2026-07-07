@@ -1,7 +1,6 @@
 #include "Window.h"
 
 #include "../services/Logger.h"
-#include "events/IEvent.h"
 #include "events/IEventDispatcher.h"
 #include "events/KeyEvents.h"
 #include "events/MouseEvents.h"
