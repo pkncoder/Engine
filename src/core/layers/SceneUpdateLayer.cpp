@@ -1,5 +1,10 @@
 #include "SceneUpdateLayer.h"
+#include "../../services/Input.h"
+#include "../../services/Logger.h"
+#include "../events/KeyEvents.h"
+#include "../events/MouseEvents.h"
 
+#include <GLFW/glfw3.h>
 #include <memory>
 
 namespace Engine {
@@ -12,6 +17,39 @@ void SceneUpdateLayer::onAttach(EngineState &engineState) {
     // sceneManager.init();
 }
 
-void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event) {}
+void SceneUpdateLayer::onUpdate(EngineState &engineState) {
+    if (Input::isKeyPressed(Key::W)) {
+        Camera &camera = sceneManager->getCamera();
+
+        camera.processMovement(engineState, FORWARD);
+    }
+    if (Input::isKeyPressed(Key::S)) {
+        Camera &camera = sceneManager->getCamera();
+
+        camera.processMovement(engineState, BACKWARD);
+    }
+    if (Input::isKeyPressed(Key::A)) {
+        Camera &camera = sceneManager->getCamera();
+
+        camera.processMovement(engineState, LEFT);
+    }
+    if (Input::isKeyPressed(Key::D)) {
+        Camera &camera = sceneManager->getCamera();
+
+        camera.processMovement(engineState, RIGHT);
+    }
+    if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        Camera &camera = sceneManager->getCamera();
+        glm::vec2 mouseDelta = Input::getMouseDelta();
+
+        Logger::check();
+
+        camera.processLookingDirectionMovement(engineState, mouseDelta.x,
+                                               -mouseDelta.y);
+    }
+}
+
+void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event,
+                               EngineState &state) {}
 
 } // namespace Engine

@@ -1,4 +1,5 @@
 #include "RendererLayer.h"
+#include <memory>
 
 namespace Engine {
 
@@ -17,6 +18,7 @@ void RendererLayer::onDetach() {
     rendererManager.getActiveRenderer()->shutdown();
 }
 
-void RendererLayer::onEvent(std::shared_ptr<IEvent> event) {}
+void RendererLayer::onEvent(std::shared_ptr<IEvent> event, EngineState &state) {
+}
 
 } // namespace Engine

@@ -33,11 +33,13 @@ glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
 }
 
 // Camera movement
-void Camera::processMovement(CameraState &state, Camera_Movement direction,
+void Camera::processMovement(EngineState &state, Camera_Movement direction,
                              float movementModifier) {
 
     // Get deltaTime from the timer
     float deltaTime = Timer::getDeltaTime();
+
+    Logger::info("DEBUG", std::to_string(deltaTime));
 
     // Calculate the velocity of the camera
     float velocity = movementSpeed * deltaTime * movementModifier;
@@ -56,12 +58,12 @@ void Camera::processMovement(CameraState &state, Camera_Movement direction,
     if (direction == DOWN)
         position -= up * velocity;
 
-    state.position = position;
-    state.cameraDirty = true;
+    state.scene.camera.position = position;
+    state.scene.camera.cameraDirty = true;
 }
 
 // Pitch and yaw modifications
-void Camera::processLookingDirectionMovement(CameraState &state, float xoffset,
+void Camera::processLookingDirectionMovement(EngineState &state, float xoffset,
                                              float yoffset,
                                              bool constrainPitch) {
 
@@ -84,9 +86,9 @@ void Camera::processLookingDirectionMovement(CameraState &state, float xoffset,
     // Update the camera vectors with new pitch & yaw
     updateCameraVectors();
 
-    state.yaw = yaw;
-    state.pitch = pitch;
-    state.cameraDirty = true;
+    state.scene.camera.yaw = yaw;
+    state.scene.camera.pitch = pitch;
+    state.scene.camera.cameraDirty = true;
 }
 
 // Update the front, right, and up vectors

@@ -13,9 +13,9 @@ class SceneUpdateLayer : public ILayer {
     ~SceneUpdateLayer() = default;
 
     void onAttach(EngineState &engineState) override;
-    inline void onUpdate(EngineState &engineState) override{};
+    void onUpdate(EngineState &engineState) override;
     inline void onDetach() override{};
-    void onEvent(std::shared_ptr<IEvent> event) override;
+    void onEvent(std::shared_ptr<IEvent> event, EngineState &state) override;
 
   private:
     std::shared_ptr<SceneManager> sceneManager;

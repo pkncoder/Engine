@@ -1,8 +1,7 @@
 #pragma once
 
-#include "events/IEventDispatcher.h"
 #include "glad/glad.h"
-#include "states/WindowState.h"
+#include "states/EngineState.h"
 #include <GLFW/glfw3.h>
 #include <c++/v1/__config>
 #include <cstddef>
@@ -11,7 +10,7 @@ namespace Engine {
 class Window {
   public:
     // Constructor & Deconstructor
-    Window(WindowState &state, IEventDispatcher &eventDispatcher);
+    Window(EngineState &state);
     ~Window();
 
     // OpenGL settings function
@@ -34,18 +33,6 @@ class Window {
   private:
     // GLFW Window
     GLFWwindow *window = nullptr;
-    WindowState *windowState = nullptr;
-    IEventDispatcher *eventDispatcher = nullptr;
-
-    static void keyEventCallback(GLFWwindow *window, int key, int scancode,
-                                 int action, int mods);
-    static void mouseButtonEventCallback(GLFWwindow *window, int button,
-                                         int action, int mods);
-    static void cursorEventCallback(GLFWwindow *window, double xPos,
-                                    double yPos);
-    static void scrollEventCallback(GLFWwindow *window, double xOffset,
-                                    double yOffset);
-    static void framebufferSizeEventCallback(GLFWwindow *window, int width,
-                                             int height);
+    EngineState *engineState = nullptr;
 };
 } // namespace Engine

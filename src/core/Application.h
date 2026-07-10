@@ -7,6 +7,7 @@
 #include "layers/RendererLayer.h"
 #include "layers/SceneUpdateLayer.h"
 
+#include <cstddef>
 #include <memory>
 
 namespace Engine {
@@ -38,7 +39,7 @@ class Application {
   private:
     // Engine state
     std::unique_ptr<EngineContext> engineContext;
-    EngineState engineState;
+    std::shared_ptr<EngineState> engineState;
 
     // Layerstack
     LayerStack layerStack;

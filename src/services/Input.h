@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../core/events/IEventDispatcher.h"
+#include "../core/states/EngineState.h"
+
 #include <GLFW/glfw3.h>
 #include <array>
 #include <glm/glm.hpp>
@@ -9,6 +12,11 @@ namespace Engine {
 class Input {
   public:
     static void init(GLFWwindow *window);
+    static inline void setEventCallback(
+        const std::function<void(std::shared_ptr<IEvent>)> &callback) {
+        dispatchEvent = callback;
+    };
+
     static void update();
 
     // --- KEYBOARD QUERIES ---
@@ -30,14 +38,22 @@ class Input {
     inline static glm::vec2 getMouseDelta() { return mouseDelta; };
 
   private:
-    // GLFW Internal Callbacks
-    static void keyCallback(GLFWwindow *window, int key, int scancode,
-                            int action, int mods);
-    static void mouseButtonCallback(GLFWwindow *window, int button, int action,
-                                    int mods);
-
-  private:
     static inline GLFWwindow *window = nullptr;
+    static inline EngineState *engineState = nullptr;
+
+    static inline std::function<void(std::shared_ptr<IEvent>)> dispatchEvent =
+        nullptr;
+
+    static void keyEventCallback(GLFWwindow *window, int key, int scancode,
+                                 int action, int mods);
+    static void mouseButtonEventCallback(GLFWwindow *window, int button,
+                                         int action, int mods);
+    static void cursorEventCallback(GLFWwindow *window, double xPos,
+                                    double yPos);
+    static void scrollEventCallback(GLFWwindow *window, double xOffset,
+                                    double yOffset);
+    static void framebufferSizeEventCallback(GLFWwindow *window, int width,
+                                             int height);
 
     // Mouse metrics
     static inline glm::vec2 lastMousePos = {0.0f, 0.0f};

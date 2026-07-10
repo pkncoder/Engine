@@ -8,7 +8,6 @@
 #include "../services/Input.h"
 #include "../services/Logger.h"
 #include "../services/Timer.h"
-#include "states/RendererSettings.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
@@ -28,17 +27,22 @@ void Application::init() {
     Logger::init();
     Logger::setNoPendingLogs(true);
 
-    layerStack = LayerStack();
+    engineState = std::make_shared<EngineState>();
 
-    engineState = EngineState();
+    layerStack = LayerStack(engineState);
 
     // Create the window & relating services
-    window = std::make_unique<Window>(engineState.window, layerStack);
+    window = std::make_unique<Window>(*engineState.get());
+
+    Input::init(window->getNativeWindow());
+    Input::setEventCallback([this](std::shared_ptr<IEvent> event) {
+        layerStack.dispatchEvent(event);
+    });
 
     Timer::init();
 
     engineContext = std::make_unique<EngineContext>();
-    engineContext->init(engineState);
+    engineContext->init(*engineState.get());
 
     sceneUpdateLayer = std::make_shared<SceneUpdateLayer>(
         std::make_shared<SceneManager>(engineContext->getScene()));
@@ -62,13 +66,15 @@ void Application::run() {
 
         START_PROFILE("Run Loop"); // Setup timer for run loop
 
+        Input::update();
+
         // Update the timer service and run the log function
         Timer::update();
 
         // Clear Screen
         window->preFrame();
 
-        layerStack.dispatchStack(engineState);
+        layerStack.dispatchStack();
 
         // Do things like event polling & buffer swapping
         window->postFrame();
@@ -83,9 +89,9 @@ void Application::run() {
                      LogType::IN_PLACE);
         Logger::info(
             "CAMERA",
-            "X: " + std::to_string(engineState.scene.camera.position.x) +
-                "Y: " + std::to_string(engineState.scene.camera.position.y) +
-                "Z: " + std::to_string(engineState.scene.camera.position.z),
+            "X: " + std::to_string(engineState->scene.camera.position.x) +
+                "Y: " + std::to_string(engineState->scene.camera.position.y) +
+                "Z: " + std::to_string(engineState->scene.camera.position.z),
             LogType::IN_PLACE);
 
         END_PROFILE("Run Loop"); // End timer for run loop
@@ -95,78 +101,6 @@ void Application::run() {
 }
 
 // Handle any inputs that come in this frame
-void Application::handleInputs() {
-
-    auto &camera = engineContext->getScene().camera;
-
-    // Moving camera look at direction
-    if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-        glm::vec2 delta = Input::getMouseDelta();
-        camera.processLookingDirectionMovement(engineState.scene.camera,
-                                               delta.x, -delta.y);
-    }
-
-    // Move the camera origin on movement
-    if (Input::isKeyPressed(GLFW_KEY_W))
-        camera.processMovement(engineState.scene.camera, FORWARD);
-    if (Input::isKeyPressed(GLFW_KEY_S))
-        camera.processMovement(engineState.scene.camera, BACKWARD);
-    if (Input::isKeyPressed(GLFW_KEY_A))
-        camera.processMovement(engineState.scene.camera, LEFT);
-    if (Input::isKeyPressed(GLFW_KEY_D))
-        camera.processMovement(engineState.scene.camera, RIGHT);
-    if (Input::isKeyPressed(GLFW_KEY_SPACE))
-        camera.processMovement(engineState.scene.camera, UP);
-    if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-        camera.processMovement(engineState.scene.camera, DOWN);
-
-    // Move the camera origin slowly
-    if (Input::isKeyPressed(GLFW_KEY_UP))
-        camera.processMovement(engineState.scene.camera, FORWARD, 0.1);
-    if (Input::isKeyPressed(GLFW_KEY_DOWN))
-        camera.processMovement(engineState.scene.camera, BACKWARD, 0.1);
-    if (Input::isKeyPressed(GLFW_KEY_LEFT))
-        camera.processMovement(engineState.scene.camera, LEFT, 0.1);
-    if (Input::isKeyPressed(GLFW_KEY_RIGHT))
-        camera.processMovement(engineState.scene.camera, RIGHT, 0.1);
-    if (Input::isKeyPressed(GLFW_KEY_ENTER))
-        camera.processMovement(engineState.scene.camera, UP, 0.1);
-    if (Input::isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
-        camera.processMovement(engineState.scene.camera, DOWN, 0.1);
-
-    if (Input::isKeyJustPressed(GLFW_KEY_R)) {
-
-        switch (engineState.renderer.settings.currentRenderChoice) {
-        case RenderChoice::RASTERIZER:
-
-            // Check to see if compute shaders are compatable with this system
-            if (engineState.renderer.settings
-                    .systemComputeShaderCompatability) {
-
-                // If they are, swap the render choice and set it in the engine
-                // state
-                engineContext->getRenderer().swapActiveRenderer(
-                    RenderChoice::PATH_TRACER);
-                engineState.renderer.settings.currentRenderChoice =
-                    RenderChoice::PATH_TRACER;
-            } else {
-
-                // Else, send an error
-                Logger::error("RENDERER",
-                              "Path Tracer not supported on this system.");
-            }
-            break;
-        case RenderChoice::PATH_TRACER:
-
-            // Swap to rasterizer & set the render choice
-            engineContext->getRenderer().swapActiveRenderer(
-                RenderChoice::RASTERIZER);
-            engineState.renderer.settings.currentRenderChoice =
-                RenderChoice::RASTERIZER;
-            break;
-        }
-    }
-}
 
 void Application::setupEntities() {
     START_PROFILE("Entity Loading");

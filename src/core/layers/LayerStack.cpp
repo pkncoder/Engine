@@ -12,9 +12,9 @@ LayerStack::~LayerStack() {
     }
 }
 
-void LayerStack::dispatchStack(EngineState &engineState) {
+void LayerStack::dispatchStack() {
     for (auto &layer : layers) {
-        layer->onUpdate(engineState);
+        layer->onUpdate(*engineState.get());
     }
 }
 
@@ -23,7 +23,7 @@ void LayerStack::dispatchEvent(std::shared_ptr<IEvent> event) {
     Logger::warn("DEBUG - EVENT", "" + event->getType());
 
     for (auto &layer : layers) {
-        layer->onEvent(event);
+        layer->onEvent(event, *engineState.get());
 
         if (event->isConsumed()) {
             break;

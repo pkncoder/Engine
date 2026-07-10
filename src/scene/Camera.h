@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core/states/CameraState.h"
+#include "../core/states/EngineState.h"
 
 #include <glm/glm.hpp>
 
@@ -25,11 +25,11 @@ class Camera {
     glm::mat4 getProjectionMatrix(float aspectRatio) const;
 
     // Processes input received from any keyboard-like input system
-    void processMovement(CameraState &state, Camera_Movement direction,
+    void processMovement(EngineState &state, Camera_Movement direction,
                          float movementModifier = 1.0);
 
     // Processes the change to where the camera is looking
-    void processLookingDirectionMovement(CameraState &state, float xoffset,
+    void processLookingDirectionMovement(EngineState &state, float xoffset,
                                          float yoffset,
                                          bool constrainPitch = true);
 

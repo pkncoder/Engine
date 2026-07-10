@@ -7,6 +7,7 @@
 
 #include "Entity.h"
 
+#include <memory>
 #include <vector>
 
 namespace Engine {
@@ -20,6 +21,7 @@ class SceneManager {
     Scene scene;
 
     std::vector<Entity> loadObjScene(const std::string filepath);
+    inline Camera &getCamera() { return camera; }
 
   private:
     EngineContext &engineContext;
