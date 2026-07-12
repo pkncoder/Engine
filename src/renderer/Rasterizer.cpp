@@ -76,7 +76,9 @@ void Rasterizer::init(EngineState &state) {
 
 void Rasterizer::render(EngineState &state) {
 
-    Scene scene = engineContext.getScene().scene;
+    SceneManager &sceneManager = engineContext.getScene();
+    Scene &scene = sceneManager.scene;
+    Camera &camera = sceneManager.getCamera();
     CameraState cameraState = state.scene.camera;
 
     // Pull renderables once — used in both passes
@@ -180,9 +182,9 @@ void Rasterizer::render(EngineState &state) {
     shader.bind();
 
     // Get the viewProjection matrix values
-    const glm::mat4 view = engineContext.getScene().camera.getViewMatrix();
-    const glm::mat4 proj = engineContext.getScene().camera.getProjectionMatrix(
-        state.window.aspectRatio);
+    Camera &camera = sceneManager.getCamera();
+    const glm::mat4 view = camera.getViewMatrix();
+    const glm::mat4 proj = camera.getProjectionMatrix(state.window.aspectRatio);
 
     // Upload the uniforms for base rendering
     shader.setMat4("uViewProjection", proj * view);

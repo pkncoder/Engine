@@ -4,6 +4,7 @@
 #include "../services/Timer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <string>
 
 namespace Engine {
 
@@ -38,8 +39,6 @@ void Camera::processMovement(EngineState &state, Camera_Movement direction,
 
     // Get deltaTime from the timer
     float deltaTime = Timer::getDeltaTime();
-
-    Logger::info("DEBUG", std::to_string(deltaTime));
 
     // Calculate the velocity of the camera
     float velocity = movementSpeed * deltaTime * movementModifier;

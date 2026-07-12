@@ -13,7 +13,7 @@ const float YAW = 0.0f;
 const float PITCH = 0.0f;
 
 // Camera movement
-const glm::vec3 POSITION = glm::vec3(0.0f, 0.0f, 3.0f);
+const glm::vec3 POSITION = glm::vec3(-2.0f, 0.0f, 3.0f);
 const float MOVEMENT_SPEED = 20.0f;
 
 // Camera looking movement
