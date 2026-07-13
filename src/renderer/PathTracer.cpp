@@ -283,7 +283,7 @@ void PathTracer::updateBuffer(const std::string &name, const void *data,
 // Flatten the active scene data for use
 void PathTracer::flattenScene() {
 
-    Scene activeScene = engineContext.getScene().scene;
+    Scene activeScene = engineContext.getScene()->scene;
 
     // Grab all of the renderables from the scene
     const auto renderables =

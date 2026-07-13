@@ -20,7 +20,7 @@ SceneManager::SceneManager(EngineContext &engineContext,
 }
 
 std::vector<Entity> SceneManager::loadObjScene(const std::string filepath) {
-    return SceneLoader::spawnObjEntity(scene, engineContext.getAsset(),
+    return SceneLoader::spawnObjEntity(scene, *engineContext.getAsset(),
                                        filepath);
 }
 

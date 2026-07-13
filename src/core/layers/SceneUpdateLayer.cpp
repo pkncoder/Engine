@@ -9,8 +9,8 @@
 
 namespace Engine {
 
-SceneUpdateLayer::SceneUpdateLayer(std::shared_ptr<SceneManager> sceneManager)
-    : sceneManager(sceneManager) {}
+SceneUpdateLayer::SceneUpdateLayer(EngineContext &engineContext)
+    : engineContext(engineContext) {}
 
 void SceneUpdateLayer::onAttach(EngineState &engineState) {
     // // TODO: make an init for sceneManager
@@ -18,6 +18,9 @@ void SceneUpdateLayer::onAttach(EngineState &engineState) {
 }
 
 void SceneUpdateLayer::onUpdate(EngineState &engineState) {
+
+    SceneManager *sceneManager = engineContext.getScene();
+
     if (Input::isKeyPressed(Key::W)) {
         Camera &camera = sceneManager->getCamera();
 
@@ -37,6 +40,16 @@ void SceneUpdateLayer::onUpdate(EngineState &engineState) {
         Camera &camera = sceneManager->getCamera();
 
         camera.processMovement(engineState, RIGHT);
+    }
+    if (Input::isKeyPressed(Key::SPACE)) {
+        Camera &camera = sceneManager->getCamera();
+
+        camera.processMovement(engineState, UP);
+    }
+    if (Input::isKeyPressed(Key::LEFT_SHIFT)) {
+        Camera &camera = sceneManager->getCamera();
+
+        camera.processMovement(engineState, DOWN);
     }
     if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
         Camera &camera = sceneManager->getCamera();

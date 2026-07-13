@@ -9,7 +9,7 @@ namespace Engine {
 
 class SceneUpdateLayer : public ILayer {
   public:
-    SceneUpdateLayer(std::shared_ptr<SceneManager> sceneManager);
+    SceneUpdateLayer(EngineContext &engineContext);
     ~SceneUpdateLayer() = default;
 
     void onAttach(EngineState &engineState) override;
@@ -18,7 +18,7 @@ class SceneUpdateLayer : public ILayer {
     void onEvent(std::shared_ptr<IEvent> event, EngineState &state) override;
 
   private:
-    std::shared_ptr<SceneManager> sceneManager;
+    EngineContext &engineContext;
 };
 
 } // namespace Engine

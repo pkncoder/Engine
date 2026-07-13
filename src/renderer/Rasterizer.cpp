@@ -76,10 +76,10 @@ void Rasterizer::init(EngineState &state) {
 
 void Rasterizer::render(EngineState &state) {
 
-    SceneManager &sceneManager = engineContext.getScene();
-    Scene &scene = sceneManager.scene;
-    Camera &camera = sceneManager.getCamera();
-    CameraState cameraState = state.scene.camera;
+    SceneManager *sceneManager = engineContext.getScene();
+    Scene &scene = sceneManager->scene;
+    Camera &camera = sceneManager->getCamera();
+    CameraState &cameraState = state.scene.camera;
 
     // Pull renderables once — used in both passes
     const auto renderables =
@@ -182,7 +182,6 @@ void Rasterizer::render(EngineState &state) {
     shader.bind();
 
     // Get the viewProjection matrix values
-    Camera &camera = sceneManager.getCamera();
     const glm::mat4 view = camera.getViewMatrix();
     const glm::mat4 proj = camera.getProjectionMatrix(state.window.aspectRatio);
 
@@ -200,7 +199,6 @@ void Rasterizer::render(EngineState &state) {
 
     // Loop each renderablable
     for (EntityID id : renderables) {
-
         // Get the important components
         const auto &mesh = scene.getComponent<MeshComponent>(id);
         const auto &transform = scene.getComponent<TransformComponent>(id);
