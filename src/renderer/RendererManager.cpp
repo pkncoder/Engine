@@ -71,10 +71,12 @@ void RendererManager::render(EngineState &state) {
     activeRenderer->render(state);
     END_PROFILE("Render"); // End Timer for render
 
-    activeRenderer->resize(state.window.width, state.window.height);
-
     // 2. Present the compute texture to the main window
     activeRenderer->present(state.window.width, state.window.height);
+}
+
+void RendererManager::resize(int newWidth, int newHeight) {
+    activeRenderer->resize(newWidth, newHeight);
 }
 
 } // namespace Engine

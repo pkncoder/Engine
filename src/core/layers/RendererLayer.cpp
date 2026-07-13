@@ -1,4 +1,6 @@
 #include "RendererLayer.h"
+#include "../events/WindowEvents.h"
+
 #include <memory>
 
 namespace Engine {
@@ -19,6 +21,12 @@ void RendererLayer::onDetach() {
 }
 
 void RendererLayer::onEvent(std::shared_ptr<IEvent> event, EngineState &state) {
+    if (event->getType() == EventType::WINDOW_RESIZE_EVENT) {
+        std::shared_ptr<WindowResizeEvent> windowResizeEvent =
+            std::static_pointer_cast<WindowResizeEvent>(event);
+        rendererManager.resize(windowResizeEvent->windowSize.x,
+                               windowResizeEvent->windowSize.y);
+    }
 }
 
 } // namespace Engine

@@ -19,6 +19,7 @@ class RendererManager {
     void swapActiveRenderer(RenderChoice choice);
 
     void render(EngineState &state);
+    void resize(int newWidth, int newHeight);
 
   private:
     EngineContext &engineContext;
