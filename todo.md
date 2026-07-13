@@ -71,6 +71,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Redo the shader pass & render target sytem to increase scope
 - [ ] Texture data
 - [ ] Create multiple I... files for compute shaders, textures, etc.
+- [ ] Move resize callback from Input -> Window
 
 ### Todo - Not Code
 
