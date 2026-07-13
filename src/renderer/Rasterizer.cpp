@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // for glm::ortho / lookAt
+#include <string>
 
 namespace Engine {
 
@@ -183,7 +184,8 @@ void Rasterizer::render(EngineState &state) {
 
     // Get the viewProjection matrix values
     const glm::mat4 view = camera.getViewMatrix();
-    const glm::mat4 proj = camera.getProjectionMatrix(state.window.aspectRatio);
+    const glm::mat4 proj =
+        camera.getProjectionMatrix(currentWidth / (float)currentHeight);
 
     // Upload the uniforms for base rendering
     shader.setMat4("uViewProjection", proj * view);
@@ -243,9 +245,16 @@ void Rasterizer::render(EngineState &state) {
 }
 
 void Rasterizer::resize(const int newWidth, const int newHeight) {
+
+    Logger::warn("DEBUG", "OLD: (" + std::to_string(currentWidth) + ", " +
+                              std::to_string(currentHeight) + ")");
+    Logger::warn("DEBUG", "NEW: (" + std::to_string(newWidth) + ", " +
+                              std::to_string(newHeight) + ")");
     // If the new size is the same as the old one, do nothing
-    if (newWidth == currentWidth && newHeight == currentHeight)
+    if (newWidth == currentWidth && newHeight == currentHeight) {
+        Logger::error("DEBUG", "Resize skipped");
         return;
+    }
 
     // Update the tracked size
     currentWidth = newWidth;

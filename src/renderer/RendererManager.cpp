@@ -70,7 +70,7 @@ void RendererManager::render(EngineState &state) {
     START_PROFILE("Render"); // Start timer for render
     activeRenderer->render(state);
     END_PROFILE("Render"); // End Timer for render
-
+    //
     // 2. Present the compute texture to the main window
     activeRenderer->present(state.window.width, state.window.height);
 }

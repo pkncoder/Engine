@@ -11,6 +11,7 @@ RendererLayer::RendererLayer(RendererManager &rendererManager)
 void RendererLayer::onAttach(EngineState &engineState) {
     // TODO: add an init function to rendererManager
     // rendererManager.init();
+    rendererManager.resize(engineState.window.width, engineState.window.height);
 }
 void RendererLayer::onUpdate(EngineState &engineState) {
     rendererManager.render(engineState);
