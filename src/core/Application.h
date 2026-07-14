@@ -7,7 +7,6 @@
 #include "layers/RendererLayer.h"
 #include "layers/SceneUpdateLayer.h"
 
-#include <cstddef>
 #include <memory>
 
 namespace Engine {

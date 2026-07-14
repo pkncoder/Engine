@@ -4,7 +4,6 @@
 #include "../core/events/WindowEvents.h"
 #include "Logger.h"
 #include <GLFW/glfw3.h>
-#include <cstring> // for std::memcpy
 
 namespace Engine {
 

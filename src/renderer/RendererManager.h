@@ -4,7 +4,6 @@
 #include "PathTracer.h"
 #include "Rasterizer.h"
 
-#include <cstdlib>
 #include <memory>
 
 namespace Engine {

@@ -3,7 +3,6 @@
 #include "../events/IEventDispatcher.h"
 #include "ILayer.h"
 
-#include <cstddef>
 #include <memory>
 #include <vector>
 
@@ -14,7 +13,7 @@ class LayerStack : public IEventDispatcher {
   public:
     LayerStack() = default;
     LayerStack(std::shared_ptr<EngineState> engineState)
-        : engineState(engineState){};
+        : engineState(engineState) {};
     ~LayerStack();
 
     inline void pushLayer(std::shared_ptr<ILayer> layer) {

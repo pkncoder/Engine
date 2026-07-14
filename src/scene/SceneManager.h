@@ -7,7 +7,6 @@
 
 #include "Entity.h"
 
-#include <memory>
 #include <vector>
 
 namespace Engine {

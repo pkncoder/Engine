@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../scene/SceneManager.h"
+#include "../EngineContext.h"
 #include "ILayer.h"
 
 #include <memory>
@@ -14,7 +14,7 @@ class SceneUpdateLayer : public ILayer {
 
     void onAttach(EngineState &engineState) override;
     void onUpdate(EngineState &engineState) override;
-    inline void onDetach() override{};
+    inline void onDetach() override {};
     void onEvent(std::shared_ptr<IEvent> event, EngineState &state) override;
 
   private:

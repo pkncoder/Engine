@@ -1,11 +1,13 @@
 #pragma once
 
-#include "../core/events/IEventDispatcher.h"
+#include "../core/events/IEvent.h"
 #include "../core/states/EngineState.h"
 
 #include <GLFW/glfw3.h>
 #include <array>
 #include <glm/glm.hpp>
+
+#include <memory>
 
 namespace Engine {
 

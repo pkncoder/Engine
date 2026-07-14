@@ -1,8 +1,7 @@
 #include "SceneUpdateLayer.h"
+#include "../../scene/SceneManager.h"
 #include "../../services/Input.h"
-#include "../../services/Logger.h"
 #include "../events/KeyEvents.h"
-#include "../events/MouseEvents.h"
 
 #include <GLFW/glfw3.h>
 #include <memory>

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../states/EngineState.h"
 #include "IEvent.h"
 
 #include <memory>

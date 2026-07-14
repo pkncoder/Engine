@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include "../scene/Camera.h"
 #include "../scene/Entity.h"
 #include "../scene/SceneManager.h"
 #include "../scene/components/MaterialComponent.h"

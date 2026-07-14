@@ -3,8 +3,6 @@
 #include "glad/glad.h"
 #include "states/EngineState.h"
 #include <GLFW/glfw3.h>
-#include <c++/v1/__config>
-#include <cstddef>
 
 namespace Engine {
 class Window {
