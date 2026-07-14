@@ -1,7 +1,5 @@
 #include "LayerStack.h"
 
-#include "../../services/Logger.h"
-
 #include <memory>
 
 namespace Engine {
@@ -19,8 +17,6 @@ void LayerStack::dispatchStack() {
 }
 
 void LayerStack::dispatchEvent(std::shared_ptr<IEvent> event) {
-
-    Logger::warn("DEBUG - EVENT", "" + event->getType());
 
     for (auto &layer : layers) {
         layer->onEvent(event, *engineState.get());

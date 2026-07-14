@@ -246,13 +246,8 @@ void Rasterizer::render(EngineState &state) {
 
 void Rasterizer::resize(const int newWidth, const int newHeight) {
 
-    Logger::warn("DEBUG", "OLD: (" + std::to_string(currentWidth) + ", " +
-                              std::to_string(currentHeight) + ")");
-    Logger::warn("DEBUG", "NEW: (" + std::to_string(newWidth) + ", " +
-                              std::to_string(newHeight) + ")");
     // If the new size is the same as the old one, do nothing
     if (newWidth == currentWidth && newHeight == currentHeight) {
-        Logger::error("DEBUG", "Resize skipped");
         return;
     }
 

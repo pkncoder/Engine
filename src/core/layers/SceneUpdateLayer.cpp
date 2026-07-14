@@ -55,8 +55,6 @@ void SceneUpdateLayer::onUpdate(EngineState &engineState) {
         Camera &camera = sceneManager->getCamera();
         glm::vec2 mouseDelta = Input::getMouseDelta();
 
-        Logger::check();
-
         camera.processLookingDirectionMovement(engineState, mouseDelta.x,
                                                -mouseDelta.y);
     }
