@@ -32,7 +32,7 @@ class Window {
     void postFrame() const;
 
     // Return the GLFW window (not our wrapper)
-    GLFWwindow *getNativeWindow() const { return window; }
+    inline GLFWwindow *getNativeWindow() const { return window; }
 
   private:
     static void framebufferSizeEventCallback(GLFWwindow *window, int width,

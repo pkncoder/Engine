@@ -12,19 +12,19 @@ class Entity {
     Entity(const EntityID id, Scene *scene) : ID(id), attachedScene(scene) {}
 
     // Getter for the id
-    EntityID getID() const { return ID; }
+    inline EntityID getID() const { return ID; }
 
     // Checking if the id is valid (not NULL_ENTITY id & scene is added)
-    bool isValid() const {
+    inline bool isValid() const {
         return ID != NULL_ENTITY && attachedScene != nullptr;
     }
 
     // Wrapper methods that talk to the Scene
-    template <typename T> T &addComponent(const T component) {
+    template <typename T> inline T &addComponent(const T component) {
         attachedScene->addComponent<T>(ID, component);
         return attachedScene->getComponent<T>(ID);
     }
-    template <typename T> T &getComponent() {
+    template <typename T> inline T &getComponent() {
         return attachedScene->getComponent<T>(ID);
     }
 

@@ -17,7 +17,7 @@ struct CPUVertex {
     glm::vec2 texCoords;
 
     // Equality opporator, used for hashing
-    bool operator==(const CPUVertex &other) const {
+    inline bool operator==(const CPUVertex &other) const {
         return position == other.position && normal == other.normal &&
                texCoords == other.texCoords;
     }
@@ -64,7 +64,7 @@ namespace std {
 
 template <> struct hash<Engine::CPUVertex> {
   public:
-    size_t operator()(const Engine::CPUVertex &vertex) const {
+    inline size_t operator()(const Engine::CPUVertex &vertex) const {
         // Using a simple bit-shifting combine method
         size_t res = 0;
 

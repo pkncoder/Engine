@@ -21,12 +21,12 @@ class IPool {
 // Component pool of type <T> class
 template <typename T> class ComponentPool : public IPool {
   public:
-    // Data
-    T *data;
-
     // Constructor & deconstructor
-    ComponentPool() { data = new T[Constants::Entity::MAX_ENTITIES]; }
-    ~ComponentPool() override { delete[] data; }
+    inline ComponentPool() { data = new T[Constants::Entity::MAX_ENTITIES]; }
+    inline ~ComponentPool() override { delete[] data; }
+
+  public:
+    T *data;
 };
 
 // --- The Scene (Registry) ---

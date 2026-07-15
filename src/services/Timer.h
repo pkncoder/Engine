@@ -35,6 +35,7 @@ class Timer {
                            const LogType logType = LogType::IN_PLACE);
 
     // Periodic run logic
+    // TODO: Create a macro
     static void periodicRun(const std::string &id, const float period,
                             const std::function<void()> function);
     static void removePeriodicTask(const std::string &id);

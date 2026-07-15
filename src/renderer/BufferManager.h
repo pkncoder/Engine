@@ -44,7 +44,7 @@ struct PersistentBuffer {
 
   public:
     // ID & bindings
-    GLuint id = 0;
+    GLuint id = 1;
     GLuint bindingIndex = 0;
     GLenum target = GL_SHADER_STORAGE_BUFFER; // TODO: Need this? Maybe use this
                                               // to reporpose

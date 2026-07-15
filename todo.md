@@ -73,6 +73,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Create multiple I... files for compute shaders, textures, etc.
 - [ ] Figure out where to place the window height/width
 - [ ] Figure out constant rules
+- [ ] Figure out inline class attribute rules
 
 ### Todo - Not Code
 
@@ -132,7 +133,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 2. [x] Fix public vs. private
 3. [x] Make functions const when needed
 4. [x] Make function params const when needed
-5. [ ] Make functions inline when needed
+5. [x] Make functions inline when needed
 6. [ ] Fix placement of functions
 7. [ ] Refactor step by step in code
 8. [ ] Rename things
