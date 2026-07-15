@@ -9,7 +9,7 @@ namespace Engine {
 class RendererLayer : public ILayer {
 
   public:
-    RendererLayer(RendererManager &rendererManager);
+    RendererLayer(EngineContext &engineContext);
     ~RendererLayer() = default;
 
     void onAttach(EngineState &state) override;
@@ -18,7 +18,7 @@ class RendererLayer : public ILayer {
     void onEvent(std::shared_ptr<IEvent> event, EngineState &state) override;
 
   private:
-    RendererManager &rendererManager;
+    EngineContext &engineContext;
 };
 
 } // namespace Engine

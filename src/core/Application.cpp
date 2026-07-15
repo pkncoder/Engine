@@ -32,6 +32,9 @@ void Application::init() {
 
     // Create the window & relating services
     window = std::make_unique<Window>(*engineState.get());
+    window->setEventCallback([this](std::shared_ptr<IEvent> event) {
+        layerStack.dispatchEvent(event);
+    });
 
     Input::init(window->getNativeWindow());
     Input::setEventCallback([this](std::shared_ptr<IEvent> event) {
@@ -46,8 +49,7 @@ void Application::init() {
     sceneUpdateLayer = std::make_shared<SceneUpdateLayer>(*engineContext);
     layerStack.pushLayer(sceneUpdateLayer);
 
-    rendererLayer =
-        std::make_shared<RendererLayer>(*engineContext->getRenderer());
+    rendererLayer = std::make_shared<RendererLayer>(*engineContext);
     layerStack.pushLayer(rendererLayer);
 
     setupEntities();
