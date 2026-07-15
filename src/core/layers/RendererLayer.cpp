@@ -46,7 +46,7 @@ void RendererLayer::onEvent(std::shared_ptr<IEvent> event, EngineState &state) {
 
                     // If they are, swap the render choice and set it in the
                     // engine state
-                    rendererManager.swapActiveRenderer(
+                    engineContext.getRenderer()->swapActiveRenderer(
                         RenderChoice::PATH_TRACER);
                     state.renderer.settings.currentRenderChoice =
                         RenderChoice::PATH_TRACER;
@@ -60,7 +60,8 @@ void RendererLayer::onEvent(std::shared_ptr<IEvent> event, EngineState &state) {
             case RenderChoice::PATH_TRACER:
 
                 // Swap to rasterizer & set the render choice
-                rendererManager.swapActiveRenderer(RenderChoice::RASTERIZER);
+                engineContext.getRenderer()->swapActiveRenderer(
+                    RenderChoice::RASTERIZER);
                 state.renderer.settings.currentRenderChoice =
                     RenderChoice::RASTERIZER;
                 break;
