@@ -107,7 +107,7 @@ void PathTracer::render(EngineState &state) {
 }
 
 // Resize the render
-void PathTracer::resize(int newWidth, int newHeight) {
+void PathTracer::resize(const int newWidth, const int newHeight) {
 
     // If the new size is the same as the old one, do nothing
     if (newWidth == currentWidth && newHeight == currentHeight)
@@ -146,7 +146,7 @@ void PathTracer::setDisplayTarget(const std::string &name) {
 }
 
 // Blit the chosen render target to the fbo for presenting
-void PathTracer::present(int width, int height) const {
+void PathTracer::present(const int width, const int height) const {
 
     // Bind the framebuffer for use
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);

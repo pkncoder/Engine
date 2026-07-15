@@ -22,16 +22,17 @@ class Camera {
     glm::mat4 getViewMatrix() const;
 
     // Calculates and returns the projection matrix based on aspect ratio
-    glm::mat4 getProjectionMatrix(float aspectRatio) const;
+    glm::mat4 getProjectionMatrix(const float aspectRatio) const;
 
     // Processes input received from any keyboard-like input system
-    void processMovement(EngineState &state, Camera_Movement direction,
-                         float movementModifier = 1.0);
+    void processMovement(EngineState &state, const Camera_Movement direction,
+                         const float movementModifier = 1.0);
 
     // Processes the change to where the camera is looking
+    // TODO: make x&y offset const
     void processLookingDirectionMovement(EngineState &state, float xoffset,
                                          float yoffset,
-                                         bool constrainPitch = true);
+                                         const bool constrainPitch = true);
 
     // TODO: Make this private (PathTracer has an issue)
   public:

@@ -49,56 +49,56 @@ void Input::update() {
 }
 
 // Return true if a key is currently pressed
-bool Input::isKeyPressed(int keycode) {
+bool Input::isKeyPressed(const int keycode) {
     if (keycode < 0 || keycode > GLFW_KEY_LAST)
         return false;
     return keysCurrent[keycode];
 }
 
 // Return true if a key has been pressed this cycle
-bool Input::isKeyJustPressed(int keycode) {
+bool Input::isKeyJustPressed(const int keycode) {
     if (keycode < 0 || keycode > GLFW_KEY_LAST)
         return false;
     return keysCurrent[keycode] && !keysPrevious[keycode];
 }
 
 // Return true if a key has been pressed last cycle & is pressed
-bool Input::isKeyHeld(int keycode) {
+bool Input::isKeyHeld(const int keycode) {
     if (keycode < 0 || keycode > GLFW_KEY_LAST)
         return false;
     return keysCurrent[keycode] && keysPrevious[keycode];
 }
 
 // Return true if a key stopped being pressed this cycle
-bool Input::isKeyLetGo(int keycode) {
+bool Input::isKeyLetGo(const int keycode) {
     if (keycode < 0 || keycode > GLFW_KEY_LAST)
         return false;
     return !keysCurrent[keycode] && keysPrevious[keycode];
 }
 
 // Return true if a mouse button is currently pressed
-bool Input::isMouseButtonPressed(int button) {
+bool Input::isMouseButtonPressed(const int button) {
     if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
         return false;
     return buttonsCurrent[button];
 }
 
 // Return true if a mouse button has been pressed this cycle
-bool Input::isMouseButtonJustPressed(int button) {
+bool Input::isMouseButtonJustPressed(const int button) {
     if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
         return false;
     return buttonsCurrent[button] && !buttonsPrevious[button];
 }
 
 // Return true if a mouse button has been pressend & is pressed this cycle
-bool Input::isButtonHeld(int button) {
+bool Input::isButtonHeld(const int button) {
     if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
         return false;
     return buttonsCurrent[button] && buttonsPrevious[button];
 }
 
 // Return true if a button has been let go this cycle
-bool Input::isMouseButtonLetGo(int button) {
+bool Input::isMouseButtonLetGo(const int button) {
     if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
         return false;
     return !buttonsCurrent[button] && buttonsPrevious[button];
@@ -112,8 +112,9 @@ glm::vec2 Input::getMousePosition() {
 }
 
 // Code ran when window size is changed
-void Input::keyEventCallback(GLFWwindow *window, int key, int scancode,
-                             int action, int mods) {
+void Input::keyEventCallback(GLFWwindow *window, const int key,
+                             const int scancode, const int action,
+                             const int mods) {
     KeyCode keyCode = static_cast<KeyCode>(key);
     bool ctrl = (mods & GLFW_MOD_CONTROL) != 0;
     bool shift = (mods & GLFW_MOD_SHIFT) != 0;
@@ -145,8 +146,8 @@ void Input::keyEventCallback(GLFWwindow *window, int key, int scancode,
 }
 
 // Code ran when window size is changed
-void Input::mouseButtonEventCallback(GLFWwindow *window, int button, int action,
-                                     int mods) {
+void Input::mouseButtonEventCallback(GLFWwindow *window, const int button,
+                                     const int action, const int mods) {
     MouseCode buttonCode = static_cast<MouseCode>(button);
 
     if (button > 0 && button <= GLFW_KEY_LAST) {
@@ -168,13 +169,14 @@ void Input::mouseButtonEventCallback(GLFWwindow *window, int button, int action,
 }
 
 // Code ran when window size is changed
-void Input::cursorEventCallback(GLFWwindow *window, double xPos, double yPos) {
+void Input::cursorEventCallback(GLFWwindow *window, const double xPos,
+                                const double yPos) {
     dispatchEvent(std::make_shared<MouseMoveEvent>(xPos, yPos));
 }
 
 // Code ran when window size is changed
-void Input::scrollEventCallback(GLFWwindow *window, double xOffset,
-                                double yOffset) {
+void Input::scrollEventCallback(GLFWwindow *window, const double xOffset,
+                                const double yOffset) {
     dispatchEvent(std::make_shared<MouseScrollEvent>(xOffset, yOffset));
 }
 

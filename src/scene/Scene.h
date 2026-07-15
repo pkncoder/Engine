@@ -49,7 +49,7 @@ class Scene {
 
     // Adding a component to an entity id
     template <typename T>
-    inline void addComponent(EntityID entity, T component) {
+    inline void addComponent(const EntityID entity, const T component) {
 
         // Get the component type's id
         ComponentType type = getComponentTypeID<T>();
@@ -64,7 +64,7 @@ class Scene {
     }
 
     // Returns a referance to a component type with the entity id
-    template <typename T> inline T &getComponent(EntityID entity) {
+    template <typename T> inline T &getComponent(const EntityID entity) {
 
         // Get the component type id
         ComponentType type = getComponentTypeID<T>();

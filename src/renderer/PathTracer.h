@@ -57,11 +57,11 @@ class PathTracer : public IRenderer {
 
     // Rendering & render management
     void render(EngineState &state) override;
-    void resize(int newWidth, int newHeight) override;
+    void resize(const int newWidth, const int newHeight) override;
 
     // Presenting rendering target
     void setDisplayTarget(const std::string &name);
-    void present(int width, int height) const override;
+    void present(const int width, const int height) const override;
 
     // Dynamic resource management
     void addStorageBuffer(const std::string &name, GLuint bindingIndex,

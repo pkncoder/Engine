@@ -226,7 +226,8 @@ void Shader::dumpExpandedShaderCode(const std::string &sourceFileName,
 }
 
 // Custom compilation error checking script
-void Shader::checkCompileErrors(uint32_t shader, std::string type) const {
+void Shader::checkCompileErrors(const uint32_t shader,
+                                const std::string type) const {
     // Satus code and info log
     int success;
     char infoLog[1024];

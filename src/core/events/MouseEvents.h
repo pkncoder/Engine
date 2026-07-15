@@ -31,7 +31,7 @@ struct MouseMoveEvent : public IEvent {
   public:
     double xPos, yPos;
 
-    inline MouseMoveEvent(double xMousePos, double yMousePos)
+    inline MouseMoveEvent(const double xMousePos, const double yMousePos)
         : xPos(xMousePos), yPos(yMousePos) {}
 
     inline EventType getType() const override {
@@ -43,7 +43,7 @@ struct MouseButtonPressEvent : public IEvent {
   public:
     MouseCode button;
 
-    inline MouseButtonPressEvent(MouseCode pressedButton)
+    inline MouseButtonPressEvent(const MouseCode pressedButton)
         : button(pressedButton) {}
 
     inline EventType getType() const override {
@@ -55,7 +55,7 @@ struct MouseButtonReleaseEvent : public IEvent {
   public:
     MouseCode button;
 
-    inline MouseButtonReleaseEvent(MouseCode releasedButton)
+    inline MouseButtonReleaseEvent(const MouseCode releasedButton)
         : button(releasedButton) {}
 
     inline EventType getType() const override {
@@ -67,7 +67,8 @@ struct MouseScrollEvent : public IEvent {
   public:
     double xOffset, yOffset;
 
-    inline MouseScrollEvent(double xScrollOffset, double yScrollOffset)
+    inline MouseScrollEvent(const double xScrollOffset,
+                            const double yScrollOffset)
         : xOffset(xScrollOffset), yOffset(yScrollOffset) {}
 
     inline EventType getType() const override {

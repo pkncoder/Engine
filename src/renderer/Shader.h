@@ -18,10 +18,10 @@ class Shader {
     void unbind() const;
 
     // Uniform utility functions
-    void setBool(const std::string &name, bool value) const;
-    void setInt(const std::string &name, int value) const;
-    void setUInt(const std::string &name, int value) const;
-    void setFloat(const std::string &name, float value) const;
+    void setBool(const std::string &name, const bool value) const;
+    void setInt(const std::string &name, const int value) const;
+    void setUInt(const std::string &name, const int value) const;
+    void setFloat(const std::string &name, const float value) const;
     void setVec2(const std::string &name, const glm::vec2 &value) const;
     void setVec3(const std::string &name, const glm::vec3 &value) const;
     void setMat4(const std::string &name, const glm::mat4 &mat) const;
@@ -39,7 +39,8 @@ class Shader {
                                 const std::string &type) const;
 
     // Used to check errors on shader & program compilations
-    void checkCompileErrors(uint32_t shader, std::string type) const;
+    void checkCompileErrors(const uint32_t shader,
+                            const std::string type) const;
 };
 
 } // namespace Engine

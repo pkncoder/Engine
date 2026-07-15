@@ -23,18 +23,20 @@ class Input {
     static void update();
 
     // --- KEYBOARD QUERIES ---
-    static bool isKeyPressed(int keycode); // Is the key down at all right now?
     static bool
-    isKeyJustPressed(int keycode); // Did the key go down THIS frame?
+    isKeyPressed(const int keycode); // Is the key down at all right now?
     static bool
-    isKeyHeld(int keycode); // Is the key being held down (down for > 1 frame)?
-    static bool isKeyLetGo(int keycode); // Did the key get released THIS frame?
+    isKeyJustPressed(const int keycode); // Did the key go down THIS frame?
+    static bool isKeyHeld(
+        const int keycode); // Is the key being held down (down for > 1 frame)?
+    static bool
+    isKeyLetGo(const int keycode); // Did the key get released THIS frame?
 
     // --- MOUSE BUTTON QUERIES ---
-    static bool isMouseButtonPressed(int button);
-    static bool isMouseButtonJustPressed(int button);
-    static bool isButtonHeld(int button);
-    static bool isMouseButtonLetGo(int button);
+    static bool isMouseButtonPressed(const int button);
+    static bool isMouseButtonJustPressed(const int button);
+    static bool isButtonHeld(const int button);
+    static bool isMouseButtonLetGo(const int button);
 
     // --- MOUSE MOVEMENT ---
     static glm::vec2 getMousePosition();
@@ -44,14 +46,15 @@ class Input {
     static inline std::function<void(std::shared_ptr<IEvent>)> dispatchEvent =
         nullptr;
 
-    static void keyEventCallback(GLFWwindow *window, int key, int scancode,
-                                 int action, int mods);
-    static void mouseButtonEventCallback(GLFWwindow *window, int button,
-                                         int action, int mods);
-    static void cursorEventCallback(GLFWwindow *window, double xPos,
-                                    double yPos);
-    static void scrollEventCallback(GLFWwindow *window, double xOffset,
-                                    double yOffset);
+    static void keyEventCallback(GLFWwindow *window, const int key,
+                                 const int scancode, const int action,
+                                 const int mods);
+    static void mouseButtonEventCallback(GLFWwindow *window, const int button,
+                                         const int action, const int mods);
+    static void cursorEventCallback(GLFWwindow *window, const double xPos,
+                                    const double yPos);
+    static void scrollEventCallback(GLFWwindow *window, const double xOffset,
+                                    const double yOffset);
 
   private:
     static inline GLFWwindow *window = nullptr;

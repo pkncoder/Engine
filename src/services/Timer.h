@@ -35,12 +35,12 @@ class Timer {
                            const LogType logType = LogType::IN_PLACE);
 
     // Periodic run logic
-    static void periodicRun(const std::string &id, float period,
-                            std::function<void()> function);
+    static void periodicRun(const std::string &id, const float period,
+                            const std::function<void()> function);
     static void removePeriodicTask(const std::string &id);
 
     // Output relevant data to console
-    static void logPerformance(bool clearTerminal = true);
+    static void logPerformance(const bool clearTerminal = true);
 
   private:
     // Delta time and delta time math

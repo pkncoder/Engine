@@ -8,6 +8,6 @@ namespace Engine {
 class TextureLoader {
   public:
     // Loads a texture from file and return the OpenGL Texture ID
-    static GLuint loadTexture(const std::string &filepath, bool &bumpTexture);
+    static GLuint loadTexture(const std::string &filepath, bool &isBumpTexture);
 };
 } // namespace Engine

@@ -15,11 +15,11 @@ struct MaterialComponent {
     MaterialComponent() = default;
 
     // Constructors
-    MaterialComponent(CPUMaterialData materialData)
+    MaterialComponent(const CPUMaterialData materialData)
         : albedo(materialData.albedo), emmissive(materialData.emmissive),
           roughness(materialData.roughness), metallic(materialData.metallic) {}
-    MaterialComponent(glm::vec3 _albedo, glm::vec3 _emmissive, float _roughness,
-                      float _metallic)
+    MaterialComponent(const glm::vec3 _albedo, const glm::vec3 _emmissive,
+                      const float _roughness, const float _metallic)
         : albedo(_albedo), emmissive(_emmissive), roughness(_roughness),
           metallic(_metallic) {}
 

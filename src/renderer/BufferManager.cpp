@@ -64,7 +64,8 @@ MeshComponent BufferManager::uploadMesh(const CPUMeshData &meshData) {
     return comp;
 }
 
-void PersistentBuffer::setup(GLenum bufferTarget, size_t bufferSize) {
+void PersistentBuffer::setup(const GLenum bufferTarget,
+                             const size_t bufferSize) {
     if (id != 0)
         shutdown(); // Clean up if re-allocating
 
@@ -88,7 +89,7 @@ void PersistentBuffer::setup(GLenum bufferTarget, size_t bufferSize) {
     glBindBuffer(target, 0);
 }
 
-void PersistentBuffer::update(const void *data, size_t updateSize) {
+void PersistentBuffer::update(const void *data, const size_t updateSize) {
     if (mappedPtr && data && updateSize <= size) {
         // Direct memory copy to the mapped VRAM pointer. Lightning fast.
         std::memcpy(mappedPtr, data, updateSize);
@@ -111,8 +112,9 @@ void PersistentBuffer::shutdown() {
     }
 }
 
-void BufferManager::createUBO(const std::string &uboName, uint32_t bindingPoint,
-                              size_t totalBlockSize) {
+void BufferManager::createUBO(const std::string &uboName,
+                              const uint32_t bindingPoint,
+                              const size_t totalBlockSize) {
     if (uboRegistry.find(uboName) != uboRegistry.end())
         return;
 
@@ -130,7 +132,8 @@ void BufferManager::createUBO(const std::string &uboName, uint32_t bindingPoint,
     uboRegistry[uboName] = ubo;
 }
 
-void BufferManager::mapUBOLayout(const std::string &uboName, uint32_t programID,
+void BufferManager::mapUBOLayout(const std::string &uboName,
+                                 const uint32_t programID,
                                  const std::string &blockName,
                                  const std::vector<std::string> &uniformNames) {
     auto it = uboRegistry.find(uboName);
@@ -167,7 +170,7 @@ void BufferManager::mapUBOLayout(const std::string &uboName, uint32_t programID,
 
 void BufferManager::setUBOValue(const std::string &uboName,
                                 const std::string &uniformName,
-                                const void *data, size_t dataSize) {
+                                const void *data, const size_t dataSize) {
     auto it = uboRegistry.find(uboName);
     if (it == uboRegistry.end())
         return;

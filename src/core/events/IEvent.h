@@ -20,7 +20,7 @@ enum struct EventType {
     WINDOW_RESIZE_EVENT
 };
 
-inline std::string to_string(EventType type) {
+inline std::string to_string(const EventType type) {
     switch (type) {
     case EventType::KEY_PRESS_EVENT:
         return "KEY_PRESS_EVENT";
@@ -45,7 +45,7 @@ inline std::string to_string(EventType type) {
     }
 }
 
-inline std::string operator+(const std::string &lhs, EventType rhs) {
+inline std::string operator+(const std::string &lhs, const EventType rhs) {
     return lhs + to_string(rhs);
 }
 

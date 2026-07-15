@@ -34,10 +34,10 @@ struct PersistentBuffer {
 
   public:
     // Allocates immutable VRAM and maps it permanently to CPU space
-    void setup(GLenum bufferTarget, size_t bufferSize);
+    void setup(const GLenum bufferTarget, const size_t bufferSize);
 
     // Fast copy data directly to VRAM
-    void update(const void *data, size_t updateSize);
+    void update(const void *data, const size_t updateSize);
 
     // Data cleanup
     void shutdown();
@@ -65,18 +65,20 @@ class BufferManager {
     // --- NEW GLOBAL UBO MANAGEMENT INTERFACES ---
 
     // Allocates raw VRAM storage for a named UBO tracking channel
-    static void createUBO(const std::string &uboName, uint32_t bindingPoint,
-                          size_t totalBlockSize);
+    static void createUBO(const std::string &uboName,
+                          const uint32_t bindingPoint,
+                          const size_t totalBlockSize);
 
     // Reflects against compiled GLSL code to cache exact byte locations
-    static void mapUBOLayout(const std::string &uboName, uint32_t programID,
+    static void mapUBOLayout(const std::string &uboName,
+                             const uint32_t programID,
                              const std::string &blockName,
                              const std::vector<std::string> &uniformNames);
 
     // Updates a specific variable inside the CPU cache side of the block
     static void setUBOValue(const std::string &uboName,
                             const std::string &uniformName, const void *data,
-                            size_t dataSize);
+                            const size_t dataSize);
 
     // Flushes the entire CPU memory region to VRAM at once
     static void pushUBO(const std::string &uboName);

@@ -27,16 +27,18 @@ class Logger {
     static void shutdown();
 
     // Log wrappers
-    static void info(std::string_view tag, std::string_view message,
-                     LogType type = LogType::STACKED);
-    static void warn(std::string_view tag, std::string_view message,
-                     LogType type = LogType::STACKED);
-    static void error(std::string_view tag, std::string_view message,
-                      LogType type = LogType::STACKED);
-    static void fatal(std::string_view tag, std::string_view message,
-                      LogType type = LogType::STACKED);
-    static void debug(std::string_view message,
-                      LogType type = LogType::STACKED);
+    static void info(const std::string_view tag, const std::string_view message,
+                     const LogType type = LogType::STACKED);
+    static void warn(const std::string_view tag, const std::string_view message,
+                     const LogType type = LogType::STACKED);
+    static void error(const std::string_view tag,
+                      const std::string_view message,
+                      const LogType type = LogType::STACKED);
+    static void fatal(const std::string_view tag,
+                      const std::string_view message,
+                      const LogType type = LogType::STACKED);
+    static void debug(const std::string_view message,
+                      const LogType type = LogType::STACKED);
 
     // Debug log
     static inline void check() {
@@ -44,10 +46,11 @@ class Logger {
     };
 
     // Special log wrappers
-    static inline void space(LogType type = LogType::STACKED) {
+    static inline void space(const LogType type = LogType::STACKED) {
         log(LogLevel::FORMATTING, "NULL", "", type);
     };
-    static inline void line(int length = 15, LogType type = LogType::STACKED) {
+    static inline void line(const int length = 15,
+                            const LogType type = LogType::STACKED) {
         std::string line(length, '-');
 
         log(LogLevel::FORMATTING, "NULL", line, type);
@@ -57,18 +60,18 @@ class Logger {
     static void outputLogs();
 
     // Set the boolean to print a log right when added
-    static inline void setNoPendingLogs(bool newValue) {
+    static inline void setNoPendingLogs(const bool newValue) {
         no_periodic_wait = newValue;
     }
 
     // Get string & ansi color for a specific level
-    static const char *getLevelName(LogLevel level);
-    static const char *getLevelColor(LogLevel level);
+    static const char *getLevelName(const LogLevel level);
+    static const char *getLevelColor(const LogLevel level);
 
   private:
     // Add a new log to the pending list
-    static void log(LogLevel level, std::string_view tag,
-                    std::string_view message, LogType type);
+    static void log(const LogLevel level, const std::string_view tag,
+                    const std::string_view message, const LogType type);
 
   private:
     // Boolean that, if true, will print whenever a new log is sent

@@ -9,7 +9,7 @@ class Entity {
   public:
     // Constructors
     Entity() = default;
-    Entity(EntityID id, Scene *scene) : ID(id), attachedScene(scene) {}
+    Entity(const EntityID id, Scene *scene) : ID(id), attachedScene(scene) {}
 
     // Getter for the id
     EntityID getID() const { return ID; }
@@ -20,7 +20,7 @@ class Entity {
     }
 
     // Wrapper methods that talk to the Scene
-    template <typename T> T &addComponent(T component) {
+    template <typename T> T &addComponent(const T component) {
         attachedScene->addComponent<T>(ID, component);
         return attachedScene->getComponent<T>(ID);
     }

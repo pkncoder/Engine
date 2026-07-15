@@ -28,13 +28,14 @@ glm::mat4 Camera::getViewMatrix() const {
 }
 
 // Calc (short for calculate) the projection matrix
-glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
+glm::mat4 Camera::getProjectionMatrix(const float aspectRatio) const {
     return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 1000.0f);
 }
 
 // Camera movement
-void Camera::processMovement(EngineState &state, Camera_Movement direction,
-                             float movementModifier) {
+void Camera::processMovement(EngineState &state,
+                             const Camera_Movement direction,
+                             const float movementModifier) {
 
     // Get deltaTime from the timer
     float deltaTime = Timer::getDeltaTime();
@@ -63,7 +64,7 @@ void Camera::processMovement(EngineState &state, Camera_Movement direction,
 // Pitch and yaw modifications
 void Camera::processLookingDirectionMovement(EngineState &state, float xoffset,
                                              float yoffset,
-                                             bool constrainPitch) {
+                                             const bool constrainPitch) {
 
     // Change the x & y offset
     xoffset *= sensitivity;

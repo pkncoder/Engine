@@ -20,8 +20,8 @@ void Logger::shutdown() {
 }
 
 // Add a new log to the pending logs list
-void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
-                 LogType type) {
+void Logger::log(const LogLevel level, const std::string_view tag,
+                 const std::string_view message, const LogType type) {
 
     // If the file is open, push the new text before anything for debug
     if (type == LogType::STACKED && logFile.is_open()) {
@@ -52,23 +52,23 @@ void Logger::log(LogLevel level, std::string_view tag, std::string_view message,
 }
 
 // Log wrappers
-void Logger::info(std::string_view tag, std::string_view message,
-                  LogType type) {
+void Logger::info(const std::string_view tag, const std::string_view message,
+                  const LogType type) {
     log(LogLevel::INFO, tag, message, type);
 }
-void Logger::warn(std::string_view tag, std::string_view message,
-                  LogType type) {
+void Logger::warn(const std::string_view tag, const std::string_view message,
+                  const LogType type) {
     log(LogLevel::WARNING, tag, message, type);
 }
-void Logger::error(std::string_view tag, std::string_view message,
-                   LogType type) {
+void Logger::error(const std::string_view tag, const std::string_view message,
+                   const LogType type) {
     log(LogLevel::ERR, tag, message, type);
 }
-void Logger::fatal(std::string_view tag, std::string_view message,
-                   LogType type) {
+void Logger::fatal(const std::string_view tag, const std::string_view message,
+                   const LogType type) {
     log(LogLevel::FATAL, tag, message, type);
 }
-void Logger::debug(std::string_view message, LogType type) {
+void Logger::debug(const std::string_view message, const LogType type) {
     log(LogLevel::DEBUG, "DEBUG", message, type);
 }
 
@@ -126,7 +126,7 @@ void Logger::outputLogs() {
 }
 
 // Switch statement to get a string of the level name
-const char *Logger::getLevelName(LogLevel level) {
+const char *Logger::getLevelName(const LogLevel level) {
     switch (level) {
     case LogLevel::FORMATTING:
         return "FORMATTING";
@@ -146,7 +146,7 @@ const char *Logger::getLevelName(LogLevel level) {
 }
 
 // Switch statement to get the ansi colr of the level name
-const char *Logger::getLevelColor(LogLevel level) {
+const char *Logger::getLevelColor(const LogLevel level) {
     // ANSI escape codes for terminal coloring
     switch (level) {
     case LogLevel::FORMATTING:

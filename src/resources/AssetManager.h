@@ -19,7 +19,7 @@ class AssetManager {
     // Getters and loaders
     const CPUModelData *loadModel(const std::string &filepath);
     const CPUMaterialData *getMaterial(const std::string &materialName) const;
-    GLuint loadTexture(const std::string &filepath, bool &bumpTexture);
+    GLuint loadTexture(const std::string &filepath, bool &isBumpTexture);
 
   private:
     // Cache materials to be fetched later

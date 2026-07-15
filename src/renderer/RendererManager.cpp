@@ -50,7 +50,7 @@ RendererManager::~RendererManager() {
         pathTracer->shutdown();
 }
 
-void RendererManager::swapActiveRenderer(RenderChoice choice) {
+void RendererManager::swapActiveRenderer(const RenderChoice choice) {
     switch (choice) {
     case RenderChoice::RASTERIZER:
         activeRenderer = rasterizer.get();
@@ -75,7 +75,7 @@ void RendererManager::render(EngineState &state) {
     activeRenderer->present(state.window.width, state.window.height);
 }
 
-void RendererManager::resize(int newWidth, int newHeight) {
+void RendererManager::resize(const int newWidth, const int newHeight) {
     activeRenderer->resize(newWidth, newHeight);
 }
 

@@ -64,7 +64,7 @@ namespace std {
 
 template <> struct hash<Engine::CPUVertex> {
   public:
-    size_t operator()(Engine::CPUVertex const &vertex) const {
+    size_t operator()(const Engine::CPUVertex &vertex) const {
         // Using a simple bit-shifting combine method
         size_t res = 0;
 

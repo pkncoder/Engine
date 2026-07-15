@@ -103,8 +103,8 @@ struct KeyPressEvent : public IEvent {
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 
-    inline KeyPressEvent(KeyCode key, bool ctrl, bool shift, bool alt,
-                         bool super)
+    inline KeyPressEvent(const KeyCode key, const bool ctrl, const bool shift,
+                         const bool alt, const bool super)
         : key(key), keyCtrl(ctrl), keyShift(shift), keyAlt(alt),
           keySuper(super) {}
 
@@ -118,8 +118,8 @@ struct KeyReleaseEvent : public IEvent {
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 
-    inline KeyReleaseEvent(KeyCode k, bool ctrl, bool shift, bool alt,
-                           bool super)
+    inline KeyReleaseEvent(const KeyCode k, const bool ctrl, const bool shift,
+                           const bool alt, const bool super)
         : key(k), keyCtrl(ctrl), keyShift(shift), keyAlt(alt), keySuper(super) {
     }
 
@@ -133,8 +133,8 @@ struct KeyRepeatEvent : public IEvent {
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 
-    inline KeyRepeatEvent(KeyCode k, bool ctrl, bool shift, bool alt,
-                          bool super)
+    inline KeyRepeatEvent(const KeyCode k, const bool ctrl, const bool shift,
+                          const bool alt, const bool super)
         : key(k), keyCtrl(ctrl), keyShift(shift), keyAlt(alt), keySuper(super) {
     }
 

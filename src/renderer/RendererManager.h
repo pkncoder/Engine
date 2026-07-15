@@ -15,10 +15,10 @@ class RendererManager {
 
     inline IRenderer *getActiveRenderer() const { return activeRenderer; }
 
-    void swapActiveRenderer(RenderChoice choice);
+    void swapActiveRenderer(const RenderChoice choice);
 
     void render(EngineState &state);
-    void resize(int newWidth, int newHeight);
+    void resize(const int newWidth, const int newHeight);
 
   private:
     EngineContext &engineContext;
