@@ -54,8 +54,6 @@ class Input {
                                     double yPos);
     static void scrollEventCallback(GLFWwindow *window, double xOffset,
                                     double yOffset);
-    static void framebufferSizeEventCallback(GLFWwindow *window, int width,
-                                             int height);
 
     // Mouse metrics
     static inline glm::vec2 lastMousePos = {0.0f, 0.0f};

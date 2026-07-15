@@ -1,13 +1,13 @@
 #include "Window.h"
 
 #include "../services/Logger.h"
+#include "events/WindowEvents.h"
 #include "states/WindowState.h"
+#include <GLFW/glfw3.h>
 
 namespace Engine {
 
 Window::Window(EngineState &state) {
-
-    engineState = &state;
 
     // Initialize & check for error for glfw
     if (!glfwInit()) {
@@ -29,9 +29,9 @@ Window::Window(EngineState &state) {
 #endif
 
     // Create the GLFW window and give it to our wrapper
-    window = glfwCreateWindow(
-        engineState->window.width, engineState->window.height,
-        engineState->window.settings.title.c_str(), nullptr, nullptr);
+    window =
+        glfwCreateWindow(state.window.width, state.window.height,
+                         state.window.settings.title.c_str(), nullptr, nullptr);
 
     // Check to make sure the window actually got made
     if (!window) {
@@ -43,6 +43,9 @@ Window::Window(EngineState &state) {
     // Set the window context to our current window
     glfwMakeContextCurrent(window);
 
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeEventCallback);
+
     // Initialize & check GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         Logger::fatal("SYSTEM", "Failed to initialize GLAD");
@@ -51,14 +54,12 @@ Window::Window(EngineState &state) {
     // Set other settings
     setSettings();
     // Set the intial window size
-    glfwGetFramebufferSize(window, &engineState->window.width,
-                           &engineState->window.height);
-    glViewport(0, 0, engineState->window.width, engineState->window.height);
+    glfwGetFramebufferSize(window, &state.window.width, &state.window.height);
+    glViewport(0, 0, state.window.width, state.window.height);
 
-    glClearColor(engineState->window.settings.clear_red,
-                 engineState->window.settings.clear_green,
-                 engineState->window.settings.clear_blue,
-                 engineState->window.settings.clear_alpha);
+    glClearColor(
+        state.window.settings.clear_red, state.window.settings.clear_green,
+        state.window.settings.clear_blue, state.window.settings.clear_alpha);
 }
 
 // Deconstructor - Kill glfw
@@ -99,6 +100,25 @@ void Window::preFrame() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 void Window::postFrame() {
     swapBuffers();
     pollEvents();
+}
+
+// Code ran when window size is changed
+void Window::framebufferSizeEventCallback(GLFWwindow *window, int width,
+                                          int height) {
+    // Change the viewport size
+    glViewport(0, 0, width, height);
+
+    // if (engineState) {
+    //     engineState->window.width = width;
+    //     engineState->window.height = height;
+    //
+    //     engineState->window.aspectRatio = width / (float)height;
+    // }
+
+    Window *windowReference =
+        static_cast<Window *>(glfwGetWindowUserPointer(window));
+    windowReference->dispatchEvent(
+        std::make_shared<WindowResizeEvent>(width, height));
 }
 
 } // namespace Engine

@@ -24,7 +24,6 @@ void Input::init(GLFWwindow *window_ptr) {
     glfwSetMouseButtonCallback(window, mouseButtonEventCallback);
     glfwSetCursorPosCallback(window, cursorEventCallback);
     glfwSetScrollCallback(window, scrollEventCallback);
-    glfwSetFramebufferSizeCallback(window, framebufferSizeEventCallback);
 
     // Get the initial mouse pos
     double x, y;
@@ -177,22 +176,6 @@ void Input::cursorEventCallback(GLFWwindow *window, double xPos, double yPos) {
 void Input::scrollEventCallback(GLFWwindow *window, double xOffset,
                                 double yOffset) {
     dispatchEvent(std::make_shared<MouseScrollEvent>(xOffset, yOffset));
-}
-
-// Code ran when window size is changed
-void Input::framebufferSizeEventCallback(GLFWwindow *window, int width,
-                                         int height) {
-    // Change the viewport size
-    glViewport(0, 0, width, height);
-
-    if (engineState) {
-        engineState->window.width = width;
-        engineState->window.height = height;
-
-        engineState->window.aspectRatio = width / (float)height;
-    }
-
-    dispatchEvent(std::make_shared<WindowResizeEvent>(width, height));
 }
 
 } // namespace Engine

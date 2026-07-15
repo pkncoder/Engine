@@ -71,7 +71,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Redo the shader pass & render target sytem to increase scope
 - [ ] Texture data
 - [ ] Create multiple I... files for compute shaders, textures, etc.
-- [ ] Move resize callback from Input -> Window
+- [ ] Figure out where to place the window height/width
 
 ### Todo - Not Code
 
@@ -194,3 +194,4 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Plan out the texture handle nonsense
 - [x] Add a SceneManager
 - [x] Make dirty mesh/camera flags (REWORKED)
+- [x] Move resize callback from Input -> Window
