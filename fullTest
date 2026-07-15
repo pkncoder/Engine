@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo -e "\n\033[1;32m=== Cleaning Caches... ===\033[0m\n" && ./clean && \
+echo -e "\n\033[1;32m=== Compiling Program... ===\033[0m\n" && ./test && \
+echo -e "\n\033[1;32m=== Launching Executable ===\033[0m\n" && ./launch || \
+echo -e "\n\033[1;31m\n[ERROR] Pipeline failed in the previous step.\033[0m\n"
+
