@@ -6,6 +6,7 @@ namespace Engine {
 
 // TODO: create the frame image2d
 struct NewFrameRenderedEvent : public IEvent {
+  public:
     // std::shared_ptr<IImage2D> frame;
 
     inline NewFrameRenderedEvent() {}

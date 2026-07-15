@@ -7,6 +7,7 @@
 namespace Engine {
 
 struct WindowResizeEvent : public IEvent {
+  public:
     glm::ivec2 windowSize;
 
     inline WindowResizeEvent(int newWidth, int newHeight)

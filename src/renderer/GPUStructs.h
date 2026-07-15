@@ -5,6 +5,7 @@
 namespace Engine {
 
 struct alignas(16) GPUMeshEntry {
+  public:
     uint32_t baseVertex;
     uint32_t baseIndex;
     uint32_t indexCount;
@@ -12,12 +13,14 @@ struct alignas(16) GPUMeshEntry {
 };
 
 struct alignas(16) GPUVertex {
+  public:
     glm::vec4 position;  // w unused
     glm::vec4 normal;    // w unused
     glm::vec4 texCoords; // z, w unused
 };
 
 struct alignas(16) GPUInstance {
+  public:
     glm::mat4 transform;
     glm::mat4 invTransform;
     uint32_t meshIndex;
@@ -26,6 +29,7 @@ struct alignas(16) GPUInstance {
 };
 
 struct alignas(16) GPUMaterial {
+  public:
     glm::vec4 albedo;
     glm::vec4 emmissive;
     float roughness;

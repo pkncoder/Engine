@@ -28,9 +28,6 @@ class Application {
     // Presenting a texture to the screen
     void presentToScreen();
 
-    // Handling inputs
-    void handleInputs();
-
     // Loading the models + allocating the entities
     // TODO: temp
     void setupEntities();

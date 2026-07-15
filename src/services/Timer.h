@@ -10,6 +10,7 @@
 namespace Engine {
 
 struct ProfileResult {
+  public:
     std::string Name;
     double Time;
 };
@@ -67,13 +68,15 @@ class Timer {
 
 // Timer that can either start and stop on const & scope, or manually keyed
 struct ScopedProfiler {
-    // Key / id for the timer
-    std::string name;
-
+  public:
     ScopedProfiler(const std::string &name) : name(name) {
         Timer::beginProfile(name);
     }                                              // Constructor - Starts timer
     ~ScopedProfiler() { Timer::endProfile(name); } // Deconstructor - Ends timer
+
+  public:
+    // Key / id for the timer
+    std::string name;
 };
 
 // Macro to create a scoped profiler

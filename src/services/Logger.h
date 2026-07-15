@@ -20,6 +20,7 @@ struct LogEntry {
 };
 
 class Logger {
+
   public:
     // Init & shutdown
     static void init();

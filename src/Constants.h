@@ -32,7 +32,7 @@ namespace PathTracer {
 
 const size_t MAX_INSTANCES = 10000;
 
-}
+} // namespace PathTracer
 
 } // namespace Constants
 } // namespace Engine

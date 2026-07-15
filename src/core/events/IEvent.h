@@ -50,6 +50,7 @@ inline std::string operator+(const std::string &lhs, EventType rhs) {
 }
 
 struct IEvent {
+  public:
     virtual ~IEvent() = default;
 
     virtual EventType getType() const = 0;

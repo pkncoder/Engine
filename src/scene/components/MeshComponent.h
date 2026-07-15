@@ -10,7 +10,7 @@ namespace Engine {
 
 // Mesh component struct
 struct MeshComponent {
-
+  public:
     std::string assetID = "";
 
     CPUMeshData meshData;

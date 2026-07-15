@@ -7,6 +7,8 @@
 
 namespace Engine {
 
+// TODO: Put into an extra ECS namespace?
+
 // Entity ID typedef and settings
 using EntityID = uint32_t;
 const EntityID NULL_ENTITY = 0;

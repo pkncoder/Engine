@@ -9,7 +9,9 @@
 #include <vector>
 
 namespace Engine {
+
 struct CPUVertex {
+  public:
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
@@ -23,6 +25,7 @@ struct CPUVertex {
 
 // Mesh information
 struct CPUMeshData {
+  public:
     std::string name;
     std::string materialName;
 
@@ -31,6 +34,7 @@ struct CPUMeshData {
 };
 
 struct CPUModelData {
+  public:
     std::string name;
     std::string materialPath;
 
@@ -39,7 +43,7 @@ struct CPUModelData {
 
 // Material information
 struct CPUMaterialData {
-
+  public:
     // Material definition name
     std::string name;
     std::map<std::string, std::string> textureNames =
@@ -57,7 +61,9 @@ struct CPUMaterialData {
 } // namespace Engine
 
 namespace std {
+
 template <> struct hash<Engine::CPUVertex> {
+  public:
     size_t operator()(Engine::CPUVertex const &vertex) const {
         // Using a simple bit-shifting combine method
         size_t res = 0;
@@ -74,4 +80,5 @@ template <> struct hash<Engine::CPUVertex> {
         return res;
     }
 };
+
 } // namespace std

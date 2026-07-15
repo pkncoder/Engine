@@ -99,6 +99,7 @@ enum : KeyCode {
 }
 
 struct KeyPressEvent : public IEvent {
+  public:
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 
@@ -113,6 +114,7 @@ struct KeyPressEvent : public IEvent {
 };
 
 struct KeyReleaseEvent : public IEvent {
+  public:
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 
@@ -127,6 +129,7 @@ struct KeyReleaseEvent : public IEvent {
 };
 
 struct KeyRepeatEvent : public IEvent {
+  public:
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 

@@ -13,6 +13,7 @@ namespace Engine {
 // UBO information
 struct GPUUniformBuffer {
 
+  public:
     // ID & bindings
     GLuint id = 0;
     GLuint bindingPoint = 0;
@@ -31,6 +32,17 @@ struct GPUUniformBuffer {
 // TODO: Decide on moving the implemtation to the BufferManager
 struct PersistentBuffer {
 
+  public:
+    // Allocates immutable VRAM and maps it permanently to CPU space
+    void setup(GLenum bufferTarget, size_t bufferSize);
+
+    // Fast copy data directly to VRAM
+    void update(const void *data, size_t updateSize);
+
+    // Data cleanup
+    void shutdown();
+
+  public:
     // ID & bindings
     GLuint id = 0;
     GLuint bindingIndex = 0;
@@ -43,15 +55,6 @@ struct PersistentBuffer {
     // Data size
     size_t size = 0;
     size_t elementSize = 0;
-
-    // Allocates immutable VRAM and maps it permanently to CPU space
-    void setup(GLenum bufferTarget, size_t bufferSize);
-
-    // Fast copy data directly to VRAM
-    void update(const void *data, size_t updateSize);
-
-    // Data cleanup
-    void shutdown();
 };
 
 class BufferManager {

@@ -38,10 +38,10 @@ class Window {
     static void framebufferSizeEventCallback(GLFWwindow *window, int width,
                                              int height);
 
+    std::function<void(std::shared_ptr<IEvent>)> dispatchEvent = nullptr;
+
   private:
     // GLFW Window
     GLFWwindow *window = nullptr;
-
-    std::function<void(std::shared_ptr<IEvent>)> dispatchEvent = nullptr;
 };
 } // namespace Engine

@@ -28,6 +28,7 @@ enum : MouseCode {
 }
 
 struct MouseMoveEvent : public IEvent {
+  public:
     double xPos, yPos;
 
     inline MouseMoveEvent(double xMousePos, double yMousePos)
@@ -39,6 +40,7 @@ struct MouseMoveEvent : public IEvent {
 };
 
 struct MouseButtonPressEvent : public IEvent {
+  public:
     MouseCode button;
 
     inline MouseButtonPressEvent(MouseCode pressedButton)
@@ -50,6 +52,7 @@ struct MouseButtonPressEvent : public IEvent {
 };
 
 struct MouseButtonReleaseEvent : public IEvent {
+  public:
     MouseCode button;
 
     inline MouseButtonReleaseEvent(MouseCode releasedButton)
@@ -61,6 +64,7 @@ struct MouseButtonReleaseEvent : public IEvent {
 };
 
 struct MouseScrollEvent : public IEvent {
+  public:
     double xOffset, yOffset;
 
     inline MouseScrollEvent(double xScrollOffset, double yScrollOffset)

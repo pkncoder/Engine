@@ -12,6 +12,7 @@
 namespace Engine {
 
 class Input {
+
   public:
     static void init(GLFWwindow *window);
     static inline void setEventCallback(
@@ -40,9 +41,6 @@ class Input {
     inline static glm::vec2 getMouseDelta() { return mouseDelta; };
 
   private:
-    static inline GLFWwindow *window = nullptr;
-    static inline EngineState *engineState = nullptr;
-
     static inline std::function<void(std::shared_ptr<IEvent>)> dispatchEvent =
         nullptr;
 
@@ -54,6 +52,10 @@ class Input {
                                     double yPos);
     static void scrollEventCallback(GLFWwindow *window, double xOffset,
                                     double yOffset);
+
+  private:
+    static inline GLFWwindow *window = nullptr;
+    static inline EngineState *engineState = nullptr;
 
     // Mouse metrics
     static inline glm::vec2 lastMousePos = {0.0f, 0.0f};

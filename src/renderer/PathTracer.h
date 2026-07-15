@@ -17,12 +17,14 @@
 namespace Engine {
 
 struct MeshRange {
+  public:
     uint32_t firstIndex;
     uint32_t count;
 };
 
 // Structure to define dynamic output textures
 struct RenderTarget {
+  public:
     std::string name;
     GLuint id = 0;
 
@@ -33,6 +35,7 @@ struct RenderTarget {
 
 // Structure to define a dynamic pass
 struct ShaderPass {
+  public:
     std::string name;
     Shader shader;
 
