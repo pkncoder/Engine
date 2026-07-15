@@ -1,7 +1,7 @@
 #include "Input.h"
 #include "../core/events/KeyEvents.h"
 #include "../core/events/MouseEvents.h"
-#include "../core/events/WindowEvents.h"
+
 #include "Logger.h"
 #include <GLFW/glfw3.h>
 

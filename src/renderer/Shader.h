@@ -9,7 +9,7 @@ namespace Engine {
 class Shader {
   public:
     // Constructors
-    Shader() : ID(0) {}
+    inline Shader() : ID(0) {}
     Shader(const char *vertexPath, const char *fragmentPath);
     Shader(const char *computePath);
 
@@ -31,12 +31,12 @@ class Shader {
 
   private:
     // Recursively handles #include statements
-    std::string getExpandedShaderCode(const std::string &shaderPath);
+    std::string getExpandedShaderCode(const std::string &shaderPath) const;
 
     // Writes the final stitched code to a file for easy debugging
     void dumpExpandedShaderCode(const std::string &sourceFileName,
                                 const std::string &source,
-                                const std::string &type);
+                                const std::string &type) const;
 
     // Used to check errors on shader & program compilations
     void checkCompileErrors(uint32_t shader, std::string type) const;

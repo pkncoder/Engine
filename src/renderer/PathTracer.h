@@ -61,7 +61,7 @@ class PathTracer : public IRenderer {
 
     // Presenting rendering target
     void setDisplayTarget(const std::string &name);
-    void present(int width, int height) override;
+    void present(int width, int height) const override;
 
     // Dynamic resource management
     void addStorageBuffer(const std::string &name, GLuint bindingIndex,
@@ -85,10 +85,10 @@ class PathTracer : public IRenderer {
     void rebuildGeometryLookupTable(Scene &activeScene);
 
     // Uniforms
-    void bindGlobalUniforms(Shader &shader, const Camera &camera);
+    void bindGlobalUniforms(Shader &shader, const Camera &camera) const;
 
     // Shader pass mangment
-    void dispatchShaderPass(const ShaderPass &pass);
+    void dispatchShaderPass(const ShaderPass &pass) const;
 
   private:
     // Render size information

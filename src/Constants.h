@@ -15,22 +15,22 @@ inline constexpr const char *MATERIAL_ID_PREFIX = "##Mn_";
 
 namespace Entity {
 
-const uint32_t MAX_ENTITIES = 10000;
-const uint8_t MAX_COMPONENTS = 32;
+inline const uint32_t MAX_ENTITIES = 10000;
+inline const uint8_t MAX_COMPONENTS = 32;
 
 } // namespace Entity
 
 // Logger Constants
 namespace Logger {
 
-const int MAX_STACKED_PENDING = 100;
-const int MAX_IN_PLACE_PENDING = 30;
+inline const int MAX_STACKED_PENDING = 100;
+inline const int MAX_IN_PLACE_PENDING = 30;
 
 } // namespace Logger
 
 namespace PathTracer {
 
-const size_t MAX_INSTANCES = 10000;
+inline const size_t MAX_INSTANCES = 10000;
 
 } // namespace PathTracer
 

@@ -150,7 +150,7 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
 
 // Recursively create an "expanded" shader code string (expanding #include
 // statments) in the code
-std::string Shader::getExpandedShaderCode(const std::string &shaderPath) {
+std::string Shader::getExpandedShaderCode(const std::string &shaderPath) const {
 
     // Get the file and check if it exists
     std::ifstream file(shaderPath);
@@ -206,7 +206,7 @@ std::string Shader::getExpandedShaderCode(const std::string &shaderPath) {
 // Output the final shader code to a dump file for debug purposes
 void Shader::dumpExpandedShaderCode(const std::string &sourceFileName,
                                     const std::string &source,
-                                    const std::string &type) {
+                                    const std::string &type) const {
 
     // Creates a directory called 'debug_shaders' if it doesn't exist
     if (!fs::exists("debugShaders")) {

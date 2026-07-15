@@ -13,7 +13,7 @@ class RendererManager {
     RendererManager(EngineContext &engineContext, EngineState &state);
     ~RendererManager();
 
-    IRenderer *getActiveRenderer() { return activeRenderer; }
+    inline IRenderer *getActiveRenderer() const { return activeRenderer; }
 
     void swapActiveRenderer(RenderChoice choice);
 

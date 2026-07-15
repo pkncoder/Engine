@@ -36,7 +36,7 @@ class Scene {
     ~Scene();
 
     // Registering a new component type & accociated pool
-    template <typename T> void registerComponent() {
+    template <typename T> inline void registerComponent() {
 
         // Get the id of this component type
         ComponentType type = getComponentTypeID<T>();
@@ -48,7 +48,8 @@ class Scene {
     }
 
     // Adding a component to an entity id
-    template <typename T> void addComponent(EntityID entity, T component) {
+    template <typename T>
+    inline void addComponent(EntityID entity, T component) {
 
         // Get the component type's id
         ComponentType type = getComponentTypeID<T>();
@@ -63,7 +64,7 @@ class Scene {
     }
 
     // Returns a referance to a component type with the entity id
-    template <typename T> T &getComponent(EntityID entity) {
+    template <typename T> inline T &getComponent(EntityID entity) {
 
         // Get the component type id
         ComponentType type = getComponentTypeID<T>();
@@ -78,7 +79,7 @@ class Scene {
 
     // Get a list of all component ids that match a list of component types
     template <typename... ComponentTypes>
-    std::vector<EntityID> getMatchingEntities() const {
+    inline std::vector<EntityID> getMatchingEntities() const {
         Signature requiredSignature; // Wanted signature
 
         // Set the bit for each component type's id (C++ fold)
@@ -104,7 +105,7 @@ class Scene {
     EntityID createEntity();
 
     // Getter for the total living entity count
-    uint32_t getLivingEntityCount() const { return livingEntityCount; }
+    inline uint32_t getLivingEntityCount() const { return livingEntityCount; }
 
   private:
     // Count of total entities, used to count and create custom id'ed entites

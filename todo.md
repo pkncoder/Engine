@@ -72,6 +72,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Texture data
 - [ ] Create multiple I... files for compute shaders, textures, etc.
 - [ ] Figure out where to place the window height/width
+- [ ] Figure out constant rules
 
 ### Todo - Not Code
 
@@ -129,14 +130,18 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 1. [x] Fix warnings
 2. [x] Fix public vs. private
-3. [ ] Make variables & functions const when needed
-4. [ ] Fix placement of functions
-5. [ ] Refactor step by step in code
-6. [ ] Rename things
-7. [ ] Add comments
-8. [ ] Place the \#includes in the right spots
-9. [ ] Fix file tree
-10. [ ] Update the obsidian canvas & png
+3. [x] Make functions const when needed
+4. [ ] Make function params const when needed
+5. [ ] Make functions inline when needed
+6. [ ] Fix placement of functions
+7. [ ] Refactor step by step in code
+8. [ ] Rename things
+9. [ ] Add comments
+10. [ ] Place the \#includes in the right spots
+11. [ ] Fix file tree
+12. [ ] Run ```./fullTest```
+13. [ ] Update the obsidian canvas & png
+14. [ ] Update the website
 
 ## Finished Todos
 

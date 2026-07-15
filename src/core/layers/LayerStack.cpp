@@ -16,9 +16,9 @@ void LayerStack::dispatchStack() {
     }
 }
 
-void LayerStack::dispatchEvent(std::shared_ptr<IEvent> event) {
+void LayerStack::dispatchEvent(std::shared_ptr<IEvent> event) const {
 
-    for (auto &layer : layers) {
+    for (const auto &layer : layers) {
         layer->onEvent(event, *engineState.get());
 
         if (event->isConsumed()) {

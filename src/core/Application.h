@@ -25,9 +25,6 @@ class Application {
     void run();
 
   private:
-    // Presenting a texture to the screen
-    void presentToScreen();
-
     // Loading the models + allocating the entities
     // TODO: temp
     void setupEntities();

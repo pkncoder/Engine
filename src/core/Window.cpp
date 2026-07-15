@@ -71,7 +71,7 @@ Window::~Window() {
 }
 
 // Wrapper to clean up constructor, sets the settings
-void Window::setSettings() {
+void Window::setSettings() const {
 
     // Turn off VSCNC
     glfwSwapInterval(0);
@@ -87,17 +87,19 @@ void Window::setSettings() {
 }
 
 // Checking for closing the window
-bool Window::shouldClose() { return glfwWindowShouldClose(window); }
+bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 
 // Polling & swapping buffers
-void Window::pollEvents() { glfwPollEvents(); }
-void Window::swapBuffers() { glfwSwapBuffers(window); }
+void Window::pollEvents() const { glfwPollEvents(); }
+void Window::swapBuffers() const { glfwSwapBuffers(window); }
 
 // Pre-frame window steps
-void Window::preFrame() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
+void Window::preFrame() const {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
 
 // Window update
-void Window::postFrame() {
+void Window::postFrame() const {
     swapBuffers();
     pollEvents();
 }

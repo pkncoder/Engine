@@ -146,7 +146,7 @@ void PathTracer::setDisplayTarget(const std::string &name) {
 }
 
 // Blit the chosen render target to the fbo for presenting
-void PathTracer::present(int width, int height) {
+void PathTracer::present(int width, int height) const {
 
     // Bind the framebuffer for use
     glBindFramebuffer(GL_READ_FRAMEBUFFER, presentFBO);
@@ -410,7 +410,8 @@ void PathTracer::rebuildGeometryLookupTable(Scene &activeScene) {
 
 // Bind the global uniforms that every shader pass has
 // TODO: Move to a UBO / reimplement it
-void PathTracer::bindGlobalUniforms(Shader &shader, const Camera &camera) {
+void PathTracer::bindGlobalUniforms(Shader &shader,
+                                    const Camera &camera) const {
     // TODO: UBO for at least defaults & dynamic uniforms
     shader.setUInt("uFrameNum", frameCount);
     shader.setVec3("uCameraPos", camera.position);
@@ -422,7 +423,7 @@ void PathTracer::bindGlobalUniforms(Shader &shader, const Camera &camera) {
 // --- Shader pass management ---
 
 // Run the shader pass, dispatching the compute shaders
-void PathTracer::dispatchShaderPass(const ShaderPass &pass) {
+void PathTracer::dispatchShaderPass(const ShaderPass &pass) const {
 
     // Calculate the group sizes
     const GLuint groupsX =

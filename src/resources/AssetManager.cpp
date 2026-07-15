@@ -56,7 +56,7 @@ const CPUModelData *AssetManager::loadModel(const std::string &filepath) {
 
 // Get a material from the cache
 const CPUMaterialData *
-AssetManager::getMaterial(const std::string &materialName) {
+AssetManager::getMaterial(const std::string &materialName) const {
 
     const auto it = materialCache.find(materialName);
     if (it != materialCache.end()) {

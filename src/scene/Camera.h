@@ -33,6 +33,7 @@ class Camera {
                                          float yoffset,
                                          bool constrainPitch = true);
 
+    // TODO: Make this private (PathTracer has an issue)
   public:
     // Camera position
     glm::vec3 position;

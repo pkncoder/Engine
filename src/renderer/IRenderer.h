@@ -16,7 +16,7 @@ class IRenderer {
     virtual void shutdown() = 0; // Shutting down a renderer
 
     virtual void resize(int width, int height) {}
-    virtual void present(int width, int height) {}
+    virtual void present(int width, int height) const {}
 };
 
 }; // namespace Engine

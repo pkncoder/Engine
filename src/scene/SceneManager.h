@@ -19,6 +19,7 @@ class SceneManager {
     std::vector<Entity> loadObjScene(const std::string filepath);
     inline Camera &getCamera() { return camera; }
 
+    // TODO: make these private
   public:
     Camera camera;
     Scene scene;

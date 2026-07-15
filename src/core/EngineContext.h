@@ -18,9 +18,11 @@ class EngineContext {
     void init(EngineState &state);
 
     // Getters for Services
-    inline AssetManager *getAsset() { return assetManager.get(); }
-    inline SceneManager *getScene() { return sceneManager.get(); }
-    inline RendererManager *getRenderer() { return rendererManager.get(); }
+    inline AssetManager *getAsset() const { return assetManager.get(); }
+    inline SceneManager *getScene() const { return sceneManager.get(); }
+    inline RendererManager *getRenderer() const {
+        return rendererManager.get();
+    }
 
   private:
     std::unique_ptr<AssetManager> assetManager;

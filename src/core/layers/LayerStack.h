@@ -24,7 +24,7 @@ class LayerStack : public IEventDispatcher {
     inline void popLayer() { layers.pop_back(); };
 
     void dispatchStack();
-    void dispatchEvent(std::shared_ptr<IEvent> event);
+    void dispatchEvent(std::shared_ptr<IEvent> event) const override;
 
   private:
     std::vector<std::shared_ptr<ILayer>> layers;

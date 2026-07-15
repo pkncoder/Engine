@@ -8,7 +8,7 @@ namespace Engine {
 
 class IEventDispatcher {
   public:
-    virtual void dispatchEvent(std::shared_ptr<IEvent> event) = 0;
+    virtual void dispatchEvent(std::shared_ptr<IEvent> event) const = 0;
     virtual ~IEventDispatcher() = default;
 };
 
