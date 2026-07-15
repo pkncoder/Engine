@@ -68,6 +68,9 @@ void Logger::fatal(std::string_view tag, std::string_view message,
                    LogType type) {
     log(LogLevel::FATAL, tag, message, type);
 }
+void Logger::debug(std::string_view message, LogType type) {
+    log(LogLevel::DEBUG, "DEBUG", message, type);
+}
 
 // Print out the logs (ansi)
 void Logger::outputLogs() {

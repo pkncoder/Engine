@@ -34,6 +34,8 @@ class Logger {
                       LogType type = LogType::STACKED);
     static void fatal(std::string_view tag, std::string_view message,
                       LogType type = LogType::STACKED);
+    static void debug(std::string_view message,
+                      LogType type = LogType::STACKED);
 
     // Debug log
     static inline void check() {
