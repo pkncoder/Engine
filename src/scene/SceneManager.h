@@ -16,8 +16,9 @@ class SceneManager {
     SceneManager(EngineContext &engineContext, EngineState &engineState);
     ~SceneManager() = default;
 
-    std::vector<Entity> loadObjScene(const std::string filepath);
     inline Camera &getCamera() { return camera; }
+
+    std::vector<Entity> loadObjScene(const std::string filepath);
 
     // TODO: make these private
   public:

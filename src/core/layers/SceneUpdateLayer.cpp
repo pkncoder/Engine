@@ -59,6 +59,8 @@ void SceneUpdateLayer::onUpdate(EngineState &engineState) {
     }
 }
 
+void SceneUpdateLayer::onDetach() {}
+
 void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event,
                                EngineState &state) {}
 

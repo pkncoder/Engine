@@ -84,7 +84,7 @@ class BufferManager {
     static void pushUBO(const std::string &uboName);
 
     // Global cleanup handler
-    static void shutdownRegistry();
+    static void shutdownUBORegistry();
 
   private:
     static inline std::unordered_map<std::string, MeshComponent> gpuMeshCache;

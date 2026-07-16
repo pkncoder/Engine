@@ -24,10 +24,10 @@ class Timer {
     static void update();
 
     // Getters
-    static float getDeltaTime() { return deltaTime; }
-    static double getTotalTime() { return totalTime; }
-    static float getFPS() { return currentFPS; }
-    static float getAverageFPS() { return averageFPS; }
+    static inline double getTotalTime() { return totalTime; }
+    static inline float getDeltaTime() { return deltaTime; }
+    static inline float getFPS() { return currentFPS; }
+    static inline float getAverageFPS() { return averageFPS; }
 
     // Profiling logic
     static void beginProfile(const std::string &name);
@@ -36,12 +36,9 @@ class Timer {
 
     // Periodic run logic
     // TODO: Create a macro
-    static void periodicRun(const std::string &id, const float period,
-                            const std::function<void()> function);
-    static void removePeriodicTask(const std::string &id);
-
-    // Output relevant data to console
-    static void logPerformance(const bool clearTerminal = true);
+    static void beginPeriodicTask(const std::string &id, const float period,
+                                  const std::function<void()> function);
+    static void endPeriodicTask(const std::string &id);
 
   private:
     // Delta time and delta time math

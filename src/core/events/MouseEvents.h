@@ -29,44 +29,45 @@ enum : MouseCode {
 
 struct MouseMoveEvent : public IEvent {
   public:
-    double xPos, yPos;
-
     inline MouseMoveEvent(const double xMousePos, const double yMousePos)
         : xPos(xMousePos), yPos(yMousePos) {}
 
     inline EventType getType() const override {
         return EventType::MOUSE_MOVE_EVENT;
     }
+
+  public:
+    double xPos, yPos;
 };
 
 struct MouseButtonPressEvent : public IEvent {
   public:
-    MouseCode button;
-
     inline MouseButtonPressEvent(const MouseCode pressedButton)
         : button(pressedButton) {}
 
     inline EventType getType() const override {
         return EventType::MOUSE_BUTTON_PRESS_EVENT;
     }
+
+  public:
+    MouseCode button;
 };
 
 struct MouseButtonReleaseEvent : public IEvent {
   public:
-    MouseCode button;
-
     inline MouseButtonReleaseEvent(const MouseCode releasedButton)
         : button(releasedButton) {}
 
     inline EventType getType() const override {
         return EventType::MOUSE_BUTTON_RELEASE_EVENT;
     }
+
+  public:
+    MouseCode button;
 };
 
 struct MouseScrollEvent : public IEvent {
   public:
-    double xOffset, yOffset;
-
     inline MouseScrollEvent(const double xScrollOffset,
                             const double yScrollOffset)
         : xOffset(xScrollOffset), yOffset(yScrollOffset) {}
@@ -74,6 +75,9 @@ struct MouseScrollEvent : public IEvent {
     inline EventType getType() const override {
         return EventType::MOUSE_SCROLL_EVENT;
     }
+
+  public:
+    double xOffset, yOffset;
 };
 
 } // namespace Engine

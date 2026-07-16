@@ -14,7 +14,7 @@ class SceneUpdateLayer : public ILayer {
 
     void onAttach(EngineState &engineState) override;
     void onUpdate(EngineState &engineState) override;
-    inline void onDetach() override {};
+    void onDetach() override;
     void onEvent(std::shared_ptr<IEvent> event, EngineState &state) override;
 
   private:

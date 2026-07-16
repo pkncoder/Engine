@@ -86,13 +86,6 @@ void Window::setSettings() const {
     glEnable(GL_MULTISAMPLE);
 }
 
-// Checking for closing the window
-bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
-
-// Polling & swapping buffers
-void Window::pollEvents() const { glfwPollEvents(); }
-void Window::swapBuffers() const { glfwSwapBuffers(window); }
-
 // Pre-frame window steps
 void Window::preFrame() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -103,6 +96,13 @@ void Window::postFrame() const {
     swapBuffers();
     pollEvents();
 }
+
+// Checking for closing the window
+bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
+
+// Polling & swapping buffers
+void Window::pollEvents() const { glfwPollEvents(); }
+void Window::swapBuffers() const { glfwSwapBuffers(window); }
 
 // Code ran when window size is changed
 void Window::framebufferSizeEventCallback(GLFWwindow *window, int width,

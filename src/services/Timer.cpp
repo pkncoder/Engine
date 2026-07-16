@@ -51,8 +51,8 @@ void Timer::endProfile(const std::string &name, const LogType logType) {
 
 // Example: Timer::periodicRun("Bagel Reminder", 2.0f, []() {
 // Logger::info("EXAMPLE", "All of the bagels please."); });
-void Timer::periodicRun(const std::string &id, const float period,
-                        const std::function<void()> function) {
+void Timer::beginPeriodicTask(const std::string &id, const float period,
+                              const std::function<void()> function) {
     if (period <= 0.0f) // Avoid zero-periods
         return;
 
@@ -80,7 +80,7 @@ void Timer::periodicRun(const std::string &id, const float period,
     }
 }
 
-void Timer::removePeriodicTask(const std::string &id) {
+void Timer::endPeriodicTask(const std::string &id) {
     periodicTimerRegistry.erase(id);
 }
 

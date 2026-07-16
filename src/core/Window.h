@@ -15,26 +15,26 @@ class Window {
     // OpenGL settings function
     void setSettings() const;
 
+    // Return the GLFW window (not our wrapper)
+    inline GLFWwindow *getNativeWindow() const { return window; }
+
     inline void setEventCallback(
         const std::function<void(std::shared_ptr<IEvent>)> &callback) {
         dispatchEvent = callback;
     };
 
-    // Check to see if the window is marked for death
-    bool shouldClose() const;
-
-    // Polling, and swapping
-    void pollEvents() const;
-    void swapBuffers() const;
-
     // Pre and post frame actions
     void preFrame() const;
     void postFrame() const;
 
-    // Return the GLFW window (not our wrapper)
-    inline GLFWwindow *getNativeWindow() const { return window; }
+    // Check to see if the window is marked for death
+    bool shouldClose() const;
 
   private:
+    // Polling, and swapping
+    void pollEvents() const;
+    void swapBuffers() const;
+
     static void framebufferSizeEventCallback(GLFWwindow *window, int width,
                                              int height);
 

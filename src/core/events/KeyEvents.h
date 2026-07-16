@@ -100,9 +100,6 @@ enum : KeyCode {
 
 struct KeyPressEvent : public IEvent {
   public:
-    KeyCode key;
-    bool keyCtrl, keyShift, keyAlt, keySuper;
-
     inline KeyPressEvent(const KeyCode key, const bool ctrl, const bool shift,
                          const bool alt, const bool super)
         : key(key), keyCtrl(ctrl), keyShift(shift), keyAlt(alt),
@@ -111,13 +108,14 @@ struct KeyPressEvent : public IEvent {
     inline EventType getType() const override {
         return EventType::KEY_PRESS_EVENT;
     }
+
+  public:
+    KeyCode key;
+    bool keyCtrl, keyShift, keyAlt, keySuper;
 };
 
 struct KeyReleaseEvent : public IEvent {
   public:
-    KeyCode key;
-    bool keyCtrl, keyShift, keyAlt, keySuper;
-
     inline KeyReleaseEvent(const KeyCode k, const bool ctrl, const bool shift,
                            const bool alt, const bool super)
         : key(k), keyCtrl(ctrl), keyShift(shift), keyAlt(alt), keySuper(super) {
@@ -126,13 +124,14 @@ struct KeyReleaseEvent : public IEvent {
     inline EventType getType() const override {
         return EventType::KEY_RELEASE_EVENT;
     }
+
+  public:
+    KeyCode key;
+    bool keyCtrl, keyShift, keyAlt, keySuper;
 };
 
 struct KeyRepeatEvent : public IEvent {
   public:
-    KeyCode key;
-    bool keyCtrl, keyShift, keyAlt, keySuper;
-
     inline KeyRepeatEvent(const KeyCode k, const bool ctrl, const bool shift,
                           const bool alt, const bool super)
         : key(k), keyCtrl(ctrl), keyShift(shift), keyAlt(alt), keySuper(super) {
@@ -141,5 +140,9 @@ struct KeyRepeatEvent : public IEvent {
     inline EventType getType() const override {
         return EventType::KEY_REPEAT_EVENT;
     }
+
+  public:
+    KeyCode key;
+    bool keyCtrl, keyShift, keyAlt, keySuper;
 };
 } // namespace Engine

@@ -14,7 +14,6 @@ class RendererManager {
     ~RendererManager();
 
     inline IRenderer *getActiveRenderer() const { return activeRenderer; }
-
     void swapActiveRenderer(const RenderChoice choice);
 
     void render(EngineState &state);
