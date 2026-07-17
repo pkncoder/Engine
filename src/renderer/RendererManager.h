@@ -11,7 +11,7 @@ namespace Engine {
 class RendererManager {
   public:
     RendererManager(EngineContext &engineContext, EngineState &state);
-    ~RendererManager();
+    void shutdown();
 
     inline IRenderer *getActiveRenderer() const { return activeRenderer; }
     void swapActiveRenderer(const RenderChoice choice);

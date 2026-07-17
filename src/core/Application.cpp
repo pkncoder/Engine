@@ -17,7 +17,30 @@ namespace Engine {
 
 // Constructor & Deconstructor
 Application::Application() {}
-Application::~Application() { Logger::shutdown(); }
+Application::~Application() {
+
+    // Set flags for logging
+    Logger::setSkipDashboard(true);
+    Logger::setNoPendingLogs(true);
+
+    Logger::line();
+
+    // Shutdown services
+    // TODO: create
+    // Input::shutdown();
+    // Timer::shutdown();
+
+    // Release and shutdown variables
+    layerStack.shutdown();
+    engineState.reset();
+
+    // Kill the context, this also kills the window
+    engineContext.reset();
+    window.reset();
+
+    // Shutdown the logger
+    Logger::shutdown();
+}
 
 // Init the window, camera, etc.
 void Application::init() {
@@ -26,34 +49,43 @@ void Application::init() {
     Logger::init();
     Logger::setNoPendingLogs(true);
 
+    // Get the state of the engine
     engineState = std::make_shared<EngineState>();
 
+    // Create the layer stack
     layerStack = LayerStack(engineState);
 
-    // Create the window & relating services
+    // Create the window and set the event callback
     window = std::make_unique<Window>(*engineState.get());
     window->setEventCallback([this](std::shared_ptr<IEvent> event) {
         layerStack.dispatchEvent(event);
     });
 
+    // Initialize the input service and set the event callback
     Input::init(window->getNativeWindow());
     Input::setEventCallback([this](std::shared_ptr<IEvent> event) {
         layerStack.dispatchEvent(event);
     });
 
+    // Initialize the timer service
     Timer::init();
 
+    // Create & initialize the engine context
     engineContext = std::make_unique<EngineContext>();
     engineContext->init(*engineState.get());
 
+    // Initialize the layers
     sceneUpdateLayer = std::make_shared<SceneUpdateLayer>(*engineContext);
-    layerStack.pushLayer(sceneUpdateLayer);
-
     rendererLayer = std::make_shared<RendererLayer>(*engineContext);
+
+    // Push each layer
+    layerStack.pushLayer(sceneUpdateLayer);
     layerStack.pushLayer(rendererLayer);
 
+    // TODO: temp; setup scene
     setupEntities();
 
+    // Log the final init log & turn off setNoPendingLogs
     Logger::info("APPLICATION", "Application init complete");
     Logger::setNoPendingLogs(false);
 }
@@ -66,42 +98,37 @@ void Application::run() {
 
         START_PROFILE("Run Loop"); // Setup timer for run loop
 
+        // Update input & timer services
         Input::update();
-
-        // Update the timer service and run the log function
         Timer::update();
 
-        // Clear Screen
+        // TODO: temp
         window->preFrame();
 
+        // Dispatch the layer stack
         layerStack.dispatchStack();
 
-        // Do things like event polling & buffer swapping
+        // TODO: temp
         window->postFrame();
 
         // TODO: temp
         // engineState.scene.camera.cameraDirty = false;
 
+        // Log profiling data
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()),
                      LogType::IN_PLACE);
         Logger::info("PROFILE",
                      "Average FPS: " + std::to_string(Timer::getAverageFPS()),
                      LogType::IN_PLACE);
-        Logger::info(
-            "CAMERA",
-            "X: " + std::to_string(engineState->scene.camera.position.x) +
-                "Y: " + std::to_string(engineState->scene.camera.position.y) +
-                "Z: " + std::to_string(engineState->scene.camera.position.z),
-            LogType::IN_PLACE);
 
         END_PROFILE("Run Loop"); // End timer for run loop
 
+        // Output any collected logs
         Logger::outputLogs();
     }
 }
 
-// Handle any inputs that come in this frame
-
+// TODO: temp
 void Application::setupEntities() {
     START_PROFILE("Entity Loading");
 

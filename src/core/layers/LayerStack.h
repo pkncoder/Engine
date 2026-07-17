@@ -14,10 +14,11 @@ class LayerStack : public IEventDispatcher {
     // Default constructor and then the main constructor
     LayerStack() = default;
     LayerStack(std::shared_ptr<EngineState> engineState)
-        : engineState(engineState){};
+        : engineState(engineState) {};
 
-    // Deconstructor, calls IEvent::onDispatch()
+    // Deconstructor, calls ILayer::onDispatch()
     ~LayerStack();
+    void shutdown();
 
     // layer vector modifications
     inline void pushLayer(std::shared_ptr<ILayer> layer) {

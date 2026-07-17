@@ -7,6 +7,7 @@ namespace Engine {
 
 struct WindowState {
   public:
+    // Window configurations
     WindowSettings settings;
 
     // Window size

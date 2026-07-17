@@ -262,6 +262,8 @@ void Rasterizer::shutdown() {
     glDeleteTextures(1, &shadowCubeMap);
     glDeleteTextures(1, &defaultWhiteTexture);
     glDeleteTextures(1, &defaultNormalTexture);
+
+    Logger::info("RENDERER", "Rasterizer shutdown complete.");
 }
 
 } // namespace Engine

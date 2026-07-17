@@ -8,6 +8,7 @@ namespace Engine {
 
 struct EngineState {
   public:
+    // State collections
     WindowState window = WindowState();
     RendererState renderer = RendererState();
     SceneState scene = SceneState();

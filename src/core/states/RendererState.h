@@ -6,7 +6,8 @@ namespace Engine {
 
 struct RendererState {
   public:
-    RendererSettings settings;
+    // Renderer configurations
+    RendererSettings settings = RendererSettings();
 };
 
 } // namespace Engine

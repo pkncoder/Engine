@@ -16,7 +16,7 @@ class Window {
     ~Window();
 
     // OpenGL settings function
-    void setSettings() const;
+    void setSettings(EngineState &state) const;
 
     // Return the GLFW window (not our wrapper)
     inline GLFWwindow *getNativeWindow() const { return window; }
@@ -38,10 +38,12 @@ class Window {
     void pollEvents() const;
     void swapBuffers() const;
 
+    // Event dispatcher - set in setEventCallback()
+    std::function<void(std::shared_ptr<IEvent>)> dispatchEvent = nullptr;
+
+    // Resize callback
     static void framebufferSizeEventCallback(GLFWwindow *window, int width,
                                              int height);
-
-    std::function<void(std::shared_ptr<IEvent>)> dispatchEvent = nullptr;
 
   private:
     // GLFW Window

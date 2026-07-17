@@ -4,7 +4,17 @@
 
 namespace Engine {
 
+// Deconstructor in case of crash
 LayerStack::~LayerStack() {
+
+    // Every onDetach once the layer stack is deleted
+    for (auto &layer : layers) {
+        layer->onDetach();
+    }
+}
+
+// Explicit shutdown
+void LayerStack::shutdown() {
 
     // Every onDetach once the layer stack is deleted
     for (auto &layer : layers) {

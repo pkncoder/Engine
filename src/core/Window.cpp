@@ -2,6 +2,7 @@
 
 #include "../services/Logger.h"
 #include "events/WindowEvents.h"
+#include "states/EngineState.h"
 #include "states/WindowState.h"
 #include <GLFW/glfw3.h>
 
@@ -15,6 +16,7 @@ Window::Window(EngineState &state) {
         return;
     }
 
+    // Opengl version setting
 #ifdef __APPLE__
     // macOS is capped at 4.1 and requires Forward Compatibility
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -43,6 +45,7 @@ Window::Window(EngineState &state) {
     // Set the window context to our current window
     glfwMakeContextCurrent(window);
 
+    // Create the window pointer for the static callback to access dispatchEvent
     glfwSetWindowUserPointer(window, this);
     glfwSetFramebufferSizeCallback(window, framebufferSizeEventCallback);
 
@@ -51,29 +54,31 @@ Window::Window(EngineState &state) {
         Logger::fatal("SYSTEM", "Failed to initialize GLAD");
     }
 
-    // Set other settings
-    setSettings();
+    // Set other settings window
+    setSettings(state);
+
     // Set the intial window size
     glfwGetFramebufferSize(window, &state.window.width, &state.window.height);
     glViewport(0, 0, state.window.width, state.window.height);
-
-    glClearColor(
-        state.window.settings.clear_red, state.window.settings.clear_green,
-        state.window.settings.clear_blue, state.window.settings.clear_alpha);
 }
 
-// Deconstructor - Kill glfw
+// Deconstructor to clean up memory
 Window::~Window() {
+
+    // If window was make, delete it
     if (window) {
         glfwDestroyWindow(window);
     }
+
+    // Kill glfw
     glfwTerminate();
 }
 
 // Wrapper to clean up constructor, sets the settings
-void Window::setSettings() const {
+void Window::setSettings(EngineState &state) const {
 
     // Turn off VSCNC
+    // TODO: temp
     glfwSwapInterval(0);
 
     // Turn on the OpenGL depth test
@@ -84,20 +89,29 @@ void Window::setSettings() const {
 
     // Hardware anti-aliasing
     glEnable(GL_MULTISAMPLE);
+
+    // Clear color
+    glClearColor(
+        state.window.settings.clearRed, state.window.settings.clearGreen,
+        state.window.settings.clearBlue, state.window.settings.clearAlpha);
 }
 
 // Pre-frame window steps
 void Window::preFrame() const {
+
+    // Clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 // Window update
 void Window::postFrame() const {
+
+    // Swap framebuffers and poll events
     swapBuffers();
     pollEvents();
 }
 
-// Checking for closing the window
+// Check for the window being marked for death
 bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 
 // Polling & swapping buffers
@@ -117,6 +131,7 @@ void Window::framebufferSizeEventCallback(GLFWwindow *window, int width,
     //     engineState->window.aspectRatio = width / (float)height;
     // }
 
+    // Get the reference to the window & dispatch a resize event
     Window *windowReference =
         static_cast<Window *>(glfwGetWindowUserPointer(window));
     windowReference->dispatchEvent(

@@ -25,9 +25,7 @@ void RendererLayer::onUpdate(EngineState &engineState) {
 }
 
 // Cleanup functions
-void RendererLayer::onDetach() {
-    engineContext.getRenderer()->getActiveRenderer()->shutdown();
-}
+void RendererLayer::onDetach() { engineContext.getRenderer()->shutdown(); }
 
 // Event
 void RendererLayer::onEvent(std::shared_ptr<IEvent> event, EngineState &state) {

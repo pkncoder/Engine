@@ -1,6 +1,7 @@
 #include "SceneUpdateLayer.h"
 #include "../../scene/SceneManager.h"
 #include "../../services/Input.h"
+#include "../../services/Logger.h"
 #include "../events/KeyEvents.h"
 
 #include <GLFW/glfw3.h>
@@ -67,6 +68,15 @@ void SceneUpdateLayer::onUpdate(EngineState &engineState) {
         camera.processLookingDirectionMovement(engineState, mouseDelta.x,
                                                -mouseDelta.y);
     }
+
+    // Log the camera position into the dashboard
+    // TODO: temp
+    Logger::info(
+        "CAMERA",
+        "X: " + std::to_string(engineState.scene.camera.position.x) +
+            "Y: " + std::to_string(engineState.scene.camera.position.y) +
+            "Z: " + std::to_string(engineState.scene.camera.position.z),
+        LogType::IN_PLACE);
 }
 
 // Deconstructors

@@ -41,7 +41,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
     Logger::info("RENDERER", "Renderer Manager initialized.");
 }
 
-RendererManager::~RendererManager() {
+void RendererManager::shutdown() {
     activeRenderer = nullptr;
 
     if (rasterizer)

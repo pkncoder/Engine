@@ -12,10 +12,10 @@ struct WindowSettings {
     std::string title = Defaults::Window::TITLE;
 
     // Clear color values
-    float clear_red = Defaults::Window::CLEAR_RED;
-    float clear_green = Defaults::Window::CLEAR_GREEN;
-    float clear_blue = Defaults::Window::CLEAR_BLUE;
-    float clear_alpha = Defaults::Window::CLEAR_ALPHA;
+    float clearRed = Defaults::Window::CLEAR_RED;
+    float clearGreen = Defaults::Window::CLEAR_GREEN;
+    float clearBlue = Defaults::Window::CLEAR_BLUE;
+    float clearAlpha = Defaults::Window::CLEAR_ALPHA;
 };
 
 } // namespace Engine
