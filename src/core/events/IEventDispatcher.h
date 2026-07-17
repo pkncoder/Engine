@@ -6,6 +6,7 @@
 
 namespace Engine {
 
+// Event dispatcher base class
 class IEventDispatcher {
   public:
     virtual ~IEventDispatcher() = default;

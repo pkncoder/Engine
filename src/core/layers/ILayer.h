@@ -11,6 +11,7 @@ class ILayer {
   public:
     virtual ~ILayer() = default;
 
+    // On every layer state change there is a function
     virtual void onAttach(EngineState &state) = 0;
     virtual void onUpdate(EngineState &state) = 0;
     virtual void onDetach() = 0;

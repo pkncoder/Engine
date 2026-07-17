@@ -12,12 +12,14 @@ class SceneUpdateLayer : public ILayer {
     SceneUpdateLayer(EngineContext &engineContext);
     ~SceneUpdateLayer() = default;
 
+    // Layer state changes
     void onAttach(EngineState &engineState) override;
     void onUpdate(EngineState &engineState) override;
     void onDetach() override;
     void onEvent(std::shared_ptr<IEvent> event, EngineState &state) override;
 
   private:
+    // Injected context
     EngineContext &engineContext;
 };
 

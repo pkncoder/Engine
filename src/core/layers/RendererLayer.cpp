@@ -10,33 +10,50 @@ namespace Engine {
 RendererLayer::RendererLayer(EngineContext &engineContext)
     : engineContext(engineContext) {}
 
+// Constructors
 void RendererLayer::onAttach(EngineState &engineState) {
     // TODO: add an init function to rendererManager
     // rendererManager.init();
     engineContext.getRenderer()->resize(engineState.window.width,
                                         engineState.window.height);
 }
+
+// Frame update
 void RendererLayer::onUpdate(EngineState &engineState) {
+    // Render the new frame
     engineContext.getRenderer()->render(engineState);
 }
 
+// Cleanup functions
 void RendererLayer::onDetach() {
     engineContext.getRenderer()->getActiveRenderer()->shutdown();
 }
 
+// Event
 void RendererLayer::onEvent(std::shared_ptr<IEvent> event, EngineState &state) {
+
+    // Window resize
     if (event->getType() == EventType::WINDOW_RESIZE_EVENT) {
+
+        // Turn the IEvent into a WindowResizeEvent
         std::shared_ptr<WindowResizeEvent> windowResizeEvent =
             std::static_pointer_cast<WindowResizeEvent>(event);
+
+        // Resize the renderer
         engineContext.getRenderer()->resize(windowResizeEvent->windowSize.x,
                                             windowResizeEvent->windowSize.y);
     }
 
+    // Current renderer choice change
     if (event->getType() == EventType::KEY_PRESS_EVENT) {
+
+        // Get the keypress event
         std::shared_ptr<KeyPressEvent> keyPressEvent =
             std::static_pointer_cast<KeyPressEvent>(event);
-        if (keyPressEvent->key == Key::R) {
+        if (keyPressEvent->key ==
+            Key::R) { // Make sure it is R for changing the renderer
 
+            // Switch statement to figure out what to change to
             switch (state.renderer.settings.currentRenderChoice) {
             case RenderChoice::RASTERIZER:
 

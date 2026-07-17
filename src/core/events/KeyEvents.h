@@ -8,9 +8,10 @@ namespace Engine {
 using KeyCode = glm::uint16_t;
 namespace Key {
 
+// From glfw3.h
 enum : KeyCode {
 
-    // Alphabet
+    // Alpha
     A = 65,
     B = 66,
     C = 67,
@@ -60,10 +61,10 @@ enum : KeyCode {
     SPACE = 32,
 
     // Arrow keys
-    RIGHT = 262,
-    LEFT = 263,
-    DOWN = 264,
     UP = 265,
+    DOWN = 264,
+    LEFT = 263,
+    RIGHT = 262,
 
     // Function keys
     F1 = 290,
@@ -96,52 +97,64 @@ enum : KeyCode {
     RIGHT_SUPER = 347,
 };
 
-}
+} // namespace Key
 
+// First press action
 struct KeyPressEvent : public IEvent {
   public:
+    // Takes the key pressed + the state of modifier keys
     inline KeyPressEvent(const KeyCode key, const bool ctrl, const bool shift,
                          const bool alt, const bool super)
         : key(key), keyCtrl(ctrl), keyShift(shift), keyAlt(alt),
           keySuper(super) {}
 
+    // Event type return
     inline EventType getType() const override {
         return EventType::KEY_PRESS_EVENT;
     }
 
   public:
+    // Key + modifier keys
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 };
 
+// On key let go
 struct KeyReleaseEvent : public IEvent {
   public:
+    // Takes the released key + the state of modifier keys
     inline KeyReleaseEvent(const KeyCode k, const bool ctrl, const bool shift,
                            const bool alt, const bool super)
         : key(k), keyCtrl(ctrl), keyShift(shift), keyAlt(alt), keySuper(super) {
     }
 
+    // Event type return
     inline EventType getType() const override {
         return EventType::KEY_RELEASE_EVENT;
     }
 
   public:
+    // Key + modifier keys
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 };
 
+// On key held - includes a buffer between KEY_PRESS_EVENT && KEY_REPEAT_EVENT
 struct KeyRepeatEvent : public IEvent {
   public:
+    // Takes the released key + the state of modifier keys
     inline KeyRepeatEvent(const KeyCode k, const bool ctrl, const bool shift,
                           const bool alt, const bool super)
         : key(k), keyCtrl(ctrl), keyShift(shift), keyAlt(alt), keySuper(super) {
     }
 
+    // Event type return
     inline EventType getType() const override {
         return EventType::KEY_REPEAT_EVENT;
     }
 
   public:
+    // Key + modifier keys
     KeyCode key;
     bool keyCtrl, keyShift, keyAlt, keySuper;
 };
