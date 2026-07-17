@@ -74,6 +74,11 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out where to place the window height/width
 - [ ] Figure out constant rules
 - [ ] Figure out inline class attribute rules
+- [ ] Move window into EngineContext?
+- [ ] Linux randomly dips in performance & core dumps on quit
+- [ ] Go around making shutdown functions & deconstructors (they just call shutdown)
+- [ ] Figure out moving around engineState so everything has the same object
+- [ ] Figure out how to handle setting glfw & glad settings; if it should just be a function like it is now, or different
 
 ### Todo - Not Code
 
