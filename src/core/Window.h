@@ -5,6 +5,9 @@
 #include "states/EngineState.h"
 #include <GLFW/glfw3.h>
 
+#include <functional>
+#include <memory>
+
 namespace Engine {
 class Window {
   public:
