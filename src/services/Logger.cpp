@@ -15,8 +15,9 @@ void Logger::init() {
 
 // Shutdown instructions for the logger
 void Logger::shutdown() {
+    info("SYSTEM", "Logger service shutdown process started.");
+    outputLogs();
     logFile.close();
-    info("SYSTEM", "Logger service shutdown.");
 }
 
 // Add a new log to the pending logs list
@@ -46,7 +47,7 @@ void Logger::log(const LogLevel level, const std::string_view tag,
              Constants::Logger::MAX_IN_PLACE_PENDING)
         pendingLogsByType[type].pop_front();
 
-    if (no_periodic_wait) {
+    if (noPeriodicWait) {
         outputLogs();
     }
 }
@@ -76,9 +77,11 @@ void Logger::debug(const std::string_view message, const LogType type) {
 void Logger::outputLogs() {
 
     // Move up the dashboard, wiping it, and reseting lastDashboardLogCount
-    while (lastDashboardLogCount > 0) {
-        std::cout << "\033[F\033[K"; // \033[F up line & \033[K wipe line
-        lastDashboardLogCount--;
+    if (!skipDashboard) {
+        while (lastDashboardLogCount > 0) {
+            std::cout << "\033[F\033[K"; // \033[F up line & \033[K wipe line
+            lastDashboardLogCount--;
+        }
     }
 
     // Loop each log for the stacked logs

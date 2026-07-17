@@ -59,9 +59,13 @@ class Logger {
     // Output all logs (ansi)
     static void outputLogs();
 
+    // Bool flag to stop the dashboard from overwriting (used at shutdown)
+    static inline void setSkipDashboard(const bool newValue) {
+        skipDashboard = newValue;
+    }
     // Set the boolean to print a log right when added
     static inline void setNoPendingLogs(const bool newValue) {
-        no_periodic_wait = newValue;
+        noPeriodicWait = newValue;
     }
 
     // Get string & ansi color for a specific level
@@ -74,8 +78,9 @@ class Logger {
                     const std::string_view message, const LogType type);
 
   private:
-    // Boolean that, if true, will print whenever a new log is sent
-    static inline bool no_periodic_wait = false;
+    // Logger flags
+    static inline bool skipDashboard = false;
+    static inline bool noPeriodicWait = false;
 
     // Logs waiting to be outputed
     static inline std::unordered_map<LogType, std::deque<LogEntry>>
