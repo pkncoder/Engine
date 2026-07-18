@@ -16,38 +16,42 @@
 
 namespace Engine {
 
-struct MeshRange {
-  public:
-    uint32_t firstIndex;
-    uint32_t count;
-};
-
-// Structure to define dynamic output textures
+// Output texture struct
 struct RenderTarget {
   public:
+    // Name
     std::string name;
-    GLuint id = 0;
 
+    // Binding values
+    GLuint id = 0;
     GLuint bindingIndex = 0;
 
+    // Texture color format
     GLenum format = GL_RGBA32F;
 };
 
-// Structure to define a dynamic pass
+// Structure to define a pass
 struct ShaderPass {
   public:
-    std::string name;
+    // Shader / program to run
     Shader shader;
 
+    // Name
+    std::string name;
+
+    // Compute shader dispatch size
     // TODO: Constant?
     glm::ivec3 workgroupSize{8, 8, 1};
 
     // TODO: dispatch size overide
+
+    // To skip the pass - defaults to true
     bool enabled = true;
 };
 
 class PathTracer : public IRenderer {
   public:
+    // Initializer just to inject the engine context
     inline PathTracer(EngineContext &engineContext)
         : engineContext(engineContext){};
 
@@ -59,15 +63,19 @@ class PathTracer : public IRenderer {
     void render(EngineState &state) override;
     void resize(const int newWidth, const int newHeight) override;
 
-    // Presenting rendering target
+    // Display target use
     void setDisplayTarget(const std::string &name);
     void present(const int width, const int height) const override;
 
     // Dynamic resource management
+
+    // Buffers
     void addStorageBuffer(const std::string &name, GLuint bindingIndex,
                           size_t elementSize, size_t initialElementCount);
+    // Render target / display target
     void addRenderTarget(const std::string &name, GLuint bindingIndex,
                          GLenum format = GL_RGBA32F);
+    // Shader pass
     void addShaderPass(const std::string &name, const char *computeShaderPath,
                        const bool enabled = true);
 
@@ -84,31 +92,32 @@ class PathTracer : public IRenderer {
     void flattenScene();
     void rebuildGeometryLookupTable(Scene &activeScene);
 
-    // Uniforms
+    // Global uniforms
     void bindGlobalUniforms(Shader &shader, const Camera &camera) const;
 
     // Shader pass mangment
     void dispatchShaderPass(const ShaderPass &pass) const;
 
   private:
-    // Render size information
+    // Engine context - Injected
+    EngineContext &engineContext;
+
+    // Render size
     int currentWidth = 0;
     int currentHeight = 0;
 
-    EngineContext &engineContext;
+    // Name of the renderTarget to be presented + the framebuffer
+    std::string currentRenderTarget;
+    GLuint presentFBO = 0;
 
     // State tracking
     int frameCount =
         0; // TODO: Use the "Timer" service & add an "accumulatedFrames"
 
-    // Dynamic resource information
+    // Dynamic resource registries
     std::unordered_map<std::string, PersistentBuffer> storageBuffers;
     std::unordered_map<std::string, RenderTarget> renderTargets;
     std::vector<ShaderPass> shaderPasses;
-
-    // Name of the renderTarget to be presented + the framebuffer
-    std::string currentRenderTarget;
-    GLuint presentFBO = 0;
 
     // Instance data cache
     std::vector<GPUInstance> instances;

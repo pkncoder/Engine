@@ -28,15 +28,15 @@ struct GPUUniformBuffer {
     std::unordered_map<std::string, size_t> uniformOffsets;
 };
 
-// A modern, persistently mapped GPU buffer
+// Persistant GPU buffer, defaults to a SSBO
 // TODO: Decide on moving the implemtation to the BufferManager
 struct PersistentBuffer {
 
   public:
-    // Allocates immutable VRAM and maps it permanently to CPU space
+    // Alocate VRAM and cache data to CPU
     void setup(const GLenum bufferTarget, const size_t bufferSize);
 
-    // Fast copy data directly to VRAM
+    // Update saved data, including in VRAM
     void update(const void *data, const size_t updateSize);
 
     // Data cleanup
@@ -59,12 +59,10 @@ struct PersistentBuffer {
 
 class BufferManager {
   public:
-    // Keep your existing Rasterizer methods here...
+    // Upload a mesh to the GPU - resturns bindings
     static MeshComponent uploadMesh(const CPUMeshData &meshData);
 
-    // --- NEW GLOBAL UBO MANAGEMENT INTERFACES ---
-
-    // Allocates raw VRAM storage for a named UBO tracking channel
+    // Create a new UBO keyed by name - allocates the block area
     static void createUBO(const std::string &uboName,
                           const uint32_t bindingPoint,
                           const size_t totalBlockSize);
@@ -75,18 +73,20 @@ class BufferManager {
                              const std::string &blockName,
                              const std::vector<std::string> &uniformNames);
 
-    // Updates a specific variable inside the CPU cache side of the block
+    // Update a uniform
     static void setUBOValue(const std::string &uboName,
                             const std::string &uniformName, const void *data,
                             const size_t dataSize);
 
     // Flushes the entire CPU memory region to VRAM at once
+    // TODO: Do this in windows
     static void pushUBO(const std::string &uboName);
 
-    // Global cleanup handler
+    // UBO cleanup handler
     static void shutdownUBORegistry();
 
   private:
+    // Mesh and UBO caches
     static inline std::unordered_map<std::string, MeshComponent> gpuMeshCache;
     static inline std::unordered_map<std::string, GPUUniformBuffer> uboRegistry;
 };

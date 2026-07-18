@@ -4,6 +4,7 @@
 
 namespace Engine {
 
+// Mesh data
 struct alignas(16) GPUMeshEntry {
   public:
     uint32_t baseVertex;
@@ -12,6 +13,7 @@ struct alignas(16) GPUMeshEntry {
     uint32_t padding;
 };
 
+// Vertex for the rasterizer
 struct alignas(16) GPUVertex {
   public:
     glm::vec4 position;  // w unused
@@ -19,6 +21,7 @@ struct alignas(16) GPUVertex {
     glm::vec4 texCoords; // z, w unused
 };
 
+// Triangle instance values
 struct alignas(16) GPUInstance {
   public:
     glm::mat4 transform;
@@ -28,6 +31,7 @@ struct alignas(16) GPUInstance {
     uint32_t padding[2]; // Pad to 16 bytes
 };
 
+// Material values
 struct alignas(16) GPUMaterial {
   public:
     glm::vec4 albedo;

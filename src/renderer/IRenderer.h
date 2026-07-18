@@ -9,12 +9,16 @@ class IRenderer {
     virtual ~IRenderer() = default; // Deconstructor
 
     // TODO: bring back for lazyloading
-    inline void init(){};        // Initializing a renderer
-    virtual void shutdown() = 0; // Shutting down a renderer
+    inline void init(){};        // Main initializing
+    virtual void shutdown() = 0; // Data cleanup
 
-    virtual void render(EngineState &state) = 0; // Rendering a frame
+    // Main render entry
+    virtual void render(EngineState &state) = 0;
 
+    // Update render output sizes
     virtual inline void resize(const int width, const int height) {}
+
+    // Blit the frame if needed
     virtual inline void present(const int width, const int height) const {}
 };
 
