@@ -17,11 +17,11 @@ namespace fs = std::filesystem;
 // On construction - compile source code & program
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
-    // Get the shader code
+    // Get the shader code without #includes
     std::string vertexCode = getExpandedShaderCode(vertexPath);
     std::string fragmentCode = getExpandedShaderCode(fragmentPath);
 
-    // Dump the expanded shader code for debug
+    // Get the filenames of each code file
     std::string vertexFileName =
         std::string(vertexPath)
             .substr(std::string(vertexPath).find_last_of('/') + 1);
@@ -30,6 +30,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
         std::string(fragmentPath)
             .substr(std::string(fragmentPath).find_last_of('/') + 1);
 
+    // Dump the expanded shader code for debug
     dumpExpandedShaderCode(vertexFileName, vertexCode, "VERTEX");
     dumpExpandedShaderCode(fragmentFileName, fragmentCode, "FRAGMENT");
 
@@ -74,35 +75,35 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
 // Constructor for Compute Shaders
 Shader::Shader(const char *computePath) {
-    // 1. Get and expand the shader code using your existing recursive logic
+    // Get the final compute code without #includes
     std::string computeCode = getExpandedShaderCode(computePath);
 
-    // 2. Dump for debug
+    // Get the filename and dump the code
     std::string fileName =
         std::string(computePath)
             .substr(std::string(computePath).find_last_of('/') + 1);
     dumpExpandedShaderCode(fileName, computeCode, "COMPUTE");
 
+    // Get the compute shader source
     const char *cShaderSource = computeCode.c_str();
-    uint32_t compute;
 
-    // 3. Create and compile the compute shader
-    compute = glCreateShader(GL_COMPUTE_SHADER);
+    // Create and compute the compute shader
+    uint32_t compute = glCreateShader(GL_COMPUTE_SHADER);
     glShaderSource(compute, 1, &cShaderSource, NULL);
     glCompileShader(compute);
 
-    // 4. Check for errors using your existing helper
+    // Check for errors
     checkCompileErrors(compute, "COMPUTE");
 
-    // 5. Create Program and link
+    // Create Program and link it
     ID = glCreateProgram();
     glAttachShader(ID, compute);
     glLinkProgram(ID);
 
-    // 6. Check for linking errors
+    // Check for errors
     checkCompileErrors(ID, "PROGRAM");
 
-    // 7. Cleanup
+    // Cleanup
     glDeleteShader(compute);
 }
 

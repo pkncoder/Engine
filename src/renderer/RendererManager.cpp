@@ -5,6 +5,7 @@
 
 namespace Engine {
 
+// Inject the engine context & setup for rendering
 RendererManager::RendererManager(EngineContext &engineContext,
                                  EngineState &state)
     : engineContext(engineContext) {
@@ -13,7 +14,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
     rasterizer = std::make_unique<Rasterizer>(engineContext);
     rasterizer->init(state);
 
-    // Check for OpenGL compatibility
+    // Set opengl version
     glGetIntegerv(GL_MAJOR_VERSION,
                   &state.renderer.settings.openGlMajorVersion);
     glGetIntegerv(GL_MINOR_VERSION,
@@ -24,7 +25,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
         (state.renderer.settings.openGlMajorVersion == 4 &&
          state.renderer.settings.openGlMinorVersion >= 6)) {
 
-        // Set compute shader compatible
+        // Set compute shader compatiblity
         state.renderer.settings.systemComputeShaderCompatability = true;
 
         // Path tracer inizialization
@@ -41,6 +42,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
     Logger::info("RENDERER", "Renderer Manager initialized.");
 }
 
+// Data cleanup
 void RendererManager::shutdown() {
     activeRenderer = nullptr;
 
@@ -50,21 +52,21 @@ void RendererManager::shutdown() {
         pathTracer->shutdown();
 }
 
+// Swap the active renderer
 void RendererManager::swapActiveRenderer(const RenderChoice choice) {
-    switch (choice) {
+    switch (choice) { // Switch the choice
     case RenderChoice::RASTERIZER:
         activeRenderer = rasterizer.get();
         Logger::info("RENDERER", "Swapped to Rasterizer.");
         break;
     case RenderChoice::PATH_TRACER:
-        // Make sure to check for compatibility
         activeRenderer = pathTracer.get();
         Logger::info("RENDERER", "Swapped to Path Tracer.");
         break;
     }
 }
 
-// TODO: replace with context
+// Render a frame
 void RendererManager::render(EngineState &state) {
     // Render the scene
     START_PROFILE("Render"); // Start timer for render
@@ -75,6 +77,7 @@ void RendererManager::render(EngineState &state) {
     activeRenderer->present(state.window.width, state.window.height);
 }
 
+// Resize the frame output
 void RendererManager::resize(const int newWidth, const int newHeight) {
     activeRenderer->resize(newWidth, newHeight);
 }

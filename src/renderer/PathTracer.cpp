@@ -24,6 +24,7 @@ void PathTracer::init() {
 
     glGenFramebuffers(1, &presentFBO);
 
+    // Add storage buffers
     addStorageBuffer("meshEntries", 0, sizeof(GPUMeshEntry),
                      1024);                                   // Mesh Entries
     addStorageBuffer("vertices", 1, sizeof(GPUVertex), 1024); // Vertices
@@ -33,6 +34,7 @@ void PathTracer::init() {
     addStorageBuffer("materials", 4, sizeof(GPUMaterial),
                      Constants::PathTracer::MAX_INSTANCES);
 
+    // Add the render targets
     addRenderTarget("MainColorOutput", 0);
     addRenderTarget("PostProcessedOutput", 1);
     addRenderTarget("Normal", 2);
@@ -42,13 +44,14 @@ void PathTracer::init() {
     addRenderTarget("Depth", 6);
     addRenderTarget("Hit", 7);
 
+    // Set the final render target
+    setDisplayTarget("PostProcessedOutput");
+
+    // Add the shader passes
     addShaderPass("gbuffer", "shaders/pathTracing/main/gbuffer.comp");
     addShaderPass("renderPass", "shaders/pathTracing/main/pathTracer.comp");
     addShaderPass("post", "shaders/pathTracing/main/post.comp");
     addShaderPass("invert", "shaders/compute/invert.comp", false);
-
-    // Display the main output by default
-    setDisplayTarget("PostProcessedOutput");
 
     Logger::info("RENDERER", "Path Tracer initialized");
 }
@@ -81,6 +84,7 @@ void PathTracer::render(EngineState &state) {
     if (currentWidth == 0 || currentHeight == 0)
         return;
 
+    // Reset accumulation if the camera has moved
     if (cameraState.cameraDirty) {
         frameCount = 0;
     }
@@ -120,6 +124,7 @@ void PathTracer::resize(const int newWidth, const int newHeight) {
     // Rebuild each render target
     for (auto &[name, target] : renderTargets) {
 
+        // If the target existed, delete it
         if (target.id != 0)
             glDeleteTextures(1, &target.id);
 
@@ -179,15 +184,19 @@ void PathTracer::present(const int width, const int height) const {
 void PathTracer::addStorageBuffer(const std::string &name, GLuint bindingIndex,
                                   size_t elementSize,
                                   size_t initialElementCount) {
+    // Create a new buffer & set the attributes
     PersistentBuffer newBuffer;
     newBuffer.bindingIndex = bindingIndex;
     newBuffer.elementSize = elementSize;
 
+    // Set up the buffer
     newBuffer.setup(GL_SHADER_STORAGE_BUFFER,
                     elementSize * initialElementCount);
 
+    // Bind it
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingIndex, newBuffer.id);
 
+    // Save it in the registry
     storageBuffers[name] = newBuffer;
 }
 
@@ -195,16 +204,19 @@ void PathTracer::addStorageBuffer(const std::string &name, GLuint bindingIndex,
 // TODO: Figure out textures vs render targets
 void PathTracer::addRenderTarget(const std::string &name, GLuint bindingIndex,
                                  GLenum format) {
+    // Create a new render target & set attributes
     RenderTarget target;
     target.name = name;
     target.bindingIndex = bindingIndex;
     target.format = format;
 
+    // Check for size issues & alocate/bind the target
     if (currentWidth > 0 && currentHeight > 0) {
         allocateRenderTarget(target);
         bindRenderTarget(target);
     }
 
+    // Save the target to the registry
     renderTargets[name] = target;
 }
 
@@ -213,11 +225,13 @@ void PathTracer::addRenderTarget(const std::string &name, GLuint bindingIndex,
 void PathTracer::addShaderPass(const std::string &name,
                                const char *computeShaderPath,
                                const bool enabled) {
+    // Create a new shader pass & set attributes
     ShaderPass pass;
     pass.name = name;
     pass.shader = Shader(computeShaderPath);
     pass.enabled = enabled;
 
+    // Add the shader pass to the registry
     shaderPasses.push_back(std::move(pass));
 }
 
