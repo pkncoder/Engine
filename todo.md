@@ -148,8 +148,8 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 10. [x] Place the \#includes in the right spots
 11. [x] Run ```./fullTest```
 12. [x] Fix file tree
-13. [ ] Update the obsidian canvas & png
-14. [ ] Update the website
+13. [x] Update the obsidian canvas & png
+14. [x] Update the website
 
 ## Finished Todos
 
