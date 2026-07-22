@@ -142,9 +142,9 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 4. [x] Make function params const when needed
 5. [x] Make functions inline when needed
 6. [x] Fix placement of functions
-7. [ ] Refactor step by step in code
-8. [ ] Rename things
-9. [ ] Add comments
+7. [x] Refactor step by step in code
+8. [x] Rename things
+9. [x] Add comments
 10. [ ] Place the \#includes in the right spots
 11. [ ] Fix file tree
 12. [ ] Run ```./fullTest```
