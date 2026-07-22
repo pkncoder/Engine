@@ -14,13 +14,14 @@ namespace Engine {
 // Loading an obj mesh
 CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
 
+    // FInal model data
     CPUModelData model;
 
     // Load the file to search for the material file path
     std::ifstream file(filepath);
     std::string line;
 
-    // Loop every line, until "mtllib " which contains the filename
+    // Loop every line, until "mtllib " which contains material file path
     while (std::getline(file, line)) {
         if (line.substr(0, 7) == "mtllib ") {
             model.materialPath = line.substr(7); // Get the base of the filename

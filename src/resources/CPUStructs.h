@@ -10,20 +10,21 @@
 
 namespace Engine {
 
+// Vertex information in form for cpu workins
 struct CPUVertex {
   public:
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
 
-    // Equality opporator, used for hashing
+    // Equality opporator for hashing; Checks every attribute
     inline bool operator==(const CPUVertex &other) const {
         return position == other.position && normal == other.normal &&
                texCoords == other.texCoords;
     }
 };
 
-// Mesh information
+// Mesh information for cpu uses
 struct CPUMeshData {
   public:
     std::string name;
@@ -33,6 +34,7 @@ struct CPUMeshData {
     std::vector<uint32_t> indices;
 };
 
+// Model information; stores a list of CPUMeshDatas
 struct CPUModelData {
   public:
     std::string name;
@@ -41,7 +43,7 @@ struct CPUModelData {
     std::vector<CPUMeshData> meshes;
 };
 
-// Material information
+// Material information for use on the cpu
 struct CPUMaterialData {
   public:
     // Material definition name
@@ -62,6 +64,7 @@ struct CPUMaterialData {
 
 namespace std {
 
+// Hash function for the vertex
 template <> struct hash<Engine::CPUVertex> {
   public:
     inline size_t operator()(const Engine::CPUVertex &vertex) const {
