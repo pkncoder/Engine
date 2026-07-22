@@ -99,7 +99,7 @@ void Application::run() {
         START_PROFILE("Run Loop"); // Setup timer for run loop
 
         // Update input & timer services
-        Input::update();
+        Input::poll();
         Timer::update();
 
         // TODO: temp

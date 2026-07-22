@@ -21,7 +21,7 @@ void Timer::update() {
     deltaTime = (float)(currentTime - lastFrameTime);
     lastFrameTime = currentTime;
 
-    // Update totals
+    // Update total
     totalTime = currentTime;
 
     // Get the instantanius fps and update the average
@@ -80,6 +80,7 @@ void Timer::beginPeriodicTask(const std::string &id, const float period,
     }
 }
 
+// Stop a period task
 void Timer::endPeriodicTask(const std::string &id) {
     periodicTimerRegistry.erase(id);
 }

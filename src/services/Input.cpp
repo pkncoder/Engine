@@ -33,7 +33,7 @@ void Input::init(GLFWwindow *window_ptr) {
     Logger::info("SYSTEM", "Input service initialized.");
 }
 
-void Input::update() {
+void Input::poll() {
     // Roll back the cycle history arrays
     keysPrevious = keysCurrent;
     buttonsPrevious = buttonsCurrent;
@@ -42,7 +42,7 @@ void Input::update() {
     keysCurrent = keysRealtime;
     buttonsCurrent = buttonsRealtime;
 
-    // 3. Process mouse tracking metrics
+    // Process mouse tracking metrics
     glm::vec2 currentPos = getMousePosition();
     mouseDelta = currentPos - lastMousePos;
     lastMousePos = currentPos;
@@ -108,27 +108,33 @@ bool Input::isMouseButtonLetGo(const int button) {
 glm::vec2 Input::getMousePosition() {
     double x, y;
     glfwGetCursorPos(window, &x, &y);
-    return {(float)x, (float)y};
+    return {(float)x, (float)y}; // vec2
 }
 
 // Code ran when window size is changed
 void Input::keyEventCallback(GLFWwindow *window, const int key,
                              const int scancode, const int action,
                              const int mods) {
+    // Key states
     KeyCode keyCode = static_cast<KeyCode>(key);
     bool ctrl = (mods & GLFW_MOD_CONTROL) != 0;
     bool shift = (mods & GLFW_MOD_SHIFT) != 0;
     bool alt = (mods & GLFW_MOD_ALT) != 0;
     bool super = (mods & GLFW_MOD_SUPER) != 0;
 
-    if (key > 0 && key <= GLFW_KEY_LAST) {
-        if (action == GLFW_PRESS) {
-            keysRealtime[key] = true;
-        } else if (action == GLFW_RELEASE) {
-            keysRealtime[key] = false;
-        }
+    // CHeck for key bounds
+    if (key <= 0 && key > GLFW_KEY_LAST) {
+        return;
     }
 
+    // Set the realtime key states
+    if (action == GLFW_PRESS) {
+        keysRealtime[key] = true;
+    } else if (action == GLFW_RELEASE) {
+        keysRealtime[key] = false;
+    }
+
+    // Dispatch events based on action
     switch (action) {
     case GLFW_PRESS:
         dispatchEvent(
@@ -148,6 +154,8 @@ void Input::keyEventCallback(GLFWwindow *window, const int key,
 // Code ran when window size is changed
 void Input::mouseButtonEventCallback(GLFWwindow *window, const int button,
                                      const int action, const int mods) {
+
+    // Button state
     MouseCode buttonCode = static_cast<MouseCode>(button);
 
     if (button > 0 && button <= GLFW_KEY_LAST) {
@@ -158,6 +166,7 @@ void Input::mouseButtonEventCallback(GLFWwindow *window, const int button,
         }
     }
 
+    // Dispatch events based on action
     switch (action) {
     case GLFW_PRESS:
         dispatchEvent(std::make_shared<MouseButtonPressEvent>(buttonCode));
@@ -168,13 +177,13 @@ void Input::mouseButtonEventCallback(GLFWwindow *window, const int button,
     }
 }
 
-// Code ran when window size is changed
+// Dispatch event for cursor state change
 void Input::cursorEventCallback(GLFWwindow *window, const double xPos,
                                 const double yPos) {
     dispatchEvent(std::make_shared<MouseMoveEvent>(xPos, yPos));
 }
 
-// Code ran when window size is changed
+// Dispatch event for scroll state change
 void Input::scrollEventCallback(GLFWwindow *window, const double xOffset,
                                 const double yOffset) {
     dispatchEvent(std::make_shared<MouseScrollEvent>(xOffset, yOffset));

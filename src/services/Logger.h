@@ -56,7 +56,7 @@ class Logger {
         log(LogLevel::FORMATTING, "NULL", line, type);
     };
 
-    // Output all logs (ansi)
+    // Output all pending logs (in terminal - ansii && file - text)
     static void outputLogs();
 
     // Bool flag to stop the dashboard from overwriting (used at shutdown)
@@ -89,7 +89,7 @@ class Logger {
     // Count of the length of the dashboard so it can be overwritten
     static inline int lastDashboardLogCount = 0;
 
-    // Log file
+    // Log file steam
     static inline std::ofstream logFile;
 };
 

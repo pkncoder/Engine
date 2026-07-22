@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include "../services/Logger.h"
+#include "ECS.h"
 
 namespace Engine {
 
@@ -17,8 +18,11 @@ Scene::~Scene() {}
 
 // Propogating a new entity id (returning a new id)
 EntityID Scene::createEntity() {
-    assert(livingEntityCount < Constants::Entity::MAX_ENTITIES &&
-           "Too many entities in existence."); // Error check
+
+    if (livingEntityCount > Constants::Entity::MAX_ENTITIES) {
+        Logger::error("SCENE", "Too many entities in existence.");
+        return NULL_ENTITY;
+    }
 
     // Grab the next available ID
     EntityID id = livingEntityCount++;

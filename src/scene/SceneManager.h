@@ -18,10 +18,12 @@ class SceneManager {
 
     inline Camera &getCamera() { return camera; }
 
+    // Wrapper for loading an obj
     std::vector<Entity> loadObjScene(const std::string filepath);
 
     // TODO: make these private
   public:
+    // TODO: add getters
     Camera camera;
     Scene scene;
 

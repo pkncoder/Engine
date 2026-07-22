@@ -9,6 +9,7 @@
 
 namespace Engine {
 
+// Profile state informatino
 struct ProfileResult {
   public:
     std::string Name;
@@ -41,7 +42,7 @@ class Timer {
     static void endPeriodicTask(const std::string &id);
 
   private:
-    // Delta time and delta time math
+    // Delta time& delta state variable
     static inline float deltaTime = 0.0;
     static inline double lastFrameTime = 0.0;
 
@@ -59,9 +60,9 @@ class Timer {
     static inline std::unordered_map<std::string, double>
         periodicTimerRegistry{};
 
-    // Profile results
-    static inline std::map<std::string, double> profileResults;
+    // Profile state maps
     static inline std::unordered_map<std::string, double> activeProfiles;
+    static inline std::map<std::string, double> profileResults;
 };
 
 // Timer that can either start and stop on const & scope, or manually keyed
