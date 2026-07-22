@@ -1,8 +1,9 @@
 #pragma once
 
+#include "IRenderer.h"
+
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
-#include "IRenderer.h"
 #include "Shader.h"
 
 #include <glad/glad.h>

@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include <cstddef> // for size_t
+#include <cstddef>
 
 namespace Engine {
 

@@ -1,8 +1,9 @@
 #include "Input.h"
+
 #include "../core/events/KeyEvents.h"
 #include "../core/events/MouseEvents.h"
-
 #include "Logger.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Engine {

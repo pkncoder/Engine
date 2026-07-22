@@ -4,6 +4,7 @@
 #include "events/WindowEvents.h"
 #include "states/EngineState.h"
 #include "states/WindowState.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Engine {

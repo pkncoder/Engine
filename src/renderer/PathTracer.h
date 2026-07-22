@@ -1,11 +1,12 @@
 #pragma once
 
+#include "IRenderer.h"
+
 #include "../core/EngineContext.h"
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
 #include "BufferManager.h"
 #include "GPUStructs.h"
-#include "IRenderer.h"
 #include "Shader.h"
 
 #include <glm/glm.hpp>

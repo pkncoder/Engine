@@ -2,8 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include <string>
-
 namespace Engine {
 
 // Initalize the starting log values

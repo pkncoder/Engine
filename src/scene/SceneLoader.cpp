@@ -1,7 +1,6 @@
 #include "SceneLoader.h"
 
 #include "../renderer/BufferManager.h"
-#include "../resources/AssetManager.h"
 #include "../services/Logger.h"
 #include "components/MaterialComponent.h"
 #include "components/MeshComponent.h"

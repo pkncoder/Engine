@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
 #include "IRenderer.h"

@@ -2,7 +2,6 @@
 
 #include "../Constants.h"
 #include "../services/Logger.h"
-#include "CPUStructs.h"
 #include "MaterialLoader.h"
 #include "ModelLoader.h"
 #include "TextureLoader.h"

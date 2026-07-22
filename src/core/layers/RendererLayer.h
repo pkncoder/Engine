@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../../renderer/RendererManager.h"
 #include "ILayer.h"
-#include <memory>
 
+#include "../EngineContext.h"
 namespace Engine {
 
 class RendererLayer : public ILayer {

@@ -3,7 +3,6 @@
 #include "Logger.h"
 
 #include <functional>
-#include <map>
 #include <string>
 #include <unordered_map>
 
@@ -62,7 +61,7 @@ class Timer {
 
     // Profile state maps
     static inline std::unordered_map<std::string, double> activeProfiles;
-    static inline std::map<std::string, double> profileResults;
+    static inline std::unordered_map<std::string, double> profileResults;
 };
 
 // Timer that can either start and stop on const & scope, or manually keyed

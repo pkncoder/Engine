@@ -1,7 +1,5 @@
 #include "LayerStack.h"
 
-#include <memory>
-
 namespace Engine {
 
 // Deconstructor in case of crash

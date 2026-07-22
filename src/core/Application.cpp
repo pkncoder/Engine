@@ -11,8 +11,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
 
-#include <memory>
-
 namespace Engine {
 
 // Constructor & Deconstructor

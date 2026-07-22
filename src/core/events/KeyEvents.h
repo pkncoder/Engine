@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IEvent.h"
+
 #include <glm/fwd.hpp>
 
 namespace Engine {

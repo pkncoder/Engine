@@ -1,4 +1,6 @@
 #include "RendererLayer.h"
+
+#include "../../renderer/RendererManager.h"
 #include "../../services/Logger.h"
 #include "../events/KeyEvents.h"
 #include "../events/WindowEvents.h"

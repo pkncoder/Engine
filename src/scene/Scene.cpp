@@ -1,7 +1,6 @@
 #include "Scene.h"
 
 #include "../services/Logger.h"
-#include "ECS.h"
 
 namespace Engine {
 

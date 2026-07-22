@@ -2,9 +2,8 @@
 
 #include "../services/Logger.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-
 #include <glm/glm.hpp>
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 namespace Engine {

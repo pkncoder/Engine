@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../EngineContext.h"
 #include "ILayer.h"
 
-#include <memory>
+#include "../EngineContext.h"
 
 namespace Engine {
 
