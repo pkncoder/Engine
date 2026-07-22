@@ -4,11 +4,6 @@
 │   ├── models/                                # Model files (.obj)
 │   └── textures/                              # Texture files (seperated into directories matching the model file name)
 ├── debugShaders/                           # The last compiled fully concatenated shaders from the #includes (in text)
-│   ├── last_COMPUTE_gbuffer.comp.glsl          # Final compute shader
-│   ├── last_COMPUTE_invert.comp.glsl           # Final compute shader
-│   ├── last_COMPUTE_pathTracer.comp.glsl       # Final compute shader
-│   ├── last_FRAGMENT_raster.frag.glsl          # Final fragment shader
-│   └── last_VERTEX_raster.vert.glsl            # Final vertex shader
 ├── build/                                  # Generated build files (gitignored)
 ├── shaders/                                # GPU-Code
 │   ├── compute/                                # Ray-Based Rendering shaders (.comp)
@@ -27,7 +22,8 @@
 │   ├── pathTracing/                            # Path tracer renderer
 │   │   ├── main/                                   # Shader files that the renderers connect with
 │   │   │   ├── gbuffer.comp                            # First hit data saving
-│   │   │   └── pathTracer.comp                         # Main render file for the path tracer
+│   │   │   ├── pathTracer.comp                         # Main render file for the path tracer
+│   │   │   └── post.comp                               # Post processing shader
 │   │   ├── models/                                 # Translation files from path tracing data to base function models
 │   │   │   ├── blinnPhong.glsl                         # Main entry Blinn-Phong function to translate path tracing data to the base
 │   │   │   └── cookTorranceBDRF.glsl                   # Main entry BDRF function to translate path tracing data to the base
@@ -36,21 +32,47 @@
 │   │   ├── structures.glsl                         # Structure definitions
 │   │   ├── to_be_uniformed_valeus.glsl             # Temporary file for definitions that will eventually be uniforms
 │   │   └── uniforms.glsl                           # Uniforms
-│   └── rasterizing/                           # Rasterizer renderer
+│   └── rasterizing/                            # Rasterizer renderer
 │       ├── main/                                   # Shader files that the renderers connect with
 │       │   ├── raster.frag                             # Vertex shader for the rasterizer
-│       │   └── raster.vert                             # Fragment shader for the rasterizer
+│       │   ├── raster.vert                             # Fragment shader for the rasterizer
+│       │   ├── shadow.frag                             # Vertex shader for the rasterizer shadow casting
+│       │   └── shadow.vert                             # Fragment shader for the rasterizer shadow casting
 │       ├── models/                                 # Translation files from rasterization data to base function models
 │       │   ├── blinnPhong.glsl                         # Main entry Blinn-Phong function to translate rasterization data to the base
 │       │   └── cookTorranceBDRF.glsl                   # Main entry BDRF function to translate rasterization data to the base
+│       ├── stylizing.glsl                          # Defines for styling renders
 │       └── uniforms.glsl                           # Uniforms
 ├── src/                                    # CPU-Code
 │   ├── core/                                   # Engine internals
+│   │   ├── events/                                 # Application interupts & actions lists
+│   │   │   ├── IEvent.h                                # Base interface for an event
+│   │   │   ├── IEventDispatcher.h                      # Base interface for an event dispatcher
+│   │   │   ├── KeyEvents.h                             # Keyboard events
+│   │   │   ├── MouseEvents.h                           # Mouse & cursor events
+│   │   │   ├── RenderEvents.h                          # Render events
+│   │   │   └── WindowEvents.h                          # Window events
+│   │   ├── layers/                                 # Application processing stack logic
+│   │   │   ├── ILayer.h                                # Base interface for a layer
+│   │   │   ├── LayerStack.cpp/h                        # Manages the stack of individual layers; Manages when they attaching, events, etc.
+│   │   │   ├── RendererLayer.cpp/h                     # Layer for render updates
+│   │   │   └── SceneUpdateLayer.cpp/h                  # Layer for scene updates
+│   │   ├── states/                                 # State & Configuration + Settings
+│   │   │   ├── CameraSettings.h                        # Camera settings
+│   │   │   ├── CameraState.h                           # Camera state
+│   │   │   ├── Defaults.h                              # Default values (ONLY used in "states" directory)
+│   │   │   ├── EngineState.h                           # Engine state
+│   │   │   ├── RendererSettings.h                      # Render configuraiton
+│   │   │   ├── RenderState.h                           # Render state
+│   │   │   ├── SceneState.h                            # Scene state
+│   │   │   ├── WindowSettings.h                        # Window configuration
+│   │   │   └── WindowState.h                           # Window state
 │   │   ├── Application.cpp/h                       # Main loop & layer management
+│   │   ├── EngineContext.cpp/h                     # Context wrapper for the managers of each module
 │   │   └── Window.cpp/h                            # GLFW abstraction
 │   ├── renderer/                               # Rendering Logic & GPU Data handling
 │   │   ├── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
-│   │   ├── GPUStructs.h                            # Struct declarations for anything that deals with sending data to the GPU. Similar to CPUStructs.h
+│   │   ├── GPUStructs.h                            # Struct declarations for anything that deals with sending data to the GPU
 │   │   ├── IRenderer.h                             # Base interface for a renderer
 │   │   ├── PathTracer.cpp/h                        # GPU Path Tracing
 │   │   ├── Rasterizer.cpp/h                        # GPU Rasterizer
@@ -70,14 +92,20 @@
 │   │   ├── Campera.cpp/h                           # Camera logic
 │   │   ├── ECS.h                                   # Entity ID typdefs & component registering
 │   │   ├── Entity.h                                # Entity wrapper for ease of use
-│   │   ├── EntitySpawner.h                         # Helper header file for spawning specific entity types (ex. renderable)
-│   │   └── Scene.cpp/h                             # The "Registry" (manages the list of entities)
+│   │   ├── Scene.cpp/h                             # The "Registry" (manages the list of entities)
+│   │   ├── SceneLoader.cpp/h                       # Takes in a scene file and propogates it to the stage of entities & componenets
+│   │   └── SceneManager.cpp/h                      # Manages scene modifications and fetching
 │   ├── services/                               # Static classes that provide services
 │   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling
 │   │   ├── Logger.cpp/h                            # Engine-wide static logger for anything required
 │   │   └── Timer.ccp/h                             # FPS, profiling, and anything time-based service
 │   ├── Constants.h                             # Constant values
-│   ├── Defaults.h                              # Default values
 │   └── main.cpp                                # Entry point
 ├── CMakeLists.txt                          # Main build script
-└── vcpkg.json                              # Package manager
+├── clean                                   # Deletes extra cache files
+├── fileTree.txt                            # Documentation fule for listing project files & context for the file
+├── fullTest                                # Runs clean, test, and launch
+├── launch                                  # Launches the executable; Assumes the executable to exist
+├── run                                     # Compiles the programv and launches the executable
+├── test                                    # Compiles the program
+└── vcpkg.json                              # Package list for the package manager (vcpkg)

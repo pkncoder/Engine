@@ -147,7 +147,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 9. [x] Add comments
 10. [x] Place the \#includes in the right spots
 11. [x] Run ```./fullTest```
-12. [ ] Fix file tree
+12. [x] Fix file tree
 13. [ ] Update the obsidian canvas & png
 14. [ ] Update the website
 
