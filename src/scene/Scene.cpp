@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include "../services/Logger.h"
+#include "../services/UUID.h"
 
 namespace Engine {
 
@@ -17,20 +18,23 @@ Scene::~Scene() {}
 
 // Propogating a new entity id (returning a new id)
 EntityID Scene::createEntity() {
+    // Generate the UUID via service
+    EntityID uuid = UUID();
 
-    if (livingEntityCount > Constants::Entity::MAX_ENTITIES) {
-        Logger::error("SCENE", "Too many entities in existence.");
-        return NULL_ENTITY;
-    }
+    // Set the internal index for this entity THEN increase for next itteration
+    uint32_t internalIndex = nextAvailableIndex++;
 
-    // Grab the next available ID
-    EntityID id = livingEntityCount++;
+    // Map this UUID to the next availiable index
+    entityToIndex[uuid] = internalIndex;
+    indexToEntity.push_back(uuid);
 
-    // Ensure its signature is clean
-    signatures[id].reset();
+    // Reset signature for the internal index
+    signatures[internalIndex].reset();
 
-    // Return the id
-    return id;
+    // Count living entity count, as next availiable index can't be trusted
+    livingEntityCount++;
+
+    // Return the uuid for use
+    return uuid;
 }
-
 } // namespace Engine

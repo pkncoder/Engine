@@ -51,30 +51,36 @@ class Scene {
     template <typename T>
     inline void addComponent(const EntityID entity, const T component) {
 
+        // Resolve UUID -> internal index
+        uint32_t internalIndex = entityToIndex[entity];
+
         // Get the component type's id
         ComponentType type = getComponentTypeID<T>();
 
         // Flip the bit at the component id on the signature of the entity
-        signatures[entity].set(type, true);
+        signatures[internalIndex].set(type, true);
 
         // Set the component at that id
         auto pool =
             std::static_pointer_cast<ComponentPool<T>>(componentPools[type]);
-        pool->data[entity] = component;
+        pool->data[internalIndex] = component;
     }
 
     // Returns a referance to a component type with the entity id
     template <typename T> inline T &getComponent(const EntityID entity) {
 
+        // Resolve UUID -> Internal Index
+        uint32_t internalIndex = entityToIndex[entity];
+
         // Get the component type id
         ComponentType type = getComponentTypeID<T>();
-        assert(signatures[entity].test(type) &&
+        assert(signatures[internalIndex].test(type) &&
                "Entity does not have this component."); // Error checking
 
         // Get the component at that id and return it
         auto pool =
             std::static_pointer_cast<ComponentPool<T>>(componentPools[type]);
-        return pool->data[entity];
+        return pool->data[internalIndex];
     }
 
     // Get a list of all component ids that match a list of component types
@@ -85,19 +91,19 @@ class Scene {
         // Set the bit for each component type's id (C++ fold)
         (requiredSignature.set(getComponentTypeID<ComponentTypes>()), ...);
 
-        // List of entity idsthat will be returned
+        // List of entity ids that will be returned
         std::vector<EntityID> matchingEntities;
 
-        // Loop through every existing entity
-        for (EntityID i = 1; i < livingEntityCount; ++i) {
-            // Compare signatures with a bitwise and, if they are the same, then
-            // add it to the list
+        // Loop using the internal memory index (uint32_t), starting at 0!
+        for (uint32_t i = 0; i < nextAvailableIndex; ++i) {
+            // Compare signatures with a bitwise and
             if ((signatures[i] & requiredSignature) == requiredSignature) {
-                matchingEntities.push_back(i);
+                // Translate the internal index 'i' back into its UUID handle
+                matchingEntities.push_back(indexToEntity[i]);
             }
         }
 
-        // Return the list fo entity ids
+        // Return the list of entity ids
         return matchingEntities;
     }
 
@@ -108,12 +114,20 @@ class Scene {
     inline uint32_t getLivingEntityCount() const { return livingEntityCount; }
 
   private:
-    // Count of total entities, used to count and create custom id'ed entites
-    EntityID livingEntityCount = 1; // Start at 1, so 0 remains NULL_ENTITY
+    // Total entity count
+    uint32_t livingEntityCount = 0;
 
     // Component and signature pool
     std::array<Signature, Constants::Entity::MAX_ENTITIES> signatures;
     std::unordered_map<ComponentType, std::shared_ptr<IPool>> componentPools;
+
+    // Entity id (UUID) to internal index for data layout
+    std::unordered_map<EntityID, uint32_t> entityToIndex;
+    std::vector<EntityID>
+        indexToEntity; // Inverse of entityToIndex for reverse lookups
+
+    // Next free memory index in the vector
+    uint32_t nextAvailableIndex = 0;
 };
 
 } // namespace Engine

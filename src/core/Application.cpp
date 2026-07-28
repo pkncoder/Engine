@@ -7,9 +7,12 @@
 #include "../services/Input.h"
 #include "../services/Logger.h"
 #include "../services/Timer.h"
+#include "../services/UUID.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
+
+#include <cstdint>
 
 namespace Engine {
 
@@ -120,6 +123,10 @@ void Application::run() {
                      LogType::IN_PLACE);
 
         END_PROFILE("Run Loop"); // End timer for run loop
+
+        Timer::beginPeriodicTask("UUID DEBUG", 0.2, []() {
+            Logger::debug(std::to_string(std::uint64_t(UUID())));
+        });
 
         // Output any collected logs
         Logger::outputLogs();

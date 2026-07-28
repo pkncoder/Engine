@@ -10,7 +10,7 @@ namespace Engine {
 // TODO: Put into an extra ECS namespace?
 
 // Entity ID typedef and settings
-using EntityID = uint32_t;
+using EntityID = uint64_t;
 const EntityID NULL_ENTITY = 0;
 
 // Signature typedef (bitset)

@@ -81,6 +81,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out how to handle setting glfw & glad settings; if it should just be a function like it is now, or different
 - [ ] Application is dumping core on quit
 - [ ] Set naming convention for the resource management to caches & registries 
+- [ ] Move services into engine context
 
 ### Todo - Not Code
 
