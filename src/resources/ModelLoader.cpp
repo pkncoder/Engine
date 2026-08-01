@@ -13,11 +13,10 @@
 namespace Engine {
 
 // Loading an obj mesh
-std::shared_ptr<CPUModelData>
-ModelLoader::loadOBJ(const std::string &filepath) {
+std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
 
     // FInal model data
-    std::shared_ptr<CPUModelData> model = std::make_shared<CPUModelData>();
+    std::vector<CPUMeshData> meshes;
     std::unordered_map<std::string, AssetHandle> materialLibrary;
 
     // Load the file to search for the material file path
@@ -58,11 +57,8 @@ ModelLoader::loadOBJ(const std::string &filepath) {
         }
 
         // Error
-        return nullptr;
+        return meshes;
     }
-
-    // Set the filepath of the model
-    model->name = filepath;
 
     // Get the attributes and shapes from the reader for the model
     const auto &attrib = reader.GetAttrib();
@@ -156,7 +152,7 @@ ModelLoader::loadOBJ(const std::string &filepath) {
         // Loop the final material id & meshdata from each sub mesh
         for (auto &[matID, meshData] : subMeshes) {
 
-            meshData.name = shape.name + "##" + model->name;
+            meshData.name = shape.name + "##" + filepath;
 
             // Assign the name from the parsed materials list
             if (matID >= 0 && matID < materialLibrary.size()) {
@@ -167,11 +163,11 @@ ModelLoader::loadOBJ(const std::string &filepath) {
             }
 
             // Add this sub-mesh chunk to the model
-            model->meshes.push_back(meshData);
+            meshes.push_back(meshData);
         }
     }
 
-    return model;
+    return meshes;
 }
 
 } // namespace Engine

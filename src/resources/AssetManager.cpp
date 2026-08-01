@@ -35,27 +35,33 @@ AssetHandle AssetManager::loadModel(const std::string &filepath) {
     }
 
     // Load the model through the model loader
-    std::shared_ptr<CPUModelData> model = ModelLoader::loadOBJ(filepath);
+    std::vector<CPUMeshData> meshes = ModelLoader::loadOBJ(filepath);
 
-    // Check to see if the load was successful
-    if (!model->meshes.empty()) {
-
-        Logger::info("ASSET", "Successfully loaded model at: " + filepath +
-                                  " (" + std::to_string(model->meshes.size()) +
-                                  " meshes)");
-        Logger::space();
-
-        // Create a new AssetHandle
-        AssetHandle newHandle = UUID();
-
-        // Cache the model and return the new referance
-        modelCache[newHandle] = model;
-        return newHandle;
+    if (meshes.empty()) {
+        Logger::error("ASSET",
+                      "AssetManager Failed to load meshes at: " + filepath);
+        return INVALID_ASSET_HANDLE; // Failed to load
     }
 
-    Logger::error("ASSET", "AssetManager Failed to load mesh at: " + filepath);
+    std::vector<AssetHandle> meshHandles;
 
-    return INVALID_ASSET_HANDLE; // Failed to load
+    // Check to see if the load was successful
+    for (auto &mesh : meshes) {
+        AssetHandle newHandle = UUID();
+        meshHandles.push_back(newHandle);
+
+        meshCache[newHandle] = std::make_shared<CPUMeshData>(mesh);
+    }
+
+    std::shared_ptr<CPUModelData> model =
+        std::make_shared<CPUModelData>(meshHandles);
+
+    // Create a new AssetHandle
+    AssetHandle newHandle = UUID();
+
+    // Cache the model and return the new referance
+    modelCache[newHandle] = model;
+    return newHandle;
 }
 
 // Get a material from the cache

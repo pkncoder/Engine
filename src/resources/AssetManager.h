@@ -3,8 +3,6 @@
 #include "../core/EngineContext.h"
 #include "CPUStructs.h"
 
-#include <glad/glad.h>
-
 #include <string>
 #include <unordered_map>
 
@@ -23,6 +21,7 @@ class AssetManager {
     AssetHandle loadTexture(const std::string &filepath);
 
     std::shared_ptr<CPUModelData> getModel(AssetHandle handle) const;
+    std::shared_ptr<CPUMeshData> getMesh(AssetHandle handle) const;
     std::shared_ptr<CPUMaterialData> getMaterial(AssetHandle handle) const;
     std::shared_ptr<CPUTextureData> getTexture(AssetHandle handle) const;
 
@@ -31,6 +30,7 @@ class AssetManager {
 
     // Asset caches
     std::unordered_map<AssetHandle, std::shared_ptr<CPUModelData>> modelCache;
+    std::unordered_map<AssetHandle, std::shared_ptr<CPUMeshData>> meshCache;
     std::unordered_map<AssetHandle, std::shared_ptr<CPUMaterialData>>
         materialCache;
     std::unordered_map<AssetHandle, std::shared_ptr<CPUTextureData>>

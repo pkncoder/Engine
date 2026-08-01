@@ -1,6 +1,5 @@
 #pragma once
 
-#include <OpenGL/gltypes.h>
 #include <glm/glm.hpp>
 #include <unordered_map>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -41,9 +40,9 @@ struct CPUMeshData {
 
 // Model information; stores a list of CPUMeshDatas
 struct CPUModelData {
-    std::string name;
-
-    std::vector<CPUMeshData> meshes;
+    inline CPUModelData(std::vector<AssetHandle> _meshHandles)
+        : meshHandles(_meshHandles) {}
+    std::vector<AssetHandle> meshHandles;
 };
 
 struct CPUTextureData {
@@ -51,7 +50,8 @@ struct CPUTextureData {
     uint32_t height = 0;
     uint32_t channels = 0;
 
-    GLenum format;
+    // TODO: own format enum
+
     std::vector<unsigned char> pixels;
 };
 

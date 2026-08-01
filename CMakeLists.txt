@@ -28,9 +28,9 @@ set(SOURCES
     # src/core/layers/RendererLayer.cpp
     src/core/layers/SceneUpdateLayer.cpp
     # src/core/Application.cpp
-    src/core/EngineContext.cpp
-    src/core/Window.cpp
-    src/renderer/BufferManager.cpp
+    # src/core/EngineContext.cpp
+    # src/core/Window.cpp
+    # src/renderer/BufferManager.cpp
     # src/renderer/PathTracer.cpp
     # src/renderer/Rasterizer.cpp
     # src/renderer/RendererManager.cpp

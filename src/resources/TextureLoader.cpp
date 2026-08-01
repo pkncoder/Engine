@@ -37,10 +37,6 @@ TextureLoader::loadTexture(const std::string &filepath) {
     texture->height = height;
     texture->channels = channels;
 
-    // Get the GL image format
-    texture->format = (channels == 1)   ? GL_RED
-                      : (channels == 4) ? GL_RGBA
-                                        : GL_RGB;
     texture->pixels =
         std::vector<unsigned char>(data, data + width * height * channels);
 

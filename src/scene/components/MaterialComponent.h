@@ -2,9 +2,6 @@
 
 #include "../../resources/CPUStructs.h"
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-
 namespace Engine {
 
 // Transformation struct, used for maths

@@ -1,6 +1,5 @@
 #include "PrefabSpawner.h"
 
-#include "../renderer/BufferManager.h"
 #include "../services/Logger.h"
 #include "components/MaterialComponent.h"
 #include "components/MeshComponent.h"
@@ -28,35 +27,35 @@ std::vector<Entity> PrefabSpawner::spawnObjEntity(Scene &scene,
         assetManager.getModel(modelHandle);
 
     // Loop each mesh to create a new renderable
-    for (auto &mesh : modelData->meshes) {
+    for (auto &meshHandle : modelData->meshHandles) {
+
+        auto meshData = assetManager.getMesh(meshHandle);
 
         // Allocate an ID and instantiate it into an entity
         const EntityID entityId = scene.createEntity();
         Entity entity(entityId, &scene);
 
         // Upload the mesh to VRAM and get the mesh component
-        const MeshComponent meshComponent = BufferManager::uploadMesh(mesh);
+        const MeshComponent meshComponent =
+            MeshComponent(meshData->name, modelHandle);
         entity.addComponent<MeshComponent>(meshComponent);
 
         // Apply the default transform component
         entity.addComponent<TransformComponent>(TransformComponent());
 
-        // Get the material data that was loaded on mesh construction
-        std::shared_ptr<CPUMaterialData> materialData =
-            assetManager.getMaterial(mesh.materialHandle);
-
         // Add the new material component
-        if (materialData != nullptr) {
+        if (meshData->materialHandle == INVALID_ASSET_HANDLE) {
 
             // Add a material component to the entity & save it
             auto &material = entity.addComponent<MaterialComponent>(
-                MaterialComponent(mesh.materialHandle));
+                MaterialComponent(meshData->materialHandle));
         }
 
         // If the model has no texture
         else {
-            Logger::warn("SPAWNER", "No material found for: " +
-                                        std::to_string(mesh.materialHandle));
+            Logger::warn("SPAWNER",
+                         "No material found for: " +
+                             std::to_string(meshData->materialHandle));
 
             // Default material
             entity.addComponent<MaterialComponent>(MaterialComponent());

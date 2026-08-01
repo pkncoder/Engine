@@ -2,8 +2,6 @@
 
 #include "../../resources/CPUStructs.h"
 
-#include <glad/glad.h>
-
 #include <string>
 
 namespace Engine {
@@ -11,19 +9,14 @@ namespace Engine {
 // Mesh component struct
 struct MeshComponent {
   public:
+    MeshComponent() = default;
+    inline MeshComponent(std::string _name, AssetHandle _handle)
+        : name(_name), handle(_handle) {}
+
     // Name declaration
-    std::string assetID = "";
+    std::string name = "";
 
-    // Mesh info
-    CPUMeshData meshData;
-
-    // OpenGL arrays
-    GLuint vao = 0;
-    GLuint vbo = 0;
-    GLuint ebo = 0;
-
-    // Index count
-    unsigned int indexCount = 0;
+    AssetHandle handle = INVALID_ASSET_HANDLE;
 };
 
 } // namespace Engine

@@ -2,7 +2,6 @@
 
 #include "AssetManager.h"
 #include "CPUStructs.h"
-#include <glad/glad.h>
 
 #include <memory>
 #include <string>
