@@ -2,7 +2,9 @@
 
 #include "../Constants.h"
 #include "../services/Logger.h"
+#include "CPUStructs.h"
 
+#include <cstddef>
 #include <tiny_obj_loader.h>
 
 #include <fstream>
@@ -11,10 +13,12 @@
 namespace Engine {
 
 // Loading an obj mesh
-CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
+std::shared_ptr<CPUModelData>
+ModelLoader::loadOBJ(const std::string &filepath) {
 
     // FInal model data
-    CPUModelData model;
+    std::shared_ptr<CPUModelData> model = std::make_shared<CPUModelData>();
+    std::unordered_map<std::string, AssetHandle> materialLibrary;
 
     // Load the file to search for the material file path
     std::ifstream file(filepath);
@@ -23,14 +27,16 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
     // Loop every line, until "mtllib " which contains material file path
     while (std::getline(file, line)) {
         if (line.substr(0, 7) == "mtllib ") {
-            model.materialPath = line.substr(7); // Get the base of the filename
-            model.materialPath.erase(
-                model.materialPath.find_last_not_of(" \n\r\t") +
-                1); // Strip off extras
 
-            // Append the material file loaction
-            model.materialPath = Constants::Asset::MATERIAL_ROOT_RELATIVE_PATH +
-                                 model.materialPath;
+            std::string mtlFilename = line.substr(7);
+            mtlFilename.erase(mtlFilename.find_last_not_of(" \n\r\t") + 1);
+            mtlFilename =
+                Constants::Asset::MATERIAL_ROOT_RELATIVE_PATH + mtlFilename;
+
+            Logger::debug("mtlFilename: " + mtlFilename);
+
+            // Call assetManager->loadMaterialLibrary
+            materialLibrary = assetManager->loadMaterialLibrary(mtlFilename);
             break;
         }
     }
@@ -52,16 +58,15 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
         }
 
         // Error
-        return model;
+        return nullptr;
     }
 
     // Set the filepath of the model
-    model.name = filepath;
+    model->name = filepath;
 
     // Get the attributes and shapes from the reader for the model
     const auto &attrib = reader.GetAttrib();
     const auto &shapes = reader.GetShapes();
-    const auto &materials = reader.GetMaterials();
 
     // Loop each shape
     for (const auto &shape : shapes) {
@@ -151,18 +156,18 @@ CPUModelData ModelLoader::loadOBJ(const std::string &filepath) {
         // Loop the final material id & meshdata from each sub mesh
         for (auto &[matID, meshData] : subMeshes) {
 
-            meshData.name = shape.name + "##" + model.name;
+            meshData.name = shape.name + "##" + model->name;
 
             // Assign the name from the parsed materials list
-            if (matID >= 0 && matID < materials.size()) {
-                meshData.materialName = materials[matID].name;
+            if (matID >= 0 && matID < materialLibrary.size()) {
+                meshData.materialHandle = materialLibrary[meshData.name];
             } else {
                 // Default to the default material
-                meshData.materialName = Constants::Asset::DEFAULT_MATERIAL_NAME;
+                meshData.materialHandle = INVALID_ASSET_HANDLE;
             }
 
             // Add this sub-mesh chunk to the model
-            model.meshes.push_back(meshData);
+            model->meshes.push_back(meshData);
         }
     }
 

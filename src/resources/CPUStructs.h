@@ -1,14 +1,18 @@
 #pragma once
 
+#include <OpenGL/gltypes.h>
 #include <glm/glm.hpp>
+#include <unordered_map>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
-#include <map>
 #include <string>
 #include <vector>
 
 namespace Engine {
+
+using AssetHandle = uint64_t;
+const AssetHandle INVALID_ASSET_HANDLE = 0;
 
 // Vertex information in form for cpu workins
 struct CPUVertex {
@@ -26,38 +30,41 @@ struct CPUVertex {
 
 // Mesh information for cpu uses
 struct CPUMeshData {
-  public:
     std::string name;
-    std::string materialName;
 
     std::vector<CPUVertex> vertices;
     std::vector<uint32_t> indices;
+
+    // Replaces std::string materialName
+    AssetHandle materialHandle = INVALID_ASSET_HANDLE;
 };
 
 // Model information; stores a list of CPUMeshDatas
 struct CPUModelData {
-  public:
     std::string name;
-    std::string materialPath;
 
     std::vector<CPUMeshData> meshes;
 };
 
+struct CPUTextureData {
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint32_t channels = 0;
+
+    GLenum format;
+    std::vector<unsigned char> pixels;
+};
+
 // Material information for use on the cpu
 struct CPUMaterialData {
-  public:
-    // Material definition name
     std::string name;
-    std::map<std::string, std::string> textureNames =
-        std::map<std::string, std::string>();
 
-    // Colored options (diffuse & light)
-    glm::vec3 albedo{1.0f, 0.0f, 1.0f};
-    glm::vec3 emmissive{0.0f, 0.0f, 0.0f};
+    glm::vec3 albedo = glm::vec3(1.0f);
+    glm::vec3 emissive = glm::vec3(0.0f);
+    float roughness = 1.0;
+    float metallic = 0.0;
 
-    // Material texture settings
-    float roughness = 1.0f;
-    float metallic = 0.0f;
+    std::unordered_map<std::string, AssetHandle> textureMaps;
 };
 
 } // namespace Engine

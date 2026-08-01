@@ -132,6 +132,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
   - Ex. RendererSettings has the active render updated, so it changes it's bit on the signature. Instead of the onEvent going through each change to see if a version matches, do a bitwise or (or something) to find the exact updated thing
 - [ ] Multiple windows
 - [ ] Vulkan option
+- [ ] DirectX option
 
 ## Steps
 

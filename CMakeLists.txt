@@ -23,25 +23,25 @@ endif()
 # --- Source Files ---
 # Note: glad.c is now handled by the library, no need to include it manually!
 set(SOURCES
-    src/main.cpp
-    src/core/layers/LayerStack.cpp
-    src/core/layers/RendererLayer.cpp
+    # src/main.cpp
+    # src/core/layers/LayerStack.cpp
+    # src/core/layers/RendererLayer.cpp
     src/core/layers/SceneUpdateLayer.cpp
-    src/core/Application.cpp
+    # src/core/Application.cpp
     src/core/EngineContext.cpp
     src/core/Window.cpp
     src/renderer/BufferManager.cpp
-    src/renderer/PathTracer.cpp
-    src/renderer/Rasterizer.cpp
-    src/renderer/RendererManager.cpp
-    src/renderer/Shader.cpp
+    # src/renderer/PathTracer.cpp
+    # src/renderer/Rasterizer.cpp
+    # src/renderer/RendererManager.cpp
+    # src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
     src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp
     src/resources/TextureLoader.cpp
     src/scene/Camera.cpp
+    src/scene/PrefabSpawner.cpp
     src/scene/Scene.cpp
-    src/scene/SceneLoader.cpp
     src/scene/SceneManager.cpp
     src/services/Input.cpp
     src/services/Logger.cpp

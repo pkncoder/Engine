@@ -1,108 +1,148 @@
 #include "AssetManager.h"
 
-#include "../Constants.h"
 #include "../services/Logger.h"
+#include "../services/UUID.h"
+#include "CPUStructs.h"
 #include "MaterialLoader.h"
 #include "ModelLoader.h"
 #include "TextureLoader.h"
+#include <memory>
 
 namespace Engine {
 
 AssetManager::AssetManager(EngineContext &engineContext)
     : engineContext(engineContext) {
 
-    // Load a default material
-    materialCache[Constants::Asset::DEFAULT_MATERIAL_NAME] = CPUMaterialData();
+    // Inject the asset manager to each loader
+    ModelLoader::init(this);
+    MaterialLoader::init(this);
+    TextureLoader::init(this);
+
+    // Load and create a default material
 
     Logger::info("ASSET", "AssetManager Initialized."); // Logging
 }
 
 // Load a CPUModelData - currently only supporting file types of .obj & .mtl
-const CPUModelData *AssetManager::loadModel(const std::string &filepath) {
+AssetHandle AssetManager::loadModel(const std::string &filepath) {
 
     // Check to see if this filepath has already been loaded, if so return from
     // the cache
-    if (modelCache.find(filepath) != modelCache.end()) {
-        Logger::info("ASSET", "Returning cached mesh: " + filepath);
-        return &modelCache[filepath];
+    const auto cachedPathIttr = cachedPaths.find(filepath);
+    if (cachedPathIttr != cachedPaths.end()) {
+        Logger::info("ASSET", "Returning cached model at: " + filepath);
+        return cachedPathIttr->second;
     }
 
     // Load the model through the model loader
-    CPUModelData model = ModelLoader::loadOBJ(filepath);
+    std::shared_ptr<CPUModelData> model = ModelLoader::loadOBJ(filepath);
 
     // Check to see if the load was successful
-    if (!model.meshes.empty()) {
-
-        // Cache the materials from the found filepath
-        if (!model.materialPath.empty()) {
-            cacheMaterials(model.materialPath);
-        }
+    if (!model->meshes.empty()) {
 
         Logger::info("ASSET", "Successfully loaded model at: " + filepath +
-                                  " (" + std::to_string(model.meshes.size()) +
+                                  " (" + std::to_string(model->meshes.size()) +
                                   " meshes)");
         Logger::space();
 
+        // Create a new AssetHandle
+        AssetHandle newHandle = UUID();
+
         // Cache the model and return the new referance
-        modelCache[filepath] = model;
-        return &modelCache[filepath];
+        modelCache[newHandle] = model;
+        return newHandle;
     }
 
     Logger::error("ASSET", "AssetManager Failed to load mesh at: " + filepath);
 
-    return nullptr; // Failed to load
+    return INVALID_ASSET_HANDLE; // Failed to load
 }
 
 // Get a material from the cache
-const CPUMaterialData *
-AssetManager::getMaterial(const std::string &materialName) const {
+std::unordered_map<std::string, AssetHandle>
+AssetManager::loadMaterialLibrary(const std::string &filepath) {
 
-    const auto it = materialCache.find(materialName);
-    if (it != materialCache.end()) {
-        Logger::info("ASSET", "Returning cached material: " + materialName);
-        return &it->second;
+    std::unordered_map<std::string, AssetHandle> libraryHandles;
+
+    std::unordered_map<std::string, CPUMaterialData> materials =
+        MaterialLoader::loadMTL(filepath);
+
+    for (const auto &[name, material] : materials) {
+
+        std::string cacheKey = filepath + ":" + name;
+
+        const auto cachedPathIttr = cachedPaths.find(cacheKey);
+        if (cachedPathIttr != cachedPaths.end()) {
+            libraryHandles[name] = cachedPathIttr->second;
+            continue; // Skip loading, as it already has been
+        }
+
+        // 4. Generate UUID and cache everything
+        AssetHandle newHandle = UUID(); // Assuming your UUID acts as a handle
+
+        materialCache[newHandle] =
+            std::make_shared<CPUMaterialData>(material); // TODO: is this ok?
+        cachedPaths[cacheKey] = newHandle;
+
+        libraryHandles[name] = newHandle;
     }
 
-    Logger::error("ASSET",
-                  "AssetManager failed to load material: " + materialName);
-    return nullptr;
+    // Check for null material
+    return libraryHandles;
 }
 
 // Load a texture from a filepath
-GLuint AssetManager::loadTexture(const std::string &filepath,
-                                 bool &isBumpTexture) {
+AssetHandle AssetManager::loadTexture(const std::string &filepath) {
     // Check cache, if it is already cached, return it
-    if (textureCache.find(filepath) != textureCache.end()) {
-        return textureCache[filepath];
+    const auto cachedPathIttr = cachedPaths.find(filepath);
+    if (cachedPathIttr != cachedPaths.end()) {
+        return cachedPathIttr->second;
     }
 
     // Load and cache the texture
-    const GLuint textureID =
-        TextureLoader::loadTexture(filepath, isBumpTexture);
-    if (textureID != 0) {
-        textureCache[filepath] = textureID;
-    }
+    std::shared_ptr<CPUTextureData> textureData =
+        TextureLoader::loadTexture(filepath);
 
-    return textureID;
+    // Check for null texture
+
+    AssetHandle newHandle = UUID();
+    textureCache[newHandle] = textureData;
+
+    return newHandle;
 }
 
-// Cache materials from the found filepath
-void AssetManager::cacheMaterials(const std::string &filepath) {
+std::shared_ptr<CPUModelData> AssetManager::getModel(AssetHandle handle) const {
 
-    // Get each material
-    std::vector<CPUMaterialData> materials = MaterialLoader::loadMTL(filepath);
+    const auto modelIttr = modelCache.find(handle);
 
-    // Check to see if there is any materials
-    if (!materials.empty()) {
-
-        // Loop each material & cache it
-        for (auto &material : materials) {
-            materialCache[material.name] = material;
-
-            Logger::info("ASSET",
-                         "Successfully cached material at: " + filepath);
-        }
+    if (modelIttr != modelCache.end()) {
+        return modelIttr->second;
     }
-}
 
+    return nullptr;
+};
+
+std::shared_ptr<CPUMaterialData>
+AssetManager::getMaterial(AssetHandle handle) const {
+
+    const auto materialIttr = materialCache.find(handle);
+
+    if (materialIttr != materialCache.end()) {
+        return materialIttr->second;
+    }
+
+    return nullptr;
+};
+
+std::shared_ptr<CPUTextureData>
+AssetManager::getTexture(AssetHandle handle) const {
+
+    const auto textureIttr = textureCache.find(handle);
+
+    if (textureIttr != textureCache.end()) {
+        return textureIttr->second;
+    }
+
+    return nullptr;
+};
 } // namespace Engine

@@ -1,6 +1,6 @@
 #include "SceneManager.h"
 
-#include "SceneLoader.h"
+#include "PrefabSpawner.h"
 #include "components/MaterialComponent.h"
 #include "components/MeshComponent.h"
 #include "components/TransformComponent.h"
@@ -20,8 +20,8 @@ SceneManager::SceneManager(EngineContext &engineContext,
 }
 
 std::vector<Entity> SceneManager::loadObjScene(const std::string filepath) {
-    return SceneLoader::spawnObjEntity(scene, *engineContext.getAsset(),
-                                       filepath);
+    return PrefabSpawner::spawnObjEntity(scene, *engineContext.getAsset(),
+                                         filepath);
 }
 
 } // namespace Engine

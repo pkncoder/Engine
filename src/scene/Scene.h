@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Constants.h"
+#include "../resources/CPUStructs.h"
 #include "ECS.h"
 
 #include <array>
@@ -34,6 +35,9 @@ class Scene {
   public:
     Scene();
     ~Scene();
+
+    EntityID createEntity();
+    void destroyEntity(EntityID entity);
 
     // Registering a new component type & accociated pool
     template <typename T> inline void registerComponent() {
@@ -107,10 +111,8 @@ class Scene {
         return matchingEntities;
     }
 
-    // Propagating a new entity (returning the new id)
-    EntityID createEntity();
+    std::vector<EntityID> instantiateModel(AssetHandle modelHandle);
 
-    // Getter for the total living entity count
     inline uint32_t getLivingEntityCount() const { return livingEntityCount; }
 
   private:

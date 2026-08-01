@@ -9,7 +9,7 @@
 
 namespace Engine {
 
-class SceneLoader {
+class PrefabSpawner {
   public:
     // Spawn new entites from a .obj model file
     static std::vector<Entity> spawnObjEntity(Scene &scene,

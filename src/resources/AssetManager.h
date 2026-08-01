@@ -17,21 +17,27 @@ class AssetManager {
     ~AssetManager() = default;
 
     // Getters and loaders
-    const CPUModelData *loadModel(const std::string &filepath);
-    const CPUMaterialData *getMaterial(const std::string &materialName) const;
-    GLuint loadTexture(const std::string &filepath, bool &isBumpTexture);
+    AssetHandle loadModel(const std::string &filepath);
+    std::unordered_map<std::string, AssetHandle>
+    loadMaterialLibrary(const std::string &filepath);
+    AssetHandle loadTexture(const std::string &filepath);
 
-  private:
-    // Cache materials to be fetched later
-    void cacheMaterials(const std::string &filepath);
+    std::shared_ptr<CPUModelData> getModel(AssetHandle handle) const;
+    std::shared_ptr<CPUMaterialData> getMaterial(AssetHandle handle) const;
+    std::shared_ptr<CPUTextureData> getTexture(AssetHandle handle) const;
 
   private:
     EngineContext &engineContext;
 
     // Asset caches
-    std::unordered_map<std::string, CPUModelData> modelCache;
-    std::unordered_map<std::string, CPUMaterialData> materialCache;
-    std::unordered_map<std::string, GLuint> textureCache;
+    std::unordered_map<AssetHandle, std::shared_ptr<CPUModelData>> modelCache;
+    std::unordered_map<AssetHandle, std::shared_ptr<CPUMaterialData>>
+        materialCache;
+    std::unordered_map<AssetHandle, std::shared_ptr<CPUTextureData>>
+        textureCache;
+
+    // Filepath cache buffer
+    std::unordered_map<std::string, AssetHandle> cachedPaths;
 };
 
 } // namespace Engine

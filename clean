@@ -1,5 +1,5 @@
 #!/bin/bash
 
-rm -rf ./build/*
-rm -rf ./debugShaders/*
-rm engine.log
+rm -rf ./build/* ||
+	rm -rf ./debugShaders/* ||
+	rm engine.log
