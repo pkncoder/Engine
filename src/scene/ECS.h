@@ -3,7 +3,6 @@
 #include "../Constants.h"
 
 #include <bitset>
-#include <cstdint>
 
 namespace Engine {
 

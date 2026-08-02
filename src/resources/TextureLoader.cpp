@@ -1,11 +1,8 @@
 #include "TextureLoader.h"
 
 #include "../services/Logger.h"
-#include "CPUStructs.h"
 
-#include <cstddef>
 #include <glm/glm.hpp>
-#include <memory>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -14,6 +11,7 @@ namespace Engine {
 std::shared_ptr<CPUTextureData>
 TextureLoader::loadTexture(const std::string &filepath) {
 
+    // Final texture data
     std::shared_ptr<CPUTextureData> texture;
 
     // Set stb flags
@@ -33,10 +31,14 @@ TextureLoader::loadTexture(const std::string &filepath) {
     // Free stb image data
     stbi_image_free(data);
 
+    // Set image size values to the texture
     texture->width = width;
     texture->height = height;
     texture->channels = channels;
 
+    // TODO: format
+
+    // Convert the data to a vector of chars for the pixels
     texture->pixels =
         std::vector<unsigned char>(data, data + width * height * channels);
 

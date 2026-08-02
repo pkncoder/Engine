@@ -14,16 +14,18 @@ class AssetManager {
     AssetManager(EngineContext &engineContext);
     ~AssetManager() = default;
 
-    // Getters and loaders
+    // Asset loaders
     AssetHandle loadModel(const std::string &filepath);
     std::unordered_map<std::string, AssetHandle>
     loadMaterialLibrary(const std::string &filepath);
     AssetHandle loadTexture(const std::string &filepath);
 
-    std::shared_ptr<CPUModelData> getModel(AssetHandle handle) const;
-    std::shared_ptr<CPUMeshData> getMesh(AssetHandle handle) const;
-    std::shared_ptr<CPUMaterialData> getMaterial(AssetHandle handle) const;
-    std::shared_ptr<CPUTextureData> getTexture(AssetHandle handle) const;
+    // Getters for assets; can return INVALID_MATERIAL_HANDLE (0)
+    std::shared_ptr<CPUModelData> getModel(const AssetHandle handle) const;
+    std::shared_ptr<CPUMeshData> getMesh(const AssetHandle handle) const;
+    std::shared_ptr<CPUMaterialData>
+    getMaterial(const AssetHandle handle) const;
+    std::shared_ptr<CPUTextureData> getTexture(const AssetHandle handle) const;
 
   private:
     EngineContext &engineContext;

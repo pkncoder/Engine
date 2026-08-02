@@ -2,9 +2,7 @@
 
 #include "../Constants.h"
 #include "../services/Logger.h"
-#include "CPUStructs.h"
 
-#include <cstddef>
 #include <tiny_obj_loader.h>
 
 #include <fstream>
@@ -12,11 +10,12 @@
 
 namespace Engine {
 
-// Loading an obj mesh
 std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
 
-    // FInal model data
+    // Final model data
     std::vector<CPUMeshData> meshes;
+
+    // Material library name:handle
     std::unordered_map<std::string, AssetHandle> materialLibrary;
 
     // Load the file to search for the material file path
@@ -27,6 +26,7 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
     while (std::getline(file, line)) {
         if (line.substr(0, 7) == "mtllib ") {
 
+            // Break down the mtl filename
             std::string mtlFilename = line.substr(7);
             mtlFilename.erase(mtlFilename.find_last_not_of(" \n\r\t") + 1);
             mtlFilename =
@@ -34,7 +34,7 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
 
             Logger::debug("mtlFilename: " + mtlFilename);
 
-            // Call assetManager->loadMaterialLibrary
+            // Load the material library through the asset manager
             materialLibrary = assetManager->loadMaterialLibrary(mtlFilename);
             break;
         }
@@ -47,10 +47,10 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
     readerConfig.mtl_search_path =
         Constants::Asset::MATERIAL_ROOT_RELATIVE_PATH;
 
-    // Get a tinyobjloader readerkl
+    // Get a tinyobjloader reader
     tinyobj::ObjReader reader;
 
-    // Try to read from the file and check for erros
+    // Try to read from the file and check for errors
     if (!reader.ParseFromFile(filepath, readerConfig)) { // Error
         if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
             Logger::error("ASSET", "tinyobjloader Error: " + reader.Error());

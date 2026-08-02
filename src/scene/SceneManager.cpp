@@ -19,7 +19,7 @@ SceneManager::SceneManager(EngineContext &engineContext,
     scene.registerComponent<MaterialComponent>();
 }
 
-std::vector<Entity> SceneManager::loadObjScene(const std::string filepath) {
+std::vector<EntityID> SceneManager::loadObjScene(const std::string filepath) {
     return PrefabSpawner::spawnObjEntity(scene, *engineContext.getAsset(),
                                          filepath);
 }

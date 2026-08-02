@@ -5,6 +5,7 @@
 #include <fstream>
 
 namespace Engine {
+
 std::unordered_map<std::string, CPUMaterialData>
 MaterialLoader::loadMTL(const std::string &filepath) {
 
@@ -24,7 +25,7 @@ MaterialLoader::loadMTL(const std::string &filepath) {
     // Load the mtl file
     tinyobj::LoadMtl(&materialMap, &loaderMaterials, &file, &warn, &err);
 
-    // Get the base for the final texture path(s)
+    // Get the base for the final texture paths
     std::string texturePathBase =
         filepath.substr(filepath.find_last_of("/") + 1);
     texturePathBase =
@@ -32,7 +33,9 @@ MaterialLoader::loadMTL(const std::string &filepath) {
 
     // Loop over each loaded material
     for (const auto &material : loaderMaterials) {
-        CPUMaterialData materialData; // CPUMaterial
+
+        // Final material data
+        CPUMaterialData materialData;
 
         // Material name
         materialData.name = material.name;
@@ -47,7 +50,7 @@ MaterialLoader::loadMTL(const std::string &filepath) {
         materialData.roughness = material.roughness;
         materialData.metallic = material.metallic;
 
-        // Lambda function for assigning textures
+        // Lambda function for loading & assigning textures
         auto assignTexture = [&](const std::string &loadedTexName,
                                  const std::string &mapTypeKey) {
             if (!loadedTexName.empty()) {
@@ -62,10 +65,10 @@ MaterialLoader::loadMTL(const std::string &filepath) {
         assignTexture(material.roughness_texname, "roughness");
         assignTexture(material.metallic_texname, "metallic");
         assignTexture(material.alpha_texname, "alpha");
-        assignTexture(material.bump_texname, "normal");
+        assignTexture(material.normal_texname, "normal");
         assignTexture(material.bump_texname, "bump");
 
-        // Push back the new material
+        // Set the new material
         finalMaterials[materialData.name] = materialData;
     }
 

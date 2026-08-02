@@ -1,11 +1,11 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <unordered_map>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Engine {
@@ -29,6 +29,7 @@ struct CPUVertex {
 
 // Mesh information for cpu uses
 struct CPUMeshData {
+  public:
     std::string name;
 
     std::vector<CPUVertex> vertices;
@@ -40,12 +41,14 @@ struct CPUMeshData {
 
 // Model information; stores a list of CPUMeshDatas
 struct CPUModelData {
+  public:
     inline CPUModelData(std::vector<AssetHandle> _meshHandles)
         : meshHandles(_meshHandles) {}
     std::vector<AssetHandle> meshHandles;
 };
 
 struct CPUTextureData {
+  public:
     uint32_t width = 0;
     uint32_t height = 0;
     uint32_t channels = 0;
@@ -57,6 +60,7 @@ struct CPUTextureData {
 
 // Material information for use on the cpu
 struct CPUMaterialData {
+  public:
     std::string name;
 
     glm::vec3 albedo = glm::vec3(1.0f);

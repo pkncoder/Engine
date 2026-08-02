@@ -6,7 +6,6 @@
 
 #include <array>
 #include <cassert>
-#include <cstdint>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -37,7 +36,7 @@ class Scene {
     ~Scene();
 
     EntityID createEntity();
-    void destroyEntity(EntityID entity);
+    void destroyEntity(const EntityID entity);
 
     // Registering a new component type & accociated pool
     template <typename T> inline void registerComponent() {
@@ -71,10 +70,10 @@ class Scene {
     }
 
     // Returns a referance to a component type with the entity id
-    template <typename T> inline T &getComponent(const EntityID entity) {
+    template <typename T> inline T &getComponent(const EntityID entity) const {
 
         // Resolve UUID -> Internal Index
-        uint32_t internalIndex = entityToIndex[entity];
+        uint32_t internalIndex = entityToIndex.find(entity)->second;
 
         // Get the component type id
         ComponentType type = getComponentTypeID<T>();
@@ -82,8 +81,8 @@ class Scene {
                "Entity does not have this component."); // Error checking
 
         // Get the component at that id and return it
-        auto pool =
-            std::static_pointer_cast<ComponentPool<T>>(componentPools[type]);
+        auto pool = std::static_pointer_cast<ComponentPool<T>>(
+            componentPools.find(type)->second);
         return pool->data[internalIndex];
     }
 
@@ -111,6 +110,8 @@ class Scene {
         return matchingEntities;
     }
 
+    // TODO: Figure out how to deal with creating models / prefabs
+    // WARN: Not created yet
     std::vector<EntityID> instantiateModel(AssetHandle modelHandle);
 
     inline uint32_t getLivingEntityCount() const { return livingEntityCount; }
