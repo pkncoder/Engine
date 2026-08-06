@@ -1,10 +1,12 @@
 #pragma once
 
+#include <OpenGL/OpenGL.h>
 #include <glm/glm.hpp>
+#include <stdalign.h>
 
 namespace Engine {
 
-// Mesh data
+// // Mesh data
 struct alignas(16) GPUMeshEntry {
   public:
     uint32_t baseVertex;
@@ -39,6 +41,17 @@ struct alignas(16) GPUMaterial {
     float roughness;
     float metallic;
     float padding[2];
+};
+
+struct alignas(16) GPUMesh {
+    GLuint vao;
+    GLuint vbo;
+    GLuint ebo;
+    uint32_t indexCount;
+};
+
+struct alignas(16) GPUTexture {
+    GLuint textureID;
 };
 
 } // namespace Engine

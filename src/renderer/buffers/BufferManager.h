@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../resources/CPUStructs.h"
-#include "../scene/components/MeshComponent.h"
+#include "../../resources/CPUStructs.h"
+#include "../../scene/components/MeshComponent.h"
+#include "UBO.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -10,52 +11,8 @@
 
 namespace Engine {
 
-// UBO information
-struct GPUUniformBuffer {
-
-  public:
-    // ID & bindings
-    GLuint id = 0;
-    GLuint bindingPoint = 0;
-
-    // Max data size
-    size_t size = 0;
-
-    // Cache for checking duplicate data & saving data to send to the GPU
-    std::vector<uint8_t> cpuCache;
-
-    // Offsets for uniforms
-    std::unordered_map<std::string, size_t> uniformOffsets;
-};
-
 // Persistant GPU buffer, defaults to a SSBO
 // TODO: Decide on moving the implemtation to the BufferManager
-struct PersistentBuffer {
-
-  public:
-    // Alocate VRAM and cache data to CPU
-    void setup(const GLenum bufferTarget, const size_t bufferSize);
-
-    // Update saved data, including in VRAM
-    void update(const void *data, const size_t updateSize);
-
-    // Data cleanup
-    void shutdown();
-
-  public:
-    // ID & bindings
-    GLuint id = 1;
-    GLuint bindingIndex = 0;
-    GLenum target = GL_SHADER_STORAGE_BUFFER; // TODO: Need this? Maybe use this
-                                              // to reporpose
-
-    // Pointer to data
-    void *mappedPtr = nullptr;
-
-    // Data size
-    size_t size = 0;
-    size_t elementSize = 0;
-};
 
 class BufferManager {
   public:

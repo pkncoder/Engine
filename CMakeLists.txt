@@ -30,11 +30,13 @@ set(SOURCES
     src/core/Application.cpp
     src/core/EngineContext.cpp
     src/core/Window.cpp
-    # src/renderer/BufferManager.cpp
-    # src/renderer/PathTracer.cpp
-    # src/renderer/Rasterizer.cpp
-    # src/renderer/RendererManager.cpp
-    # src/renderer/Shader.cpp
+    src/renderer/buffers/BufferManager.cpp
+    src/renderer/buffers/SSBO.cpp
+    src/renderer/GPUResourceManager.cpp
+    src/renderer/PathTracer.cpp
+    src/renderer/Rasterizer.cpp
+    src/renderer/RendererManager.cpp
+    src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
     src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp

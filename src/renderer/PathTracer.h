@@ -5,9 +5,9 @@
 #include "../core/EngineContext.h"
 #include "../scene/Camera.h"
 #include "../scene/Scene.h"
-#include "BufferManager.h"
 #include "GPUStructs.h"
 #include "Shader.h"
+#include "buffers/SSBO.h"
 
 #include <glm/glm.hpp>
 
@@ -116,7 +116,7 @@ class PathTracer : public IRenderer {
         0; // TODO: Use the "Timer" service & add an "accumulatedFrames"
 
     // Dynamic resource registries
-    std::unordered_map<std::string, PersistentBuffer> storageBuffers;
+    std::unordered_map<std::string, SSBO> storageBuffers;
     std::unordered_map<std::string, RenderTarget> renderTargets;
     std::vector<ShaderPass> shaderPasses;
 
