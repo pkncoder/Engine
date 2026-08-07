@@ -29,8 +29,8 @@ RendererManager::RendererManager(EngineContext &engineContext,
         state.renderer.settings.systemComputeShaderCompatability = true;
 
         // Path tracer inizialization
-        pathTracer = std::make_unique<PathTracer>(engineContext);
-        pathTracer->init();
+        // pathTracer = std::make_unique<PathTracer>(engineContext);
+        // pathTracer->init();
     } else {
         Logger::warn("RENDERER", "Path Tracer not supported on this system.");
     }
@@ -48,8 +48,8 @@ void RendererManager::shutdown() {
 
     if (rasterizer)
         rasterizer->shutdown();
-    if (pathTracer)
-        pathTracer->shutdown();
+    // if (pathTracer)
+    //     pathTracer->shutdown();
 }
 
 // Swap the active renderer
@@ -60,7 +60,7 @@ void RendererManager::swapActiveRenderer(const RenderChoice choice) {
         Logger::info("RENDERER", "Swapped to Rasterizer.");
         break;
     case RenderChoice::PATH_TRACER:
-        activeRenderer = pathTracer.get();
+        // activeRenderer = pathTracer.get();
         Logger::info("RENDERER", "Swapped to Path Tracer.");
         break;
     }
@@ -70,11 +70,16 @@ void RendererManager::swapActiveRenderer(const RenderChoice choice) {
 void RendererManager::render(EngineState &state) {
     // Render the scene
     START_PROFILE("Render"); // Start timer for render
-    activeRenderer->render(state);
+    activeRenderer->beginFrame(state);
+
+    activeRenderer->extract(state);
+    activeRenderer->prepare(state);
+
+    activeRenderer->dispatch(state);
+    activeRenderer->postProcess(state);
+
+    activeRenderer->present(state);
     END_PROFILE("Render"); // End Timer for render
-    //
-    // 2. Present the compute texture to the main window
-    activeRenderer->present(state.window.width, state.window.height);
 }
 
 // Resize the frame output

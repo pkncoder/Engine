@@ -1,5 +1,6 @@
 #include "MaterialLoader.h"
 
+#include "../services/Logger.h"
 #include "tiny_obj_loader.h"
 
 #include <fstream>
@@ -55,7 +56,8 @@ MaterialLoader::loadMTL(const std::string &filepath) {
                                  const std::string &mapTypeKey) {
             if (!loadedTexName.empty()) {
                 materialData.textureMaps[mapTypeKey] =
-                    assetManager->loadTexture(texturePathBase + loadedTexName);
+                    assetManager->loadTexture("assets/textures/" +
+                                              texturePathBase + loadedTexName);
             }
         };
 
@@ -70,6 +72,8 @@ MaterialLoader::loadMTL(const std::string &filepath) {
 
         // Set the new material
         finalMaterials[materialData.name] = materialData;
+
+        Logger::info("ASSET", "Successfully cached material:" + material.name);
     }
 
     return finalMaterials;

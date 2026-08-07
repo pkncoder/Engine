@@ -2,6 +2,7 @@
 
 #include "../Constants.h"
 #include "../services/Logger.h"
+#include "CPUStructs.h"
 
 #include <tiny_obj_loader.h>
 
@@ -63,6 +64,7 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
     // Get the attributes and shapes from the reader for the model
     const auto &attrib = reader.GetAttrib();
     const auto &shapes = reader.GetShapes();
+    const auto &materials = reader.GetMaterials();
 
     // Loop each shape
     for (const auto &shape : shapes) {
@@ -93,6 +95,9 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
             // Get the mesh data & vertice cache for this material id
             auto &meshData = subMeshes[materialID];
             auto &uniqueVertices = uniqueMaterialVerticies[materialID];
+
+            meshData.materialHandle =
+                materialLibrary[materials[materialID].name];
 
             // Loop each vertex
             for (size_t vertexIndex = 0; vertexIndex < vertexNumber;
@@ -149,21 +154,8 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
             vertexIndexOffset += vertexNumber;
         }
 
-        // Loop the final material id & meshdata from each sub mesh
-        for (auto &[matID, meshData] : subMeshes) {
-
-            meshData.name = shape.name + "##" + filepath;
-
-            // Assign the name from the parsed materials list
-            if (matID >= 0 && matID < materialLibrary.size()) {
-                meshData.materialHandle = materialLibrary[meshData.name];
-            } else {
-                // Default to the default material
-                meshData.materialHandle = INVALID_ASSET_HANDLE;
-            }
-
-            // Add this sub-mesh chunk to the model
-            meshes.push_back(meshData);
+        for (auto [_, mesh] : subMeshes) {
+            meshes.push_back(mesh);
         }
     }
 

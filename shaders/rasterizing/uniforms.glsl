@@ -25,6 +25,7 @@ uniform sampler2D uAlphaMap;
 
 // Normal map + uniform for bump map detection
 uniform sampler2D uNormalMap;
+uniform sampler2D uBumpMap;
 uniform int uIsBumpMap;
 
 // Shadow mapping

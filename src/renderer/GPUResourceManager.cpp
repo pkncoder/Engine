@@ -1,4 +1,5 @@
 #include "GPUResourceManager.h"
+#include "../services/Logger.h"
 #include "GPUStructs.h"
 #include <OpenGL/gltypes.h>
 
@@ -11,8 +12,10 @@ GPUMesh *GPUResourceManager::getOrUploadMesh(AssetHandle handle) {
     }
 
     auto cpuMesh = assetManager->getMesh(handle);
-    if (!cpuMesh)
+    if (!cpuMesh) {
+        Logger::debug("NOASSETHANDLE: " + std::to_string(handle));
         return nullptr; // Invalid handle!
+    }
 
     GPUMesh newGPUMesh = uploadMesh(*cpuMesh);
 
@@ -36,7 +39,7 @@ GPUTexture *GPUResourceManager::getOrUploadTexture(AssetHandle handle) {
     return &gpuTextureCache[handle];
 }
 
-GPUMesh GPUResourceManager::uploadMesh(CPUMeshData meshData) {
+GPUMesh GPUResourceManager::uploadMesh(CPUMeshData &meshData) {
 
     // Create the new mesh component and set the index count
     GPUMesh gpuMesh;
@@ -83,7 +86,7 @@ GPUMesh GPUResourceManager::uploadMesh(CPUMeshData meshData) {
     return gpuMesh;
 }
 
-GPUTexture GPUResourceManager::uploadTexture(CPUTextureData textureData) {
+GPUTexture GPUResourceManager::uploadTexture(CPUTextureData &textureData) {
 
     GPUTexture gpuTexture;
 
@@ -92,13 +95,14 @@ GPUTexture GPUResourceManager::uploadTexture(CPUTextureData textureData) {
                     : (textureData.channels == 4) ? GL_RGBA
                                                   : GL_RGB;
 
+    const void *rawPixelData = textureData.pixels.data();
+
     glGenTextures(1, &gpuTexture.textureID);
 
     glBindTexture(GL_TEXTURE_2D, gpuTexture.textureID);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(GL_TEXTURE_2D, 0, format, textureData.width,
-                 textureData.height, 0, format, GL_UNSIGNED_BYTE,
-                 &textureData.pixels);
+                 textureData.height, 0, format, GL_UNSIGNED_BYTE, rawPixelData);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

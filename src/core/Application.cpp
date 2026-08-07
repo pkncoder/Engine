@@ -125,10 +125,6 @@ void Application::run() {
 
         END_PROFILE("Run Loop"); // End timer for run loop
 
-        Timer::beginPeriodicTask("UUID DEBUG", 0.2, []() {
-            Logger::debug(std::to_string(std::uint64_t(UUID())));
-        });
-
         // Output any collected logs
         Logger::outputLogs();
     }
@@ -218,7 +214,7 @@ void Application::setupEntities() {
     }
 
     // Gay Room (me)
-    if (1) {
+    if (0) {
         std::vector<EntityID> room =
             sceneManager->loadObjScene("assets/models/gayRoom.obj");
 
@@ -307,7 +303,7 @@ void Application::setupEntities() {
     }
 
     // Sponza
-    if (0) {
+    if (1) {
         std::vector<EntityID> sponza =
             sceneManager->loadObjScene("assets/models/sponza.obj");
 

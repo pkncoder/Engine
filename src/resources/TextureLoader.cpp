@@ -12,7 +12,8 @@ std::shared_ptr<CPUTextureData>
 TextureLoader::loadTexture(const std::string &filepath) {
 
     // Final texture data
-    std::shared_ptr<CPUTextureData> texture;
+    std::shared_ptr<CPUTextureData> texture =
+        std::make_shared<CPUTextureData>();
 
     // Set stb flags
     stbi_set_flip_vertically_on_load(true);

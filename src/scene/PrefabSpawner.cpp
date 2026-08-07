@@ -19,6 +19,7 @@ PrefabSpawner::spawnObjEntity(Scene &scene, AssetManager &assetManager,
 
     // Get the mesh data & check to make sure that it loaded right
     const AssetHandle modelHandle = assetManager.loadModel(filepath);
+
     if (modelHandle == INVALID_ASSET_HANDLE) {
         Logger::error("ASSET", "Failed to load model at: " + filepath);
         return entities; // TODO: temp - Return the empty array
@@ -40,14 +41,14 @@ PrefabSpawner::spawnObjEntity(Scene &scene, AssetManager &assetManager,
 
         // Create a new mesh component and add the entity
         const MeshComponent meshComponent =
-            MeshComponent(meshData->name, modelHandle);
+            MeshComponent(meshData->name, meshHandle);
         entity.addComponent<MeshComponent>(meshComponent);
 
         // Apply the default transform component
         entity.addComponent<TransformComponent>(TransformComponent());
 
         // Check to see if the mesh has a material handle
-        if (meshData->materialHandle == INVALID_ASSET_HANDLE) {
+        if (meshData->materialHandle != INVALID_ASSET_HANDLE) {
 
             // Add a material component to the entity
             entity.addComponent<MaterialComponent>(

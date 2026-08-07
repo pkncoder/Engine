@@ -1,25 +1,38 @@
 #pragma once
 
 #include "../core/states/EngineState.h"
+#include "../scene/components/MaterialComponent.h"
+#include "../scene/components/MeshComponent.h"
 
 namespace Engine {
+
+struct RenderPacket {
+    glm::mat4 modelMatrix;
+    AssetHandle meshHandle;
+    AssetHandle materialHandle;
+};
 
 class IRenderer {
   public:
     virtual ~IRenderer() = default; // Deconstructor
 
-    // TODO: bring back for lazyloading
-    inline void init(){};        // Main initializing
-    virtual void shutdown() = 0; // Data cleanup
+    // --- Lifecycle ---
 
-    // Main render entry
-    virtual void render(EngineState &state) = 0;
+    virtual void init(EngineState &state) = 0;
+    virtual void shutdown() = 0;
+    virtual void resize(const uint32_t width, const uint32_t height) = 0;
 
-    // Update render output sizes
-    virtual inline void resize(const int width, const int height) {}
+    // --- The Frame Pipeline ---
 
-    // Blit the frame if needed
-    virtual inline void present(const int width, const int height) const {}
+    virtual void beginFrame(EngineState &state) = 0;
+
+    virtual void extract(EngineState &state) = 0;
+    virtual void prepare(EngineState &state) = 0;
+
+    virtual void dispatch(EngineState &state) = 0;
+    virtual void postProcess(EngineState &state) = 0;
+
+    virtual void present(EngineState &state) = 0;
 };
 
 }; // namespace Engine

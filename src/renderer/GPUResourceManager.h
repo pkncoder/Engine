@@ -1,11 +1,12 @@
 #pragma once
 
 #include "../core/EngineContext.h"
-#include "../resources/AssetManager.cpp"
+#include "../resources/AssetManager.h"
 #include "../resources/CPUStructs.h"
 #include "GPUStructs.h"
 
 #include <OpenGL/gltypes.h>
+#include <c++/v1/__config>
 #include <glad/glad.h>
 #include <unordered_map>
 
@@ -21,14 +22,14 @@ class GPUResourceManager {
     static GPUTexture *getOrUploadTexture(AssetHandle assetHandle);
 
   private:
-    static GPUMesh uploadMesh(CPUMeshData mesh);
-    static GPUTexture uploadTexture(CPUTextureData texture);
+    static GPUMesh uploadMesh(CPUMeshData &mesh);
+    static GPUTexture uploadTexture(CPUTextureData &texture);
 
   private:
     static inline AssetManager *assetManager = nullptr;
 
-    static std::unordered_map<AssetHandle, GPUMesh> gpuMeshCache;
-    static std::unordered_map<AssetHandle, GPUTexture> gpuTextureCache;
+    static inline std::unordered_map<AssetHandle, GPUMesh> gpuMeshCache;
+    static inline std::unordered_map<AssetHandle, GPUTexture> gpuTextureCache;
 };
 
 } // namespace Engine
