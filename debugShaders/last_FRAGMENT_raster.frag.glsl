@@ -455,7 +455,7 @@ void main() {
     // Find the local normal through the texture
     vec3 localNormal;
     if (uIsBumpMap == 1) {
-        localNormal = bumpToTangentNormal(uBumpMap, vTexCoords, vWorldPos, 0.06);
+        localNormal = bumpToTangentNormal(uBumpMap, vTexCoords, vWorldPos, 0.02);
     } else {
         localNormal = normalize(texture(uNormalMap, vTexCoords).rgb * 2.0 - 1.0);
     }
