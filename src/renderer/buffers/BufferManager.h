@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../../resources/CPUStructs.h"
-#include "../../scene/components/MeshComponent.h"
-#include "UBO.h"
+#include "GPUBuffer.h"
 
+#include <cstdint>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -11,41 +10,41 @@
 
 namespace Engine {
 
-// Persistant GPU buffer, defaults to a SSBO
-// TODO: Decide on moving the implemtation to the BufferManager
-
 class BufferManager {
   public:
-    // Upload a mesh to the GPU - resturns bindings
-    static MeshComponent uploadMesh(const CPUMeshData &meshData);
+    BufferManager() = default;
+    ~BufferManager();
 
-    // Create a new UBO keyed by name - allocates the block area
-    static void createUBO(const std::string &uboName,
-                          const uint32_t bindingPoint,
-                          const size_t totalBlockSize);
+    // Creation and deletion of buffers
+    BufferHandle createBuffer(const std::string &name, BufferType type,
+                              BufferUsage usage, size_t size,
+                              const void *initialData = nullptr,
+                              bool multiBuffered = false);
+    void destroyBuffer(BufferHandle handle);
 
-    // Reflects against compiled GLSL code to cache exact byte locations
-    static void mapUBOLayout(const std::string &uboName,
-                             const uint32_t programID,
-                             const std::string &blockName,
-                             const std::vector<std::string> &uniformNames);
+    void updateBufferCache(BufferHandle handle, size_t size, size_t offset,
+                           const void *data);
 
-    // Update a uniform
-    static void setUBOValue(const std::string &uboName,
-                            const std::string &uniformName, const void *data,
-                            const size_t dataSize);
+    void pushBuffer(BufferHandle handle, uint32_t globalFrameIndex);
 
-    // Flushes the entire CPU memory region to VRAM at once
-    // TODO: Do this in windows
-    static void pushUBO(const std::string &uboName);
+    void streamData(BufferHandle handle, size_t size, const void *data,
+                    uint32_t globalFrameIndex);
 
-    // UBO cleanup handler
-    static void shutdownUBORegistry();
+    void bindBuffer(BufferHandle handle, uint32_t globalFrameIndex);
+    void bindBufferBase(BufferHandle handle, uint32_t bindingPoint,
+                        uint32_t globalFrameIndex);
+
+    void mapUBOLayout(BufferHandle handle, uint32_t programID,
+                      const std::string &blockName,
+                      const std::vector<std::string> &uniformNames);
+    void setUBOLayout(BufferHandle handle, const std::string &uniformName,
+                      size_t size, const void *data);
+
+    GPUBuffer *getBuffer(BufferHandle handle);
+    GPUBuffer *getBufferByName(const std::string &name);
 
   private:
-    // Mesh and UBO caches
-    static inline std::unordered_map<std::string, MeshComponent> gpuMeshCache;
-    static inline std::unordered_map<std::string, GPUUniformBuffer> uboRegistry;
+    static inline std::unordered_map<BufferHandle, GPUBuffer> bufferRegistry;
 };
 
 } // namespace Engine

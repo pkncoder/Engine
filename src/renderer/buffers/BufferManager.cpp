@@ -1,141 +1,305 @@
 #include "BufferManager.h"
 
 #include "../../services/Logger.h"
-#include "UBO.h"
+#include "../../services/UUID.h"
+#include "GPUBuffer.h"
 
-#include <cstring>
+#include <cstdint>
+#include <unordered_map>
+#include <vector>
 
 namespace Engine {
 
-void BufferManager::createUBO(const std::string &uboName,
-                              const uint32_t bindingPoint,
-                              const size_t totalBlockSize) {
+BufferManager::~BufferManager() {}
 
-    // Check to see if the UBO has already been created
-    if (uboRegistry.find(uboName) != uboRegistry.end())
-        return;
+BufferHandle BufferManager::createBuffer(const std::string &name,
+                                         BufferType type, BufferUsage usage,
+                                         size_t size, const void *initialData,
+                                         bool multiBuffered) {
 
-    // Create the ubo and set attributes
-    GPUUniformBuffer ubo;
-    ubo.bindingPoint = bindingPoint;
-    ubo.size = totalBlockSize;
-    ubo.cpuCache.resize(totalBlockSize, 0);
+    GPUBuffer buffer;
+    buffer.name = name;
+    buffer.handle = UUID();
 
-    auto createUBOBuffer = [&](GLuint &uboId) {
-        glGenBuffers(1, &uboId);
-        glBindBuffer(GL_UNIFORM_BUFFER, uboId);
+    buffer.size = size;
+    buffer.type = type;
 
-        glBufferData(GL_UNIFORM_BUFFER, totalBlockSize, nullptr,
-                     GL_DYNAMIC_DRAW);
-        glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, uboId);
+    buffer.multiBuffered = multiBuffered;
 
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    };
+    buffer.cpuCache = std::vector<uint8_t>();
 
-    createUBOBuffer(ubo.frontBuffer);
-    createUBOBuffer(ubo.backBuffer);
+    if (type == BufferType::UniformBuffer) {
+        buffer.uniformOffsets = std::unordered_map<std::string, size_t>();
+    }
 
-    // Save the ubo to the registry
-    uboRegistry[uboName] = ubo;
+    uint32_t buffersToGenerate = multiBuffered ? FRAMES_IN_FLIGHT : 1;
+    glGenBuffers(buffersToGenerate, buffer.ids);
+
+    GLenum glType = static_cast<GLenum>(type);
+    GLenum glUsage = static_cast<GLenum>(usage);
+
+    for (uint32_t i = 0; i < buffersToGenerate; i++) {
+        glBindBuffer(glType, buffer.ids[i]);
+        glBufferData(glType, size, initialData, glUsage);
+
+        glBindBuffer(glType, 0);
+
+        bufferRegistry[buffer.handle] = std::move(buffer);
+    }
+
+    if (usage == BufferUsage::Dynamic) {
+        buffer.cpuCache.resize(size, 0);
+        if (initialData) {
+            std::memcpy(buffer.cpuCache.data(), initialData, size);
+        }
+    }
+
+    return buffer.handle;
 }
 
-void BufferManager::mapUBOLayout(const std::string &uboName,
-                                 const uint32_t programID,
+void BufferManager::destroyBuffer(BufferHandle handle) {
+
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end()) {
+        Logger::error("BUFFER",
+                      "Buffer not found. BufferManager::destroyBuffer");
+        return;
+    }
+
+    GPUBuffer &buffer = ittr->second;
+
+    size_t numBuffers = buffer.multiBuffered ? FRAMES_IN_FLIGHT : 1;
+    glDeleteBuffers(numBuffers, buffer.ids);
+
+    bufferRegistry.erase(handle);
+}
+
+void BufferManager::streamData(BufferHandle handle, size_t size,
+                               const void *data, uint32_t globalFrameIndex) {
+    auto it = bufferRegistry.find(handle);
+    if (it == bufferRegistry.end())
+        return;
+
+    const GPUBuffer &buf = it->second;
+
+    // Safety check: Only Stream buffers use this high-frequency update path
+    if (buf.usage != BufferUsage::Stream) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to streamBuffer on a non-stream buffer: " +
+                          buf.name);
+        return;
+    }
+
+    // Ensure we don't write out of bounds
+    if (size > buf.size) {
+        Logger::error("BUFFER_MGR",
+                      "Stream size exceeds buffer capacity for: " + buf.name);
+        return;
+    }
+
+    // Resolve the active frame ID
+    GLuint activeID = buf.multiBuffered
+                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buf.ids[0];
+    GLenum glType = static_cast<GLenum>(buf.type);
+
+    glBindBuffer(glType, activeID);
+
+    // OpenGL 4.1 Buffer Orphaning:
+    // Pass nullptr to force the driver to give us a brand new block of VRAM
+    // so we don't stall waiting for the GPU to finish reading the old block.
+    glBufferData(glType, buf.size, nullptr, GL_STREAM_DRAW);
+
+    // Map the new memory block, copy the data, and unmap
+    void *mappedPtr = glMapBufferRange(
+        glType, 0, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+    if (mappedPtr) {
+        std::memcpy(mappedPtr, data, size);
+        glUnmapBuffer(glType);
+    }
+
+    glBindBuffer(glType, 0);
+}
+
+void BufferManager::updateBufferCache(BufferHandle handle, size_t offset,
+                                      size_t size, const void *data) {
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end()) {
+        Logger::error("BUFFER",
+                      "Buffer not found. BufferManager::updateBufferCache");
+        return;
+    }
+
+    GPUBuffer &buffer = ittr->second;
+
+    if (offset + size < buffer.size) {
+        Logger::error("BUFFER", "Buffer Out-Of-Bounds error prevented "
+                                "BufferManager::updateBufferCache");
+        return;
+    }
+
+    std::memcpy(buffer.cpuCache.data() + offset, data, size);
+}
+
+void BufferManager::pushBuffer(BufferHandle handle, uint32_t globalFrameIndex) {
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end())
+        return;
+
+    const GPUBuffer &buf = ittr->second;
+
+    // Safety check: Only Dynamic buffers use the CPU cache pushing mechanism
+    if (buf.usage != BufferUsage::Dynamic) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to pushBuffer on a non-dynamic buffer: " +
+                          buf.name);
+        return;
+    }
+
+    // Resolve the active frame ID
+    GLuint activeID = buf.multiBuffered
+                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buf.ids[0];
+    GLenum glType = static_cast<GLenum>(buf.type);
+
+    // Bind, push the shadowed CPU cache, and unbind
+    glBindBuffer(glType, activeID);
+    glBufferSubData(glType, 0, buf.size, buf.cpuCache.data());
+    glBindBuffer(glType, 0);
+}
+
+void BufferManager::bindBuffer(BufferHandle handle, uint32_t globalFrameIndex) {
+    auto it = bufferRegistry.find(handle);
+    if (it == bufferRegistry.end()) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to bind invalid buffer handle: " +
+                          std::to_string(handle));
+        return;
+    }
+
+    const GPUBuffer &buf = it->second;
+
+    // Dynamically resolve the correct OpenGL ID based on the current frame
+    GLuint activeID = buf.multiBuffered
+                          ? buf.ids[globalFrameIndex & FRAMES_IN_FLIGHT]
+                          : buf.ids[0];
+
+    glBindBuffer(static_cast<GLenum>(buf.type), activeID);
+}
+
+void BufferManager::bindBufferBase(BufferHandle handle, uint32_t bindingPoint,
+                                   uint32_t globalFrameIndex) {
+    auto it = bufferRegistry.find(handle);
+    if (it != bufferRegistry.end()) {
+        const GPUBuffer &buf = it->second;
+
+        GLuint activeID = buf.multiBuffered
+                              ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                              : buf.ids[0];
+
+        glBindBufferBase(static_cast<GLenum>(buf.type), bindingPoint, activeID);
+    }
+}
+
+void BufferManager::mapUBOLayout(BufferHandle handle, uint32_t programID,
                                  const std::string &blockName,
                                  const std::vector<std::string> &uniformNames) {
 
-    // Try to find the ubo
-    auto it = uboRegistry.find(uboName);
-    if (it == uboRegistry.end()) {
+    auto it = bufferRegistry.find(handle);
+    if (it == bufferRegistry.end()) {
         Logger::error("BUFFER_MGR",
-                      "Cannot map layout to unallocated UBO channel: " +
-                          uboName);
+                      "Cannot map layout to unallocated UBO handle: " +
+                          std::to_string(handle));
         return;
     }
 
-    // Get the found UBO
-    GPUUniformBuffer &ubo = it->second;
+    GPUBuffer &buffer = it->second;
 
-    // Link shader programmatic location index to global physical binding port
-    // Get the index & block name of the uniform block
+    // Safety check: Ensure this is actually a UBO
+    if (buffer.type != BufferType::UniformBuffer) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to map UBO layout on a non-UBO buffer: " +
+                          buffer.name);
+        return;
+    }
+
+    // 2. Get the index of the uniform block within the shader program
     GLuint blockIndex = glGetUniformBlockIndex(programID, blockName.c_str());
-    if (blockIndex == GL_INVALID_INDEX)
-        return; // Pass might not use this block, ignore safely
-
-    // Set the binding point at the index
-    glUniformBlockBinding(programID, blockIndex, ubo.bindingPoint);
-
-    // Find the uniform offsets
+    if (blockIndex == GL_INVALID_INDEX) {
+        // The shader compiler often optimizes out unused blocks. Don't crash,
+        // just ignore.
+        return;
+    }
     for (const auto &name : uniformNames) {
-
-        // Querry the indice
         const char *nameCStr = name.c_str();
         GLuint uniformIndex;
+
+        // Query OpenGL for the specific index of this variable
         glGetUniformIndices(programID, 1, &nameCStr, &uniformIndex);
 
         if (uniformIndex != GL_INVALID_INDEX) {
-
-            // Get the uniform offset & save it to the ubo
             GLint offset = 0;
+            // Query OpenGL for the byte offset of that index
             glGetActiveUniformsiv(programID, 1, &uniformIndex,
                                   GL_UNIFORM_OFFSET, &offset);
-            ubo.uniformOffsets[name] = static_cast<size_t>(offset);
+
+            // Cache the offset in the GPUBuffer struct
+            buffer.uniformOffsets[name] = static_cast<size_t>(offset);
         }
     }
 }
 
-void BufferManager::setUBOValue(const std::string &uboName,
-                                const std::string &uniformName,
-                                const void *data, const size_t dataSize) {
-
-    // Look to see if the ubo exists
-    auto it = uboRegistry.find(uboName);
-    if (it == uboRegistry.end())
+void BufferManager::setUBOLayout(BufferHandle handle,
+                                 const std::string &uniformName, size_t size,
+                                 const void *data) {
+    auto it = bufferRegistry.find(handle);
+    if (it == bufferRegistry.end())
         return;
 
-    // Get the offset of the uniform
-    GPUUniformBuffer &ubo = it->second;
-    auto offsetIt = ubo.uniformOffsets.find(uniformName);
-    if (offsetIt == ubo.uniformOffsets.end())
-        return; // Shader doesn't actively use this variable
+    GPUBuffer &buffer = it->second;
 
-    // Update the ubo cpuCache based on offset
+    // 2. Look up the cached byte offset for this specific variable
+    auto offsetIt = buffer.uniformOffsets.find(uniformName);
+    if (offsetIt == buffer.uniformOffsets.end()) {
+        // Variable wasn't found (likely optimized out by the GLSL compiler).
+        // Safely ignore.
+        return;
+    }
+
     size_t targetOffset = offsetIt->second;
-    if (targetOffset + dataSize <= ubo.size) { // Check for no bound error
-        std::memcpy(ubo.cpuCache.data() + targetOffset, data, dataSize);
+
+    // 3. Safety bounds check before modifying memory
+    if (targetOffset + size <= buffer.size) {
+        // Copy the new data into the CPU cache shadow copy
+        std::memcpy(buffer.cpuCache.data() + targetOffset, data, size);
+    } else {
+        Logger::error("BUFFER_MGR",
+                      "Buffer overflow prevented in UBO: " + buffer.name +
+                          " for uniform: " + uniformName);
     }
 }
 
-void BufferManager::pushUBO(const std::string &uboName) {
+GPUBuffer *BufferManager::getBuffer(BufferHandle handle) {
+    auto ittr = bufferRegistry.find(handle);
 
-    // Try to find the ubo in the registry
-    auto it = uboRegistry.find(uboName);
-    if (it == uboRegistry.end())
-        return;
+    if (ittr == bufferRegistry.end()) {
+        Logger::error("BUFFER", "Failed to find buffer : getBuffer");
+    }
 
-    // Subsitue the new data
-    // TODO: offsets / windows
-    const GPUUniformBuffer &ubo = it->second;
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo.backBuffer);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, ubo.size, ubo.cpuCache.data());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    return &ittr->second;
 }
 
-void BufferManager::shutdownUBORegistry() {
+GPUBuffer *BufferManager::getBufferByName(const std::string &name) {
 
-    // Loop each UBO and delete it's buffer
-    for (auto &[name, ubo] : uboRegistry) {
-        if (ubo.frontBuffer != 0) {
-            glDeleteBuffers(1, &ubo.frontBuffer);
-        }
-
-        if (ubo.backBuffer != 0) {
-            glDeleteBuffers(1, &ubo.backBuffer);
+    for (auto &[handle, buffer] : bufferRegistry) {
+        if (buffer.name == name) {
+            return &buffer;
         }
     }
 
-    // Clear remaining data
-    uboRegistry.clear();
+    Logger::error("BUFFER", "Buffer not found by name");
+
+    return nullptr;
 }
 
 } // namespace Engine

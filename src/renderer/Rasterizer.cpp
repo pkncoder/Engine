@@ -316,7 +316,6 @@ void Rasterizer::dispatch(EngineState &state) {
         bindMap(bumpTex, "uBumpMap", defaultWhiteTexture, shader);
 
         if (bumpTex && !normalTex) {
-            Logger::debug("BUMP: " + cpuMat->name);
             shader.setInt("uIsBumpMap", 1);
 
         } else {

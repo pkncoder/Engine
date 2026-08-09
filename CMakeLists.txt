@@ -31,7 +31,6 @@ set(SOURCES
     src/core/EngineContext.cpp
     src/core/Window.cpp
     src/renderer/buffers/BufferManager.cpp
-    src/renderer/buffers/SSBO.cpp
     src/renderer/GPUResourceManager.cpp
     # src/renderer/PathTracer.cpp
     src/renderer/Rasterizer.cpp
