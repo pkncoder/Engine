@@ -5,7 +5,7 @@
 
 namespace Engine {
 
-GPUMesh *GPUResourceManager::getOrUploadMesh(AssetHandle handle) {
+GPUMesh *GPUResourceManager::getOrUploadMesh(const AssetHandle handle) {
     auto it = gpuMeshCache.find(handle);
     if (it != gpuMeshCache.end()) {
         return &it->second;
@@ -23,7 +23,7 @@ GPUMesh *GPUResourceManager::getOrUploadMesh(AssetHandle handle) {
     return &gpuMeshCache[handle];
 }
 
-GPUTexture *GPUResourceManager::getOrUploadTexture(AssetHandle handle) {
+GPUTexture *GPUResourceManager::getOrUploadTexture(const AssetHandle handle) {
     auto it = gpuTextureCache.find(handle);
     if (it != gpuTextureCache.end()) {
         return &it->second;
@@ -39,7 +39,7 @@ GPUTexture *GPUResourceManager::getOrUploadTexture(AssetHandle handle) {
     return &gpuTextureCache[handle];
 }
 
-GPUMesh GPUResourceManager::uploadMesh(CPUMeshData &meshData) {
+GPUMesh GPUResourceManager::uploadMesh(const CPUMeshData &meshData) {
 
     // Create the new mesh component and set the index count
     GPUMesh gpuMesh;
@@ -86,7 +86,8 @@ GPUMesh GPUResourceManager::uploadMesh(CPUMeshData &meshData) {
     return gpuMesh;
 }
 
-GPUTexture GPUResourceManager::uploadTexture(CPUTextureData &textureData) {
+GPUTexture
+GPUResourceManager::uploadTexture(const CPUTextureData &textureData) {
 
     GPUTexture gpuTexture;
 

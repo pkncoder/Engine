@@ -44,6 +44,7 @@ struct alignas(16) GPUMaterial {
 };
 
 struct alignas(16) GPUMesh {
+  public:
     GLuint vao;
     GLuint vbo;
     GLuint ebo;
@@ -51,6 +52,7 @@ struct alignas(16) GPUMesh {
 };
 
 struct alignas(16) GPUTexture {
+  public:
     GLuint textureID;
 };
 

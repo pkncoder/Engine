@@ -12,10 +12,10 @@ namespace Engine {
 
 BufferManager::~BufferManager() {}
 
-BufferHandle BufferManager::createBuffer(const std::string &name,
-                                         BufferType type, BufferUsage usage,
-                                         size_t size, const void *initialData,
-                                         bool multiBuffered) {
+BufferHandle
+BufferManager::createBuffer(const std::string &name, const BufferType type,
+                            const BufferUsage usage, const size_t size,
+                            const void *initialData, const bool multiBuffered) {
 
     GPUBuffer buffer;
     buffer.name = name;
@@ -57,7 +57,7 @@ BufferHandle BufferManager::createBuffer(const std::string &name,
     return buffer.handle;
 }
 
-void BufferManager::destroyBuffer(BufferHandle handle) {
+void BufferManager::destroyBuffer(const BufferHandle handle) {
 
     auto ittr = bufferRegistry.find(handle);
     if (ittr == bufferRegistry.end()) {
@@ -74,55 +74,32 @@ void BufferManager::destroyBuffer(BufferHandle handle) {
     bufferRegistry.erase(handle);
 }
 
-void BufferManager::streamData(BufferHandle handle, size_t size,
-                               const void *data, uint32_t globalFrameIndex) {
-    auto it = bufferRegistry.find(handle);
-    if (it == bufferRegistry.end())
-        return;
+GPUBuffer *BufferManager::getBuffer(const BufferHandle handle) {
+    auto ittr = bufferRegistry.find(handle);
 
-    const GPUBuffer &buf = it->second;
-
-    // Safety check: Only Stream buffers use this high-frequency update path
-    if (buf.usage != BufferUsage::Stream) {
-        Logger::error("BUFFER_MGR",
-                      "Attempted to streamBuffer on a non-stream buffer: " +
-                          buf.name);
-        return;
+    if (ittr == bufferRegistry.end()) {
+        Logger::error("BUFFER", "Failed to find buffer : getBuffer");
     }
 
-    // Ensure we don't write out of bounds
-    if (size > buf.size) {
-        Logger::error("BUFFER_MGR",
-                      "Stream size exceeds buffer capacity for: " + buf.name);
-        return;
-    }
-
-    // Resolve the active frame ID
-    GLuint activeID = buf.multiBuffered
-                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                          : buf.ids[0];
-    GLenum glType = static_cast<GLenum>(buf.type);
-
-    glBindBuffer(glType, activeID);
-
-    // OpenGL 4.1 Buffer Orphaning:
-    // Pass nullptr to force the driver to give us a brand new block of VRAM
-    // so we don't stall waiting for the GPU to finish reading the old block.
-    glBufferData(glType, buf.size, nullptr, GL_STREAM_DRAW);
-
-    // Map the new memory block, copy the data, and unmap
-    void *mappedPtr = glMapBufferRange(
-        glType, 0, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-    if (mappedPtr) {
-        std::memcpy(mappedPtr, data, size);
-        glUnmapBuffer(glType);
-    }
-
-    glBindBuffer(glType, 0);
+    return &ittr->second;
 }
 
-void BufferManager::updateBufferCache(BufferHandle handle, size_t offset,
-                                      size_t size, const void *data) {
+GPUBuffer *BufferManager::getBufferByName(const std::string &name) {
+
+    for (auto &[handle, buffer] : bufferRegistry) {
+        if (buffer.name == name) {
+            return &buffer;
+        }
+    }
+
+    Logger::error("BUFFER", "Buffer not found by name");
+
+    return nullptr;
+}
+
+void BufferManager::updateBufferCache(const BufferHandle handle,
+                                      const size_t offset, const size_t size,
+                                      const void *data) {
     auto ittr = bufferRegistry.find(handle);
     if (ittr == bufferRegistry.end()) {
         Logger::error("BUFFER",
@@ -141,67 +118,8 @@ void BufferManager::updateBufferCache(BufferHandle handle, size_t offset,
     std::memcpy(buffer.cpuCache.data() + offset, data, size);
 }
 
-void BufferManager::pushBuffer(BufferHandle handle, uint32_t globalFrameIndex) {
-    auto ittr = bufferRegistry.find(handle);
-    if (ittr == bufferRegistry.end())
-        return;
-
-    const GPUBuffer &buf = ittr->second;
-
-    // Safety check: Only Dynamic buffers use the CPU cache pushing mechanism
-    if (buf.usage != BufferUsage::Dynamic) {
-        Logger::error("BUFFER_MGR",
-                      "Attempted to pushBuffer on a non-dynamic buffer: " +
-                          buf.name);
-        return;
-    }
-
-    // Resolve the active frame ID
-    GLuint activeID = buf.multiBuffered
-                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                          : buf.ids[0];
-    GLenum glType = static_cast<GLenum>(buf.type);
-
-    // Bind, push the shadowed CPU cache, and unbind
-    glBindBuffer(glType, activeID);
-    glBufferSubData(glType, 0, buf.size, buf.cpuCache.data());
-    glBindBuffer(glType, 0);
-}
-
-void BufferManager::bindBuffer(BufferHandle handle, uint32_t globalFrameIndex) {
-    auto it = bufferRegistry.find(handle);
-    if (it == bufferRegistry.end()) {
-        Logger::error("BUFFER_MGR",
-                      "Attempted to bind invalid buffer handle: " +
-                          std::to_string(handle));
-        return;
-    }
-
-    const GPUBuffer &buf = it->second;
-
-    // Dynamically resolve the correct OpenGL ID based on the current frame
-    GLuint activeID = buf.multiBuffered
-                          ? buf.ids[globalFrameIndex & FRAMES_IN_FLIGHT]
-                          : buf.ids[0];
-
-    glBindBuffer(static_cast<GLenum>(buf.type), activeID);
-}
-
-void BufferManager::bindBufferBase(BufferHandle handle, uint32_t bindingPoint,
-                                   uint32_t globalFrameIndex) {
-    auto it = bufferRegistry.find(handle);
-    if (it != bufferRegistry.end()) {
-        const GPUBuffer &buf = it->second;
-
-        GLuint activeID = buf.multiBuffered
-                              ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                              : buf.ids[0];
-
-        glBindBufferBase(static_cast<GLenum>(buf.type), bindingPoint, activeID);
-    }
-}
-
-void BufferManager::mapUBOLayout(BufferHandle handle, uint32_t programID,
+void BufferManager::mapUBOLayout(const BufferHandle handle,
+                                 const uint32_t programID,
                                  const std::string &blockName,
                                  const std::vector<std::string> &uniformNames) {
 
@@ -249,9 +167,9 @@ void BufferManager::mapUBOLayout(BufferHandle handle, uint32_t programID,
     }
 }
 
-void BufferManager::setUBOLayout(BufferHandle handle,
-                                 const std::string &uniformName, size_t size,
-                                 const void *data) {
+void BufferManager::setUBOLayout(const BufferHandle handle,
+                                 const std::string &uniformName,
+                                 const size_t size, const void *data) {
     auto it = bufferRegistry.find(handle);
     if (it == bufferRegistry.end())
         return;
@@ -279,27 +197,115 @@ void BufferManager::setUBOLayout(BufferHandle handle,
     }
 }
 
-GPUBuffer *BufferManager::getBuffer(BufferHandle handle) {
-    auto ittr = bufferRegistry.find(handle);
-
-    if (ittr == bufferRegistry.end()) {
-        Logger::error("BUFFER", "Failed to find buffer : getBuffer");
+void BufferManager::bindBuffer(const BufferHandle handle,
+                               const uint32_t globalFrameIndex) const {
+    auto it = bufferRegistry.find(handle);
+    if (it == bufferRegistry.end()) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to bind invalid buffer handle: " +
+                          std::to_string(handle));
+        return;
     }
 
-    return &ittr->second;
+    const GPUBuffer &buf = it->second;
+
+    // Dynamically resolve the correct OpenGL ID based on the current frame
+    GLuint activeID = buf.multiBuffered
+                          ? buf.ids[globalFrameIndex & FRAMES_IN_FLIGHT]
+                          : buf.ids[0];
+
+    glBindBuffer(static_cast<GLenum>(buf.type), activeID);
 }
 
-GPUBuffer *BufferManager::getBufferByName(const std::string &name) {
+void BufferManager::bindBufferBase(const BufferHandle handle,
+                                   const uint32_t bindingPoint,
+                                   const uint32_t globalFrameIndex) const {
+    auto it = bufferRegistry.find(handle);
+    if (it != bufferRegistry.end()) {
+        const GPUBuffer &buf = it->second;
 
-    for (auto &[handle, buffer] : bufferRegistry) {
-        if (buffer.name == name) {
-            return &buffer;
-        }
+        GLuint activeID = buf.multiBuffered
+                              ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                              : buf.ids[0];
+
+        glBindBufferBase(static_cast<GLenum>(buf.type), bindingPoint, activeID);
+    }
+}
+
+void BufferManager::streamData(const BufferHandle handle, const size_t size,
+                               const void *data,
+                               const uint32_t globalFrameIndex) const {
+    auto it = bufferRegistry.find(handle);
+    if (it == bufferRegistry.end())
+        return;
+
+    const GPUBuffer &buf = it->second;
+
+    // Safety check: Only Stream buffers use this high-frequency update path
+    if (buf.usage != BufferUsage::Stream) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to streamBuffer on a non-stream buffer: " +
+                          buf.name);
+        return;
     }
 
-    Logger::error("BUFFER", "Buffer not found by name");
+    // Ensure we don't write out of bounds
+    if (size > buf.size) {
+        Logger::error("BUFFER_MGR",
+                      "Stream size exceeds buffer capacity for: " + buf.name);
+        return;
+    }
 
-    return nullptr;
+    // Resolve the active frame ID
+    GLuint activeID = buf.multiBuffered
+                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buf.ids[0];
+    GLenum glType = static_cast<GLenum>(buf.type);
+
+    glBindBuffer(glType, activeID);
+
+    // OpenGL 4.1 Buffer Orphaning:
+    // Pass nullptr to force the driver to give us a brand new block of VRAM
+    // so we don't stall waiting for the GPU to finish reading the old block.
+    glBufferData(glType, buf.size, nullptr, GL_STREAM_DRAW);
+
+    // Map the new memory block, copy the data, and unmap
+    void *mappedPtr = glMapBufferRange(
+        glType, 0, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+    if (mappedPtr) {
+        std::memcpy(mappedPtr, data, size);
+        glUnmapBuffer(glType);
+    }
+
+    glBindBuffer(glType, 0);
+}
+
+void BufferManager::pushBuffer(const BufferHandle handle,
+                               const uint32_t globalFrameIndex) const {
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end())
+        return;
+
+    const GPUBuffer &buf = ittr->second;
+
+    // Safety check: Only Dynamic buffers use the CPU cache pushing mechanism
+    if (buf.usage != BufferUsage::Dynamic) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to pushBuffer on a non-dynamic buffer: " +
+                          buf.name);
+        return;
+    }
+
+    // Resolve the active frame ID
+    GLuint activeID = buf.multiBuffered
+                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buf.ids[0];
+    GLenum glType = static_cast<GLenum>(buf.type);
+
+    // Bind, push the shadowed CPU cache, and unbind
+    glBindBuffer(glType, activeID);
+    glBufferSubData(glType, 0, buf.size, buf.cpuCache.data());
+    glBindBuffer(glType, 0);
 }
 
 } // namespace Engine

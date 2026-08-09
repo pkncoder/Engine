@@ -30,7 +30,7 @@ enum class BufferType {
 };
 
 struct GPUBuffer {
-
+  public:
     BufferHandle handle = INVALID_BUFFER_HANDLE; // TODO: Kepp or no
     std::string name;
 

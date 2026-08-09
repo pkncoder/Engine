@@ -80,7 +80,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Figure out moving around engineState so everything has the same object
 - [ ] Figure out how to handle setting glfw & glad settings; if it should just be a function like it is now, or different
 - [ ] Application is dumping core on quit
-- [ ] Set naming convention for the resource management to caches & registries 
+- [ ] Set naming convention for the resource management to caches & registries
 - [ ] Move services into engine context
 
 ### Todo - Not Code
@@ -138,17 +138,17 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 
 ### Refactor Checklist
 
-1. [ ] Fix warnings
-2. [ ] Fix public vs. private
-3. [ ] Make functions const when needed
-4. [ ] Make function params const when needed
-5. [ ] Make functions inline when needed
-6. [ ] Fix placement of functions
+1. [x] Fix warnings
+2. [x] Fix public vs. private
+3. [x] Make functions const when needed
+4. [x] Make function params const when needed
+5. [x] Make functions inline when needed
+6. [x] Fix placement of functions
 7. [ ] Refactor step by step in code
 8. [ ] Rename things
 9. [ ] Add comments
 10. [ ] Place the \#includes in the right spots
-11. [ ] Run ```./fullTest```
+11. [ ] Run `./fullTest`
 12. [ ] Fix file tree
 13. [ ] Update the obsidian canvas & png
 14. [ ] Update the website

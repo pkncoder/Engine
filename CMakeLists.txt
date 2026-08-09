@@ -32,6 +32,7 @@ set(SOURCES
     src/core/Window.cpp
     src/renderer/buffers/BufferManager.cpp
     src/renderer/GPUResourceManager.cpp
+    src/renderer/IRenderer.cpp
     # src/renderer/PathTracer.cpp
     src/renderer/Rasterizer.cpp
     src/renderer/RendererManager.cpp

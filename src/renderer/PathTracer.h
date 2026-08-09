@@ -7,7 +7,6 @@
 #include "../scene/Scene.h"
 #include "GPUStructs.h"
 #include "Shader.h"
-#include "buffers/SSBO.h"
 
 #include <glm/glm.hpp>
 

@@ -34,15 +34,15 @@ struct RenderTarget {
 // Structure to define a pass
 struct ShaderPass {
   public:
-    void addTextureInput(AssetHandle textureHandle) {
+    inline void addTextureInput(AssetHandle textureHandle) {
         textureInputs.push_back(textureHandle);
     }
 
-    void addRenderTarget(RenderTargetHandle renderTargetHandle) {
+    inline void addRenderTarget(RenderTargetHandle renderTargetHandle) {
         renderTargets.push_back(renderTargetHandle);
     }
 
-    void addBufferInput(BufferHandle bufferHandle) {
+    inline void addBufferInput(BufferHandle bufferHandle) {
         bufferInputs.push_back(bufferHandle);
     }
 

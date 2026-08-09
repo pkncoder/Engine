@@ -18,12 +18,12 @@ class GPUResourceManager {
         assetManager = _assetManager;
     }
 
-    static GPUMesh *getOrUploadMesh(AssetHandle assetHandle);
-    static GPUTexture *getOrUploadTexture(AssetHandle assetHandle);
+    static GPUMesh *getOrUploadMesh(const AssetHandle assetHandle);
+    static GPUTexture *getOrUploadTexture(const AssetHandle assetHandle);
 
   private:
-    static GPUMesh uploadMesh(CPUMeshData &mesh);
-    static GPUTexture uploadTexture(CPUTextureData &texture);
+    static GPUMesh uploadMesh(const CPUMeshData &mesh);
+    static GPUTexture uploadTexture(const CPUTextureData &texture);
 
   private:
     static inline AssetManager *assetManager = nullptr;
