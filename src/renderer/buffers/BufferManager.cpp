@@ -17,6 +17,7 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
                             const BufferUsage usage, const size_t size,
                             const void *initialData, const bool multiBuffered) {
 
+    // Setup the new buffer & attributes
     GPUBuffer buffer;
     buffer.name = name;
     buffer.handle = UUID();
@@ -32,24 +33,31 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
         buffer.uniformOffsets = std::unordered_map<std::string, size_t>();
     }
 
+    // Generate as many gl buffers as needed & asign the ids
     uint32_t buffersToGenerate = multiBuffered ? FRAMES_IN_FLIGHT : 1;
     glGenBuffers(buffersToGenerate, buffer.ids);
 
+    // Get the opengl type & usage of the buffers
     GLenum glType = static_cast<GLenum>(type);
     GLenum glUsage = static_cast<GLenum>(usage);
 
+    // Loop over each buffer to generate
     for (uint32_t i = 0; i < buffersToGenerate; i++) {
+        // Bind the buffer & the initial data
         glBindBuffer(glType, buffer.ids[i]);
         glBufferData(glType, size, initialData, glUsage);
-
-        glBindBuffer(glType, 0);
-
-        bufferRegistry[buffer.handle] = std::move(buffer);
     }
 
+    // Unbind the buffer
+    glBindBuffer(glType, 0);
+
+    // Save the buffer into the registry
+    bufferRegistry[buffer.handle] = std::move(buffer);
+
+    // If the buffer is dynamic, resize the cpu cache
     if (usage == BufferUsage::Dynamic) {
         buffer.cpuCache.resize(size, 0);
-        if (initialData) {
+        if (initialData) { // memcpy any initial data if it exists
             std::memcpy(buffer.cpuCache.data(), initialData, size);
         }
     }
@@ -59,6 +67,7 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
 
 void BufferManager::destroyBuffer(const BufferHandle handle) {
 
+    // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
     if (ittr == bufferRegistry.end()) {
         Logger::error("BUFFER",
@@ -66,32 +75,41 @@ void BufferManager::destroyBuffer(const BufferHandle handle) {
         return;
     }
 
+    // Get the refrence
     GPUBuffer &buffer = ittr->second;
 
+    // Figure out how many buffers to generate & delete them
     size_t numBuffers = buffer.multiBuffered ? FRAMES_IN_FLIGHT : 1;
     glDeleteBuffers(numBuffers, buffer.ids);
 
+    // Erase the handle & buffer, freeing the memory
     bufferRegistry.erase(handle);
 }
 
 GPUBuffer *BufferManager::getBuffer(const BufferHandle handle) {
-    auto ittr = bufferRegistry.find(handle);
 
+    // Find the target buffer
+    auto ittr = bufferRegistry.find(handle);
     if (ittr == bufferRegistry.end()) {
         Logger::error("BUFFER", "Failed to find buffer : getBuffer");
     }
 
+    // Return a refrence
     return &ittr->second;
 }
 
 GPUBuffer *BufferManager::getBufferByName(const std::string &name) {
 
+    // Loop over each buffer in the registry
     for (auto &[handle, buffer] : bufferRegistry) {
+
+        // Try to match the name, if found return the buffer
         if (buffer.name == name) {
             return &buffer;
         }
     }
 
+    // No buffer matched
     Logger::error("BUFFER", "Buffer not found by name");
 
     return nullptr;
@@ -100,6 +118,8 @@ GPUBuffer *BufferManager::getBufferByName(const std::string &name) {
 void BufferManager::updateBufferCache(const BufferHandle handle,
                                       const size_t offset, const size_t size,
                                       const void *data) {
+
+    // Find target buffer
     auto ittr = bufferRegistry.find(handle);
     if (ittr == bufferRegistry.end()) {
         Logger::error("BUFFER",
@@ -107,14 +127,17 @@ void BufferManager::updateBufferCache(const BufferHandle handle,
         return;
     }
 
+    // Obtain a refrence
     GPUBuffer &buffer = ittr->second;
 
-    if (offset + size < buffer.size) {
+    // Check for out of bounds error
+    if (offset + size <= buffer.size) {
         Logger::error("BUFFER", "Buffer Out-Of-Bounds error prevented "
                                 "BufferManager::updateBufferCache");
         return;
     }
 
+    // memcpy the data to the cpu cache
     std::memcpy(buffer.cpuCache.data() + offset, data, size);
 }
 
@@ -123,17 +146,19 @@ void BufferManager::mapUBOLayout(const BufferHandle handle,
                                  const std::string &blockName,
                                  const std::vector<std::string> &uniformNames) {
 
-    auto it = bufferRegistry.find(handle);
-    if (it == bufferRegistry.end()) {
+    // Find the target buffer
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end()) {
         Logger::error("BUFFER_MGR",
                       "Cannot map layout to unallocated UBO handle: " +
                           std::to_string(handle));
         return;
     }
 
-    GPUBuffer &buffer = it->second;
+    // Get the refrence
+    GPUBuffer &buffer = ittr->second;
 
-    // Safety check: Ensure this is actually a UBO
+    // Make sure this buffer is actually a UBO
     if (buffer.type != BufferType::UniformBuffer) {
         Logger::error("BUFFER_MGR",
                       "Attempted to map UBO layout on a non-UBO buffer: " +
@@ -141,22 +166,27 @@ void BufferManager::mapUBOLayout(const BufferHandle handle,
         return;
     }
 
-    // 2. Get the index of the uniform block within the shader program
+    // Get the block index from the program
     GLuint blockIndex = glGetUniformBlockIndex(programID, blockName.c_str());
     if (blockIndex == GL_INVALID_INDEX) {
-        // The shader compiler often optimizes out unused blocks. Don't crash,
-        // just ignore.
+        // Ignore the unused block
         return;
     }
+
+    // Loop each name in uniform names
     for (const auto &name : uniformNames) {
+
+        // Get the cStr of the name & create a variable for the uniform index
         const char *nameCStr = name.c_str();
         GLuint uniformIndex;
 
         // Query OpenGL for the specific index of this variable
         glGetUniformIndices(programID, 1, &nameCStr, &uniformIndex);
 
+        // Make sure the index is valid
         if (uniformIndex != GL_INVALID_INDEX) {
             GLint offset = 0;
+
             // Query OpenGL for the byte offset of that index
             glGetActiveUniformsiv(programID, 1, &uniformIndex,
                                   GL_UNIFORM_OFFSET, &offset);
@@ -170,25 +200,28 @@ void BufferManager::mapUBOLayout(const BufferHandle handle,
 void BufferManager::setUBOLayout(const BufferHandle handle,
                                  const std::string &uniformName,
                                  const size_t size, const void *data) {
-    auto it = bufferRegistry.find(handle);
-    if (it == bufferRegistry.end())
+
+    // Find the target buffer
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end())
         return;
 
-    GPUBuffer &buffer = it->second;
+    // Get the refrence
+    GPUBuffer &buffer = ittr->second;
 
-    // 2. Look up the cached byte offset for this specific variable
-    auto offsetIt = buffer.uniformOffsets.find(uniformName);
-    if (offsetIt == buffer.uniformOffsets.end()) {
-        // Variable wasn't found (likely optimized out by the GLSL compiler).
-        // Safely ignore.
+    // Find the target uniform offset
+    auto offsetIttr = buffer.uniformOffsets.find(uniformName);
+    if (offsetIttr == buffer.uniformOffsets.end()) {
+        // Ignore a not found uniform
         return;
     }
 
-    size_t targetOffset = offsetIt->second;
+    // Get the offset
+    size_t targetOffset = offsetIttr->second;
 
-    // 3. Safety bounds check before modifying memory
+    // Check the bounds of the UBO
     if (targetOffset + size <= buffer.size) {
-        // Copy the new data into the CPU cache shadow copy
+        // Copy the new data into the CPU cache
         std::memcpy(buffer.cpuCache.data() + targetOffset, data, size);
     } else {
         Logger::error("BUFFER_MGR",
@@ -199,75 +232,92 @@ void BufferManager::setUBOLayout(const BufferHandle handle,
 
 void BufferManager::bindBuffer(const BufferHandle handle,
                                const uint32_t globalFrameIndex) const {
-    auto it = bufferRegistry.find(handle);
-    if (it == bufferRegistry.end()) {
+
+    // Find the target buffer
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end()) {
         Logger::error("BUFFER_MGR",
                       "Attempted to bind invalid buffer handle: " +
                           std::to_string(handle));
         return;
     }
 
-    const GPUBuffer &buf = it->second;
+    // Get a refrence
+    const GPUBuffer &buffer = ittr->second;
 
-    // Dynamically resolve the correct OpenGL ID based on the current frame
-    GLuint activeID = buf.multiBuffered
-                          ? buf.ids[globalFrameIndex & FRAMES_IN_FLIGHT]
-                          : buf.ids[0];
+    // Get the current id based on the global frame num
+    GLuint activeID = buffer.multiBuffered
+                          ? buffer.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buffer.ids[0];
 
-    glBindBuffer(static_cast<GLenum>(buf.type), activeID);
+    // Bind the buffer
+    glBindBuffer(static_cast<GLenum>(buffer.type), activeID);
 }
 
 void BufferManager::bindBufferBase(const BufferHandle handle,
                                    const uint32_t bindingPoint,
                                    const uint32_t globalFrameIndex) const {
-    auto it = bufferRegistry.find(handle);
-    if (it != bufferRegistry.end()) {
-        const GPUBuffer &buf = it->second;
 
-        GLuint activeID = buf.multiBuffered
-                              ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                              : buf.ids[0];
-
-        glBindBufferBase(static_cast<GLenum>(buf.type), bindingPoint, activeID);
+    // Find the target buffer
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end()) {
+        Logger::error("BUFFER_MGR",
+                      "Attempted to bind invalid buffer handle: " +
+                          std::to_string(handle));
+        return;
     }
+
+    // Obtain a refrence
+    const GPUBuffer &buffer = ittr->second;
+
+    // Get the current id based on the global frame num
+    GLuint activeID = buffer.multiBuffered
+                          ? buffer.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buffer.ids[0];
+
+    // Bind the base of the buffer
+    glBindBufferBase(static_cast<GLenum>(buffer.type), bindingPoint, activeID);
 }
 
 void BufferManager::streamData(const BufferHandle handle, const size_t size,
                                const void *data,
                                const uint32_t globalFrameIndex) const {
-    auto it = bufferRegistry.find(handle);
-    if (it == bufferRegistry.end())
+
+    // Find target buffer
+    auto ittr = bufferRegistry.find(handle);
+    if (ittr == bufferRegistry.end())
         return;
 
-    const GPUBuffer &buf = it->second;
+    // Obtain a refrence
+    const GPUBuffer &buffer = ittr->second;
 
-    // Safety check: Only Stream buffers use this high-frequency update path
-    if (buf.usage != BufferUsage::Stream) {
+    // Make sure this buffer is actually a stream buffer
+    if (buffer.usage != BufferUsage::Stream) {
         Logger::error("BUFFER_MGR",
                       "Attempted to streamBuffer on a non-stream buffer: " +
-                          buf.name);
+                          buffer.name);
         return;
     }
 
-    // Ensure we don't write out of bounds
-    if (size > buf.size) {
+    // Check for out of bounds errors
+    if (size > buffer.size) {
         Logger::error("BUFFER_MGR",
-                      "Stream size exceeds buffer capacity for: " + buf.name);
+                      "Stream size exceeds buffer capacity for: " +
+                          buffer.name);
         return;
     }
 
-    // Resolve the active frame ID
-    GLuint activeID = buf.multiBuffered
-                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                          : buf.ids[0];
-    GLenum glType = static_cast<GLenum>(buf.type);
+    // Resolve the active frame ID based on the global frame number
+    GLuint activeID = buffer.multiBuffered
+                          ? buffer.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buffer.ids[0];
+    GLenum glType = static_cast<GLenum>(buffer.type);
 
+    // Bind the current buffer
     glBindBuffer(glType, activeID);
 
-    // OpenGL 4.1 Buffer Orphaning:
-    // Pass nullptr to force the driver to give us a brand new block of VRAM
-    // so we don't stall waiting for the GPU to finish reading the old block.
-    glBufferData(glType, buf.size, nullptr, GL_STREAM_DRAW);
+    // Pass null to the data to reset the current memory block
+    glBufferData(glType, buffer.size, nullptr, GL_STREAM_DRAW);
 
     // Map the new memory block, copy the data, and unmap
     void *mappedPtr = glMapBufferRange(
@@ -282,29 +332,32 @@ void BufferManager::streamData(const BufferHandle handle, const size_t size,
 
 void BufferManager::pushBuffer(const BufferHandle handle,
                                const uint32_t globalFrameIndex) const {
+
+    // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
     if (ittr == bufferRegistry.end())
         return;
 
-    const GPUBuffer &buf = ittr->second;
+    // Get a refrence to the bfufer
+    const GPUBuffer &buffer = ittr->second;
 
-    // Safety check: Only Dynamic buffers use the CPU cache pushing mechanism
-    if (buf.usage != BufferUsage::Dynamic) {
+    // Make sure this buffer is a dynamic buffer
+    if (buffer.usage != BufferUsage::Dynamic) {
         Logger::error("BUFFER_MGR",
                       "Attempted to pushBuffer on a non-dynamic buffer: " +
-                          buf.name);
+                          buffer.name);
         return;
     }
 
-    // Resolve the active frame ID
-    GLuint activeID = buf.multiBuffered
-                          ? buf.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                          : buf.ids[0];
-    GLenum glType = static_cast<GLenum>(buf.type);
+    // Get the active buffer id based on the global frame num
+    GLuint activeID = buffer.multiBuffered
+                          ? buffer.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
+                          : buffer.ids[0];
+    GLenum glType = static_cast<GLenum>(buffer.type);
 
-    // Bind, push the shadowed CPU cache, and unbind
+    // Bind, push the CPU cache, and unbind
     glBindBuffer(glType, activeID);
-    glBufferSubData(glType, 0, buf.size, buf.cpuCache.data());
+    glBufferSubData(glType, 0, buffer.size, buffer.cpuCache.data());
     glBindBuffer(glType, 0);
 }
 
