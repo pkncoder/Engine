@@ -1,11 +1,12 @@
 #include "IRenderer.h"
 
 #include "../services/UUID.h"
-#include <cstdint>
 
 namespace Engine {
 
 void IRenderer::shutdown() {
+
+    // Loop each render target and delete the texture
     for (auto &[handle, target] : renderTargets) {
         if (target.id != 0) {
             glDeleteTextures(1, &target.id);
@@ -13,23 +14,29 @@ void IRenderer::shutdown() {
         }
     }
 
+    // Clear out registries
     renderTargets.clear();
     renderTargetNameMap.clear();
     shaderPasses.clear();
 }
 
 void IRenderer::resize(const uint32_t newWidth, const uint32_t newHeight) {
+
+    // Check for same size
     if (newWidth == currentWidth && newHeight == currentHeight) {
         return;
     }
 
+    // Check for invalid size
     if (newWidth == 0 || newHeight == 0) {
         return;
     }
 
+    // Set new width & height
     currentWidth = newWidth;
     currentHeight = newHeight;
 
+    // Reset each texture for the render targets
     for (auto &[handle, target] : renderTargets) {
         allocateRenderTarget(target);
     }
@@ -87,16 +94,16 @@ ShaderPass &IRenderer::addShaderPass(const std::string &name,
 }
 
 RenderTarget *IRenderer::getRenderTarget(const RenderTargetHandle handle) {
-    auto it = renderTargets.find(handle);
-    return it != renderTargets.end() ? &it->second : nullptr;
+    // Find the render target via handle, if it exists return a refrance
+    auto ittr = renderTargets.find(handle);
+    return ittr != renderTargets.end() ? &ittr->second : nullptr;
 }
 
 RenderTarget *IRenderer::getRenderTargetByName(const std::string &name) {
-    auto it = renderTargetNameMap.find(name);
-    if (it != renderTargetNameMap.end()) {
-        return &renderTargets[it->second];
-    }
-    return nullptr;
+    // Find the render target via name, if it exists return a refrance
+    auto ittr = renderTargetNameMap.find(name);
+    return ittr != renderTargetNameMap.end() ? &renderTargets[ittr->second]
+                                             : nullptr;
 }
 
 void IRenderer::allocateRenderTarget(RenderTarget &target) const {

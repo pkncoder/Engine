@@ -1,40 +1,49 @@
 #include "GPUResourceManager.h"
+
 #include "../services/Logger.h"
-#include "GPUStructs.h"
-#include <OpenGL/gltypes.h>
 
 namespace Engine {
 
 GPUMesh *GPUResourceManager::getOrUploadMesh(const AssetHandle handle) {
-    auto it = gpuMeshCache.find(handle);
-    if (it != gpuMeshCache.end()) {
-        return &it->second;
+
+    // Find the mesh in the cache and return a refrence
+    auto ittr = gpuMeshCache.find(handle);
+    if (ittr != gpuMeshCache.end()) {
+        return &ittr->second;
     }
 
+    // If it doesn't exist, get the mesh data from asset manager
     auto cpuMesh = assetManager->getMesh(handle);
     if (!cpuMesh) {
         Logger::debug("NOASSETHANDLE: " + std::to_string(handle));
         return nullptr; // Invalid handle!
     }
 
+    // Upload the mesh to VRAM
     GPUMesh newGPUMesh = uploadMesh(*cpuMesh);
 
+    // Cache it under the asset handle and return it
     gpuMeshCache[handle] = newGPUMesh;
     return &gpuMeshCache[handle];
 }
 
 GPUTexture *GPUResourceManager::getOrUploadTexture(const AssetHandle handle) {
-    auto it = gpuTextureCache.find(handle);
-    if (it != gpuTextureCache.end()) {
-        return &it->second;
+
+    // Find the mesh in the cache and return a refrence
+    auto ittr = gpuTextureCache.find(handle);
+    if (ittr != gpuTextureCache.end()) {
+        return &ittr->second;
     }
 
+    // If it is not in the cache, get the texture data from asset manager
     auto cpuTexture = assetManager->getTexture(handle);
     if (!cpuTexture)
         return nullptr; // Invalid handle!
 
+    // Upload the texture to VRAM
     GPUTexture newGPUTexture = uploadTexture(*cpuTexture);
 
+    // Cache the texture and return a refrence
     gpuTextureCache[handle] = newGPUTexture;
     return &gpuTextureCache[handle];
 }
@@ -96,22 +105,27 @@ GPUResourceManager::uploadTexture(const CPUTextureData &textureData) {
                     : (textureData.channels == 4) ? GL_RGBA
                                                   : GL_RGB;
 
+    // Get the raw pixel data
     const void *rawPixelData = textureData.pixels.data();
 
+    // Create a texture
     glGenTextures(1, &gpuTexture.textureID);
 
+    // Set the pixel data and generate LODs
     glBindTexture(GL_TEXTURE_2D, gpuTexture.textureID);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(GL_TEXTURE_2D, 0, format, textureData.width,
                  textureData.height, 0, format, GL_UNSIGNED_BYTE, rawPixelData);
     glGenerateMipmap(GL_TEXTURE_2D);
 
+    // Set texture params
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    // Return the final mesh
     return gpuTexture;
 }
 

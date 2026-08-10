@@ -74,18 +74,20 @@ class IRenderer {
 
     // --- Render & Shader Passes ---
 
+    // Render target handling
     virtual RenderTargetHandle
     addRenderTarget(const std::string &name, const GLuint bindingIndex,
                     const GLenum format = GL_RGBA32F);
     virtual void setDisplayTarget(const RenderTargetHandle handle);
 
-    virtual ShaderPass &addShaderPass(const std::string &name,
-                                      const char *computeShaderPath,
-                                      const bool enabled = true);
-    virtual ShaderPass &addShaderPass(const std::string &name,
-                                      const char *vertexShaderPath,
-                                      const char *fragmentShaderPath,
-                                      const bool enabled = true);
+    // Shader pass overloads
+    virtual ShaderPass &
+    addShaderPass(const std::string &name, const char *vertexShaderPath,
+                  const char *fragmentShaderPath,
+                  const bool enabled = true); // Vert & Frag shaders
+    virtual ShaderPass &
+    addShaderPass(const std::string &name, const char *computeShaderPath,
+                  const bool enabled = true); // Compute shaders
 
     // Lookups
     RenderTarget *getRenderTarget(const RenderTargetHandle handle);
@@ -93,27 +95,35 @@ class IRenderer {
 
     // --- The Frame Pipeline ---
 
+    // Reseting and setting up for frame
     virtual void beginFrame(EngineState &state) = 0;
 
+    // Getting and formatting data
     virtual void extract(EngineState &state) = 0;
     virtual void prepare(EngineState &state) = 0;
 
+    // Sending shader passes
     virtual void dispatch(EngineState &state) = 0;
     virtual void postProcess(EngineState &state) = 0;
 
+    // Presenting / blitting to FOB
     virtual void present(EngineState &state) = 0;
 
   protected:
+    // Methods for setting up render targets
     virtual void allocateRenderTarget(RenderTarget &target) const;
     virtual void bindRenderTarget(RenderTarget &target) const;
 
   protected:
+    // Tracked render width & height
     uint32_t currentWidth;
     uint32_t currentHeight;
 
+    // Registry for the render targets + another map for str -> handle
     std::unordered_map<RenderTargetHandle, RenderTarget> renderTargets;
     std::unordered_map<std::string, RenderTargetHandle> renderTargetNameMap;
 
+    // Shader passes
     std::vector<ShaderPass> shaderPasses;
 };
 

@@ -2,8 +2,6 @@
 
 #include <glad/glad.h>
 
-#include <cstddef>
-#include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -31,19 +29,25 @@ enum class BufferType {
 
 struct GPUBuffer {
   public:
-    BufferHandle handle = INVALID_BUFFER_HANDLE; // TODO: Kepp or no
+    // Handle and string name
+    BufferHandle handle = INVALID_BUFFER_HANDLE;
     std::string name;
 
+    // Buffer type and use enums - static cast to GLenum
     BufferUsage usage;
     BufferType type;
 
+    // Buffer ids are saved via an array for multibuffering - set by bool
     bool multiBuffered = false;
-
     GLuint ids[FRAMES_IN_FLIGHT] = {0};
+
+    // Size of the buffer
     size_t size = 0;
 
+    // CPU data caches
     std::vector<uint8_t> cpuCache;
-    std::unordered_map<std::string, size_t> uniformOffsets;
+    std::unordered_map<std::string, size_t>
+        uniformOffsets; // Specifically for UBOs
 };
 
 } // namespace Engine

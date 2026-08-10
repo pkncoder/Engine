@@ -71,9 +71,12 @@
 │   │   ├── EngineContext.cpp/h                     # Context wrapper for the managers of each module
 │   │   └── Window.cpp/h                            # GLFW abstraction
 │   ├── renderer/                               # Rendering Logic & GPU Data handling
-│   │   ├── BufferManager.cpp/h                     # SSBO/VBO/VAO handling
+│   │   ├── buffers/                               # Logic for handling buffers
+│   │   │   ├── BufferManager.cpp/h                     # SSBO/VBO/EBO/TBO/UBO handling
+│   │   │   └── GPUBuffer.h                             # Generic, centralized buffer definition
+│   │   ├── GPUResourceManager.cpp/h                # Caching meshes & textures + uploading to VRAM - Copying the same handles as asset manager
 │   │   ├── GPUStructs.h                            # Struct declarations for anything that deals with sending data to the GPU
-│   │   ├── IRenderer.h                             # Base interface for a renderer
+│   │   ├── IRenderer.cpp/h                         # Base interface for a renderer
 │   │   ├── PathTracer.cpp/h                        # GPU Path Tracing
 │   │   ├── Rasterizer.cpp/h                        # GPU Rasterizer
 │   │   ├── RendererManager.cpp/h                   # Renderer management
@@ -92,13 +95,14 @@
 │   │   ├── Campera.cpp/h                           # Camera logic
 │   │   ├── ECS.h                                   # Entity ID typdefs & component registering
 │   │   ├── Entity.h                                # Entity wrapper for ease of use
+│   │   ├── PrefabSpawner.cpp/h                     # Takes in a scene file and propogates it to the stage of entities & componenets
 │   │   ├── Scene.cpp/h                             # The "Registry" (manages the list of entities)
-│   │   ├── SceneLoader.cpp/h                       # Takes in a scene file and propogates it to the stage of entities & componenets
 │   │   └── SceneManager.cpp/h                      # Manages scene modifications and fetching
 │   ├── services/                               # Static classes that provide services
 │   │   ├── Input.cpp/h                             # Input checking and deltaMouse polling
 │   │   ├── Logger.cpp/h                            # Engine-wide static logger for anything required
-│   │   └── Timer.ccp/h                             # FPS, profiling, and anything time-based service
+│   │   ├── Timer.ccp/h                             # FPS, profiling, and anything time-based service
+│   │   └── UUID.ccp/h                              # Generating UUIDs - 64 bit uints in this case
 │   ├── Constants.h                             # Constant values
 │   └── main.cpp                                # Entry point
 ├── CMakeLists.txt                          # Main build script
