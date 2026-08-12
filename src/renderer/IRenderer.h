@@ -119,6 +119,8 @@ class IRenderer {
     uint32_t currentWidth;
     uint32_t currentHeight;
 
+    RenderTargetHandle currentRenderTarget;
+
     // Registry for the render targets + another map for str -> handle
     std::unordered_map<RenderTargetHandle, RenderTarget> renderTargets;
     std::unordered_map<std::string, RenderTargetHandle> renderTargetNameMap;

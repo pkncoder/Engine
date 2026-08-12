@@ -136,7 +136,7 @@ void Rasterizer::extract(EngineState &state) {
 
         // Push to the render packet list
         m_RenderPackets.push_back(
-            {buildModel(transform), mesh.handle, material.handle});
+            {mesh.handle, material.handle, buildModel(transform)});
     }
 }
 

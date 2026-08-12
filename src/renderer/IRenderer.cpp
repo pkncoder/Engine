@@ -1,5 +1,6 @@
 #include "IRenderer.h"
 
+#include "../services/Logger.h"
 #include "../services/UUID.h"
 
 namespace Engine {
@@ -62,6 +63,17 @@ RenderTargetHandle IRenderer::addRenderTarget(const std::string &name,
     renderTargets[target.handle] = target;
 
     return target.handle;
+}
+
+void IRenderer::setDisplayTarget(RenderTargetHandle handle) {
+    if (renderTargets.find(handle) == renderTargets.end()) {
+        Logger::warn("RENDERER", "Attempted to set invalid display target: " +
+                                     std::to_string(handle));
+        return;
+    }
+
+    // Set the name for later fetching
+    currentRenderTarget = handle;
 }
 
 ShaderPass &IRenderer::addShaderPass(const std::string &name,

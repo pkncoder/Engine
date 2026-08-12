@@ -4,6 +4,7 @@
 #include "../../services/UUID.h"
 #include "GPUBuffer.h"
 
+#include <cstring>
 #include <unordered_map>
 #include <vector>
 
