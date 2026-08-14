@@ -1,3 +1,4 @@
+
 #define AABB_VARIENCE_CLIP_SIGMA_MODIFICAITON 1.5
 #define REPROJECTION_MAX_ACCUM_FRAMES 64.0
 #define REPROJECTION_MAX_CAMERA_ACCUM_FRAMES 1.0
@@ -466,7 +467,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 
     // Get the scene
     setScene(iMouse);
-
+    #if (SCENE==4)
+    //scene.spheres[0].origin = vec3(sin(iTime/0.25)*4.0, 2.0, cos(iTime/0.25)*4.0 + (3.0 + 2.0*sqrt(3.0)/3.0));
+    #endif
+    
     // Save a color at a higher scope to be added to each ray sample
     vec3 col = vec3(0.0);
 
@@ -575,3 +579,4 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     fragColor = vec4(col, 0.0);
     #endif
 }
+

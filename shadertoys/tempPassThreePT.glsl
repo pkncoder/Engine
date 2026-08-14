@@ -116,6 +116,10 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         4.0/256.0, 16.0/256.0, 24.0/256.0, 16.0/256.0, 4.0/256.0,
         1.0/256.0,  4.0/256.0,  6.0/256.0,  4.0/256.0, 1.0/256.0
     );
+    
+     // Get a random rotation matrix
+    float ang = 2.0 * PI * rnd1(seed);
+    mat2 m = mat2(cos(ang), sin(ang), -sin(ang), cos(ang));
 
 
     /* Kernal execute */
@@ -132,7 +136,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
             // Get this sample's coordinate
             vec2 offset = vec2(x, y) * denoiseStrength;
-            vec2 sampleCoord = clamp(centerCoord + offset, vec2(0), iResolution.xy - vec2(1));
+            vec2 sampleCoord = clamp(centerCoord + m*offset, vec2(0), iResolution.xy - vec2(1));
             vec2 sampleUV = sampleCoord / iResolution.xy;
 
             // Get the G-Buffer values at this sample
@@ -184,21 +188,37 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     // Sum up surounding colors in a 3x3 grid
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++) {
-            vec2 offsetUV = clamp(centerCoord + vec2(x, y), vec2(0), iResolution.xy - vec2(1)) / iResolution.xy;
+            vec2 offset = vec2(x, y) * denoiseStrength;
+            vec2 offsetUV = clamp(centerCoord + offset, vec2(0), iResolution.xy - vec2(1)) / iResolution.xy;
             vec3 neighborColor = texture(iChannel1, offsetUV).rgb;
+            
             totalColor += neighborColor;
             totalColor2 += neighborColor * neighborColor;
         }
     }
+    
+    totalColor += denoisedColor;
+    totalColor2 += denoisedColor * denoisedColor;
 
     // Get the average color and the standard deviation 
-    vec3 averageColor = totalColor / 9.0;
-    vec3 standardDeviation = sqrt(max(totalColor2 / 9.0 - averageColor * averageColor, 0.0));
+    vec3 averageColor = totalColor / 10.0;
+    vec3 standardDeviation = sqrt(max(totalColor2 / 10.0 - averageColor * averageColor, 0.0));
 
-    // Get the min and max colors multipled by gamma
-    float gamma = mix(0.25, 1.25, validHistory ? pow(historyLength / MAX_HISTORY, 1.0) : 0.0);
+    // Get a factor based on the number of pixels moving
+    float motionPixels = length(motionVector * iResolution.xy);
+    float motionFactor = smoothstep(2.0, 0.0, motionPixels);
+    
+    // Get a gamma value to expand (or not expand) the aabb box
+    float gamma = mix(0.25, 1.25, validHistory ? (historyLength / MAX_HISTORY) : 0.0);
+    gamma += (motionFactor * 2.0); // Expands box when still, tightens when moving
+    
+    // Calculate the aab min & max based on gamma
     vec3 aabbMin = averageColor - standardDeviation * gamma;
     vec3 aabbMax = averageColor + standardDeviation * gamma;
+    
+    // Include the denoised color in the box
+    aabbMin = min(aabbMin, denoisedColor);
+    aabbMax = max(aabbMax, denoisedColor);
 
     // Clamp the history color to reality
     vec3 clippedHistory = clamp(historyColor, aabbMin, aabbMax);

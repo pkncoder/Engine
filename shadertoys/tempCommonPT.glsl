@@ -13,7 +13,7 @@ precision highp float;
  * 5 - Reinder Box - No Anim. - NOT WORKING
  */
 #define SCENE 4
-
+#define SCENEFOURTWO 1
 #if (SCENE == 1)
 
 // Array lengths
@@ -41,10 +41,17 @@ precision highp float;
 #elif (SCENE == 4)
 
 // Array lengths
-#define SPH_NUM 10
+#if (SCENEFOURTWO == 1)
+#define SPH_NUM 13
 #define BOX_NUM 0
 #define PLN_NUM 1
-#define SPH_LIGHT_NUM 0
+#define SPH_LIGHT_NUM 3
+#else
+#define SPH_NUM 11
+#define BOX_NUM 0
+#define PLN_NUM 1
+#define SPH_LIGHT_NUM 1
+#endif
 
 #elif (SCENE == 5)
 
@@ -60,14 +67,14 @@ precision highp float;
 // Exposure & Sky settings
 #define EXPOSURE 1.0
 #if (SCENE == 3 || SCENE == 5)
-#define SKYBOX_COLOR_MULT 0.2
+#define SKYBOX_COLOR_MULT 0.5
 #else
-#define SKYBOX_COLOR_MULT 0.9
+#define SKYBOX_COLOR_MULT 0.2
 #endif
 
 // Ray Settings
 #define MAX_BOUNCES 6
-#define SAMPLES 1
+#define SAMPLES 2
 #define MIN_BOUNCE_RUSSIAN_ROULETTE 2
 
 // Camera Position
@@ -85,7 +92,7 @@ precision highp float;
 
 // Anti Aliassing (0==Off; 1==On)
 #define ANTI_ALIASING 0
-#define TAA 1
+#define TAA 0
 
 // Numbers
 #define PI 3.14159265359
@@ -370,6 +377,61 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
         )
     )
     #elif (SCENE == 4)
+    #if (SCENEFOURTWO == 1)
+    Sphere( // Light
+        vec3(-5.0, 1.0, 8.0),
+        0.7,
+        Material(
+            vec3(1.0),
+            vec3(0.5, 0.1, 0.9) * 20.0,
+
+            1.0,
+            0.0,
+
+            LAMBERTION
+        )
+    ),
+    Sphere( // Light
+        vec3(7.0, 2.0, 6.0),
+        0.5,
+        Material(
+            vec3(1.0),
+            vec3(0.8, 0.3, 0.5) * 40.0,
+
+            1.0,
+            0.0,
+
+            LAMBERTION
+        )
+    ),
+    Sphere( // Light
+        vec3(-2.0, 4.0, -4.0),
+        0.35,
+        Material(
+            vec3(1.0),
+            vec3(0.2, 0.7, 0.5) * 60.0,
+
+            1.0,
+            0.0,
+
+            LAMBERTION
+        )
+    ),
+    #else
+    Sphere( // Light
+        vec3(-5.0, 1.0, 8.0),
+        0.7,
+        Material(
+            vec3(1.0),
+            vec3(0.5, 0.1, 0.9) * 20.0,
+
+            1.0,
+            0.0,
+
+            LAMBERTION
+        )
+    ),
+    #endif
     Sphere( // B-F-L (1)
         vec3(-2.0, -2.0, 3.0),
         1.0,
@@ -377,7 +439,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -390,7 +452,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -403,7 +465,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -416,7 +478,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -429,7 +491,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -442,7 +504,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -455,7 +517,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -468,7 +530,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -481,7 +543,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -494,7 +556,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(1.0),
             vec3(0.0),
 
-            0.3,
+            0.25,
             1.0,
 
             METAL
@@ -507,7 +569,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
         0.6,
         Material(
             vec3(0.0),
-            vec3(1.0) * 5.0,
+            vec3(16.86, 10.76, 8.2)*1.3,
             
             1.0,
             0.0,
@@ -519,7 +581,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
         vec3(1.0, -1.0, -0.3),
         1.0,
         Material(
-            vec3(0.8),
+            vec3(.7295, .7355, .729)*0.7,
             vec3(0.0),
             
             1.0,
@@ -535,7 +597,7 @@ const Sphere spheres[SPH_NUM] = Sphere[SPH_NUM](
             vec3(0.9),
             vec3(0.0),
             
-            0.1,
+            0.4,
             1.0,
             
             METAL
@@ -681,7 +743,7 @@ const Plane planes[PLN_NUM] = Plane[PLN_NUM](
     #elif (SCENE == 4)
     Plane( // Floor
         normalize(vec3(0.0, 1.0, 0.0)),
-        -3.0 - 2.*EPSILON,
+        -3.0 - 2.0*EPSILON,
         Material(
             vec3(0.4, 0.3, 0.1),
             vec3(0.0),
@@ -695,9 +757,9 @@ const Plane planes[PLN_NUM] = Plane[PLN_NUM](
     #elif (SCENE == 5)
     Plane( // Top
         normalize(vec3(0.0, -1.0, 0.0)),
-        -5.0,
+        -3.0,
         Material(
-            vec3(0.9),
+            vec3(.7295, .7355, .729)*0.7,
             vec3(0.0),
             
             1.0,
@@ -710,7 +772,7 @@ const Plane planes[PLN_NUM] = Plane[PLN_NUM](
         normalize(vec3(0.0, 1.0, 0.0)),
         -2.0,
         Material(
-            vec3(0.9),
+            vec3(.7295, .7355, .729)*0.7,
             vec3(0.0),
             
             1.0,
@@ -720,10 +782,10 @@ const Plane planes[PLN_NUM] = Plane[PLN_NUM](
         )
     ),
     Plane( // Left
-        normalize(vec3(-1.0, 0.0, 0.0)),
+        normalize(vec3(1.0, 0.0, 0.0)),
         -3.0,
         Material(
-            vec3(0.9),
+            vec3(.711, .0555, .062)*0.7,
             vec3(0.0),
             
             1.0,
@@ -733,10 +795,10 @@ const Plane planes[PLN_NUM] = Plane[PLN_NUM](
         )
     ),
     Plane( // Right
-        normalize(vec3(1.0, 0.0, 0.0)),
+        normalize(vec3(-1.0, 0.0, 0.0)),
         -3.0,
         Material(
-            vec3(0.9),
+            vec3(.117, .5125, .115)*0.7,
             vec3(0.0),
             
             1.0,
@@ -749,7 +811,7 @@ const Plane planes[PLN_NUM] = Plane[PLN_NUM](
         normalize(vec3(0.0, 0.0, -1.0)),
         -2.0,
         Material(
-            vec3(0.9),
+            vec3(.7295, .7355, .729)*0.7,
             vec3(0.0),
             
             1.0,
@@ -809,6 +871,22 @@ void setScene(vec4 mouse) {
     // Total emmisive values
     scene.totalEmmisiveValue = scene.emmisiveValues[0] + scene.emmisiveValues[1] + scene.emmisiveValues[2] + scene.emmisiveValues[3];
 
+    #elif (SCENE == 4)
+
+    #if (SCENEFOURTWO == 1)
+    scene.emmisiveValues[0] = getLuma(spheres[0].material.emmisive);
+    scene.emmisiveValues[1] = getLuma(spheres[1].material.emmisive);
+    scene.emmisiveValues[2] = getLuma(spheres[2].material.emmisive);
+    scene.totalEmmisiveValue = scene.emmisiveValues[0] + scene.emmisiveValues[1] + scene.emmisiveValues[2];
+    #else
+    scene.emmisiveValues[0] = getLuma(spheres[0].material.emmisive);
+    scene.totalEmmisiveValue = scene.emmisiveValues[0];
+    #endif
+    
+    #elif (SCENE == 5)
+    scene.emmisiveValues[0] = getLuma(spheres[0].material.emmisive);
+    scene.totalEmmisiveValue = scene.emmisiveValues[0];
+    
     #endif
 }
 

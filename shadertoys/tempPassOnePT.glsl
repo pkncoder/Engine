@@ -25,6 +25,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
     // Set the scene & get the first hit
     setScene(iMouse);
+    #if (SCENE==4)
+    //scene.spheres[0].origin = vec3(sin(iTime/0.25)*4.0, 2.0, cos(iTime/0.25)*4.0 + (3.0 + 2.0*sqrt(3.0)/3.0));
+    #endif
     HitInfo hit = rayScene(ray, seed);
 
     // Check for hit, if hit, pack the normal (xy), hit distance (z), object type + object index (w)

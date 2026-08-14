@@ -17,11 +17,11 @@ Mouse can be used as an orbit camera, no keys.
 
 ***Check common tab for tons of settings, and the code is pretty much fully commented.***
 
-note: I AM STILL TUNING RIGHT NOW
+Note: I AM STILL TUNING RIGHT NOW
 
 */
 
-#define SPLITLINE 1
+#define SPLITLINE 0
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 
