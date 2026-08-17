@@ -29,9 +29,6 @@ TextureLoader::loadTexture(const std::string &filepath) {
         return nullptr;
     }
 
-    // Free stb image data
-    stbi_image_free(data);
-
     // Set image size values to the texture
     texture->width = width;
     texture->height = height;
@@ -42,6 +39,9 @@ TextureLoader::loadTexture(const std::string &filepath) {
     // Convert the data to a vector of chars for the pixels
     texture->pixels =
         std::vector<unsigned char>(data, data + width * height * channels);
+
+    // Free stb image data
+    stbi_image_free(data);
 
     Logger::info("ASSET", "Successfully loaded texture at: " + filepath);
     return texture;
