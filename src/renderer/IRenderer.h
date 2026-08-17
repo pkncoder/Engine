@@ -10,6 +10,8 @@ namespace Engine {
 using RenderTargetHandle = uint32_t;
 constexpr RenderTargetHandle INVALID_RENDER_TARGET = 0;
 
+struct DrawCommand {};
+
 struct RenderPacket {
     AssetHandle meshHandle;
     AssetHandle materialHandle;
@@ -52,14 +54,15 @@ struct ShaderPass {
 
     // Shader / program to run
     Shader shader;
-    bool enabled = true;
+    GLuint fbo = 0;
 
-    // Compute shader dispatch size
-    glm::ivec3 workgroupSize{8, 8, 1};
+    bool enabled = true;
 
     std::vector<AssetHandle> textureInputs;
     std::vector<RenderTargetHandle> renderTargets;
     std::vector<BufferHandle> bufferInputs;
+
+    std::vector<DrawCommand> commands;
 };
 
 class IRenderer {

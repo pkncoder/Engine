@@ -4,11 +4,20 @@
 
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
+#include "../scene/Camera.h"
 #include "Shader.h"
+#include "buffers/BufferManager.h"
+#include "buffers/GPUBuffer.h"
 
 #include <glad/glad.h>
 
 namespace Engine {
+
+struct RasterDrawCommand : DrawCommand {
+    GLuint vao;
+    GLuint indexCount;
+    glm::mat4 modelMatrix;
+};
 
 class Rasterizer : public IRenderer {
   public:
@@ -29,14 +38,17 @@ class Rasterizer : public IRenderer {
     void present(EngineState &state) override;
 
   private:
+    void tempGenDefaultTextures();
+    void tempGenShadowCubemap(EngineState &state);
+
+  private:
     EngineContext &engineContext;
+
+    int frameIndex = 0;
 
     // Render size information
     int currentWidth = 0;
     int currentHeight = 0;
-
-    Shader shader;
-    Shader shadowShader;
 
     GLuint defaultWhiteTexture = 0;
     GLuint defaultNormalTexture = 0;
@@ -45,11 +57,13 @@ class Rasterizer : public IRenderer {
     GLuint shadowCubeMap = 0;
     GLuint shadowDepthRBO = 0;
 
-    std::vector<RenderPacket> m_RenderPackets;
-    glm::vec3 m_ActiveLightPos;
-    glm::mat4 m_ViewMatrix;
-    glm::mat4 m_ProjMatrix;
-    glm::mat4 m_ShadowProjMatrix;
+    std::vector<RenderPacket> renderPackets;
+
+    CameraData cameraData;
+    BufferHandle cameraUBO;
+
+    glm::vec3 activeLightPos;
+    glm::mat4 shadowProjMatrix;
 };
 
 } // namespace Engine
