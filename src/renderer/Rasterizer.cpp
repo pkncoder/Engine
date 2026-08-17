@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // for glm::ortho / lookAt
 
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -80,23 +81,23 @@ void Rasterizer::init(EngineState &state) {
 
 void Rasterizer::beginFrame(EngineState &state) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_RenderPackets.clear();
+    renderPackets.clear();
 }
 
 void Rasterizer::extract(EngineState &state) {
+    AssetManager *assetManager = engineContext.getAsset();
 
     SceneManager *sceneManager = engineContext.getScene();
-    AssetManager *assetManager = engineContext.getAsset();
     Scene &scene = sceneManager->getScene();
 
-    CameraState &cameraState = state.scene.camera;
+    if (currentHeight > 0) {
+        cameraData.view = sceneManager->getCamera().getViewMatrix();
+        cameraData.projection = sceneManager->getCamera().getProjectionMatrix(
+            (float)currentWidth / (float)currentHeight);
+    }
+    activeLightPos = state.scene.camera.position; // Fallback light pos
 
-    // Pull renderables once — used in both passes
-    const auto renderables =
-        scene.getMatchingEntities<TransformComponent, MeshComponent,
-                                  MaterialComponent>();
-
-    // Model matrix helper lamba function
+    // 2. Build Packets
     auto buildModel = [](const TransformComponent &t) {
         glm::mat4 m = glm::mat4(1.0f);
         m = glm::translate(m, t.position);
@@ -105,39 +106,32 @@ void Rasterizer::extract(EngineState &state) {
         return m;
     };
 
-    // Lambda for binding texture maps
-    int currentTextureUnit = 0;
-    auto bindMap = [&](GLuint texID, const std::string &uniformName,
-                       GLuint fallbackID) {
-        glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
-        glBindTexture(GL_TEXTURE_2D, texID != 0 ? texID : fallbackID);
-        shader.setInt(uniformName, currentTextureUnit);
-        currentTextureUnit++;
-    };
-
-    m_ActiveLightPos = cameraState.position;
+    const auto renderables =
+        scene.getMatchingEntities<TransformComponent, MeshComponent,
+                                  MaterialComponent>();
     float bestEmissive = 0.0f;
 
-    // Loop ECS ONCE and pack the data
     for (EntityID id : renderables) {
         const auto &transform = scene.getComponent<TransformComponent>(id);
         const auto &mesh = scene.getComponent<MeshComponent>(id);
         const auto &material = scene.getComponent<MaterialComponent>(id);
 
-        // Find the brightest light (temporary logic)
+        // Temp Light finding logic
         auto cpuMat = assetManager->getMaterial(material.handle);
-        if (cpuMat) {
-            float strength = glm::length(cpuMat->emissive);
-            if (strength > bestEmissive) {
-                bestEmissive = strength;
-                m_ActiveLightPos = transform.position;
-            }
+        if (cpuMat && glm::length(cpuMat->emissive) > bestEmissive) {
+            bestEmissive = glm::length(cpuMat->emissive);
+            activeLightPos = transform.position;
         }
 
-        // Push to the render packet list
-        m_RenderPackets.push_back(
+        renderPackets.push_back(
             {mesh.handle, material.handle, buildModel(transform)});
     }
+
+    // 3. SORT PACKETS BY MATERIAL! (Crucial for performance)
+    std::sort(renderPackets.begin(), renderPackets.end(),
+              [](const RenderPacket &a, const RenderPacket &b) {
+                  return a.materialHandle < b.materialHandle;
+              });
 }
 
 void Rasterizer::prepare(EngineState &state) {

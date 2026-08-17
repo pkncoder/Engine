@@ -5,6 +5,8 @@
 #include "Shader.h"
 #include "buffers/GPUBuffer.h"
 
+#include <memory>
+
 namespace Engine {
 
 using RenderTargetHandle = uint32_t;
@@ -62,7 +64,7 @@ struct ShaderPass {
     std::vector<RenderTargetHandle> renderTargets;
     std::vector<BufferHandle> bufferInputs;
 
-    std::vector<DrawCommand> commands;
+    std::vector<std::shared_ptr<DrawCommand>> commands;
 };
 
 class IRenderer {

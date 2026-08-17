@@ -5,8 +5,6 @@
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
 #include "../scene/Camera.h"
-#include "Shader.h"
-#include "buffers/BufferManager.h"
 #include "buffers/GPUBuffer.h"
 
 #include <glad/glad.h>
@@ -17,12 +15,21 @@ struct RasterDrawCommand : DrawCommand {
     GLuint vao;
     GLuint indexCount;
     glm::mat4 modelMatrix;
+
+    /*
+     * Albedo
+     * Emmissive
+     * Alpha
+     * ARM
+     * Specular
+     */
+    int textures[8] = {0};
 };
 
 class Rasterizer : public IRenderer {
   public:
     inline Rasterizer(EngineContext &engineContext)
-        : engineContext(engineContext){};
+        : engineContext(engineContext) {};
 
     // --- Lifecycle ---
     void init(EngineState &state) override;
@@ -38,8 +45,8 @@ class Rasterizer : public IRenderer {
     void present(EngineState &state) override;
 
   private:
-    void tempGenDefaultTextures();
-    void tempGenShadowCubemap(EngineState &state);
+    void setupDefaultTextures();
+    void setupShadowFBO(EngineState &state);
 
   private:
     EngineContext &engineContext;

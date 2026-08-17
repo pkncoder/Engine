@@ -1,0 +1,17 @@
+{
+	"nodes":[
+		{"id":"9fa7c3ee98cb625e","type":"text","text":"# RenderPass","x":-440,"y":-394,"width":192,"height":50},
+		{"id":"2bafda747a71c0cc","type":"text","text":"- Per frame\n- Contains fbo, sizes, and draw commands","x":-469,"y":-300,"width":250,"height":120},
+		{"id":"c6c5d3b9f9f04f5b","type":"text","text":"# Shader","x":-913,"y":-394,"width":134,"height":50},
+		{"id":"5ab4e13f9441cc82","type":"text","text":"# DrawCommand","x":140,"y":-394,"width":241,"height":50},
+		{"id":"cbc890e05f649b88","x":111,"y":-300,"width":299,"height":160,"type":"text","text":"- Per frame\n- Contains information that is Renderer-specific\n- The immediate draw calls or equivilant"},
+		{"id":"13027eccdca54503","type":"text","text":"- Persistant\n- Contains the shader and program ID\n- Contains inputs and outputs\n- Contains the render passes for this shader","x":-1000,"y":-300,"width":308,"height":200}
+	],
+	"edges":[
+		{"id":"59cdd5b2961e8f5d","fromNode":"9fa7c3ee98cb625e","fromSide":"bottom","toNode":"2bafda747a71c0cc","toSide":"top"},
+		{"id":"193d780440558b8b","fromNode":"c6c5d3b9f9f04f5b","fromSide":"bottom","toNode":"13027eccdca54503","toSide":"top"},
+		{"id":"f1d25f1352145ee9","fromNode":"c6c5d3b9f9f04f5b","fromSide":"right","toNode":"9fa7c3ee98cb625e","toSide":"left"},
+		{"id":"ad595d86541a921e","fromNode":"9fa7c3ee98cb625e","fromSide":"right","toNode":"5ab4e13f9441cc82","toSide":"left"},
+		{"id":"6436eb876b0e96a8","fromNode":"5ab4e13f9441cc82","fromSide":"bottom","toNode":"cbc890e05f649b88","toSide":"top"}
+	]
+}
