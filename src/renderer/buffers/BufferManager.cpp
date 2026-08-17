@@ -197,9 +197,9 @@ void BufferManager::mapUBOLayout(const BufferHandle handle,
     }
 }
 
-void BufferManager::setUBOLayout(const BufferHandle handle,
-                                 const std::string &uniformName,
-                                 const size_t size, const void *data) {
+void BufferManager::setUBOValue(const BufferHandle handle,
+                                const std::string &uniformName,
+                                const size_t size, const void *data) {
 
     // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
@@ -231,7 +231,7 @@ void BufferManager::setUBOLayout(const BufferHandle handle,
 }
 
 void BufferManager::bindBuffer(const BufferHandle handle,
-                               const uint32_t globalFrameIndex) const {
+                               const uint32_t globalFrameIndex) {
 
     // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
@@ -256,7 +256,7 @@ void BufferManager::bindBuffer(const BufferHandle handle,
 
 void BufferManager::bindBufferBase(const BufferHandle handle,
                                    const uint32_t bindingPoint,
-                                   const uint32_t globalFrameIndex) const {
+                                   const uint32_t globalFrameIndex) {
 
     // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
@@ -281,7 +281,7 @@ void BufferManager::bindBufferBase(const BufferHandle handle,
 
 void BufferManager::streamData(const BufferHandle handle, const size_t size,
                                const void *data,
-                               const uint32_t globalFrameIndex) const {
+                               const uint32_t globalFrameIndex) {
 
     // Find target buffer
     auto ittr = bufferRegistry.find(handle);
@@ -331,7 +331,7 @@ void BufferManager::streamData(const BufferHandle handle, const size_t size,
 }
 
 void BufferManager::pushBuffer(const BufferHandle handle,
-                               const uint32_t globalFrameIndex) const {
+                               const uint32_t globalFrameIndex) {
 
     // Find the target buffer
     auto ittr = bufferRegistry.find(handle);

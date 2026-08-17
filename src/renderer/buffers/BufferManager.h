@@ -13,37 +13,41 @@ class BufferManager {
     ~BufferManager();
 
     // Creation and deletion of buffers
-    BufferHandle createBuffer(const std::string &name, const BufferType type,
-                              const BufferUsage usage, const size_t size,
-                              const void *initialData = nullptr,
-                              const bool multiBuffered = false);
-    void destroyBuffer(const BufferHandle handle);
+    static BufferHandle createBuffer(const std::string &name,
+                                     const BufferType type,
+                                     const BufferUsage usage, const size_t size,
+                                     const void *initialData = nullptr,
+                                     const bool multiBuffered = false);
+    static void destroyBuffer(const BufferHandle handle);
 
-    GPUBuffer *getBuffer(const BufferHandle handle);
-    GPUBuffer *getBufferByName(const std::string &name);
+    static GPUBuffer *getBuffer(const BufferHandle handle);
+    static GPUBuffer *getBufferByName(const std::string &name);
 
-    void updateBufferCache(const BufferHandle handle, const size_t size,
-                           const size_t offset, const void *data);
+    static void updateBufferCache(const BufferHandle handle, const size_t size,
+                                  const size_t offset, const void *data);
 
-    void mapUBOLayout(const BufferHandle handle, const uint32_t programID,
-                      const std::string &blockName,
-                      const std::vector<std::string> &uniformNames);
-    void setUBOLayout(const BufferHandle handle, const std::string &uniformName,
-                      const size_t size, const void *data);
+    static void mapUBOLayout(const BufferHandle handle,
+                             const uint32_t programID,
+                             const std::string &blockName,
+                             const std::vector<std::string> &uniformNames);
+    static void setUBOValue(const BufferHandle handle,
+                            const std::string &uniformName, const size_t size,
+                            const void *data);
 
-    void bindBuffer(const BufferHandle handle,
-                    const uint32_t globalFrameIndex) const;
-    void bindBufferBase(const BufferHandle handle, const uint32_t bindingPoint,
-                        const uint32_t globalFrameIndex) const;
+    static void bindBuffer(const BufferHandle handle,
+                           const uint32_t globalFrameIndex);
+    static void bindBufferBase(const BufferHandle handle,
+                               const uint32_t bindingPoint,
+                               const uint32_t globalFrameIndex);
 
-    void streamData(const BufferHandle handle, const size_t size,
-                    const void *data, const uint32_t globalFrameIndex) const;
+    static void streamData(const BufferHandle handle, const size_t size,
+                           const void *data, const uint32_t globalFrameIndex);
 
-    void pushBuffer(const BufferHandle handle,
-                    const uint32_t globalFrameIndex) const;
+    static void pushBuffer(const BufferHandle handle,
+                           const uint32_t globalFrameIndex);
 
   private:
-    std::unordered_map<BufferHandle, GPUBuffer> bufferRegistry;
+    static inline std::unordered_map<BufferHandle, GPUBuffer> bufferRegistry;
 };
 
 } // namespace Engine

@@ -10,6 +10,11 @@ namespace Engine {
 // Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 
+struct alignas(16) CameraData {
+    glm::mat4 view;
+    glm::mat4 projection;
+};
+
 // Default camera values
 
 class Camera {
