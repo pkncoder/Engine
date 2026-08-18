@@ -11,6 +11,7 @@
 #include "buffers/BufferManager.h"
 
 #include <GLFW/glfw3.h>
+#include <__config>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // for glm::ortho / lookAt
 
@@ -72,8 +73,8 @@ void Rasterizer::init(EngineState &state) {
     setupShadowFBO(state);
 
     // Register Passes into the IRenderer Graph
-    addShaderPass("ShadowPass", "shaders/shadow.vert", "shaders/shadow.frag");
-    addShaderPass("RasterPass", "shaders/raster.vert", "shaders/raster.frag");
+    addShaderNode("ShadowPass", "shaders/shadow.vert", "shaders/shadow.frag");
+    addShaderNode("RasterPass", "shaders/raster.vert", "shaders/raster.frag");
 
     // Allocate persistent UBO
     cameraUBO =
@@ -102,8 +103,8 @@ void Rasterizer::prepare(EngineState &state) {
     // TODO: generate shadowFBO?
 
     // Create the render passes
-    ShaderPass shadowPass = shaderPasses[0];
-    ShaderPass mainPass = shaderPasses[0];
+    RenderLayer shadowStep;
+    RenderLayer mainStep;
 
     // Loop through the render packets
     for (const auto &packet : renderPackets) {
@@ -113,6 +114,17 @@ void Rasterizer::prepare(EngineState &state) {
         CPUMaterialData *cpuMaterial = engineContext.getAsset()
                                            ->getMaterial(packet.materialHandle)
                                            .get(); // TEMP
+
+        if (!gpuMesh || !cpuMaterial) {
+            Logger::warn(
+                "RENDERER",
+                "Render Packet Skipped (GPU Mesh: " +
+                    std::string(gpuMesh == nullptr ? "no" : "yes") +
+                    ") \(CPU Material: " +
+                    std::string(cpuMaterial == nullptr ? "no" : "yes") + ")");
+
+            continue;
+        }
 
         // Map material textures to GLuints safely
         auto getTexID = [&](const std::string &key) -> GLuint {
@@ -129,7 +141,7 @@ void Rasterizer::prepare(EngineState &state) {
         {
             std::shared_ptr<RasterDrawCommand> drawCommand;
 
-            shadowPass.fbo = shadowFBO;
+            shadowStep.fbo = shadowFBO;
 
             drawCommand->vao = gpuMesh->vao;
             drawCommand->indexCount = gpuMesh->indexCount;
@@ -138,14 +150,14 @@ void Rasterizer::prepare(EngineState &state) {
             // TODO: textures? (alpha map)
             drawCommand->textures[2] = getTexID("alpha");
 
-            shadowPass.commands.push_back(drawCommand);
+            shadowStep.commands.push_back(drawCommand);
         }
 
         /* ----------------- Main Pass ---------------- */
         {
             std::shared_ptr<RasterDrawCommand> drawCommand;
 
-            mainPass.fbo = 0; // Main screen
+            mainStep.fbo = 0; // Main screen
 
             drawCommand->vao = gpuMesh->vao;
             drawCommand->indexCount = gpuMesh->indexCount;
@@ -169,42 +181,47 @@ void Rasterizer::prepare(EngineState &state) {
                 // shader.setInt("uIsBumpMap", 0);
             }
 
-            mainPass.commands.push_back(drawCommand);
+            drawCommand->textures[7] = shadowCubeMap;
+
+            mainStep.commands.push_back(drawCommand);
         }
     }
 }
 
 void Rasterizer::dispatch(EngineState &state) {
-    for (const ShaderPass &pass : shaderPasses) {
-
-        glBindFramebuffer(GL_FRAMEBUFFER, pass.fbo);
-        glViewport(0, 0, currentWidth, currentHeight); // TODO: per-pass
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (const ShaderNode &pass : shaderNodeTree) {
 
         glUseProgram(pass.shader.ID);
 
-        // GLuint currentShader = 0;
-        GLuint currentVAO = 0;
+        for (const RenderLayer &layer : pass.renderSteps) {
 
-        for (const std::shared_ptr<DrawCommand> cmd : pass.commands) {
+            glBindFramebuffer(GL_FRAMEBUFFER, layer.fbo);
+            glViewport(0, 0, currentWidth, currentHeight); // TODO: per-pass
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            const auto command =
-                std::static_pointer_cast<RasterDrawCommand>(cmd);
+            // GLuint currentShader = 0;
+            GLuint currentVAO = 0;
 
-            // Upload Model Matrix (Ideally this is in a UBO/TBO too, not a
-            // uniform)
-            // glUniformMatrix4fv(0, 1, GL_FALSE,
-            //                    glm::value_ptr(command->modelMatrix));
+            for (const std::shared_ptr<DrawCommand> cmd : layer.commands) {
 
-            pass.shader.setMat4("uModel", command->modelMatrix);
+                const auto command =
+                    std::static_pointer_cast<RasterDrawCommand>(cmd);
 
-            if (currentVAO != command->vao) {
-                glBindVertexArray(command->vao);
-                currentVAO = command->vao;
+                // Upload Model Matrix (Ideally this is in a UBO/TBO too, not a
+                // uniform)
+                // glUniformMatrix4fv(0, 1, GL_FALSE,
+                //                    glm::value_ptr(command->modelMatrix));
+
+                pass.shader.setMat4("uModel", command->modelMatrix);
+
+                if (currentVAO != command->vao) {
+                    glBindVertexArray(command->vao);
+                    currentVAO = command->vao;
+                }
+
+                glDrawElements(GL_TRIANGLES, command->indexCount,
+                               GL_UNSIGNED_INT, 0);
             }
-
-            glDrawElements(GL_TRIANGLES, command->indexCount, GL_UNSIGNED_INT,
-                           0);
         }
     }
 }

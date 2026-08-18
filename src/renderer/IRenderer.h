@@ -12,15 +12,6 @@ namespace Engine {
 using RenderTargetHandle = uint32_t;
 constexpr RenderTargetHandle INVALID_RENDER_TARGET = 0;
 
-struct DrawCommand {};
-
-struct RenderPacket {
-    AssetHandle meshHandle;
-    AssetHandle materialHandle;
-
-    glm::mat4 modelMatrix;
-};
-
 struct RenderTarget {
   public:
     // Name & Handle
@@ -35,8 +26,26 @@ struct RenderTarget {
     GLenum format = GL_RGBA32F;
 };
 
+struct DrawCommand {};
+
+struct RenderPacket {
+    AssetHandle meshHandle;
+    AssetHandle materialHandle;
+
+    glm::mat4 modelMatrix;
+};
+
+struct RenderLayer {
+    GLuint fbo = 0;
+
+    size_t renderWidth;
+    size_t renderHeight;
+
+    std::vector<std::shared_ptr<DrawCommand>> commands;
+};
+
 // Structure to define a pass
-struct ShaderPass {
+struct ShaderNode {
   public:
     inline void addTextureInput(AssetHandle textureHandle) {
         textureInputs.push_back(textureHandle);
@@ -56,15 +65,13 @@ struct ShaderPass {
 
     // Shader / program to run
     Shader shader;
-    GLuint fbo = 0;
-
     bool enabled = true;
 
     std::vector<AssetHandle> textureInputs;
     std::vector<RenderTargetHandle> renderTargets;
     std::vector<BufferHandle> bufferInputs;
 
-    std::vector<std::shared_ptr<DrawCommand>> commands;
+    std::vector<RenderLayer> renderSteps;
 };
 
 class IRenderer {
@@ -86,12 +93,12 @@ class IRenderer {
     virtual void setDisplayTarget(const RenderTargetHandle handle);
 
     // Shader pass overloads
-    virtual ShaderPass &
-    addShaderPass(const std::string &name, const char *vertexShaderPath,
+    virtual ShaderNode &
+    addShaderNode(const std::string &name, const char *vertexShaderPath,
                   const char *fragmentShaderPath,
                   const bool enabled = true); // Vert & Frag shaders
-    virtual ShaderPass &
-    addShaderPass(const std::string &name, const char *computeShaderPath,
+    virtual ShaderNode &
+    addShaderNode(const std::string &name, const char *computeShaderPath,
                   const bool enabled = true); // Compute shaders
 
     // Lookups
@@ -131,7 +138,7 @@ class IRenderer {
     std::unordered_map<std::string, RenderTargetHandle> renderTargetNameMap;
 
     // Shader passes
-    std::vector<ShaderPass> shaderPasses;
+    std::vector<ShaderNode> shaderNodeTree;
 };
 
 }; // namespace Engine

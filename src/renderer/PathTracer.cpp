@@ -47,10 +47,10 @@ void PathTracer::init() {
     setDisplayTarget("PostProcessedOutput");
 
     // Add the shader passes
-    addShaderPass("gbuffer", "shaders/pathTracing/main/gbuffer.comp");
-    addShaderPass("renderPass", "shaders/pathTracing/main/pathTracer.comp");
-    addShaderPass("post", "shaders/pathTracing/main/post.comp");
-    addShaderPass("invert", "shaders/compute/invert.comp", false);
+    addShaderNode("gbuffer", "shaders/pathTracing/main/gbuffer.comp");
+    addShaderNode("renderPass", "shaders/pathTracing/main/pathTracer.comp");
+    addShaderNode("post", "shaders/pathTracing/main/post.comp");
+    addShaderNode("invert", "shaders/compute/invert.comp", false);
 
     Logger::info("RENDERER", "Path Tracer initialized");
 }
@@ -221,11 +221,11 @@ void PathTracer::addRenderTarget(const std::string &name, GLuint bindingIndex,
 
 // Add a new compute shader pass to be ran
 // Enabled is defaulted to true
-void PathTracer::addShaderPass(const std::string &name,
+void PathTracer::addShaderNode(const std::string &name,
                                const char *computeShaderPath,
                                const bool enabled) {
     // Create a new shader pass & set attributes
-    ShaderPass pass;
+    ShaderNode pass;
     pass.name = name;
     pass.shader = Shader(computeShaderPath);
     pass.enabled = enabled;
@@ -436,7 +436,7 @@ void PathTracer::bindGlobalUniforms(Shader &shader,
 // --- Shader pass management ---
 
 // Run the shader pass, dispatching the compute shaders
-void PathTracer::dispatchShaderPass(const ShaderPass &pass) const {
+void PathTracer::dispatchShaderPass(const ShaderNode &pass) const {
 
     // Calculate the group sizes
     const GLuint groupsX =

@@ -18,7 +18,7 @@ void IRenderer::shutdown() {
     // Clear out registries
     renderTargets.clear();
     renderTargetNameMap.clear();
-    shaderPasses.clear();
+    shaderNodeTree.clear();
 }
 
 void IRenderer::resize(const uint32_t newWidth, const uint32_t newHeight) {
@@ -76,33 +76,33 @@ void IRenderer::setDisplayTarget(RenderTargetHandle handle) {
     currentRenderTarget = handle;
 }
 
-ShaderPass &IRenderer::addShaderPass(const std::string &name,
+ShaderNode &IRenderer::addShaderNode(const std::string &name,
                                      const char *computeShaderPath,
                                      const bool enabled) {
     // Create a new shader pass & set attributes
-    ShaderPass pass;
+    ShaderNode pass;
     pass.name = name;
     pass.shader = Shader(computeShaderPath);
     pass.enabled = enabled;
 
     // Add the shader pass to the registry
-    shaderPasses.push_back(std::move(pass));
-    return shaderPasses.back();
+    shaderNodeTree.push_back(std::move(pass));
+    return shaderNodeTree.back();
 }
 
-ShaderPass &IRenderer::addShaderPass(const std::string &name,
+ShaderNode &IRenderer::addShaderNode(const std::string &name,
                                      const char *vertexShaderPath,
                                      const char *fragmentShaderPath,
                                      const bool enabled) {
     // Create a new shader pass & set attributes
-    ShaderPass pass;
+    ShaderNode pass;
     pass.name = name;
     pass.shader = Shader(vertexShaderPath, fragmentShaderPath);
     pass.enabled = enabled;
 
     // Add the shader pass to the registry
-    shaderPasses.push_back(std::move(pass));
-    return shaderPasses.back();
+    shaderNodeTree.push_back(std::move(pass));
+    return shaderNodeTree.back();
 }
 
 RenderTarget *IRenderer::getRenderTarget(const RenderTargetHandle handle) {

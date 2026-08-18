@@ -76,7 +76,7 @@ class PathTracer : public IRenderer {
     void addRenderTarget(const std::string &name, GLuint bindingIndex,
                          GLenum format = GL_RGBA32F);
     // Shader pass
-    void addShaderPass(const std::string &name, const char *computeShaderPath,
+    void addShaderNode(const std::string &name, const char *computeShaderPath,
                        const bool enabled = true);
 
   private:
@@ -96,7 +96,7 @@ class PathTracer : public IRenderer {
     void bindGlobalUniforms(Shader &shader, const Camera &camera) const;
 
     // Shader pass mangment
-    void dispatchShaderPass(const ShaderPass &pass) const;
+    void dispatchShaderPass(const ShaderNode &pass) const;
 
   private:
     // Engine context - Injected
@@ -117,7 +117,7 @@ class PathTracer : public IRenderer {
     // Dynamic resource registries
     std::unordered_map<std::string, SSBO> storageBuffers;
     std::unordered_map<std::string, RenderTarget> renderTargets;
-    std::vector<ShaderPass> shaderPasses;
+    std::vector<ShaderNode> shaderPasses;
 
     // Instance data cache
     std::vector<GPUInstance> instances;
