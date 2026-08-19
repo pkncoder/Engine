@@ -1,4 +1,5 @@
 #include "Rasterizer.h"
+#include "GPUStructs.h"
 
 #include "../scene/SceneManager.h"
 #include "../scene/components/MaterialComponent.h"
@@ -7,10 +8,12 @@
 #include "../services/Logger.h"
 #include "GPUResourceManager.h"
 #include "IRenderer.h"
+#include "buffers/BufferManager.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // for glm::ortho / lookAt
+#include <glm/gtc/type_ptr.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -18,16 +21,7 @@
 
 namespace Engine {
 
-void Rasterizer::init(EngineState &state) {
-
-    shader = Shader("shaders/rasterizing/main/raster.vert",
-                    "shaders/rasterizing/main/raster.frag");
-
-    shadowShader = Shader("shaders/rasterizing/main/shadow.vert",
-                          "shaders/rasterizing/main/shadow.frag");
-
-    /* --- TODO: TEMP --- */
-
+void Rasterizer::setupDefaultTextures() {
     glGenTextures(1, &defaultWhiteTexture);
     glBindTexture(GL_TEXTURE_2D, defaultWhiteTexture);
     unsigned char whitePixel[] = {255, 255, 255, 255};
@@ -39,9 +33,21 @@ void Rasterizer::init(EngineState &state) {
     unsigned char flatNormalPixel[] = {128, 128, 255, 255};
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  flatNormalPixel);
+}
 
-    // --- NEW: Shadow Map FBO + Depth Texture ---
-    // Create the R32F cube map — one face per direction, stores linear distance
+void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
+
+    // If the new size is the same as the old one, do nothing
+    if (newWidth == currentWidth && newHeight == currentHeight) {
+        return;
+    }
+
+    // Update the tracked size
+    currentWidth = newWidth;
+    currentHeight = newHeight;
+}
+
+void Rasterizer::setupShadowFBO(EngineState &state) {
     glGenTextures(1, &shadowCubeMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubeMap);
     for (int i = 0; i < 6; i++) {
@@ -56,25 +62,43 @@ void Rasterizer::init(EngineState &state) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    // Generate the shadow render buffer & attach the width & height
     glGenRenderbuffers(1, &shadowDepthRBO);
     glBindRenderbuffer(GL_RENDERBUFFER, shadowDepthRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
                           state.renderer.settings.shadowWidth,
                           state.renderer.settings.shadowHeight);
 
-    // Generate the shadow fbo + attach the render buffer
     glGenFramebuffers(1, &shadowFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                               GL_RENDERBUFFER, shadowDepthRBO);
 
-    // Check to make sure it generated
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         Logger::error("RENDERER", "Shadow cube map FBO incomplete!");
 
-    // Un-bind the the fbo
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Rasterizer::init(EngineState &state) {
+    setupDefaultTextures();
+    setupShadowFBO(state);
+
+    // Register Passes into the IRenderer Graph
+    addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.vert",
+                  "shaders/rasterizing/main/shadow.frag");
+    addShaderNode("RasterPass", "shaders/rasterizing/main/raster.vert",
+                  "shaders/rasterizing/main/raster.frag");
+
+    // Allocate persistent UBO
+    cameraUBO =
+        BufferManager::createBuffer("CameraUBO", BufferType::UniformBuffer,
+                                    BufferUsage::Dynamic, sizeof(CameraData));
+
+    // NOTE: In modern OpenGL, binding UBOs via layout(std140, binding = 0) in
+    // the shader is preferred over manual block lookup, but your BufferManager
+    // map layout goes here.
+    BufferManager::mapUBOLayout(cameraUBO, 0, "CameraUBO",
+                                {"uView", "uProjection"});
 
     Logger::info("RENDERER", "Rasterizer initialized.");
 }
@@ -134,216 +158,224 @@ void Rasterizer::extract(EngineState &state) {
               });
 }
 
-void Rasterizer::prepare(EngineState &state) {
-    SceneManager *sceneManager = engineContext.getScene();
-    Camera &camera = sceneManager->getCamera();
+void generateShadowMatricies(EngineState &state, RenderLayer *shadowStep,
+                             glm::vec3 lightPos) {
+    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f,
+                                            state.renderer.settings.shadowNear,
+                                            state.renderer.settings.shadowFar);
 
-    // Pre-calculate all global matrices for the dispatch phase
-    if (currentHeight > 0) {
-        m_ViewMatrix = camera.getViewMatrix();
-        m_ProjMatrix =
-            camera.getProjectionMatrix(currentWidth / (float)currentHeight);
-    }
-
-    m_ShadowProjMatrix = glm::perspective(glm::radians(90.0f), 1.0f,
-                                          state.renderer.settings.shadowNear,
-                                          state.renderer.settings.shadowFar);
-}
-
-void Rasterizer::dispatch(EngineState &state) {
-
-    AssetManager *assetManager = engineContext.getAsset();
-    // GPUResourceManager* gpuManager = engineContext.getGPUResourceManager();
-    GPUResourceManager::init(assetManager);
-
-    int currentTextureUnit = 0;
-    auto bindMap = [&](GPUTexture *gpuTex, const std::string &uniformName,
-                       GLuint fallbackID, Shader &activeShader) {
-        glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
-        glBindTexture(GL_TEXTURE_2D, gpuTex ? gpuTex->textureID : fallbackID);
-        activeShader.setInt(uniformName, currentTextureUnit);
-        currentTextureUnit++;
-    };
-
-    // Offsets for the shadow map
     const glm::vec3 faceDirections[6] = {{1, 0, 0},  {-1, 0, 0}, {0, 1, 0},
                                          {0, -1, 0}, {0, 0, 1},  {0, 0, -1}};
     const glm::vec3 faceUps[6] = {{0, -1, 0}, {0, -1, 0}, {0, 0, 1},
                                   {0, 0, -1}, {0, -1, 0}, {0, -1, 0}};
 
-    // Get the render dimentions & pre-shadow mapping
-    GLint savedViewport[4];
-    glGetIntegerv(GL_VIEWPORT, savedViewport);
-
-    // Change the size of theviewport & bind the shadow FBO
-    glViewport(0, 0, state.renderer.settings.shadowHeight,
-               state.renderer.settings.shadowHeight);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-
-    // Bind the shadow map shader & upload uniforms
-    shadowShader.bind();
-    shadowShader.setVec3("uLightPos", m_ActiveLightPos);
-    shadowShader.setFloat("uFarPlane", state.renderer.settings.shadowFar);
-
-    // Loop each face for the mapping
     for (int face = 0; face < 6; face++) {
-        // Point the FBO color output at this cube face and attach settings
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                               GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-                               shadowCubeMap, 0);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glm::mat4 lightView = glm::lookAt(
+            lightPos, lightPos + faceDirections[face], faceUps[face]);
 
-        // Get the light view mat, and upload the new viewProjection matrix
-        glm::mat4 lightView =
-            glm::lookAt(m_ActiveLightPos,
-                        m_ActiveLightPos + faceDirections[face], faceUps[face]);
-        shadowShader.setMat4("uLightSpaceMatrix",
-                             m_ShadowProjMatrix * lightView);
-
-        // Loop each renderable & and shadow map it
-        for (const RenderPacket packet : m_RenderPackets) {
-
-            GPUMesh *gpuMesh =
-                GPUResourceManager::getOrUploadMesh(packet.meshHandle);
-            if (!gpuMesh)
-                continue;
-
-            shadowShader.setMat4("uModel", packet.modelMatrix);
-
-            currentTextureUnit = 0;
-            auto cpuMat = assetManager->getMaterial(packet.materialHandle);
-
-            if (cpuMat) {
-
-                GPUTexture *alphaTex = nullptr;
-                auto it = cpuMat->textureMaps.find("alpha");
-
-                if (it != cpuMat->textureMaps.end()) {
-                    // Found it! Use the handle to get the GPU texture
-                    alphaTex =
-                        GPUResourceManager::getOrUploadTexture(it->second);
-                }
-
-                bindMap(alphaTex, "uAlphaMap", defaultWhiteTexture,
-                        shadowShader);
-            }
-
-            glBindVertexArray(gpuMesh->vao);
-            glDrawElements(GL_TRIANGLES, gpuMesh->indexCount, GL_UNSIGNED_INT,
-                           0);
-        }
+        shadowStep->shadowTransforms.push_back(shadowProj * lightView);
     }
+}
 
-    // Un-bind the framebuffer and re-enstate the new viewport
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(savedViewport[0], savedViewport[1], savedViewport[2],
-               savedViewport[3]);
+void Rasterizer::prepare(EngineState &state) {
+    // input: list of render packets (mesh, material, modelMatrix)
+    // output: list of draw commands within each shader pass
 
-    /* ----------------- Pass 2 ----------------- */
+    BufferManager::setUBOValue(cameraUBO, "uView", sizeof(glm::mat4),
+                               glm::value_ptr(cameraData.view));
+    BufferManager::setUBOValue(cameraUBO, "uProjection", sizeof(glm::mat4),
+                               glm::value_ptr(cameraData.projection));
+    BufferManager::pushBuffer(cameraUBO, frameIndex);
 
-    // Bind the main shader
-    shader.bind();
+    // TODO: generate shadowFBO?
 
-    // Upload the uniforms for base rendering
-    shader.setMat4("uViewProjection", m_ProjMatrix * m_ViewMatrix);
-    shader.setVec3("uCameraPos", state.scene.camera.position);
-    shader.setFloat("uFOV", state.scene.camera.fov);
-    shader.setVec2("uResolution", glm::vec2(currentWidth, currentHeight));
+    shaderNodeTree[0].renderSteps.clear();
+    shaderNodeTree[1].renderSteps.clear();
 
-    // Upload shadow mapping uniforms
-    shader.setVec3("uLightPos", m_ActiveLightPos);
-    shader.setFloat(
-        "uShadowFarPlane",
-        state.renderer.settings.shadowFar); // new — replaces uLightSpaceMatrix
+    // Create the render passes
+    RenderLayer shadowStep;
+    shadowStep.fbo = shadowFBO;
+    shadowStep.renderWidth = state.renderer.settings.shadowWidth;
+    shadowStep.renderHeight = state.renderer.settings.shadowHeight;
+    shadowStep.isShadowPass = true;
 
-    // Loop each renderablable
-    for (const RenderPacket packet : m_RenderPackets) {
+    generateShadowMatricies(state, &shadowStep, activeLightPos);
+
+    RenderLayer mainStep;
+    mainStep.fbo = 0;
+    mainStep.renderWidth = currentWidth;
+    mainStep.renderHeight = currentHeight;
+    mainStep.isShadowPass = false;
+
+    // Loop through the render packets
+    for (const auto &packet : renderPackets) {
 
         GPUMesh *gpuMesh =
             GPUResourceManager::getOrUploadMesh(packet.meshHandle);
-        if (!gpuMesh) {
-            Logger::debug("NOMESH");
+        CPUMaterialData *cpuMaterial = engineContext.getAsset()
+                                           ->getMaterial(packet.materialHandle)
+                                           .get(); // TEMP
+
+        if (!gpuMesh || !cpuMaterial) {
+            Logger::warn(
+                "RENDERER",
+                "Render Packet Skipped (GPU Mesh: " +
+                    std::string(gpuMesh == nullptr ? "no" : "yes") +
+                    ") \(CPU Material: " +
+                    std::string(cpuMaterial == nullptr ? "no" : "yes") + ")");
+
             continue;
         }
 
-        shader.setMat4("uModel", packet.modelMatrix);
-
-        // 2. FETCH MATERIAL DATA
-        std::shared_ptr<CPUMaterialData> cpuMat =
-            assetManager->getMaterial(packet.materialHandle);
-        if (!cpuMat) {
-            Logger::fatal("RENDER", "CPU material error, mat handle: " +
-                                        std::to_string(packet.materialHandle));
-        }
-
-        shader.setVec3("uAlbedo", cpuMat->albedo);
-        shader.setVec3("uEmmissive", cpuMat->emissive);
-        shader.setFloat("uRoughness", cpuMat->roughness);
-        shader.setFloat("uMetallic", cpuMat->metallic);
-
-        // Texture map binding
-        currentTextureUnit = 0;
-
-        auto getSafeTex = [&](const std::string &key) -> GPUTexture * {
-            auto it = cpuMat->textureMaps.find(key);
-            if (it != cpuMat->textureMaps.end()) {
-                return GPUResourceManager::getOrUploadTexture(it->second);
+        // Map material textures to GLuints safely
+        auto getTexID = [&](const std::string &key) -> GLuint {
+            auto ittr = cpuMaterial->textureMaps.find(key);
+            if (ittr != cpuMaterial->textureMaps.end()) {
+                GPUTexture *tex =
+                    GPUResourceManager::getOrUploadTexture(ittr->second);
+                return tex ? tex->textureID : 0;
             }
-            return nullptr; // Texture doesn't exist for this material
+            return 0;
         };
 
-        GPUTexture *albedoTex = getSafeTex("albedo");
-        GPUTexture *emissiveTex = getSafeTex("emissive");
-        GPUTexture *roughnessTex = getSafeTex("roughness");
-        GPUTexture *metallicTex = getSafeTex("metallic");
-        GPUTexture *alphaTex = getSafeTex("alpha");
-        GPUTexture *normalTex = getSafeTex("normal");
-        GPUTexture *bumpTex = getSafeTex("bump");
+        /* ----------------- Shadow Pass ----------------- */
+        {
+            std::shared_ptr<RasterDrawCommand> drawCommand =
+                std::make_shared<RasterDrawCommand>();
 
-        bindMap(albedoTex, "uAlbedoMap", defaultWhiteTexture, shader);
-        bindMap(emissiveTex, "uEmissiveMap", defaultWhiteTexture, shader);
-        bindMap(roughnessTex, "uRoughnessMap", defaultWhiteTexture, shader);
-        bindMap(metallicTex, "uMetallicMap", defaultWhiteTexture, shader);
-        bindMap(alphaTex, "uAlphaMap", defaultWhiteTexture, shader);
-        bindMap(normalTex, "uNormalMap", defaultNormalTexture, shader);
-        bindMap(bumpTex, "uBumpMap", defaultWhiteTexture, shader);
+            drawCommand->vao = gpuMesh->vao;
+            drawCommand->indexCount = gpuMesh->indexCount;
+            drawCommand->modelMatrix = packet.modelMatrix;
 
-        if (bumpTex && !normalTex) {
-            shader.setInt("uIsBumpMap", 1);
+            // TODO: textures? (alpha map)
+            drawCommand->textures[2] = getTexID("alpha");
 
-        } else {
-            shader.setInt("uIsBumpMap", 0);
+            // TODO: assigning uniforms??
+
+            shadowStep.commands.push_back(drawCommand);
         }
 
-        glActiveTexture(GL_TEXTURE0 + currentTextureUnit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubeMap);
-        shader.setInt("uShadowCubeMap", currentTextureUnit);
-        currentTextureUnit++;
+        /* ----------------- Main Pass ---------------- */
+        {
+            std::shared_ptr<RasterDrawCommand> drawCommand =
+                std::make_shared<RasterDrawCommand>();
 
-        // Bind the vao and draw the triangles
-        glBindVertexArray(gpuMesh->vao);
-        glDrawElements(GL_TRIANGLES, gpuMesh->indexCount, GL_UNSIGNED_INT, 0);
+            mainStep.fbo = 0; // Main screen
+
+            drawCommand->vao = gpuMesh->vao;
+            drawCommand->indexCount = gpuMesh->indexCount;
+            drawCommand->modelMatrix = packet.modelMatrix;
+
+            drawCommand->albedo = cpuMaterial->albedo;
+            drawCommand->emissive = cpuMaterial->emissive;
+            drawCommand->roughness = cpuMaterial->roughness;
+            drawCommand->metallic = cpuMaterial->metallic;
+
+            drawCommand->textures[0] = getTexID("albedo");
+            drawCommand->textures[1] = getTexID("emissive");
+            drawCommand->textures[2] = getTexID("alpha");
+            drawCommand->textures[3] = getTexID("roughness");
+            drawCommand->textures[4] = getTexID("metallic");
+            drawCommand->textures[5] = getTexID("normal");
+            drawCommand->textures[6] = getTexID("bump");
+            drawCommand->textures[7] = shadowCubeMap;
+
+            // Calculate bump map logic and store it in the command
+            drawCommand->isBumpMap = (drawCommand->textures[6] != 0 &&
+                                      drawCommand->textures[5] == 0);
+
+            mainStep.commands.push_back(drawCommand);
+        }
     }
 
-    glBindVertexArray(0);
+    // Push layers into the tree so dispatch can find them
+    shaderNodeTree[0].renderSteps.push_back(shadowStep);
+    shaderNodeTree[1].renderSteps.push_back(mainStep);
+}
+
+void Rasterizer::dispatch(EngineState &state) {
+    for (const ShaderNode &pass : shaderNodeTree) {
+
+        glUseProgram(pass.shader.ID);
+
+        for (const RenderLayer &layer : pass.renderSteps) {
+
+            glBindFramebuffer(GL_FRAMEBUFFER, layer.fbo);
+            glViewport(0, 0, layer.renderWidth, layer.renderHeight);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            if (layer.isShadowPass) {
+                // Send the 6 matrices to the Geometry Shader uniform array
+                for (int i = 0; i < 6; ++i) {
+                    pass.shader.setMat4("uShadowMatrices[" + std::to_string(i) +
+                                            "]",
+                                        layer.shadowTransforms[i]);
+                }
+                pass.shader.setVec3("uLightPos", activeLightPos);
+                pass.shader.setFloat("uFarPlane",
+                                     state.renderer.settings.shadowFar);
+            } else {
+                // Main pass global uniforms
+                pass.shader.setVec3("uCameraPos", state.scene.camera.position);
+                pass.shader.setFloat("uShadowFarPlane",
+                                     state.renderer.settings.shadowFar);
+                pass.shader.setVec3("uLightPos", activeLightPos);
+            }
+
+            GLuint currentVAO = 0;
+
+            for (const std::shared_ptr<DrawCommand> cmd : layer.commands) {
+                const auto command =
+                    std::static_pointer_cast<RasterDrawCommand>(cmd);
+
+                // 1. Send Model Matrix
+                pass.shader.setMat4("uModel", command->modelMatrix);
+
+                // 2. Send Material Data (Only matters for the main pass, but
+                // safe to set if unused)
+                if (!layer.isShadowPass) {
+                    pass.shader.setVec3("uAlbedo", command->albedo);
+                    pass.shader.setVec3("uEmmissive", command->emissive);
+                    pass.shader.setFloat("uRoughness", command->roughness);
+                    pass.shader.setFloat("uMetallic", command->metallic);
+                    pass.shader.setInt("uIsBumpMap",
+                                       command->isBumpMap ? 1 : 0);
+                }
+
+                // 3. Bind Textures from the array
+                for (int i = 0; i < 8; ++i) {
+                    if (command->textures[i] != 0) {
+                        glActiveTexture(GL_TEXTURE0 + i);
+                        // Note: Slot 7 is the cubemap, others are 2D.
+                        // In a more advanced system you'd track texture
+                        // targets, but this works for now.
+                        GLuint target =
+                            (i == 7) ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
+                        glBindTexture(target, command->textures[i]);
+
+                        // Set sampler uniform (e.g., uAlbedoMap = 0,
+                        // uEmissiveMap = 1) Ideally you use fixed
+                        // layout(binding = X) in GLSL to avoid this call!
+                        // pass.shader.setInt("samplerName", i);
+                    }
+                }
+
+                // 4. Draw
+                if (currentVAO != command->vao) {
+                    glBindVertexArray(command->vao);
+                    currentVAO = command->vao;
+                }
+
+                glDrawElements(GL_TRIANGLES, command->indexCount,
+                               GL_UNSIGNED_INT, 0);
+            }
+        }
+    }
 }
 
 void Rasterizer::postProcess(EngineState &state) {}
 
 void Rasterizer::present(EngineState &state) {}
-
-void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
-
-    // If the new size is the same as the old one, do nothing
-    if (newWidth == currentWidth && newHeight == currentHeight) {
-        return;
-    }
-
-    // Update the tracked size
-    currentWidth = newWidth;
-    currentHeight = newHeight;
-}
 
 void Rasterizer::shutdown() {
     glDeleteFramebuffers(1, &shadowFBO);

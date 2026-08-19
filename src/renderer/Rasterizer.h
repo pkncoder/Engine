@@ -16,6 +16,12 @@ struct RasterDrawCommand : DrawCommand {
     GLuint indexCount;
     glm::mat4 modelMatrix;
 
+    glm::vec3 albedo;
+    glm::vec3 emissive;
+    float roughness;
+    float metallic;
+    bool isBumpMap; // Store the logic here!
+
     /*
      * Albedo
      * Emmissive

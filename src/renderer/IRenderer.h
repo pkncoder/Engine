@@ -41,6 +41,10 @@ struct RenderLayer {
     size_t renderWidth;
     size_t renderHeight;
 
+    // TODO: Temp; this will need to be moved into individual layers once the tree is defined
+    bool isShadowPass = false; // A flag to help dispatch know what to do
+    std::vector<glm::mat4> shadowTransforms;
+
     std::vector<std::shared_ptr<DrawCommand>> commands;
 };
 
