@@ -2,6 +2,7 @@
 
 #include "../services/Logger.h"
 #include "../services/Timer.h"
+#include "GPUResourceManager.h"
 
 namespace Engine {
 
@@ -9,6 +10,8 @@ namespace Engine {
 RendererManager::RendererManager(EngineContext &engineContext,
                                  EngineState &state)
     : engineContext(engineContext) {
+
+    GPUResourceManager::init(engineContext.getAsset());
 
     // Rasterizer inizialization
     rasterizer = std::make_unique<Rasterizer>(engineContext);

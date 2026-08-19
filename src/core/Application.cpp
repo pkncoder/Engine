@@ -7,12 +7,10 @@
 #include "../services/Input.h"
 #include "../services/Logger.h"
 #include "../services/Timer.h"
-#include "../services/UUID.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
 
-#include <cstdint>
 #include <memory>
 
 namespace Engine {
@@ -214,7 +212,7 @@ void Application::setupEntities() {
     }
 
     // Gay Room (me)
-    if (0) {
+    if (1) {
         std::vector<EntityID> room =
             sceneManager->loadObjScene("assets/models/gayRoom.obj");
 
@@ -303,7 +301,7 @@ void Application::setupEntities() {
     }
 
     // Sponza
-    if (1) {
+    if (0) {
         std::vector<EntityID> sponza =
             sceneManager->loadObjScene("assets/models/sponza.obj");
 

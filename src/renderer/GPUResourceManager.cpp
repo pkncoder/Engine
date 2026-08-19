@@ -12,6 +12,11 @@ GPUMesh *GPUResourceManager::getOrUploadMesh(const AssetHandle handle) {
         return &ittr->second;
     }
 
+    if (!assetManager) {
+        Logger::fatal("GPU RESOURCE", "ASSET MANAGER NOT INITIALIZED");
+        return nullptr;
+    }
+
     // If it doesn't exist, get the mesh data from asset manager
     auto cpuMesh = assetManager->getMesh(handle);
     if (!cpuMesh) {

@@ -22,6 +22,8 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
     buffer.name = name;
     buffer.handle = UUID();
 
+    buffer.usage = usage;
+
     buffer.size = size;
     buffer.type = type;
 
