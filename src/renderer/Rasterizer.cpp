@@ -90,9 +90,9 @@ void Rasterizer::init(EngineState &state) {
                   "shaders/rasterizing/main/raster.frag");
 
     // Allocate persistent UBO
-    cameraUBO =
-        BufferManager::createBuffer("CameraUBO", BufferType::UniformBuffer,
-                                    BufferUsage::Dynamic, sizeof(CameraData));
+    cameraUBO = BufferManager::createBuffer(
+        "CameraUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
+        sizeof(CameraData), nullptr, true);
 
     // NOTE: In modern OpenGL, binding UBOs via layout(std140, binding = 0) in
     // the shader is preferred over manual block lookup, but your BufferManager
@@ -185,9 +185,7 @@ void Rasterizer::prepare(EngineState &state) {
                                glm::value_ptr(cameraData.view));
     BufferManager::setUBOValue(cameraUBO, "uProjection", sizeof(glm::mat4),
                                glm::value_ptr(cameraData.projection));
-    Logger::check();
     BufferManager::pushBuffer(cameraUBO, frameIndex);
-    Logger::check();
 
     // TODO: generate shadowFBO?
 
@@ -296,7 +294,6 @@ void Rasterizer::prepare(EngineState &state) {
 }
 
 void Rasterizer::dispatch(EngineState &state) {
-    Logger::check();
     for (const ShaderNode &pass : shaderNodeTree) {
 
         glUseProgram(pass.shader.ID);

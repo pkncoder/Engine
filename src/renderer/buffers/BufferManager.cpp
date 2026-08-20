@@ -48,21 +48,22 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
         // Bind the buffer & the initial data
         glBindBuffer(glType, buffer.ids[i]);
         glBufferData(glType, size, initialData, glUsage);
+        glBindBuffer(glType, 0);
     }
 
     // Unbind the buffer
     glBindBuffer(glType, 0);
 
-    // Save the buffer into the registry
-    bufferRegistry[buffer.handle] = std::move(buffer);
-
     // If the buffer is dynamic, resize the cpu cache
     if (usage == BufferUsage::Dynamic) {
-        buffer.cpuCache.resize(size, 0);
+        buffer.cpuCache.resize(size);
         if (initialData) { // memcpy any initial data if it exists
             std::memcpy(buffer.cpuCache.data(), initialData, size);
         }
     }
+
+    // Save the buffer into the registry
+    bufferRegistry[buffer.handle] = std::move(buffer);
 
     return buffer.handle;
 }
@@ -356,9 +357,6 @@ void BufferManager::pushBuffer(const BufferHandle handle,
                           ? buffer.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
                           : buffer.ids[0];
     GLenum glType = static_cast<GLenum>(buffer.type);
-
-    Logger::debug(std::to_string(buffer.ids[0]) + " ; " +
-                  std::to_string(buffer.ids[0]));
 
     // Bind, push the CPU cache, and unbind
     glBindBuffer(glType, activeID);
