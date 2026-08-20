@@ -357,6 +357,9 @@ void BufferManager::pushBuffer(const BufferHandle handle,
                           : buffer.ids[0];
     GLenum glType = static_cast<GLenum>(buffer.type);
 
+    Logger::debug(std::to_string(buffer.ids[0]) + " ; " +
+                  std::to_string(buffer.ids[0]));
+
     // Bind, push the CPU cache, and unbind
     glBindBuffer(glType, activeID);
     glBufferSubData(glType, 0, buffer.size, buffer.cpuCache.data());

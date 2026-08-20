@@ -185,7 +185,9 @@ void Rasterizer::prepare(EngineState &state) {
                                glm::value_ptr(cameraData.view));
     BufferManager::setUBOValue(cameraUBO, "uProjection", sizeof(glm::mat4),
                                glm::value_ptr(cameraData.projection));
+    Logger::check();
     BufferManager::pushBuffer(cameraUBO, frameIndex);
+    Logger::check();
 
     // TODO: generate shadowFBO?
 
@@ -294,6 +296,7 @@ void Rasterizer::prepare(EngineState &state) {
 }
 
 void Rasterizer::dispatch(EngineState &state) {
+    Logger::check();
     for (const ShaderNode &pass : shaderNodeTree) {
 
         glUseProgram(pass.shader.ID);

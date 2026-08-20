@@ -87,7 +87,7 @@ void Application::init() {
 
     // Log the final init log & turn off setNoPendingLogs
     Logger::info("APPLICATION", "Application init complete");
-    Logger::setNoPendingLogs(false);
+    // Logger::setNoPendingLogs(false);
 }
 
 // Main loop
