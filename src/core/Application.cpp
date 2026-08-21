@@ -275,7 +275,7 @@ void Application::setupEntities() {
     }
 
     // Breakfast room
-    if (1) {
+    if (0) {
         std::vector<EntityID> room =
             sceneManager->loadObjScene("assets/models/breakfast_room.obj");
 
@@ -301,7 +301,7 @@ void Application::setupEntities() {
     }
 
     // Sponza
-    if (0) {
+    if (1) {
         std::vector<EntityID> sponza =
             sceneManager->loadObjScene("assets/models/sponza.obj");
 

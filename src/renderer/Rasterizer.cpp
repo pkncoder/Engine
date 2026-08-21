@@ -14,6 +14,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // for glm::ortho / lookAt
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -120,6 +121,8 @@ void Rasterizer::init(EngineState &state) {
 void Rasterizer::beginFrame(EngineState &state) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderPackets.clear();
+
+    frameIndex++;
 }
 
 void Rasterizer::extract(EngineState &state) {
@@ -275,8 +278,6 @@ void Rasterizer::prepare(EngineState &state) {
             std::shared_ptr<RasterDrawCommand> drawCommand =
                 std::make_shared<RasterDrawCommand>();
 
-            mainStep.fbo = 0; // Main screen
-
             drawCommand->vao = gpuMesh->vao;
             drawCommand->indexCount = gpuMesh->indexCount;
             drawCommand->modelMatrix = packet.modelMatrix;
@@ -300,8 +301,9 @@ void Rasterizer::prepare(EngineState &state) {
             drawCommand->textures[7] = shadowCubeMap;
 
             // Calculate bump map logic and store it in the command
-            drawCommand->isBumpMap = (drawCommand->textures[6] != 0 &&
-                                      drawCommand->textures[5] == 0);
+            drawCommand->isBumpMap =
+                (drawCommand->textures[6] != defaultWhiteTexture &&
+                 drawCommand->textures[5] == defaultNormalTexture);
 
             mainStep.commands.push_back(drawCommand);
         }
@@ -315,7 +317,7 @@ void Rasterizer::prepare(EngineState &state) {
 void Rasterizer::dispatch(EngineState &state) {
     for (const ShaderNode &pass : shaderNodeTree) {
 
-        glUseProgram(pass.shader.ID);
+        pass.shader.bind();
 
         pass.shader.setMat4("uViewProjection",
                             cameraData.projection * cameraData.view);
@@ -336,6 +338,9 @@ void Rasterizer::dispatch(EngineState &state) {
                     pass.shader.setMat4("uShadowMatrices[" + std::to_string(i) +
                                             "]",
                                         layer.shadowTransforms[i]);
+                    if (frameIndex == 1)
+                        Logger::debug(
+                            glm::to_string(layer.shadowTransforms[i]));
                 }
                 pass.shader.setVec3("uLightPos", activeLightPos);
                 pass.shader.setFloat("uFarPlane",
@@ -388,6 +393,8 @@ void Rasterizer::dispatch(EngineState &state) {
                                GL_UNSIGNED_INT, 0);
             }
         }
+
+        pass.shader.unbind();
     }
 }
 
