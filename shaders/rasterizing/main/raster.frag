@@ -108,7 +108,7 @@ void main() {
     // Calculate the world normal
     vec3 worldNormal = normalize(TBN * localNormal);
 
-    // float shadow = calcShadow(vWorldPos, worldNormal);
+    float shadow = calcShadow(vWorldPos, worldNormal);
 
     // Sample & get the material values
     vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;

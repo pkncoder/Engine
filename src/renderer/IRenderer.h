@@ -41,7 +41,8 @@ struct RenderLayer {
     size_t renderWidth;
     size_t renderHeight;
 
-    // TODO: Temp; this will need to be moved into individual layers once the tree is defined
+    // TODO: Temp; this will need to be moved into individual layers once the
+    // tree is defined
     bool isShadowPass = false; // A flag to help dispatch know what to do
     std::vector<glm::mat4> shadowTransforms;
 
@@ -97,6 +98,11 @@ class IRenderer {
     virtual void setDisplayTarget(const RenderTargetHandle handle);
 
     // Shader pass overloads
+    virtual ShaderNode &
+    addShaderNode(const std::string &name, const char *vertexShaderPath,
+                  const char *geometryShaderPath,
+                  const char *fragmentShaderPath,
+                  const bool enabled = true); // Vert & Geom & Frag shaders
     virtual ShaderNode &
     addShaderNode(const std::string &name, const char *vertexShaderPath,
                   const char *fragmentShaderPath,

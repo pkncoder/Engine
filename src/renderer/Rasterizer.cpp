@@ -84,8 +84,9 @@ void Rasterizer::init(EngineState &state) {
     setupShadowFBO(state);
 
     // Register Passes into the IRenderer Graph
-    addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.geom",
-                  GL_GEOMETRY_SHADER);
+    addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.vert",
+                  "shaders/rasterizing/main/shadow.geom",
+                  "shaders/rasterizing/main/shadow.frag");
     addShaderNode("RasterPass", "shaders/rasterizing/main/raster.vert",
                   "shaders/rasterizing/main/raster.frag");
 

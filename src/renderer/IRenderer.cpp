@@ -77,12 +77,15 @@ void IRenderer::setDisplayTarget(RenderTargetHandle handle) {
 }
 
 ShaderNode &IRenderer::addShaderNode(const std::string &name,
-                                     const char *computeShaderPath,
+                                     const char *vertexShaderPath,
+                                     const char *geometryShaderPath,
+                                     const char *fragmentShaderPath,
                                      const bool enabled) {
     // Create a new shader pass & set attributes
     ShaderNode pass;
     pass.name = name;
-    pass.shader = Shader(computeShaderPath);
+    pass.shader =
+        Shader(vertexShaderPath, geometryShaderPath, fragmentShaderPath);
     pass.enabled = enabled;
 
     // Add the shader pass to the registry
@@ -98,6 +101,20 @@ ShaderNode &IRenderer::addShaderNode(const std::string &name,
     ShaderNode pass;
     pass.name = name;
     pass.shader = Shader(vertexShaderPath, fragmentShaderPath);
+    pass.enabled = enabled;
+
+    // Add the shader pass to the registry
+    shaderNodeTree.push_back(std::move(pass));
+    return shaderNodeTree.back();
+}
+
+ShaderNode &IRenderer::addShaderNode(const std::string &name,
+                                     const char *computeShaderPath,
+                                     const bool enabled) {
+    // Create a new shader pass & set attributes
+    ShaderNode pass;
+    pass.name = name;
+    pass.shader = Shader(computeShaderPath);
     pass.enabled = enabled;
 
     // Add the shader pass to the registry
