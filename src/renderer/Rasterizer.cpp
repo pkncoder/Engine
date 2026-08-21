@@ -84,8 +84,8 @@ void Rasterizer::init(EngineState &state) {
     setupShadowFBO(state);
 
     // Register Passes into the IRenderer Graph
-    addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.vert",
-                  "shaders/rasterizing/main/shadow.frag");
+    addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.geom",
+                  GL_GEOMETRY_SHADER);
     addShaderNode("RasterPass", "shaders/rasterizing/main/raster.vert",
                   "shaders/rasterizing/main/raster.frag");
 
@@ -99,6 +99,19 @@ void Rasterizer::init(EngineState &state) {
     // map layout goes here.
     BufferManager::mapUBOLayout(cameraUBO, 0, "CameraUBO",
                                 {"uView", "uProjection"});
+
+    glUseProgram(shaderNodeTree[1].shader.ID);
+
+    shaderNodeTree[1].shader.setInt("uAlbedoMap", 0);
+    shaderNodeTree[1].shader.setInt("uEmissiveMap", 1);
+    shaderNodeTree[1].shader.setInt("uAlphaMap", 2);
+    shaderNodeTree[1].shader.setInt("uRoughnessMap", 3);
+    shaderNodeTree[1].shader.setInt("uMetallicMap", 4);
+    shaderNodeTree[1].shader.setInt("uNormalMap", 5);
+    shaderNodeTree[1].shader.setInt("uBumpMap", 6);
+    shaderNodeTree[1].shader.setInt("uShadowCubeMap", 7);
+
+    glUseProgram(0);
 
     Logger::info("RENDERER", "Rasterizer initialized.");
 }
@@ -185,7 +198,7 @@ void Rasterizer::prepare(EngineState &state) {
                                glm::value_ptr(cameraData.view));
     BufferManager::setUBOValue(cameraUBO, "uProjection", sizeof(glm::mat4),
                                glm::value_ptr(cameraData.projection));
-    BufferManager::pushBuffer(cameraUBO, frameIndex);
+    // BufferManager::pushBuffer(cameraUBO, frameIndex);
 
     // TODO: generate shadowFBO?
 
@@ -228,14 +241,15 @@ void Rasterizer::prepare(EngineState &state) {
         }
 
         // Map material textures to GLuints safely
-        auto getTexID = [&](const std::string &key) -> GLuint {
+        auto getTexID = [&](const std::string &key, GLuint fallback) -> GLuint {
             auto ittr = cpuMaterial->textureMaps.find(key);
             if (ittr != cpuMaterial->textureMaps.end()) {
                 GPUTexture *tex =
                     GPUResourceManager::getOrUploadTexture(ittr->second);
-                return tex ? tex->textureID : 0;
+                if (tex && tex->textureID != 0)
+                    return tex->textureID;
             }
-            return 0;
+            return fallback; // Return default white/normal texture instead of 0
         };
 
         /* ----------------- Shadow Pass ----------------- */
@@ -248,7 +262,7 @@ void Rasterizer::prepare(EngineState &state) {
             drawCommand->modelMatrix = packet.modelMatrix;
 
             // TODO: textures? (alpha map)
-            drawCommand->textures[2] = getTexID("alpha");
+            drawCommand->textures[2] = getTexID("alpha", defaultWhiteTexture);
 
             // TODO: assigning uniforms??
 
@@ -271,13 +285,17 @@ void Rasterizer::prepare(EngineState &state) {
             drawCommand->roughness = cpuMaterial->roughness;
             drawCommand->metallic = cpuMaterial->metallic;
 
-            drawCommand->textures[0] = getTexID("albedo");
-            drawCommand->textures[1] = getTexID("emissive");
-            drawCommand->textures[2] = getTexID("alpha");
-            drawCommand->textures[3] = getTexID("roughness");
-            drawCommand->textures[4] = getTexID("metallic");
-            drawCommand->textures[5] = getTexID("normal");
-            drawCommand->textures[6] = getTexID("bump");
+            // Main pass setup:
+            drawCommand->textures[0] = getTexID("albedo", defaultWhiteTexture);
+            drawCommand->textures[1] =
+                getTexID("emissive", defaultWhiteTexture);
+            drawCommand->textures[2] = getTexID("alpha", defaultWhiteTexture);
+            drawCommand->textures[3] =
+                getTexID("roughness", defaultWhiteTexture);
+            drawCommand->textures[4] =
+                getTexID("metallic", defaultWhiteTexture);
+            drawCommand->textures[5] = getTexID("normal", defaultNormalTexture);
+            drawCommand->textures[6] = getTexID("bump", defaultWhiteTexture);
             drawCommand->textures[7] = shadowCubeMap;
 
             // Calculate bump map logic and store it in the command
@@ -297,6 +315,13 @@ void Rasterizer::dispatch(EngineState &state) {
     for (const ShaderNode &pass : shaderNodeTree) {
 
         glUseProgram(pass.shader.ID);
+
+        pass.shader.setMat4("uViewProjection",
+                            cameraData.projection * cameraData.view);
+        pass.shader.setVec3("uCameraPos", state.scene.camera.position);
+        pass.shader.setFloat("uFOV", state.scene.camera.fov);
+        pass.shader.setVec2("uResolution",
+                            glm::vec2(currentWidth, currentHeight));
 
         for (const RenderLayer &layer : pass.renderSteps) {
 
@@ -346,17 +371,9 @@ void Rasterizer::dispatch(EngineState &state) {
                 for (int i = 0; i < 8; ++i) {
                     if (command->textures[i] != 0) {
                         glActiveTexture(GL_TEXTURE0 + i);
-                        // Note: Slot 7 is the cubemap, others are 2D.
-                        // In a more advanced system you'd track texture
-                        // targets, but this works for now.
                         GLuint target =
                             (i == 7) ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
                         glBindTexture(target, command->textures[i]);
-
-                        // Set sampler uniform (e.g., uAlbedoMap = 0,
-                        // uEmissiveMap = 1) Ideally you use fixed
-                        // layout(binding = X) in GLSL to avoid this call!
-                        // pass.shader.setInt("samplerName", i);
                     }
                 }
 

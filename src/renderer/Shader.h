@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <string>
@@ -10,6 +11,10 @@ class Shader {
   public:
     // Constructors
     inline Shader() : ID(0) {}
+
+    // TODO: Custom setup for individual things
+    Shader(const char *vertexPath, const char *geometryPath,
+           const char *fragmentPath);
     Shader(const char *vertexPath, const char *fragmentPath);
     Shader(const char *computePath);
 
@@ -36,11 +41,13 @@ class Shader {
     // Writes the final stitched code to a file for easy debugging
     void dumpExpandedShaderCode(const std::string &sourceFileName,
                                 const std::string &source,
-                                const std::string &type) const;
+                                const std::string &type)
+        const; // TODO: Swap to using custom enum on type
 
     // Used to check errors on shader & program compilations
     void checkCompileErrors(const uint32_t shader,
-                            const std::string type) const;
+                            const std::string type)
+        const; // TODO: Swap to using custom enum on type
 };
 
 } // namespace Engine

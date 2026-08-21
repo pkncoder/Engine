@@ -3,7 +3,7 @@
 
 newmtl breakfast_room:Artwork
 illum 4
-Kd 0.00 0.00 0.00
+Kd 1.00 1.00 1.00
 Ka 1.00 1.00 1.00
 Tf 1.00 1.00 1.00
 map_Kd picture3.jpg
@@ -44,7 +44,7 @@ Ks 0.80 0.80 0.80
 Ns 100.00
 newmtl breakfast_room:Floor_Tiles
 illum 4
-Kd 0.00 0.00 0.00
+Kd 1.00 1.00 1.00
 Ka 1.00 1.00 1.00
 Tf 1.00 1.00 1.00
 map_Kd tiles.png

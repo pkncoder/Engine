@@ -14,6 +14,82 @@ namespace Engine {
 
 namespace fs = std::filesystem;
 
+Shader::Shader(const char *vertexPath, const char *geometryPath,
+               const char *fragmentPath) {
+
+    // Get the shader code without #includes
+    std::string vertexCode = getExpandedShaderCode(vertexPath);
+    std::string geometryCode = getExpandedShaderCode(geometryPath);
+    std::string fragmentCode = getExpandedShaderCode(fragmentPath);
+
+    // Get the filenames of each code file
+    std::string vertexFileName =
+        std::string(vertexPath)
+            .substr(std::string(vertexPath).find_last_of('/') + 1);
+
+    std::string geometryFileName =
+        std::string(geometryPath)
+            .substr(std::string(geometryPath).find_last_of('/') + 1);
+
+    std::string fragmentFileName =
+        std::string(fragmentPath)
+            .substr(std::string(fragmentPath).find_last_of('/') + 1);
+
+    // Dump the expanded shader code for debug
+    dumpExpandedShaderCode(vertexFileName, vertexCode, "VERTEX");
+    dumpExpandedShaderCode(geometryFileName, geometryCode, "GEOMETRY");
+    dumpExpandedShaderCode(fragmentFileName, fragmentCode, "FRAGMENT");
+
+    // Get c-strings of the shader code
+    const char *vShaderSource = vertexCode.c_str();
+    const char *gShaderSource = vertexCode.c_str();
+    const char *fShaderSource = fragmentCode.c_str();
+
+    // Save variables for the final shader
+    uint32_t vertex, geometry, fragment;
+
+    // Create and compile the vertex shader
+    vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vShaderSource, NULL);
+    glCompileShader(vertex);
+
+    // Check for compilation errors
+    checkCompileErrors(vertex, "VERTEX");
+
+    // Create and compile the fragment shader
+    fragment = glCreateShader(GL_GEOMETRY_SHADER);
+    glShaderSource(geometry, 1, &gShaderSource, NULL);
+    glCompileShader(geometry);
+
+    // Check for compilation errors
+    checkCompileErrors(vertex, "GEOMETRY");
+
+    // Create and compile the fragment shader
+    fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fShaderSource, NULL);
+    glCompileShader(fragment);
+
+    // Check for compilation errors
+    checkCompileErrors(fragment, "FRAGMENT");
+
+    // Create an OpenGL program & attatch the shaders
+    ID = glCreateProgram();
+    glAttachShader(ID, vertex);
+    glAttachShader(ID, geometry);
+    glAttachShader(ID, fragment);
+
+    // Link the program to OpenGL
+    glLinkProgram(ID);
+
+    // Check for projgram creation errors
+    checkCompileErrors(ID, "PROGRAM");
+
+    // Delete the old shaders, as the program now has them
+    glDeleteShader(vertex);
+    glDeleteShader(geometry);
+    glDeleteShader(fragment);
+}
+
 // On construction - compile source code & program
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 

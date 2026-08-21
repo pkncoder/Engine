@@ -108,7 +108,7 @@ void main() {
     // Calculate the world normal
     vec3 worldNormal = normalize(TBN * localNormal);
 
-    float shadow = calcShadow(vWorldPos, worldNormal);
+    // float shadow = calcShadow(vWorldPos, worldNormal);
 
     // Sample & get the material values
     vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
@@ -129,7 +129,7 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
+    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, 0.0);
 
     // Add the emissive glow to the color
     color += emissive;

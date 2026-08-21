@@ -87,7 +87,7 @@ void Application::init() {
 
     // Log the final init log & turn off setNoPendingLogs
     Logger::info("APPLICATION", "Application init complete");
-    // Logger::setNoPendingLogs(false);
+    Logger::setNoPendingLogs(false);
 }
 
 // Main loop
@@ -212,7 +212,7 @@ void Application::setupEntities() {
     }
 
     // Gay Room (me)
-    if (1) {
+    if (0) {
         std::vector<EntityID> room =
             sceneManager->loadObjScene("assets/models/gayRoom.obj");
 
@@ -275,7 +275,7 @@ void Application::setupEntities() {
     }
 
     // Breakfast room
-    if (0) {
+    if (1) {
         std::vector<EntityID> room =
             sceneManager->loadObjScene("assets/models/breakfast_room.obj");
 
