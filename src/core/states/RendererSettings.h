@@ -24,7 +24,7 @@ struct RendererSettings {
     static inline GLint shadowWidth = 1024;
     static inline GLint shadowHeight = 1024;
     static inline float shadowNear = 0.5f;
-    static inline float shadowFar = 100000.0f;
+    static inline float shadowFar = 100.0f;
 };
 
 } // namespace Engine
