@@ -307,18 +307,18 @@ void Application::setupEntities() {
 
         std::vector<EntityID> emmissiveCube =
             sceneManager->loadObjScene("assets/models/cube.obj");
-
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).position =
-            glm::vec3(1.3f, 8.4f, -0.2f);
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).scale =
-            glm::vec3(0.05f);
-
-        std::shared_ptr<CPUMaterialData> material =
-            engineContext->getAsset()->getMaterial(
-                scene.getComponent<MaterialComponent>(emmissiveCube[0]).handle);
-
-        material->albedo = glm::vec3(0.0f);
-        material->emissive = glm::vec3(2.0);
+        //
+        // scene.getComponent<TransformComponent>(emmissiveCube[0]).position =
+        //     glm::vec3(1.3f, 8.4f, -0.2f);
+        // scene.getComponent<TransformComponent>(emmissiveCube[0]).scale =
+        //     glm::vec3(0.05f);
+        //
+        // std::shared_ptr<CPUMaterialData> material =
+        //     engineContext->getAsset()->getMaterial(
+        //         scene.getComponent<MaterialComponent>(emmissiveCube[0]).handle);
+        //
+        // material->albedo = glm::vec3(0.0f);
+        // material->emissive = glm::vec3(2.0);
 
         // 0.15 exposure
         // 0.02 fog density; 0.5, 0.4, 0.1 fog color

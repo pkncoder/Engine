@@ -51,35 +51,36 @@ void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
 void Rasterizer::setupShadowFBO(EngineState &state) {
     glGenTextures(1, &shadowCubeMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubeMap);
+
+    // 1. Use GL_DEPTH_COMPONENT instead of GL_R32F/GL_RED
     for (int i = 0; i < 6; i++) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_R32F,
-                     state.renderer.settings.shadowWidth,
-                     state.renderer.settings.shadowHeight, 0, GL_RED, GL_FLOAT,
-                     nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                     GL_DEPTH_COMPONENT32F, state.renderer.settings.shadowWidth,
+                     state.renderer.settings.shadowHeight, 0,
+                     GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     }
+
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    glGenRenderbuffers(1, &shadowDepthRBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, shadowDepthRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
-                          state.renderer.settings.shadowWidth,
-                          state.renderer.settings.shadowHeight);
-
     glGenFramebuffers(1, &shadowFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                              GL_RENDERBUFFER, shadowDepthRBO);
+
+    // 2. Attach the cubemap directly to the FBO's depth attachment
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowCubeMap, 0);
+
+    // 3. Explicitly tell OpenGL we are not writing any color data to this FBO
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         Logger::error("RENDERER", "Shadow cube map FBO incomplete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
 void Rasterizer::init(EngineState &state) {
     setupDefaultTextures();
     setupShadowFBO(state);
@@ -167,6 +168,8 @@ void Rasterizer::extract(EngineState &state) {
         renderPackets.push_back(
             {mesh.handle, material.handle, buildModel(transform)});
     }
+
+    activeLightPos = glm::vec3(1.3f, 8.4f, -0.2f);
 
     // 3. SORT PACKETS BY MATERIAL! (Crucial for performance)
     std::sort(renderPackets.begin(), renderPackets.end(),
@@ -404,7 +407,6 @@ void Rasterizer::present(EngineState &state) {}
 
 void Rasterizer::shutdown() {
     glDeleteFramebuffers(1, &shadowFBO);
-    glDeleteRenderbuffers(1, &shadowDepthRBO);
     glDeleteTextures(1, &shadowCubeMap);
     glDeleteTextures(1, &defaultWhiteTexture);
     glDeleteTextures(1, &defaultNormalTexture);

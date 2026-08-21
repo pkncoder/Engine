@@ -465,6 +465,9 @@ void main() {
 
     float shadow = calcShadow(vWorldPos, worldNormal);
 
+    FragColor = vec4(vec3(shadow), 1.0);
+    // return;
+
     // Sample & get the material values
     vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
     vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;

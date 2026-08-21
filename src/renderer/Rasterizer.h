@@ -68,7 +68,6 @@ class Rasterizer : public IRenderer {
 
     GLuint shadowFBO = 0;
     GLuint shadowCubeMap = 0;
-    GLuint shadowDepthRBO = 0;
 
     std::vector<RenderPacket> renderPackets;
 

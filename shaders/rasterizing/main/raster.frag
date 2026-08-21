@@ -110,6 +110,9 @@ void main() {
 
     float shadow = calcShadow(vWorldPos, worldNormal);
 
+    FragColor = vec4(vec3(shadow), 1.0);
+    // return;
+
     // Sample & get the material values
     vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
     vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;
@@ -129,7 +132,7 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, 0.0);
+    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
 
     // Add the emissive glow to the color
     color += emissive;
