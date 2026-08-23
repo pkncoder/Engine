@@ -11,8 +11,9 @@ namespace Engine {
 enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 
 struct alignas(16) CameraData {
-    glm::mat4 view;
-    glm::mat4 projection;
+    glm::vec4 position;
+    glm::mat4 viewProjection;
+    glm::mat4 inverseView;
 };
 
 // Default camera values

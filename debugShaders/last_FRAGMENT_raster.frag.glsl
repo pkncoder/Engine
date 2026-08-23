@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 // BEGIN INCLUDE: ../../include/common.glsl
 // Numbers
@@ -47,8 +47,8 @@ struct Material {
 // END INCLUDE: ../../include/sharedStructures.glsl
 // BEGIN INCLUDE: ../../include/sharedUniforms.glsl
 // Camera position + inverseView matrix
-uniform vec3 uCameraPos;
-uniform mat4 uInverseView;
+// uniform vec3 uCameraPos;
+// uniform mat4 uInverseView;
 
 // Camera FOV
 uniform float uFOV;
@@ -367,6 +367,12 @@ vec3 cookTorranceBDRF(const in vec3 viewPos, const in vec3 worldPos, const in ve
 
 // END INCLUDE: ../models/cookTorranceBDRF.glsl
 
+layout (std140) uniform CameraUBO {
+    vec4 uCameraPos;
+    mat4 uViewProjection;
+    mat4 uInverseView;
+};
+
 // Add worldPos parameter
 float calcShadow(vec3 worldPos, vec3 normal) {
     // Get the distance
@@ -489,7 +495,7 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
+    vec3 color = blinnPhong(uCameraPos.xyz, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
 
     // Add the emissive glow to the color
     color += emissive;
@@ -504,7 +510,7 @@ void main() {
 
     if (fog) {
         // Fog
-        float fogDist = length(uCameraPos - vWorldPos);
+        float fogDist = length(uCameraPos.xyz - vWorldPos);
         float fogFactor = exp(-pow(fogDist * fogDensity, 2.0));
         fogFactor = clamp(fogFactor, 0.0, 1.0);
         color = mix(fogColor, color, fogFactor);

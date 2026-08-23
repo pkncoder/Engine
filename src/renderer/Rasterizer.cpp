@@ -101,8 +101,9 @@ void Rasterizer::init(EngineState &state) {
     // NOTE: In modern OpenGL, binding UBOs via layout(std140, binding = 0) in
     // the shader is preferred over manual block lookup, but your BufferManager
     // map layout goes here.
-    BufferManager::mapUBOLayout(cameraUBO, 0, "CameraUBO",
-                                {"uView", "uProjection"});
+    BufferManager::mapUBOLayout(
+        cameraUBO, shaderNodeTree[1].shader.ID, "CameraUBO",
+        {"uCameraPos", "uViewProjection", "uInverseView"});
 
     glUseProgram(shaderNodeTree[1].shader.ID);
 
@@ -132,11 +133,15 @@ void Rasterizer::extract(EngineState &state) {
 
     SceneManager *sceneManager = engineContext.getScene();
     Scene &scene = sceneManager->getScene();
+    Camera &camera = sceneManager->getCamera();
 
     if (currentHeight > 0) {
-        cameraData.view = sceneManager->getCamera().getViewMatrix();
-        cameraData.projection = sceneManager->getCamera().getProjectionMatrix(
-            (float)currentWidth / (float)currentHeight);
+        cameraData.position = glm::vec4(camera.position, 0.0);
+        cameraData.viewProjection =
+            camera.getViewMatrix() *
+            camera.getProjectionMatrix((float)currentWidth /
+                                       (float)currentHeight);
+        cameraData.inverseView = glm::inverse(camera.getViewMatrix());
     }
     activeLightPos = state.scene.camera.position; // Fallback light pos
 
@@ -201,12 +206,14 @@ void Rasterizer::prepare(EngineState &state) {
     // input: list of render packets (mesh, material, modelMatrix)
     // output: list of draw commands within each shader pass
 
-    BufferManager::setUBOValue(cameraUBO, "uView", sizeof(glm::mat4),
-                               glm::value_ptr(cameraData.view));
-    BufferManager::setUBOValue(cameraUBO, "uProjection", sizeof(glm::mat4),
-                               glm::value_ptr(cameraData.projection));
-    // BufferManager::pushBuffer(cameraUBO, frameIndex);
+    BufferManager::setUBOValue(cameraUBO, "uCameraPos", sizeof(glm::vec4),
+                               glm::value_ptr(cameraData.position));
+    BufferManager::setUBOValue(cameraUBO, "uViewProjection", sizeof(glm::mat4),
+                               glm::value_ptr(cameraData.viewProjection));
+    BufferManager::setUBOValue(cameraUBO, "uInverseView", sizeof(glm::mat4),
+                               glm::value_ptr(cameraData.inverseView));
 
+    BufferManager::pushBuffer(cameraUBO, frameIndex);
     // TODO: generate shadowFBO?
 
     shaderNodeTree[0].renderSteps.clear();
@@ -322,9 +329,6 @@ void Rasterizer::dispatch(EngineState &state) {
 
         pass.shader.bind();
 
-        pass.shader.setMat4("uViewProjection",
-                            cameraData.projection * cameraData.view);
-        pass.shader.setVec3("uCameraPos", state.scene.camera.position);
         pass.shader.setFloat("uFOV", state.scene.camera.fov);
         pass.shader.setVec2("uResolution",
                             glm::vec2(currentWidth, currentHeight));

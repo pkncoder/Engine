@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 #include "../../include/common.glsl"
 #include "../../include/sharedStructures.glsl"
@@ -11,6 +11,12 @@
 
 #include "../models/blinnPhong.glsl"
 #include "../models/cookTorranceBDRF.glsl"
+
+layout (std140) uniform CameraUBO {
+    vec4 uCameraPos;
+    mat4 uViewProjection;
+    mat4 uInverseView;
+};
 
 // Add worldPos parameter
 float calcShadow(vec3 worldPos, vec3 normal) {
@@ -134,7 +140,7 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
+    vec3 color = blinnPhong(uCameraPos.xyz, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
 
     // Add the emissive glow to the color
     color += emissive;
@@ -149,7 +155,7 @@ void main() {
 
     if (fog) {
         // Fog
-        float fogDist = length(uCameraPos - vWorldPos);
+        float fogDist = length(uCameraPos.xyz - vWorldPos);
         float fogFactor = exp(-pow(fogDist * fogDensity, 2.0));
         fogFactor = clamp(fogFactor, 0.0, 1.0);
         color = mix(fogColor, color, fogFactor);
