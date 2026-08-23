@@ -342,9 +342,6 @@ void Rasterizer::dispatch(EngineState &state) {
                     pass.shader.setMat4("uShadowMatrices[" + std::to_string(i) +
                                             "]",
                                         layer.shadowTransforms[i]);
-                    if (frameIndex == 1)
-                        Logger::debug(
-                            glm::to_string(layer.shadowTransforms[i]));
                 }
                 pass.shader.setVec3("uLightPos", activeLightPos);
                 pass.shader.setFloat("uFarPlane",
