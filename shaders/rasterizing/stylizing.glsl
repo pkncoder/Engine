@@ -1,6 +1,6 @@
 const float alphaCuttoff = 0.2;
 
-const float shadowDiskRadius = 0.05;
+const float shadowDiskRadius = 0.04;
 
 const float exposure = 0.5;
 

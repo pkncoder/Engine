@@ -20,7 +20,9 @@ float calcShadow(vec3 worldPos, vec3 normal) {
 
     // Find the light dir and bias the NdotL
     vec3 lightDir = normalize(-fragToLight);
-    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
+
+    float baseBias = 0.5 / uShadowFarPlane; 
+    float bias = max(baseBias * (1.0 - dot(normal, lightDir)), baseBias * 0.2);
 
     // 20-tap 3D PCF — offsets spread around a sphere for smooth penumbra
     vec3 sampleOffsets[20] = vec3[](

@@ -8,6 +8,7 @@
 #include "../services/Logger.h"
 #include "GPUResourceManager.h"
 #include "IRenderer.h"
+#include "Shader.h"
 #include "buffers/BufferManager.h"
 
 #include <GLFW/glfw3.h>
@@ -160,7 +161,8 @@ void Rasterizer::extract(EngineState &state) {
 
         // Temp Light finding logic
         auto cpuMat = assetManager->getMaterial(material.handle);
-        if (cpuMat && glm::length(cpuMat->emissive) > bestEmissive) {
+        if (glm::length(cpuMat->emissive) > 0.001 && cpuMat &&
+            glm::length(cpuMat->emissive) > bestEmissive) {
             bestEmissive = glm::length(cpuMat->emissive);
             activeLightPos = transform.position;
         }
@@ -168,8 +170,6 @@ void Rasterizer::extract(EngineState &state) {
         renderPackets.push_back(
             {mesh.handle, material.handle, buildModel(transform)});
     }
-
-    activeLightPos = glm::vec3(1.3f, 8.4f, -0.2f);
 
     // 3. SORT PACKETS BY MATERIAL! (Crucial for performance)
     std::sort(renderPackets.begin(), renderPackets.end(),
@@ -336,6 +336,7 @@ void Rasterizer::dispatch(EngineState &state) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (layer.isShadowPass) {
+                glCullFace(GL_FRONT);
                 // Send the 6 matrices to the Geometry Shader uniform array
                 for (int i = 0; i < 6; ++i) {
                     pass.shader.setMat4("uShadowMatrices[" + std::to_string(i) +
@@ -349,6 +350,7 @@ void Rasterizer::dispatch(EngineState &state) {
                 pass.shader.setFloat("uFarPlane",
                                      state.renderer.settings.shadowFar);
             } else {
+                glCullFace(GL_BACK);
                 // Main pass global uniforms
                 pass.shader.setVec3("uCameraPos", state.scene.camera.position);
                 pass.shader.setFloat("uShadowFarPlane",
