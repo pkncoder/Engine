@@ -42,7 +42,7 @@ Shader::Shader(const char *vertexPath, const char *geometryPath,
 
     // Get c-strings of the shader code
     const char *vShaderSource = vertexCode.c_str();
-    const char *gShaderSource = vertexCode.c_str();
+    const char *gShaderSource = geometryCode.c_str();
     const char *fShaderSource = fragmentCode.c_str();
 
     // Save variables for the final shader
@@ -57,12 +57,12 @@ Shader::Shader(const char *vertexPath, const char *geometryPath,
     checkCompileErrors(vertex, "VERTEX");
 
     // Create and compile the fragment shader
-    fragment = glCreateShader(GL_GEOMETRY_SHADER);
+    geometry = glCreateShader(GL_GEOMETRY_SHADER);
     glShaderSource(geometry, 1, &gShaderSource, NULL);
     glCompileShader(geometry);
 
     // Check for compilation errors
-    checkCompileErrors(vertex, "GEOMETRY");
+    checkCompileErrors(geometry, "GEOMETRY");
 
     // Create and compile the fragment shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);

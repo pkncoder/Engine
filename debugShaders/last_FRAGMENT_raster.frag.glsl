@@ -465,7 +465,7 @@ void main() {
 
     float shadow = calcShadow(vWorldPos, worldNormal);
 
-    FragColor = vec4(vec3(shadow), 1.0);
+    FragColor = vec4(vec3(shadow + 0.1), 1.0);
     // return;
 
     // Sample & get the material values
