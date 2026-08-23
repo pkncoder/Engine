@@ -48,6 +48,7 @@ AssetHandle AssetManager::loadModel(const std::string &filepath) {
     std::vector<AssetHandle> meshHandles;
 
     // Loop each mesh
+    // TODO: individual mesh caches
     for (auto &mesh : meshes) {
 
         // Gen a new asset handle
@@ -67,6 +68,8 @@ AssetHandle AssetManager::loadModel(const std::string &filepath) {
 
     // Cache the model and return the new handle
     modelCache[newHandle] = model;
+    cachedPaths[filepath] = newHandle;
+
     return newHandle;
 }
 
@@ -126,7 +129,9 @@ AssetHandle AssetManager::loadTexture(const std::string &filepath) {
 
     // Get a new handle and cache the texture
     AssetHandle newHandle = UUID();
+
     textureCache[newHandle] = textureData;
+    cachedPaths[filepath] = newHandle;
 
     return newHandle;
 }
