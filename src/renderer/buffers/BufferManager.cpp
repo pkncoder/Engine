@@ -174,6 +174,8 @@ void BufferManager::mapUBOLayout(const BufferHandle handle,
     if (blockIndex == GL_INVALID_INDEX) {
         // Ignore the unused block
         return;
+    } else {
+        glUniformBlockBinding(programID, blockIndex, 0);
     }
 
     // Loop each name in uniform names
@@ -362,6 +364,8 @@ void BufferManager::pushBuffer(const BufferHandle handle,
     glBindBuffer(glType, activeID);
     glBufferSubData(glType, 0, buffer.size, buffer.cpuCache.data());
     glBindBuffer(glType, 0);
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, activeID);
 }
 
 } // namespace Engine

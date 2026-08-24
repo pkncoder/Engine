@@ -138,9 +138,9 @@ void Rasterizer::extract(EngineState &state) {
     if (currentHeight > 0) {
         cameraData.position = glm::vec4(camera.position, 0.0);
         cameraData.viewProjection =
-            camera.getViewMatrix() *
             camera.getProjectionMatrix((float)currentWidth /
-                                       (float)currentHeight);
+                                       (float)currentHeight) *
+            camera.getViewMatrix();
         cameraData.inverseView = glm::inverse(camera.getViewMatrix());
     }
     activeLightPos = state.scene.camera.position; // Fallback light pos
