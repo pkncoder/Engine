@@ -2,9 +2,24 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 18) out; // 3 vertices * 6 faces = 18
 
-uniform mat4 uShadowMatrices[6]; // The 6 view-projection matrices
-
 out vec4 FragPos; // Passed to the fragment shader
+
+layout(std140) uniform GlobalSceneUBO {
+    mat4 uShadowMatrices[6];
+    vec4 uLightPos;
+    vec2 uResolution;
+    float uFOV;
+    float uShadowFarPlane;
+};
+
+layout(std140) uniform ObjectUBO {
+    mat4 uModel;
+    vec4 uAlbedo;     // Ensure vec4 in GLSL
+    vec4 uEmissive;   // Ensure vec4 in GLSL
+    float uRoughness;
+    float uMetallic;
+    int uIsBumpMap;
+};
 
 void main() {
     for(int face = 0; face < 6; ++face) {

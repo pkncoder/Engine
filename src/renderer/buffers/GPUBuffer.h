@@ -40,6 +40,7 @@ struct GPUBuffer {
     // Buffer ids are saved via an array for multibuffering - set by bool
     bool multiBuffered = false;
     GLuint ids[FRAMES_IN_FLIGHT] = {0};
+    GLuint bindingIndex = -1;
 
     // Size of the buffer
     size_t size = 0;

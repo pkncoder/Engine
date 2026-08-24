@@ -13,7 +13,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp> // for glm::ortho / lookAt
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 
@@ -38,13 +38,8 @@ void Rasterizer::setupDefaultTextures() {
 }
 
 void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
-
-    // If the new size is the same as the old one, do nothing
-    if (newWidth == currentWidth && newHeight == currentHeight) {
+    if (newWidth == currentWidth && newHeight == currentHeight)
         return;
-    }
-
-    // Update the tracked size
     currentWidth = newWidth;
     currentHeight = newHeight;
 }
@@ -53,7 +48,6 @@ void Rasterizer::setupShadowFBO(EngineState &state) {
     glGenTextures(1, &shadowCubeMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubeMap);
 
-    // 1. Use GL_DEPTH_COMPONENT instead of GL_R32F/GL_RED
     for (int i = 0; i < 6; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                      GL_DEPTH_COMPONENT32F, state.renderer.settings.shadowWidth,
@@ -69,11 +63,7 @@ void Rasterizer::setupShadowFBO(EngineState &state) {
 
     glGenFramebuffers(1, &shadowFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-
-    // 2. Attach the cubemap directly to the FBO's depth attachment
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowCubeMap, 0);
-
-    // 3. Explicitly tell OpenGL we are not writing any color data to this FBO
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
@@ -82,31 +72,52 @@ void Rasterizer::setupShadowFBO(EngineState &state) {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
 void Rasterizer::init(EngineState &state) {
     setupDefaultTextures();
     setupShadowFBO(state);
 
-    // Register Passes into the IRenderer Graph
+    // Register Passes
     addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.vert",
                   "shaders/rasterizing/main/shadow.geom",
                   "shaders/rasterizing/main/shadow.frag");
+
     addShaderNode("RasterPass", "shaders/rasterizing/main/raster.vert",
                   "shaders/rasterizing/main/raster.frag");
 
-    // Allocate persistent UBO
+    // 1. Allocate UBOs
     cameraUBO = BufferManager::createBuffer(
         "CameraUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
         sizeof(CameraData), nullptr, true);
+    globalSceneUBO = BufferManager::createBuffer(
+        "GlobalSceneUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
+        sizeof(GlobalSceneData), nullptr, true);
+    objectUBO = BufferManager::createBuffer(
+        "ObjectUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
+        sizeof(ObjectRenderData), nullptr, true);
 
-    // NOTE: In modern OpenGL, binding UBOs via layout(std140, binding = 0) in
-    // the shader is preferred over manual block lookup, but your BufferManager
-    // map layout goes here.
-    BufferManager::mapUBOLayout(
-        cameraUBO, shaderNodeTree[1].shader.ID, "CameraUBO",
-        {"uCameraPos", "uViewProjection", "uInverseView"});
+    // 2. Map Layouts (Ensuring your GLSL uses these exact block names)
+    // Shadow Pass (Index 0)
+    BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[0].shader.ID,
+                          "GlobalSceneUBO",
+                          {"uShadowMatrices", "uLightPos", "uResolution",
+                           "uFOV", "uShadowFarPlane"});
+    BufferManager::mapUBO(objectUBO, shaderNodeTree[0].shader.ID, "ObjectUBO",
+                          {"uModel"});
 
+    // Main Raster Pass (Index 1)
+    BufferManager::mapUBO(cameraUBO, shaderNodeTree[1].shader.ID, "CameraUBO",
+                          {"uCameraPos", "uViewProjection", "uInverseView"});
+    BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[1].shader.ID,
+                          "GlobalSceneUBO",
+                          {"uShadowMatrices", "uLightPos", "uResolution",
+                           "uFOV", "uShadowFarPlane"});
+    BufferManager::mapUBO(objectUBO, shaderNodeTree[1].shader.ID, "ObjectUBO",
+                          {"uModel", "uAlbedo", "uEmissive", "uRoughness",
+                           "uMetallic", "uIsBumpMap"});
+
+    // Setup Texture Sampler Uniforms (These remain standard uniforms)
     glUseProgram(shaderNodeTree[1].shader.ID);
-
     shaderNodeTree[1].shader.setInt("uAlbedoMap", 0);
     shaderNodeTree[1].shader.setInt("uEmissiveMap", 1);
     shaderNodeTree[1].shader.setInt("uAlphaMap", 2);
@@ -115,7 +126,6 @@ void Rasterizer::init(EngineState &state) {
     shaderNodeTree[1].shader.setInt("uNormalMap", 5);
     shaderNodeTree[1].shader.setInt("uBumpMap", 6);
     shaderNodeTree[1].shader.setInt("uShadowCubeMap", 7);
-
     glUseProgram(0);
 
     Logger::info("RENDERER", "Rasterizer initialized.");
@@ -124,13 +134,12 @@ void Rasterizer::init(EngineState &state) {
 void Rasterizer::beginFrame(EngineState &state) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderPackets.clear();
-
     frameIndex++;
 }
 
 void Rasterizer::extract(EngineState &state) {
+    // ... [No changes needed in extract] ...
     AssetManager *assetManager = engineContext.getAsset();
-
     SceneManager *sceneManager = engineContext.getScene();
     Scene &scene = sceneManager->getScene();
     Camera &camera = sceneManager->getCamera();
@@ -143,9 +152,8 @@ void Rasterizer::extract(EngineState &state) {
             camera.getViewMatrix();
         cameraData.inverseView = glm::inverse(camera.getViewMatrix());
     }
-    activeLightPos = state.scene.camera.position; // Fallback light pos
+    activeLightPos = state.scene.camera.position;
 
-    // 2. Build Packets
     auto buildModel = [](const TransformComponent &t) {
         glm::mat4 m = glm::mat4(1.0f);
         m = glm::translate(m, t.position);
@@ -164,19 +172,16 @@ void Rasterizer::extract(EngineState &state) {
         const auto &mesh = scene.getComponent<MeshComponent>(id);
         const auto &material = scene.getComponent<MaterialComponent>(id);
 
-        // Temp Light finding logic
         auto cpuMat = assetManager->getMaterial(material.handle);
         if (glm::length(cpuMat->emissive) > 0.001 && cpuMat &&
             glm::length(cpuMat->emissive) > bestEmissive) {
             bestEmissive = glm::length(cpuMat->emissive);
             activeLightPos = transform.position;
         }
-
         renderPackets.push_back(
             {mesh.handle, material.handle, buildModel(transform)});
     }
 
-    // 3. SORT PACKETS BY MATERIAL! (Crucial for performance)
     std::sort(renderPackets.begin(), renderPackets.end(),
               [](const RenderPacket &a, const RenderPacket &b) {
                   return a.materialHandle < b.materialHandle;
@@ -197,35 +202,28 @@ void generateShadowMatricies(EngineState &state, RenderLayer *shadowStep,
     for (int face = 0; face < 6; face++) {
         glm::mat4 lightView = glm::lookAt(
             lightPos, lightPos + faceDirections[face], faceUps[face]);
-
         shadowStep->shadowTransforms.push_back(shadowProj * lightView);
     }
 }
 
 void Rasterizer::prepare(EngineState &state) {
-    // input: list of render packets (mesh, material, modelMatrix)
-    // output: list of draw commands within each shader pass
-
+    // 1. Push Camera Data
     BufferManager::setUBOValue(cameraUBO, "uCameraPos", sizeof(glm::vec4),
                                glm::value_ptr(cameraData.position));
     BufferManager::setUBOValue(cameraUBO, "uViewProjection", sizeof(glm::mat4),
                                glm::value_ptr(cameraData.viewProjection));
     BufferManager::setUBOValue(cameraUBO, "uInverseView", sizeof(glm::mat4),
                                glm::value_ptr(cameraData.inverseView));
-
     BufferManager::pushBuffer(cameraUBO, frameIndex);
-    // TODO: generate shadowFBO?
 
     shaderNodeTree[0].renderSteps.clear();
     shaderNodeTree[1].renderSteps.clear();
 
-    // Create the render passes
     RenderLayer shadowStep;
     shadowStep.fbo = shadowFBO;
     shadowStep.renderWidth = state.renderer.settings.shadowWidth;
     shadowStep.renderHeight = state.renderer.settings.shadowHeight;
     shadowStep.isShadowPass = true;
-
     generateShadowMatricies(state, &shadowStep, activeLightPos);
 
     RenderLayer mainStep;
@@ -234,27 +232,41 @@ void Rasterizer::prepare(EngineState &state) {
     mainStep.renderHeight = currentHeight;
     mainStep.isShadowPass = false;
 
-    // Loop through the render packets
-    for (const auto &packet : renderPackets) {
+    // 2. Prepare Global Scene UBO Data
+    GlobalSceneData globalData = {};
+    for (int i = 0; i < 6; i++) {
+        globalData.shadowMatrices[i] = shadowStep.shadowTransforms[i];
+    }
+    globalData.lightPos = glm::vec4(activeLightPos, 1.0f);
+    globalData.resolution = glm::vec2(currentWidth, currentHeight);
+    globalData.fov = state.scene.camera.fov;
+    globalData.shadowFarPlane = state.renderer.settings.shadowFar;
 
+    // We can map the whole struct directly into the UBO instead of setting
+    // variables one by one Assuming your BufferManager has a way to upload raw
+    // bytes to the CPU cache. If not, map individually:
+    BufferManager::setUBOValue(globalSceneUBO, "uShadowMatrices",
+                               sizeof(glm::mat4) * 6,
+                               glm::value_ptr(globalData.shadowMatrices[0]));
+    BufferManager::setUBOValue(globalSceneUBO, "uLightPos", sizeof(glm::vec4),
+                               glm::value_ptr(globalData.lightPos));
+    BufferManager::setUBOValue(globalSceneUBO, "uResolution", sizeof(glm::vec2),
+                               glm::value_ptr(globalData.resolution));
+    BufferManager::setUBOValue(globalSceneUBO, "uFOV", sizeof(float),
+                               &globalData.fov);
+    BufferManager::setUBOValue(globalSceneUBO, "uShadowFarPlane", sizeof(float),
+                               &globalData.shadowFarPlane);
+    BufferManager::pushBuffer(globalSceneUBO, frameIndex);
+
+    for (const auto &packet : renderPackets) {
         GPUMesh *gpuMesh =
             GPUResourceManager::getOrUploadMesh(packet.meshHandle);
-        CPUMaterialData *cpuMaterial = engineContext.getAsset()
-                                           ->getMaterial(packet.materialHandle)
-                                           .get(); // TEMP
+        CPUMaterialData *cpuMaterial =
+            engineContext.getAsset()->getMaterial(packet.materialHandle).get();
 
-        if (!gpuMesh || !cpuMaterial) {
-            Logger::warn(
-                "RENDERER",
-                "Render Packet Skipped (GPU Mesh: " +
-                    std::string(gpuMesh == nullptr ? "no" : "yes") +
-                    ") \(CPU Material: " +
-                    std::string(cpuMaterial == nullptr ? "no" : "yes") + ")");
-
+        if (!gpuMesh || !cpuMaterial)
             continue;
-        }
 
-        // Map material textures to GLuints safely
         auto getTexID = [&](const std::string &key, GLuint fallback) -> GLuint {
             auto ittr = cpuMaterial->textureMaps.find(key);
             if (ittr != cpuMaterial->textureMaps.end()) {
@@ -263,31 +275,24 @@ void Rasterizer::prepare(EngineState &state) {
                 if (tex && tex->textureID != 0)
                     return tex->textureID;
             }
-            return fallback; // Return default white/normal texture instead of 0
+            return fallback;
         };
 
-        /* ----------------- Shadow Pass ----------------- */
+        /* ----------------- Shadow Pass Command ----------------- */
         {
             std::shared_ptr<RasterDrawCommand> drawCommand =
                 std::make_shared<RasterDrawCommand>();
-
             drawCommand->vao = gpuMesh->vao;
             drawCommand->indexCount = gpuMesh->indexCount;
             drawCommand->modelMatrix = packet.modelMatrix;
-
-            // TODO: textures? (alpha map)
             drawCommand->textures[2] = getTexID("alpha", defaultWhiteTexture);
-
-            // TODO: assigning uniforms??
-
             shadowStep.commands.push_back(drawCommand);
         }
 
-        /* ----------------- Main Pass ---------------- */
+        /* ----------------- Main Pass Command ---------------- */
         {
             std::shared_ptr<RasterDrawCommand> drawCommand =
                 std::make_shared<RasterDrawCommand>();
-
             drawCommand->vao = gpuMesh->vao;
             drawCommand->indexCount = gpuMesh->indexCount;
             drawCommand->modelMatrix = packet.modelMatrix;
@@ -297,7 +302,6 @@ void Rasterizer::prepare(EngineState &state) {
             drawCommand->roughness = cpuMaterial->roughness;
             drawCommand->metallic = cpuMaterial->metallic;
 
-            // Main pass setup:
             drawCommand->textures[0] = getTexID("albedo", defaultWhiteTexture);
             drawCommand->textures[1] =
                 getTexID("emissive", defaultWhiteTexture);
@@ -310,7 +314,6 @@ void Rasterizer::prepare(EngineState &state) {
             drawCommand->textures[6] = getTexID("bump", defaultWhiteTexture);
             drawCommand->textures[7] = shadowCubeMap;
 
-            // Calculate bump map logic and store it in the command
             drawCommand->isBumpMap =
                 (drawCommand->textures[6] != defaultWhiteTexture &&
                  drawCommand->textures[5] == defaultNormalTexture);
@@ -319,7 +322,6 @@ void Rasterizer::prepare(EngineState &state) {
         }
     }
 
-    // Push layers into the tree so dispatch can find them
     shaderNodeTree[0].renderSteps.push_back(shadowStep);
     shaderNodeTree[1].renderSteps.push_back(mainStep);
 }
@@ -329,10 +331,6 @@ void Rasterizer::dispatch(EngineState &state) {
 
         pass.shader.bind();
 
-        pass.shader.setFloat("uFOV", state.scene.camera.fov);
-        pass.shader.setVec2("uResolution",
-                            glm::vec2(currentWidth, currentHeight));
-
         for (const RenderLayer &layer : pass.renderSteps) {
 
             glBindFramebuffer(GL_FRAMEBUFFER, layer.fbo);
@@ -341,22 +339,8 @@ void Rasterizer::dispatch(EngineState &state) {
 
             if (layer.isShadowPass) {
                 glCullFace(GL_FRONT);
-                // Send the 6 matrices to the Geometry Shader uniform array
-                for (int i = 0; i < 6; ++i) {
-                    pass.shader.setMat4("uShadowMatrices[" + std::to_string(i) +
-                                            "]",
-                                        layer.shadowTransforms[i]);
-                }
-                pass.shader.setVec3("uLightPos", activeLightPos);
-                pass.shader.setFloat("uFarPlane",
-                                     state.renderer.settings.shadowFar);
             } else {
                 glCullFace(GL_BACK);
-                // Main pass global uniforms
-                pass.shader.setVec3("uCameraPos", state.scene.camera.position);
-                pass.shader.setFloat("uShadowFarPlane",
-                                     state.renderer.settings.shadowFar);
-                pass.shader.setVec3("uLightPos", activeLightPos);
             }
 
             GLuint currentVAO = 0;
@@ -365,21 +349,37 @@ void Rasterizer::dispatch(EngineState &state) {
                 const auto command =
                     std::static_pointer_cast<RasterDrawCommand>(cmd);
 
-                // 1. Send Model Matrix
-                pass.shader.setMat4("uModel", command->modelMatrix);
+                // Update Per-Object UBO
+                BufferManager::setUBOValue(
+                    objectUBO, "uModel", sizeof(glm::mat4),
+                    glm::value_ptr(command->modelMatrix));
 
-                // 2. Send Material Data (Only matters for the main pass, but
-                // safe to set if unused)
                 if (!layer.isShadowPass) {
-                    pass.shader.setVec3("uAlbedo", command->albedo);
-                    pass.shader.setVec3("uEmmissive", command->emissive);
-                    pass.shader.setFloat("uRoughness", command->roughness);
-                    pass.shader.setFloat("uMetallic", command->metallic);
-                    pass.shader.setInt("uIsBumpMap",
-                                       command->isBumpMap ? 1 : 0);
+                    // Note: padding vec3s up to vec4s to satisfy std140 layout
+                    glm::vec4 padAlbedo = glm::vec4(command->albedo, 1.0f);
+                    glm::vec4 padEmissive = glm::vec4(command->emissive, 1.0f);
+
+                    BufferManager::setUBOValue(objectUBO, "uAlbedo",
+                                               sizeof(glm::vec4),
+                                               glm::value_ptr(padAlbedo));
+                    BufferManager::setUBOValue(objectUBO, "uEmissive",
+                                               sizeof(glm::vec4),
+                                               glm::value_ptr(padEmissive));
+                    BufferManager::setUBOValue(objectUBO, "uRoughness",
+                                               sizeof(float),
+                                               &command->roughness);
+                    BufferManager::setUBOValue(objectUBO, "uMetallic",
+                                               sizeof(float),
+                                               &command->metallic);
+                    BufferManager::setUBOValue(objectUBO, "uIsBumpMap",
+                                               sizeof(int),
+                                               &command->isBumpMap);
                 }
 
-                // 3. Bind Textures from the array
+                // Push the object UBO memory to the GPU per draw call
+                BufferManager::pushBuffer(objectUBO, frameIndex);
+
+                // Bind Textures
                 for (int i = 0; i < 8; ++i) {
                     if (command->textures[i] != 0) {
                         glActiveTexture(GL_TEXTURE0 + i);
@@ -389,7 +389,7 @@ void Rasterizer::dispatch(EngineState &state) {
                     }
                 }
 
-                // 4. Draw
+                // Draw
                 if (currentVAO != command->vao) {
                     glBindVertexArray(command->vao);
                     currentVAO = command->vao;
@@ -399,7 +399,6 @@ void Rasterizer::dispatch(EngineState &state) {
                                GL_UNSIGNED_INT, 0);
             }
         }
-
         pass.shader.unbind();
     }
 }

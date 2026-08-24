@@ -10,11 +10,28 @@ layout (std140) uniform CameraUBO {
     mat4 uInverseView;
 };
 
-uniform mat4 uModel;
+layout(std140) uniform GlobalSceneUBO {
+    mat4 uShadowMatrices[6];
+    vec4 uLightPos;
+    vec2 uResolution;
+    float uFOV;
+    float uShadowFarPlane;
+};
+
+layout(std140) uniform ObjectUBO {
+    mat4 uModel;
+    vec4 uAlbedo;     // Ensure vec4 in GLSL
+    vec4 uEmissive;   // Ensure vec4 in GLSL
+    float uRoughness;
+    float uMetallic;
+    int uIsBumpMap;
+};
 
 out vec3 vNormal;
 out vec3 vWorldPos;
 out vec2 vTexCoords;
+
+
 
 void main() {
 

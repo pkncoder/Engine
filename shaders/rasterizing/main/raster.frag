@@ -2,7 +2,6 @@
 
 #include "../../include/common.glsl"
 #include "../../include/sharedStructures.glsl"
-#include "../../include/sharedUniforms.glsl"
 #include "../../include/utils/srgb.glsl"
 #include "../../include/utils/toneMapping.glsl"
 
@@ -18,10 +17,27 @@ layout (std140) uniform CameraUBO {
     mat4 uInverseView;
 };
 
+layout(std140) uniform GlobalSceneUBO {
+    mat4 uShadowMatrices[6];
+    vec4 uLightPos;
+    vec2 uResolution;
+    float uFOV;
+    float uShadowFarPlane;
+};
+
+layout(std140) uniform ObjectUBO {
+    mat4 uModel;
+    vec4 uAlbedo;     // Ensure vec4 in GLSL
+    vec4 uEmissive;   // Ensure vec4 in GLSL
+    float uRoughness;
+    float uMetallic;
+    int uIsBumpMap;
+};
+
 // Add worldPos parameter
 float calcShadow(vec3 worldPos, vec3 normal) {
     // Get the distance
-    vec3 fragToLight = worldPos - uLightPos;
+    vec3 fragToLight = worldPos - uLightPos.xyz;
     float currentDist = length(fragToLight) / uShadowFarPlane;
 
     // Find the light dir and bias the NdotL
@@ -122,8 +138,8 @@ void main() {
     // return;
 
     // Sample & get the material values
-    vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
-    vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;
+    vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo.xyz;
+    vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmissive.xyz;
     float roughness = texture(uRoughnessMap, vTexCoords).r * uRoughness;
     float metallic = texture(uMetallicMap, vTexCoords).r * uMetallic;
     float alpha = texture(uAlphaMap, vTexCoords).r;
@@ -140,7 +156,7 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos.xyz, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
+    vec3 color = blinnPhong(uCameraPos.xyz, vWorldPos, worldNormal, mat, uLightPos.xyz, lightMat, shadow);
 
     // Add the emissive glow to the color
     color += emissive;

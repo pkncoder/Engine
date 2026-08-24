@@ -72,7 +72,10 @@ class Rasterizer : public IRenderer {
     std::vector<RenderPacket> renderPackets;
 
     CameraData cameraData;
+
     BufferHandle cameraUBO;
+    BufferHandle globalSceneUBO;
+    BufferHandle objectUBO;
 
     glm::vec3 activeLightPos;
     glm::mat4 shadowProjMatrix;

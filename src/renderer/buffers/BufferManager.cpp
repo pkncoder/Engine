@@ -144,10 +144,9 @@ void BufferManager::updateBufferCache(const BufferHandle handle,
     std::memcpy(buffer.cpuCache.data() + offset, data, size);
 }
 
-void BufferManager::mapUBOLayout(const BufferHandle handle,
-                                 const uint32_t programID,
-                                 const std::string &blockName,
-                                 const std::vector<std::string> &uniformNames) {
+void BufferManager::mapUBO(const BufferHandle handle, const uint32_t programID,
+                           const std::string &blockName,
+                           const std::vector<std::string> &uniformNames) {
 
     // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
@@ -169,14 +168,18 @@ void BufferManager::mapUBOLayout(const BufferHandle handle,
         return;
     }
 
-    // Get the block index from the program
     GLuint blockIndex = glGetUniformBlockIndex(programID, blockName.c_str());
     if (blockIndex == GL_INVALID_INDEX) {
-        // Ignore the unused block
-        return;
-    } else {
-        glUniformBlockBinding(programID, blockIndex, 0);
+        return; // Ignore the unused block
     }
+
+    // --- NEW LOGIC: Assign binding index if it doesn't have one ---
+    if (buffer.bindingIndex == -1) {
+        buffer.bindingIndex = nextBindingIndex++; // Assign and increment
+    }
+
+    // Map the shader's uniform block to our dynamically assigned binding index
+    glUniformBlockBinding(programID, blockIndex, buffer.bindingIndex);
 
     // Loop each name in uniform names
     for (const auto &name : uniformNames) {
@@ -363,9 +366,12 @@ void BufferManager::pushBuffer(const BufferHandle handle,
     // Bind, push the CPU cache, and unbind
     glBindBuffer(glType, activeID);
     glBufferSubData(glType, 0, buffer.size, buffer.cpuCache.data());
-    glBindBuffer(glType, 0);
 
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, activeID);
+    if (glType == GL_UNIFORM_BUFFER && buffer.bindingIndex != -1) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, buffer.bindingIndex, activeID);
+    }
+
+    glBindBuffer(glType, 0);
 }
 
 } // namespace Engine

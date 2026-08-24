@@ -26,10 +26,9 @@ class BufferManager {
     static void updateBufferCache(const BufferHandle handle, const size_t size,
                                   const size_t offset, const void *data);
 
-    static void mapUBOLayout(const BufferHandle handle,
-                             const uint32_t programID,
-                             const std::string &blockName,
-                             const std::vector<std::string> &uniformNames);
+    static void mapUBO(const BufferHandle handle, const uint32_t programID,
+                       const std::string &blockName,
+                       const std::vector<std::string> &uniformNames);
     static void setUBOValue(const BufferHandle handle,
                             const std::string &uniformName, const size_t size,
                             const void *data);
@@ -48,6 +47,7 @@ class BufferManager {
 
   private:
     static inline std::unordered_map<BufferHandle, GPUBuffer> bufferRegistry;
+    static inline GLuint nextBindingIndex = 0;
 };
 
 } // namespace Engine

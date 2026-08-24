@@ -45,14 +45,6 @@ struct Material {
     float metallic;
 };
 // END INCLUDE: ../../include/sharedStructures.glsl
-// BEGIN INCLUDE: ../../include/sharedUniforms.glsl
-// Camera position + inverseView matrix
-// uniform vec3 uCameraPos;
-// uniform mat4 uInverseView;
-
-// Camera FOV
-uniform float uFOV;
-// END INCLUDE: ../../include/sharedUniforms.glsl
 // BEGIN INCLUDE: ../../include/utils/srgb.glsl
 vec3 vecLessThan(vec3 f, float value) {
     return vec3(
@@ -101,15 +93,6 @@ in vec2 vTexCoords;
 // Final color output
 out vec4 FragColor;
 
-// Render resolution
-uniform vec2 uResolution;
-
-// Base material values
-uniform vec3 uAlbedo;
-uniform vec3 uEmmissive;
-uniform float uRoughness;
-uniform float uMetallic;
-
 // Texture material values
 uniform sampler2D uAlbedoMap;
 uniform sampler2D uEmissiveMap;
@@ -120,12 +103,9 @@ uniform sampler2D uAlphaMap;
 // Normal map + uniform for bump map detection
 uniform sampler2D uNormalMap;
 uniform sampler2D uBumpMap;
-uniform int uIsBumpMap;
 
-// Shadow mapping
 uniform samplerCube uShadowCubeMap;
-uniform float uShadowFarPlane;
-uniform vec3 uLightPos;
+
 // END INCLUDE: ../uniforms.glsl
 // BEGIN INCLUDE: ../stylizing.glsl
 const float alphaCuttoff = 0.2;
@@ -373,10 +353,27 @@ layout (std140) uniform CameraUBO {
     mat4 uInverseView;
 };
 
+layout(std140) uniform GlobalSceneUBO {
+    mat4 uShadowMatrices[6];
+    vec4 uLightPos;
+    vec2 uResolution;
+    float uFOV;
+    float uShadowFarPlane;
+};
+
+layout(std140) uniform ObjectUBO {
+    mat4 uModel;
+    vec4 uAlbedo;     // Ensure vec4 in GLSL
+    vec4 uEmissive;   // Ensure vec4 in GLSL
+    float uRoughness;
+    float uMetallic;
+    int uIsBumpMap;
+};
+
 // Add worldPos parameter
 float calcShadow(vec3 worldPos, vec3 normal) {
     // Get the distance
-    vec3 fragToLight = worldPos - uLightPos;
+    vec3 fragToLight = worldPos - uLightPos.xyz;
     float currentDist = length(fragToLight) / uShadowFarPlane;
 
     // Find the light dir and bias the NdotL
@@ -477,8 +474,8 @@ void main() {
     // return;
 
     // Sample & get the material values
-    vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo;
-    vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmmissive;
+    vec3 albedo = texture(uAlbedoMap, vTexCoords).rgb * uAlbedo.xyz;
+    vec3 emissive = texture(uEmissiveMap, vTexCoords).rgb * uEmissive.xyz;
     float roughness = texture(uRoughnessMap, vTexCoords).r * uRoughness;
     float metallic = texture(uMetallicMap, vTexCoords).r * uMetallic;
     float alpha = texture(uAlphaMap, vTexCoords).r;
@@ -495,7 +492,7 @@ void main() {
 
     // Get the light color
     // vec3 color = cookTorranceBDRF(uCameraPos, vWorldPos, worldNormal, mat, uCameraPos, lightMat);
-    vec3 color = blinnPhong(uCameraPos.xyz, vWorldPos, worldNormal, mat, uLightPos, lightMat, shadow);
+    vec3 color = blinnPhong(uCameraPos.xyz, vWorldPos, worldNormal, mat, uLightPos.xyz, lightMat, shadow);
 
     // Add the emissive glow to the color
     color += emissive;
