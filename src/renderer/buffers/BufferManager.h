@@ -33,12 +33,6 @@ class BufferManager {
                             const std::string &uniformName, const size_t size,
                             const void *data);
 
-    static void bindBuffer(const BufferHandle handle,
-                           const uint32_t globalFrameIndex);
-    static void bindBufferBase(const BufferHandle handle,
-                               const uint32_t bindingPoint,
-                               const uint32_t globalFrameIndex);
-
     static void streamData(const BufferHandle handle, const size_t size,
                            const void *data, const uint32_t globalFrameIndex);
 
@@ -46,8 +40,8 @@ class BufferManager {
                            const uint32_t globalFrameIndex);
 
   private:
-    static inline std::unordered_map<BufferHandle, GPUBuffer> bufferRegistry;
     static inline GLuint nextBindingIndex = 0;
+    static inline std::unordered_map<BufferHandle, GPUBuffer> bufferRegistry;
 };
 
 } // namespace Engine

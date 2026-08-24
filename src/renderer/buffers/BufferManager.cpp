@@ -238,55 +238,6 @@ void BufferManager::setUBOValue(const BufferHandle handle,
     }
 }
 
-void BufferManager::bindBuffer(const BufferHandle handle,
-                               const uint32_t globalFrameIndex) {
-
-    // Find the target buffer
-    auto ittr = bufferRegistry.find(handle);
-    if (ittr == bufferRegistry.end()) {
-        Logger::error("BUFFER_MGR",
-                      "Attempted to bind invalid buffer handle: " +
-                          std::to_string(handle));
-        return;
-    }
-
-    // Get a refrence
-    const GPUBuffer &buffer = ittr->second;
-
-    // Get the current id based on the global frame num
-    GLuint activeID = buffer.multiBuffered
-                          ? buffer.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                          : buffer.ids[0];
-
-    // Bind the buffer
-    glBindBuffer(static_cast<GLenum>(buffer.type), activeID);
-}
-
-void BufferManager::bindBufferBase(const BufferHandle handle,
-                                   const uint32_t bindingPoint,
-                                   const uint32_t globalFrameIndex) {
-
-    // Find the target buffer
-    auto ittr = bufferRegistry.find(handle);
-    if (ittr == bufferRegistry.end()) {
-        Logger::error("BUFFER_MGR",
-                      "Attempted to bind invalid buffer handle: " +
-                          std::to_string(handle));
-        return;
-    }
-
-    // Obtain a refrence
-    const GPUBuffer &buffer = ittr->second;
-
-    // Get the current id based on the global frame num
-    GLuint activeID = buffer.multiBuffered
-                          ? buffer.ids[globalFrameIndex % FRAMES_IN_FLIGHT]
-                          : buffer.ids[0];
-
-    // Bind the base of the buffer
-    glBindBufferBase(static_cast<GLenum>(buffer.type), bindingPoint, activeID);
-}
-
 void BufferManager::streamData(const BufferHandle handle, const size_t size,
                                const void *data,
                                const uint32_t globalFrameIndex) {

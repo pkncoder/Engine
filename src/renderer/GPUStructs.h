@@ -58,6 +58,7 @@ struct alignas(16) GPUTexture {
 
 // 1. Global Scene Data (Per Frame)
 struct alignas(16) GlobalSceneData {
+  public:
     glm::mat4 shadowMatrices[6]; // 6 * 64 = 384 bytes
     glm::vec4 lightPos;          // 16 bytes (xyz = pos, w = unused/padding)
     glm::vec2 resolution;        // 8 bytes
@@ -67,6 +68,7 @@ struct alignas(16) GlobalSceneData {
 
 // 2. Object & Material Data (Per Draw Call)
 struct alignas(16) ObjectRenderData {
+  public:
     glm::mat4 model;    // 64 bytes
     glm::vec4 albedo;   // 16 bytes (xyz = albedo, w = unused)
     glm::vec4 emissive; // 16 bytes (xyz = emissive, w = unused)

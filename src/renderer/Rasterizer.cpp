@@ -23,6 +23,13 @@
 
 namespace Engine {
 
+void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
+    if (newWidth == currentWidth && newHeight == currentHeight)
+        return;
+    currentWidth = newWidth;
+    currentHeight = newHeight;
+}
+
 void Rasterizer::setupDefaultTextures() {
     glGenTextures(1, &defaultWhiteTexture);
     glBindTexture(GL_TEXTURE_2D, defaultWhiteTexture);
@@ -35,13 +42,6 @@ void Rasterizer::setupDefaultTextures() {
     unsigned char flatNormalPixel[] = {128, 128, 255, 255};
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  flatNormalPixel);
-}
-
-void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
-    if (newWidth == currentWidth && newHeight == currentHeight)
-        return;
-    currentWidth = newWidth;
-    currentHeight = newHeight;
 }
 
 void Rasterizer::setupShadowFBO(EngineState &state) {
@@ -189,7 +189,7 @@ void Rasterizer::extract(EngineState &state) {
 }
 
 void generateShadowMatricies(EngineState &state, RenderLayer *shadowStep,
-                             glm::vec3 lightPos) {
+                             const glm::vec3 lightPos) {
     glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f,
                                             state.renderer.settings.shadowNear,
                                             state.renderer.settings.shadowFar);
@@ -267,7 +267,8 @@ void Rasterizer::prepare(EngineState &state) {
         if (!gpuMesh || !cpuMaterial)
             continue;
 
-        auto getTexID = [&](const std::string &key, GLuint fallback) -> GLuint {
+        auto getTexID = [&](const std::string &key,
+                            const GLuint fallback) -> GLuint {
             auto ittr = cpuMaterial->textureMaps.find(key);
             if (ittr != cpuMaterial->textureMaps.end()) {
                 GPUTexture *tex =
