@@ -2,7 +2,6 @@
 
 #include "../../services/Logger.h"
 #include "../../services/UUID.h"
-#include "GPUBuffer.h"
 
 #include <cstring>
 #include <unordered_map>
@@ -15,22 +14,30 @@ BufferManager::~BufferManager() {}
 BufferHandle
 BufferManager::createBuffer(const std::string &name, const BufferType type,
                             const BufferUsage usage, const size_t size,
-                            const void *initialData, const bool multiBuffered) {
+                            const GLuint bindingIndex, const void *initialData,
+                            const bool multiBuffered) {
 
     // Setup the new buffer & attributes
     GPUBuffer buffer;
+
+    // Buffer specifications
     buffer.name = name;
     buffer.handle = UUID();
 
+    // OpenGL enums
     buffer.usage = usage;
-
-    buffer.size = size;
     buffer.type = type;
 
+    // Buffer ids
     buffer.multiBuffered = multiBuffered;
+    buffer.bindingIndex =
+        bindingIndex == -1 ? nextBindingIndex++ : bindingIndex;
 
+    // Buffer size
+    buffer.size = size;
+
+    // Buffer caches
     buffer.cpuCache = std::vector<uint8_t>();
-
     if (type == BufferType::UniformBuffer) {
         buffer.uniformOffsets = std::unordered_map<std::string, size_t>();
     }
@@ -50,9 +57,6 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
         glBufferData(glType, size, initialData, glUsage);
         glBindBuffer(glType, 0);
     }
-
-    // Unbind the buffer
-    glBindBuffer(glType, 0);
 
     // If the buffer is dynamic, resize the cpu cache
     if (usage == BufferUsage::Dynamic) {
@@ -119,7 +123,7 @@ GPUBuffer *BufferManager::getBufferByName(const std::string &name) {
 }
 
 void BufferManager::updateBufferCache(const BufferHandle handle,
-                                      const size_t offset, const size_t size,
+                                      const size_t size, const size_t offset,
                                       const void *data) {
 
     // Find target buffer
@@ -134,7 +138,7 @@ void BufferManager::updateBufferCache(const BufferHandle handle,
     GPUBuffer &buffer = ittr->second;
 
     // Check for out of bounds error
-    if (offset + size <= buffer.size) {
+    if (size + offset > buffer.size) {
         Logger::error("BUFFER", "Buffer Out-Of-Bounds error prevented "
                                 "BufferManager::updateBufferCache");
         return;
@@ -168,17 +172,13 @@ void BufferManager::mapUBO(const BufferHandle handle, const uint32_t programID,
         return;
     }
 
+    // Get the block index
     GLuint blockIndex = glGetUniformBlockIndex(programID, blockName.c_str());
     if (blockIndex == GL_INVALID_INDEX) {
         return; // Ignore the unused block
     }
 
-    // --- NEW LOGIC: Assign binding index if it doesn't have one ---
-    if (buffer.bindingIndex == -1) {
-        buffer.bindingIndex = nextBindingIndex++; // Assign and increment
-    }
-
-    // Map the shader's uniform block to our dynamically assigned binding index
+    // Set the uniform buffer binding
     glUniformBlockBinding(programID, blockIndex, buffer.bindingIndex);
 
     // Loop each name in uniform names
@@ -228,14 +228,14 @@ void BufferManager::setUBOValue(const BufferHandle handle,
     size_t targetOffset = offsetIttr->second;
 
     // Check the bounds of the UBO
-    if (targetOffset + size <= buffer.size) {
-        // Copy the new data into the CPU cache
-        std::memcpy(buffer.cpuCache.data() + targetOffset, data, size);
-    } else {
+    if (targetOffset + size > buffer.size) {
         Logger::error("BUFFER_MGR",
                       "Buffer overflow prevented in UBO: " + buffer.name +
                           " for uniform: " + uniformName);
     }
+
+    // Copy the new data into the CPU cache
+    std::memcpy(buffer.cpuCache.data() + targetOffset, data, size);
 }
 
 void BufferManager::streamData(const BufferHandle handle, const size_t size,

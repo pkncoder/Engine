@@ -24,19 +24,19 @@
 namespace Engine {
 
 void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
-    if (newWidth == currentWidth && newHeight == currentHeight)
-        return;
-    currentWidth = newWidth;
-    currentHeight = newHeight;
+    IRenderer::resize(newWidth, newHeight); // Internal interface resize
 }
 
 void Rasterizer::setupDefaultTextures() {
+
+    // Default white
     glGenTextures(1, &defaultWhiteTexture);
     glBindTexture(GL_TEXTURE_2D, defaultWhiteTexture);
     unsigned char whitePixel[] = {255, 255, 255, 255};
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  whitePixel);
 
+    // Default black
     glGenTextures(1, &defaultNormalTexture);
     glBindTexture(GL_TEXTURE_2D, defaultNormalTexture);
     unsigned char flatNormalPixel[] = {128, 128, 255, 255};
@@ -45,9 +45,12 @@ void Rasterizer::setupDefaultTextures() {
 }
 
 void Rasterizer::setupShadowFBO(EngineState &state) {
+
+    // Generate & bind the textures
     glGenTextures(1, &shadowCubeMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubeMap);
 
+    // Generate 6 textures or the cubemap
     for (int i = 0; i < 6; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                      GL_DEPTH_COMPONENT32F, state.renderer.settings.shadowWidth,
@@ -55,66 +58,89 @@ void Rasterizer::setupShadowFBO(EngineState &state) {
                      GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     }
 
+    // Set texture params
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    // Generate the framebuffer
     glGenFramebuffers(1, &shadowFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowCubeMap, 0);
+
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
+    // Check to make sure the framebuffer is complete
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         Logger::error("RENDERER", "Shadow cube map FBO incomplete!");
 
+    // Unbind the fbo
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Rasterizer::init(EngineState &state) {
-    setupDefaultTextures();
-    setupShadowFBO(state);
+void Rasterizer::setupShaderNodes() {
 
-    // Register Passes
+    // Shadow pass
     addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.vert",
                   "shaders/rasterizing/main/shadow.geom",
                   "shaders/rasterizing/main/shadow.frag");
 
+    // Temp opaque pass
     addShaderNode("RasterPass", "shaders/rasterizing/main/raster.vert",
                   "shaders/rasterizing/main/raster.frag");
+}
 
-    // 1. Allocate UBOs
+void Rasterizer::setupBuffers() {
+
+    // Create and save the buffers
     cameraUBO = BufferManager::createBuffer(
         "CameraUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
-        sizeof(CameraData), nullptr, true);
+        sizeof(CameraData), -1, nullptr, true);
     globalSceneUBO = BufferManager::createBuffer(
         "GlobalSceneUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
-        sizeof(GlobalSceneData), nullptr, true);
+        sizeof(GlobalSceneData), -1, nullptr, true);
     objectUBO = BufferManager::createBuffer(
         "ObjectUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
-        sizeof(ObjectRenderData), nullptr, true);
+        sizeof(ObjectRenderData), -1, nullptr, true);
 
-    // 2. Map Layouts (Ensuring your GLSL uses these exact block names)
-    // Shadow Pass (Index 0)
-    BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[0].shader.ID,
-                          "GlobalSceneUBO",
-                          {"uShadowMatrices", "uLightPos", "uResolution",
-                           "uFOV", "uShadowFarPlane"});
-    BufferManager::mapUBO(objectUBO, shaderNodeTree[0].shader.ID, "ObjectUBO",
-                          {"uModel"});
+    { // Shadow pass mapping
 
-    // Main Raster Pass (Index 1)
-    BufferManager::mapUBO(cameraUBO, shaderNodeTree[1].shader.ID, "CameraUBO",
-                          {"uCameraPos", "uViewProjection", "uInverseView"});
-    BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[1].shader.ID,
-                          "GlobalSceneUBO",
-                          {"uShadowMatrices", "uLightPos", "uResolution",
-                           "uFOV", "uShadowFarPlane"});
-    BufferManager::mapUBO(objectUBO, shaderNodeTree[1].shader.ID, "ObjectUBO",
-                          {"uModel", "uAlbedo", "uEmissive", "uRoughness",
-                           "uMetallic", "uIsBumpMap"});
+        // Global scene data
+        BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[0].shader.ID,
+                              "GlobalSceneUBO",
+                              {"uShadowMatrices", "uLightPos", "uResolution",
+                               "uFOV", "uShadowFarPlane"});
+
+        // Object data
+        BufferManager::mapUBO(objectUBO, shaderNodeTree[0].shader.ID,
+                              "ObjectUBO", {"uModel"});
+    }
+
+    { // Opaque pass mapping
+
+        // Camera
+        BufferManager::mapUBO(
+            cameraUBO, shaderNodeTree[1].shader.ID, "CameraUBO",
+            {"uCameraPos", "uViewProjection", "uInverseView"});
+
+        // Global scene data
+        BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[1].shader.ID,
+                              "GlobalSceneUBO",
+                              {"uShadowMatrices", "uLightPos", "uResolution",
+                               "uFOV", "uShadowFarPlane"});
+
+        // Object
+        BufferManager::mapUBO(objectUBO, shaderNodeTree[1].shader.ID,
+                              "ObjectUBO",
+                              {"uModel", "uAlbedo", "uEmissive", "uRoughness",
+                               "uMetallic", "uIsBumpMap"});
+    }
+}
+
+void Rasterizer::setBaseBindings() {
 
     // Setup Texture Sampler Uniforms (These remain standard uniforms)
     glUseProgram(shaderNodeTree[1].shader.ID);
@@ -127,23 +153,47 @@ void Rasterizer::init(EngineState &state) {
     shaderNodeTree[1].shader.setInt("uBumpMap", 6);
     shaderNodeTree[1].shader.setInt("uShadowCubeMap", 7);
     glUseProgram(0);
+}
+
+void Rasterizer::init(EngineState &state) {
+    setupDefaultTextures();
+    setupShadowFBO(state);
+
+    // TODO: temp
+    setupShaderNodes();
+    setupBuffers();
+    setBaseBindings();
 
     Logger::info("RENDERER", "Rasterizer initialized.");
 }
 
 void Rasterizer::beginFrame(EngineState &state) {
+    renderPackets.clear(); // Wipe old render packets
+
+    // Clera the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderPackets.clear();
-    frameIndex++;
 }
 
 void Rasterizer::extract(EngineState &state) {
-    // ... [No changes needed in extract] ...
+
+    // Grab the managers
     AssetManager *assetManager = engineContext.getAsset();
     SceneManager *sceneManager = engineContext.getScene();
+
+    // Get teh scene & scene data
     Scene &scene = sceneManager->getScene();
     Camera &camera = sceneManager->getCamera();
 
+    // Lambda for building the model matrix
+    const auto buildModel = [](const TransformComponent &t) {
+        glm::mat4 m = glm::mat4(1.0f);
+        m = glm::translate(m, t.position);
+        m *= glm::mat4_cast(t.rotation);
+        m = glm::scale(m, t.scale);
+        return m;
+    };
+
+    // Set the camera data values
     if (currentHeight > 0) {
         cameraData.position = glm::vec4(camera.position, 0.0);
         cameraData.viewProjection =
@@ -154,34 +204,32 @@ void Rasterizer::extract(EngineState &state) {
     }
     activeLightPos = state.scene.camera.position;
 
-    auto buildModel = [](const TransformComponent &t) {
-        glm::mat4 m = glm::mat4(1.0f);
-        m = glm::translate(m, t.position);
-        m *= glm::mat4_cast(t.rotation);
-        m = glm::scale(m, t.scale);
-        return m;
-    };
-
+    // Get the renderables
     const auto renderables =
         scene.getMatchingEntities<TransformComponent, MeshComponent,
                                   MaterialComponent>();
-    float bestEmissive = 0.0f;
+    float bestEmissive =
+        0.0f; // Temp save for the best emmisive value (shadow mapping)
 
     for (EntityID id : renderables) {
         const auto &transform = scene.getComponent<TransformComponent>(id);
         const auto &mesh = scene.getComponent<MeshComponent>(id);
         const auto &material = scene.getComponent<MaterialComponent>(id);
 
+        // Get the material for checking teh best emmisive
         auto cpuMat = assetManager->getMaterial(material.handle);
         if (glm::length(cpuMat->emissive) > 0.001 && cpuMat &&
             glm::length(cpuMat->emissive) > bestEmissive) {
             bestEmissive = glm::length(cpuMat->emissive);
             activeLightPos = transform.position;
         }
+
+        // Create the new render packet and push it to the vector
         renderPackets.push_back(
             {mesh.handle, material.handle, buildModel(transform)});
     }
 
+    // Sort the packets by material
     std::sort(renderPackets.begin(), renderPackets.end(),
               [](const RenderPacket &a, const RenderPacket &b) {
                   return a.materialHandle < b.materialHandle;
@@ -190,14 +238,15 @@ void Rasterizer::extract(EngineState &state) {
 
 void generateShadowMatricies(EngineState &state, RenderLayer *shadowStep,
                              const glm::vec3 lightPos) {
-    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f,
-                                            state.renderer.settings.shadowNear,
-                                            state.renderer.settings.shadowFar);
 
     const glm::vec3 faceDirections[6] = {{1, 0, 0},  {-1, 0, 0}, {0, 1, 0},
                                          {0, -1, 0}, {0, 0, 1},  {0, 0, -1}};
     const glm::vec3 faceUps[6] = {{0, -1, 0}, {0, -1, 0}, {0, 0, 1},
                                   {0, 0, -1}, {0, -1, 0}, {0, -1, 0}};
+
+    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f,
+                                            state.renderer.settings.shadowNear,
+                                            state.renderer.settings.shadowFar);
 
     for (int face = 0; face < 6; face++) {
         glm::mat4 lightView = glm::lookAt(
@@ -207,18 +256,18 @@ void generateShadowMatricies(EngineState &state, RenderLayer *shadowStep,
 }
 
 void Rasterizer::prepare(EngineState &state) {
-    // 1. Push Camera Data
-    BufferManager::setUBOValue(cameraUBO, "uCameraPos", sizeof(glm::vec4),
-                               glm::value_ptr(cameraData.position));
-    BufferManager::setUBOValue(cameraUBO, "uViewProjection", sizeof(glm::mat4),
-                               glm::value_ptr(cameraData.viewProjection));
-    BufferManager::setUBOValue(cameraUBO, "uInverseView", sizeof(glm::mat4),
-                               glm::value_ptr(cameraData.inverseView));
+
+    // Updaet the camera data and push the buffer
+    BufferManager::updateBufferCache(
+        cameraUBO, sizeof(CameraData), 0,
+        reinterpret_cast<const void *>(&cameraData));
     BufferManager::pushBuffer(cameraUBO, frameIndex);
 
+    // Clear out the render steps in each pass
     shaderNodeTree[0].renderSteps.clear();
     shaderNodeTree[1].renderSteps.clear();
 
+    // Create and setup attributes for the shadow step
     RenderLayer shadowStep;
     shadowStep.fbo = shadowFBO;
     shadowStep.renderWidth = state.renderer.settings.shadowWidth;
@@ -226,39 +275,33 @@ void Rasterizer::prepare(EngineState &state) {
     shadowStep.isShadowPass = true;
     generateShadowMatricies(state, &shadowStep, activeLightPos);
 
+    // Create and setup attributes for the temp main step
     RenderLayer mainStep;
     mainStep.fbo = 0;
     mainStep.renderWidth = currentWidth;
     mainStep.renderHeight = currentHeight;
     mainStep.isShadowPass = false;
 
-    // 2. Prepare Global Scene UBO Data
+    // Set the attributes for the global scene data buffer
     GlobalSceneData globalData = {};
     for (int i = 0; i < 6; i++) {
         globalData.shadowMatrices[i] = shadowStep.shadowTransforms[i];
     }
-    globalData.lightPos = glm::vec4(activeLightPos, 1.0f);
+    globalData.lightPos = glm::vec4(activeLightPos, 0.0f);
     globalData.resolution = glm::vec2(currentWidth, currentHeight);
     globalData.fov = state.scene.camera.fov;
     globalData.shadowFarPlane = state.renderer.settings.shadowFar;
 
-    // We can map the whole struct directly into the UBO instead of setting
-    // variables one by one Assuming your BufferManager has a way to upload raw
-    // bytes to the CPU cache. If not, map individually:
-    BufferManager::setUBOValue(globalSceneUBO, "uShadowMatrices",
-                               sizeof(glm::mat4) * 6,
-                               glm::value_ptr(globalData.shadowMatrices[0]));
-    BufferManager::setUBOValue(globalSceneUBO, "uLightPos", sizeof(glm::vec4),
-                               glm::value_ptr(globalData.lightPos));
-    BufferManager::setUBOValue(globalSceneUBO, "uResolution", sizeof(glm::vec2),
-                               glm::value_ptr(globalData.resolution));
-    BufferManager::setUBOValue(globalSceneUBO, "uFOV", sizeof(float),
-                               &globalData.fov);
-    BufferManager::setUBOValue(globalSceneUBO, "uShadowFarPlane", sizeof(float),
-                               &globalData.shadowFarPlane);
+    // Update and send the data to the gpu for the globals
+    BufferManager::updateBufferCache(
+        globalSceneUBO, sizeof(GlobalSceneData), 0,
+        reinterpret_cast<const void *>(&globalData));
     BufferManager::pushBuffer(globalSceneUBO, frameIndex);
 
+    // Loop each packet
     for (const auto &packet : renderPackets) {
+
+        // Uplaod the gpu mesh and get the material
         GPUMesh *gpuMesh =
             GPUResourceManager::getOrUploadMesh(packet.meshHandle);
         CPUMaterialData *cpuMaterial =
@@ -267,8 +310,9 @@ void Rasterizer::prepare(EngineState &state) {
         if (!gpuMesh || !cpuMaterial)
             continue;
 
-        auto getTexID = [&](const std::string &key,
-                            const GLuint fallback) -> GLuint {
+        // Lambda for getting a texture id safely
+        const auto getTexID = [&](const std::string &key,
+                                  const GLuint fallback) -> GLuint {
             auto ittr = cpuMaterial->textureMaps.find(key);
             if (ittr != cpuMaterial->textureMaps.end()) {
                 GPUTexture *tex =
@@ -328,16 +372,19 @@ void Rasterizer::prepare(EngineState &state) {
 }
 
 void Rasterizer::dispatch(EngineState &state) {
-    for (const ShaderNode &pass : shaderNodeTree) {
+    for (const ShaderNode &pass : shaderNodeTree) { // Loop each shader
 
+        // Bind the shader
         pass.shader.bind();
 
-        for (const RenderLayer &layer : pass.renderSteps) {
+        for (const RenderLayer &layer :
+             pass.renderSteps) { // Loop each layer in the shader
 
             glBindFramebuffer(GL_FRAMEBUFFER, layer.fbo);
             glViewport(0, 0, layer.renderWidth, layer.renderHeight);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            // Culling settings
             if (layer.isShadowPass) {
                 glCullFace(GL_FRONT);
             } else {
@@ -356,7 +403,8 @@ void Rasterizer::dispatch(EngineState &state) {
                     glm::value_ptr(command->modelMatrix));
 
                 if (!layer.isShadowPass) {
-                    // Note: padding vec3s up to vec4s to satisfy std140 layout
+                    // Note: padding vec3s up to vec4s to satisfy std140
+                    // layout
                     glm::vec4 padAlbedo = glm::vec4(command->albedo, 1.0f);
                     glm::vec4 padEmissive = glm::vec4(command->emissive, 1.0f);
 
@@ -406,7 +454,7 @@ void Rasterizer::dispatch(EngineState &state) {
 
 void Rasterizer::postProcess(EngineState &state) {}
 
-void Rasterizer::present(EngineState &state) {}
+void Rasterizer::present(EngineState &state) { frameIndex++; }
 
 void Rasterizer::shutdown() {
     glDeleteFramebuffers(1, &shadowFBO);

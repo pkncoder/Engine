@@ -35,7 +35,7 @@ struct RasterDrawCommand : DrawCommand {
 class Rasterizer : public IRenderer {
   public:
     inline Rasterizer(EngineContext &engineContext)
-        : engineContext(engineContext) {};
+        : engineContext(engineContext){};
 
     // --- Lifecycle ---
     void init(EngineState &state) override;
@@ -54,31 +54,30 @@ class Rasterizer : public IRenderer {
     void setupDefaultTextures();
     void setupShadowFBO(EngineState &state);
 
+    // TODO: temp
+    void setupShaderNodes();
+    void setupBuffers();
+    void setBaseBindings();
+
   private:
     EngineContext &engineContext;
 
     int frameIndex = 0;
 
-    // Render size information
-    int currentWidth = 0;
-    int currentHeight = 0;
-
     GLuint defaultWhiteTexture = 0;
     GLuint defaultNormalTexture = 0;
 
-    GLuint shadowFBO = 0;
-    GLuint shadowCubeMap = 0;
-
     std::vector<RenderPacket> renderPackets;
 
-    CameraData cameraData;
+    GLuint shadowFBO = 0;
+    GLuint shadowCubeMap = 0;
 
     BufferHandle cameraUBO;
     BufferHandle globalSceneUBO;
     BufferHandle objectUBO;
 
+    CameraData cameraData;
     glm::vec3 activeLightPos;
-    glm::mat4 shadowProjMatrix;
 };
 
 } // namespace Engine
