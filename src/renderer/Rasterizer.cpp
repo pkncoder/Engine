@@ -10,6 +10,8 @@
 #include "IRenderer.h"
 #include "Shader.h"
 #include "buffers/BufferManager.h"
+#include "shaders/IProgram.h"
+#include "shaders/IShader.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -83,14 +85,35 @@ void Rasterizer::setupShadowFBO(EngineState &state) {
 
 void Rasterizer::setupShaderNodes() {
 
-    // Shadow pass
-    addShaderNode("ShadowPass", "shaders/rasterizing/main/shadow.vert",
-                  "shaders/rasterizing/main/shadow.geom",
-                  "shaders/rasterizing/main/shadow.frag");
+    ShaderNode shadowPass;
+    {
+        shadowPass.name = "ShadowPass";
+        shadowPass.enabled = true;
 
-    // Temp opaque pass
-    addShaderNode("RasterPass", "shaders/rasterizing/main/raster.vert",
-                  "shaders/rasterizing/main/raster.frag");
+        shadowPass.program = IProgram();
+        shadowPass.program.attachShader(
+            IShader("shaders/rasterizing/main/shadow.vert", Vertex));
+        shadowPass.program.attachShader(
+            IShader("shaders/rasterizing/main/shadow.geom", Geometry));
+        shadowPass.program.attachShader(
+            IShader("shaders/rasterizing/main/shadow.frag", Fragment));
+        shadowPass.program.link();
+    }
+    shaderNodeTree.push_back(shadowPass);
+
+    ShaderNode opaquePass;
+    {
+        opaquePass.name = "OpaquePass";
+        opaquePass.enabled = true;
+
+        opaquePass.program = IProgram();
+        opaquePass.program.attachShader(
+            IShader("shaders/rasterizing/main/raster.vert", Vertex));
+        opaquePass.program.attachShader(
+            IShader("shaders/rasterizing/main/raster.frag", Fragment));
+        opaquePass.program.link();
+    }
+    shaderNodeTree.push_back(opaquePass);
 }
 
 void Rasterizer::setupBuffers() {
@@ -109,13 +132,13 @@ void Rasterizer::setupBuffers() {
     { // Shadow pass mapping
 
         // Global scene data
-        BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[0].shader.ID,
+        BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[0].program.ID,
                               "GlobalSceneUBO",
                               {"uShadowMatrices", "uLightPos", "uResolution",
                                "uFOV", "uShadowFarPlane"});
 
         // Object data
-        BufferManager::mapUBO(objectUBO, shaderNodeTree[0].shader.ID,
+        BufferManager::mapUBO(objectUBO, shaderNodeTree[0].program.ID,
                               "ObjectUBO", {"uModel"});
     }
 
@@ -123,17 +146,17 @@ void Rasterizer::setupBuffers() {
 
         // Camera
         BufferManager::mapUBO(
-            cameraUBO, shaderNodeTree[1].shader.ID, "CameraUBO",
+            cameraUBO, shaderNodeTree[1].program.ID, "CameraUBO",
             {"uCameraPos", "uViewProjection", "uInverseView"});
 
         // Global scene data
-        BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[1].shader.ID,
+        BufferManager::mapUBO(globalSceneUBO, shaderNodeTree[1].program.ID,
                               "GlobalSceneUBO",
                               {"uShadowMatrices", "uLightPos", "uResolution",
                                "uFOV", "uShadowFarPlane"});
 
         // Object
-        BufferManager::mapUBO(objectUBO, shaderNodeTree[1].shader.ID,
+        BufferManager::mapUBO(objectUBO, shaderNodeTree[1].program.ID,
                               "ObjectUBO",
                               {"uModel", "uAlbedo", "uEmissive", "uRoughness",
                                "uMetallic", "uIsBumpMap"});
@@ -143,15 +166,15 @@ void Rasterizer::setupBuffers() {
 void Rasterizer::setBaseBindings() {
 
     // Setup Texture Sampler Uniforms (These remain standard uniforms)
-    glUseProgram(shaderNodeTree[1].shader.ID);
-    shaderNodeTree[1].shader.setInt("uAlbedoMap", 0);
-    shaderNodeTree[1].shader.setInt("uEmissiveMap", 1);
-    shaderNodeTree[1].shader.setInt("uAlphaMap", 2);
-    shaderNodeTree[1].shader.setInt("uRoughnessMap", 3);
-    shaderNodeTree[1].shader.setInt("uMetallicMap", 4);
-    shaderNodeTree[1].shader.setInt("uNormalMap", 5);
-    shaderNodeTree[1].shader.setInt("uBumpMap", 6);
-    shaderNodeTree[1].shader.setInt("uShadowCubeMap", 7);
+    glUseProgram(shaderNodeTree[1].program.ID);
+    shaderNodeTree[1].program.setInt("uAlbedoMap", 0);
+    shaderNodeTree[1].program.setInt("uEmissiveMap", 1);
+    shaderNodeTree[1].program.setInt("uAlphaMap", 2);
+    shaderNodeTree[1].program.setInt("uRoughnessMap", 3);
+    shaderNodeTree[1].program.setInt("uMetallicMap", 4);
+    shaderNodeTree[1].program.setInt("uNormalMap", 5);
+    shaderNodeTree[1].program.setInt("uBumpMap", 6);
+    shaderNodeTree[1].program.setInt("uShadowCubeMap", 7);
     glUseProgram(0);
 }
 
@@ -375,7 +398,7 @@ void Rasterizer::dispatch(EngineState &state) {
     for (const ShaderNode &pass : shaderNodeTree) { // Loop each shader
 
         // Bind the shader
-        pass.shader.bind();
+        pass.program.bind();
 
         for (const RenderLayer &layer :
              pass.renderSteps) { // Loop each layer in the shader
@@ -448,7 +471,7 @@ void Rasterizer::dispatch(EngineState &state) {
                                GL_UNSIGNED_INT, 0);
             }
         }
-        pass.shader.unbind();
+        pass.program.unbind();
     }
 }
 

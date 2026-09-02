@@ -31,6 +31,8 @@ set(SOURCES
     src/core/EngineContext.cpp
     src/core/Window.cpp
     src/renderer/buffers/BufferManager.cpp
+    src/renderer/shaders/IProgram.cpp
+    src/renderer/shaders/IShader.cpp
     src/renderer/GPUResourceManager.cpp
     src/renderer/IRenderer.cpp
     # src/renderer/PathTracer.cpp
@@ -56,9 +58,9 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 # --- Linking ---
 # We link against the "Namespaced" targets provided by the packages
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    glfw 
-    glad::glad 
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    glfw
+    glad::glad
     glm::glm
     tinyobjloader::tinyobjloader
     stb::stb

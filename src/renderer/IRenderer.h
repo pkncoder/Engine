@@ -4,6 +4,7 @@
 #include "../resources/CPUStructs.h"
 #include "Shader.h"
 #include "buffers/GPUBuffer.h"
+#include "shaders/IProgram.h"
 
 #include <memory>
 
@@ -69,7 +70,7 @@ struct ShaderNode {
     std::string name;
 
     // Shader / program to run
-    Shader shader;
+    IProgram program;
     bool enabled = true;
 
     std::vector<AssetHandle> textureInputs;
@@ -96,21 +97,6 @@ class IRenderer {
     addRenderTarget(const std::string &name, const GLuint bindingIndex,
                     const GLenum format = GL_RGBA32F);
     virtual void setDisplayTarget(const RenderTargetHandle handle);
-
-    // Shader pass overloads
-    virtual ShaderNode &
-    addShaderNode(const std::string &name, const char *vertexShaderPath,
-                  const char *geometryShaderPath,
-                  const char *fragmentShaderPath,
-                  const bool enabled = true); // Vert & Geom & Frag shaders
-    virtual ShaderNode &
-    addShaderNode(const std::string &name, const char *vertexShaderPath,
-                  const char *fragmentShaderPath,
-                  const bool enabled = true); // Vert & Frag shaders
-    virtual ShaderNode &
-    addShaderNode(const std::string &name, const char *computeShaderPath,
-                  const bool enabled = true); // Compute shaders
-
     // Lookups
     RenderTarget *getRenderTarget(const RenderTargetHandle handle);
     RenderTarget *getRenderTargetByName(const std::string &name);

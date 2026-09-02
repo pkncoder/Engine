@@ -76,52 +76,6 @@ void IRenderer::setDisplayTarget(RenderTargetHandle handle) {
     currentRenderTarget = handle;
 }
 
-ShaderNode &IRenderer::addShaderNode(const std::string &name,
-                                     const char *vertexShaderPath,
-                                     const char *geometryShaderPath,
-                                     const char *fragmentShaderPath,
-                                     const bool enabled) {
-    // Create a new shader pass & set attributes
-    ShaderNode pass;
-    pass.name = name;
-    pass.shader =
-        Shader(vertexShaderPath, geometryShaderPath, fragmentShaderPath);
-    pass.enabled = enabled;
-
-    // Add the shader pass to the registry
-    shaderNodeTree.push_back(std::move(pass));
-    return shaderNodeTree.back();
-}
-
-ShaderNode &IRenderer::addShaderNode(const std::string &name,
-                                     const char *vertexShaderPath,
-                                     const char *fragmentShaderPath,
-                                     const bool enabled) {
-    // Create a new shader pass & set attributes
-    ShaderNode pass;
-    pass.name = name;
-    pass.shader = Shader(vertexShaderPath, fragmentShaderPath);
-    pass.enabled = enabled;
-
-    // Add the shader pass to the registry
-    shaderNodeTree.push_back(std::move(pass));
-    return shaderNodeTree.back();
-}
-
-ShaderNode &IRenderer::addShaderNode(const std::string &name,
-                                     const char *computeShaderPath,
-                                     const bool enabled) {
-    // Create a new shader pass & set attributes
-    ShaderNode pass;
-    pass.name = name;
-    pass.shader = Shader(computeShaderPath);
-    pass.enabled = enabled;
-
-    // Add the shader pass to the registry
-    shaderNodeTree.push_back(std::move(pass));
-    return shaderNodeTree.back();
-}
-
 RenderTarget *IRenderer::getRenderTarget(const RenderTargetHandle handle) {
     // Find the render target via handle, if it exists return a refrance
     auto ittr = renderTargets.find(handle);
