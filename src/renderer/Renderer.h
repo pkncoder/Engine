@@ -2,7 +2,6 @@
 
 #include "../core/states/EngineState.h"
 #include "../resources/CPUStructs.h"
-#include "Shader.h"
 #include "buffers/GPUBuffer.h"
 #include "shaders/IProgram.h"
 
@@ -80,49 +79,36 @@ struct ShaderNode {
     std::vector<RenderLayer> renderSteps;
 };
 
-class IRenderer {
+class Renderer {
   public:
-    virtual ~IRenderer() = default; // Deconstructor
+    Renderer() = default;
+    ~Renderer() = default; // Deconstructor
 
     // --- Lifecycle ---
 
-    virtual void init(EngineState &state) = 0;
-    virtual void shutdown() = 0;
-    virtual void resize(const uint32_t width, const uint32_t height) = 0;
+    void shutdown();
+    void resize(const uint32_t width, const uint32_t height);
 
     // --- Render & Shader Passes ---
 
     // Render target handling
-    virtual RenderTargetHandle
-    addRenderTarget(const std::string &name, const GLuint bindingIndex,
-                    const GLenum format = GL_RGBA32F);
-    virtual void setDisplayTarget(const RenderTargetHandle handle);
+    RenderTargetHandle addRenderTarget(const std::string &name,
+                                       const GLuint bindingIndex,
+                                       const GLenum format = GL_RGBA32F);
+    void setDisplayTarget(const RenderTargetHandle handle);
+
     // Lookups
     RenderTarget *getRenderTarget(const RenderTargetHandle handle);
     RenderTarget *getRenderTargetByName(const std::string &name);
 
-    // --- The Frame Pipeline ---
+    void execute(EngineState &state);
 
-    // Reseting and setting up for frame
-    virtual void beginFrame(EngineState &state) = 0;
-
-    // Getting and formatting data
-    virtual void extract(EngineState &state) = 0;
-    virtual void prepare(EngineState &state) = 0;
-
-    // Sending shader passes
-    virtual void dispatch(EngineState &state) = 0;
-    virtual void postProcess(EngineState &state) = 0;
-
-    // Presenting / blitting to FOB
-    virtual void present(EngineState &state) = 0;
-
-  protected:
+  private:
     // Methods for setting up render targets
-    virtual void allocateRenderTarget(RenderTarget &target) const;
-    virtual void bindRenderTarget(RenderTarget &target) const;
+    void allocateRenderTarget(RenderTarget &target) const;
+    void bindRenderTarget(RenderTarget &target) const;
 
-  protected:
+  private:
     // Tracked render width & height
     uint32_t currentWidth;
     uint32_t currentHeight;

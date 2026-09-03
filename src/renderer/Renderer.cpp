@@ -1,11 +1,11 @@
-#include "IRenderer.h"
+#include "Renderer.h"
 
 #include "../services/Logger.h"
 #include "../services/UUID.h"
 
 namespace Engine {
 
-void IRenderer::shutdown() {
+void Renderer::shutdown() {
 
     // Loop each render target and delete the texture
     for (auto &[handle, target] : renderTargets) {
@@ -21,7 +21,7 @@ void IRenderer::shutdown() {
     shaderNodeTree.clear();
 }
 
-void IRenderer::resize(const uint32_t newWidth, const uint32_t newHeight) {
+void Renderer::resize(const uint32_t newWidth, const uint32_t newHeight) {
 
     // Check for same size
     if (newWidth == currentWidth && newHeight == currentHeight) {
@@ -43,9 +43,9 @@ void IRenderer::resize(const uint32_t newWidth, const uint32_t newHeight) {
     }
 }
 
-RenderTargetHandle IRenderer::addRenderTarget(const std::string &name,
-                                              const GLuint bindingIndex,
-                                              const GLenum format) {
+RenderTargetHandle Renderer::addRenderTarget(const std::string &name,
+                                             const GLuint bindingIndex,
+                                             const GLenum format) {
     // Create a new render target & set attributes
     RenderTarget target;
     target.name = name;
@@ -65,7 +65,7 @@ RenderTargetHandle IRenderer::addRenderTarget(const std::string &name,
     return target.handle;
 }
 
-void IRenderer::setDisplayTarget(RenderTargetHandle handle) {
+void Renderer::setDisplayTarget(RenderTargetHandle handle) {
     if (renderTargets.find(handle) == renderTargets.end()) {
         Logger::warn("RENDERER", "Attempted to set invalid display target: " +
                                      std::to_string(handle));
@@ -76,20 +76,20 @@ void IRenderer::setDisplayTarget(RenderTargetHandle handle) {
     currentRenderTarget = handle;
 }
 
-RenderTarget *IRenderer::getRenderTarget(const RenderTargetHandle handle) {
+RenderTarget *Renderer::getRenderTarget(const RenderTargetHandle handle) {
     // Find the render target via handle, if it exists return a refrance
     auto ittr = renderTargets.find(handle);
     return ittr != renderTargets.end() ? &ittr->second : nullptr;
 }
 
-RenderTarget *IRenderer::getRenderTargetByName(const std::string &name) {
+RenderTarget *Renderer::getRenderTargetByName(const std::string &name) {
     // Find the render target via name, if it exists return a refrance
     auto ittr = renderTargetNameMap.find(name);
     return ittr != renderTargetNameMap.end() ? &renderTargets[ittr->second]
                                              : nullptr;
 }
 
-void IRenderer::allocateRenderTarget(RenderTarget &target) const {
+void Renderer::allocateRenderTarget(RenderTarget &target) const {
     // If the texture id exists, delete it
     if (target.id != 0) {
         glDeleteTextures(1, &target.id);
@@ -109,10 +109,12 @@ void IRenderer::allocateRenderTarget(RenderTarget &target) const {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void IRenderer::bindRenderTarget(RenderTarget &target) const {
+void Renderer::bindRenderTarget(RenderTarget &target) const {
     // Bind the texture to it's binding index
     glBindImageTexture(target.bindingIndex, target.id, 0, GL_FALSE, 0,
                        GL_WRITE_ONLY, target.format);
 };
+
+void Renderer::execute(EngineState &state) {}
 
 } // namespace Engine

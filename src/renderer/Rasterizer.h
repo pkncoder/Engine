@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IRenderer.h"
+#include "Renderer.h"
 
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
@@ -32,10 +32,10 @@ struct RasterDrawCommand : DrawCommand {
     int textures[8] = {0};
 };
 
-class Rasterizer : public IRenderer {
+class Rasterizer : public Renderer {
   public:
     inline Rasterizer(EngineContext &engineContext)
-        : engineContext(engineContext){};
+        : engineContext(engineContext) {};
 
     // --- Lifecycle ---
     void init(EngineState &state) override;

@@ -7,8 +7,7 @@
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
 #include "GPUResourceManager.h"
-#include "IRenderer.h"
-#include "Shader.h"
+#include "Renderer.h"
 #include "buffers/BufferManager.h"
 #include "shaders/IProgram.h"
 #include "shaders/IShader.h"
@@ -26,7 +25,7 @@
 namespace Engine {
 
 void Rasterizer::resize(const uint32_t newWidth, const uint32_t newHeight) {
-    IRenderer::resize(newWidth, newHeight); // Internal interface resize
+    Renderer::resize(newWidth, newHeight); // Internal interface resize
 }
 
 void Rasterizer::setupDefaultTextures() {

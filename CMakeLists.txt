@@ -16,8 +16,8 @@ find_package(tinyobjloader CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 # Create the missing modern target if it doesn't exist
 if(NOT TARGET stb::stb)
-    add_library(stb::stb INTERFACE IMPORTED)
-    target_include_directories(stb::stb INTERFACE ${Stb_INCLUDE_DIRS})
+  add_library(stb::stb INTERFACE IMPORTED)
+  target_include_directories(stb::stb INTERFACE ${Stb_INCLUDE_DIRS})
 endif()
 
 # --- Source Files ---
@@ -34,11 +34,10 @@ set(SOURCES
     src/renderer/shaders/IProgram.cpp
     src/renderer/shaders/IShader.cpp
     src/renderer/GPUResourceManager.cpp
-    src/renderer/IRenderer.cpp
     # src/renderer/PathTracer.cpp
-    src/renderer/Rasterizer.cpp
+    # src/renderer/Rasterizer.cpp
+    src/renderer/Renderer.cpp
     src/renderer/RendererManager.cpp
-    src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
     src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp

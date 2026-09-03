@@ -2,13 +2,13 @@
 
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
-#include "IRenderer.h"
-// #include "PathTracer.h"
-#include "Rasterizer.h"
+#include "Renderer.h"
 
-#include <memory>
+#include <unordered_map>
 
 namespace Engine {
+
+using RendererHandle = uint32_t;
 
 class RendererManager {
   public:
@@ -17,8 +17,12 @@ class RendererManager {
     void shutdown();
 
     // Active renderer modifications
-    inline IRenderer *getActiveRenderer() const { return activeRenderer; }
-    void swapActiveRenderer(const RenderChoice choice);
+    inline Renderer *getActiveRenderer() const { return activeRenderer; }
+    void swapActiveRenderer(const RendererHandle handle);
+
+    RendererHandle createNewRenderer();
+    Renderer *getRenderer(RendererHandle handle);
+    void destroyRenderer(const RendererHandle handle);
 
     // Renderer functions
     void render(EngineState &state);
@@ -28,12 +32,11 @@ class RendererManager {
     // Injected engine context
     EngineContext &engineContext;
 
-    // Renderers
-    std::unique_ptr<Rasterizer> rasterizer = nullptr;
-    // std::unique_ptr<PathTracer> pathTracer = nullptr;
+    std::unordered_map<RendererHandle, std::shared_ptr<Renderer>>
+        rendererRegistry;
 
     // Active renderer choice (ptr to the uniques)
-    IRenderer *activeRenderer = nullptr;
+    Renderer *activeRenderer = nullptr;
 };
 
 } // namespace Engine

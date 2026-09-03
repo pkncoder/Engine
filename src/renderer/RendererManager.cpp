@@ -2,7 +2,10 @@
 
 #include "../services/Logger.h"
 #include "../services/Timer.h"
+#include "../services/UUID.h"
 #include "GPUResourceManager.h"
+
+#include <memory>
 
 namespace Engine {
 
@@ -12,10 +15,6 @@ RendererManager::RendererManager(EngineContext &engineContext,
     : engineContext(engineContext) {
 
     GPUResourceManager::init(engineContext.getAsset());
-
-    // Rasterizer inizialization
-    rasterizer = std::make_unique<Rasterizer>(engineContext);
-    rasterizer->init(state);
 
     // Set opengl version
     glGetIntegerv(GL_MAJOR_VERSION,
@@ -30,17 +29,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
 
         // Set compute shader compatiblity
         state.renderer.settings.systemComputeShaderCompatability = true;
-
-        // Path tracer inizialization
-        // pathTracer = std::make_unique<PathTracer>(engineContext);
-        // pathTracer->init();
-    } else {
-        Logger::warn("RENDERER", "Path Tracer not supported on this system.");
     }
-
-    // Set the active renderer
-    activeRenderer = rasterizer.get();
-    state.renderer.settings.currentRenderChoice = RenderChoice::RASTERIZER;
 
     Logger::info("RENDERER", "Renderer Manager initialized.");
 }
@@ -49,39 +38,65 @@ RendererManager::RendererManager(EngineContext &engineContext,
 void RendererManager::shutdown() {
     activeRenderer = nullptr;
 
-    if (rasterizer)
-        rasterizer->shutdown();
-    // if (pathTracer)
-    //     pathTracer->shutdown();
+    for (auto &ittr : rendererRegistry) {
+        ittr.second->shutdown();
+    }
+
+    rendererRegistry.clear();
 }
 
 // Swap the active renderer
-void RendererManager::swapActiveRenderer(const RenderChoice choice) {
-    switch (choice) { // Switch the choice
-    case RenderChoice::RASTERIZER:
-        activeRenderer = rasterizer.get();
-        Logger::info("RENDERER", "Swapped to Rasterizer.");
-        break;
-    case RenderChoice::PATH_TRACER:
-        // activeRenderer = pathTracer.get();
-        Logger::info("RENDERER", "Swapped to Path Tracer.");
-        break;
+void RendererManager::swapActiveRenderer(const RendererHandle handle) {
+    const auto &ittr = rendererRegistry.find(handle);
+    if (ittr == rendererRegistry.end()) {
+        Logger::error(
+            "RENDERER",
+            "Failed to swap active renderer: render handle not in registry: " +
+                std::to_string(handle));
     }
+
+    activeRenderer = ittr->second.get();
+}
+
+RendererHandle RendererManager::createNewRenderer() {
+    std::shared_ptr<Renderer> renderer = std::make_shared<Renderer>();
+
+    RendererHandle newHandle = UUID();
+    rendererRegistry[newHandle] = renderer;
+
+    return newHandle;
+}
+
+Renderer *RendererManager::getRenderer(RendererHandle handle) {
+    const auto &ittr = rendererRegistry.find(handle);
+    if (ittr == rendererRegistry.end()) {
+        Logger::error(
+            "RENDERER",
+            "Failed to locate renderer: render handle not in registry: " +
+                std::to_string(handle));
+    }
+
+    return ittr->second.get();
+}
+
+void RendererManager::destroyRenderer(const RendererHandle handle) {
+    const auto &ittr = rendererRegistry.find(handle);
+    if (ittr == rendererRegistry.end()) {
+        Logger::error(
+            "RENDERER",
+            "Failed to destroy renderer: render handle not in registry: " +
+                std::to_string(handle));
+    }
+
+    ittr->second->shutdown();
+    rendererRegistry.erase(handle);
 }
 
 // Render a frame
 void RendererManager::render(EngineState &state) {
     // Render the scene
     START_PROFILE("Render"); // Start timer for render
-    activeRenderer->beginFrame(state);
-
-    activeRenderer->extract(state);
-    activeRenderer->prepare(state);
-
-    activeRenderer->dispatch(state);
-    activeRenderer->postProcess(state);
-
-    activeRenderer->present(state);
+    activeRenderer->execute(state);
     END_PROFILE("Render"); // End Timer for render
 }
 
