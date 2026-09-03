@@ -17,7 +17,7 @@ For a single line definition: *The Render Graph is an API meant to simplify and 
 ## Implementation
 
 The render graph tree contains a variety of different nodes that are meant to connect to eachother. These include:
-- [[IShaderPassNode]] - The base node sent for rendering
-- [[IShaderInput]] - The input node for the [[IShaderPassNode]]
-- [[IShaderOutput]] - The base output node for the [[IShaderPassNode]]
+- [[ShaderPassNode]] - The base node sent for rendering
+- [[IShaderInput]] - The input node for the [[ShaderPassNode]]
+- [[IShaderOutput]] - The base output node for the [[ShaderPassNode]]
 - [[IRenderOutput]] - Sends blitable images to the [[BlitList]]
