@@ -304,7 +304,7 @@ void PathTracer::flattenScene() {
                                         MaterialComponent>();
 
     // Loop each entity id
-    for (EntityID id : renderables) {
+    for (entt::entity id : renderables) {
 
         // Get the mesh component and check to see if it changed brender section
         // TODO: Here? maybe check for dirty flags in the
@@ -324,7 +324,7 @@ void PathTracer::flattenScene() {
     materialList.clear();
     materialList.reserve(renderables.size());
 
-    for (EntityID id : renderables) {
+    for (entt::entity id : renderables) {
 
         // Get each component for rendering
         auto &meshComp = activeScene.getComponent<MeshComponent>(id);

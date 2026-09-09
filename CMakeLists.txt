@@ -8,6 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # --- Find Dependencies ---
 # vcpkg makes these available to find_package
+find_package(EnTT CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
@@ -59,6 +60,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # --- Linking ---
 # We link against the "Namespaced" targets provided by the packages
 target_link_libraries(${PROJECT_NAME} PRIVATE
+    EnTT::EnTT
     glfw
     glad::glad
     glm::glm

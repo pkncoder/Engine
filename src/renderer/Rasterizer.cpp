@@ -229,27 +229,29 @@ void Rasterizer::extract(EngineState &state) {
 
     // Get the renderables
     const auto renderables =
-        scene.getMatchingEntities<TransformComponent, MeshComponent,
-                                  MaterialComponent>();
+        scene.getRegistry()
+            .view<TransformComponent, MeshComponent, MaterialComponent>();
     float bestEmissive =
         0.0f; // Temp save for the best emmisive value (shadow mapping)
 
-    for (EntityID id : renderables) {
-        const auto &transform = scene.getComponent<TransformComponent>(id);
-        const auto &mesh = scene.getComponent<MeshComponent>(id);
-        const auto &material = scene.getComponent<MaterialComponent>(id);
+    for (entt::entity id : renderables) {
+        const auto &transform =
+            scene.getRegistry().try_get<TransformComponent>(id);
+        const auto &mesh = scene.getRegistry().try_get<MeshComponent>(id);
+        const auto &material =
+            scene.getRegistry().try_get<MaterialComponent>(id);
 
         // Get the material for checking teh best emmisive
-        auto cpuMat = assetManager->getMaterial(material.handle);
+        auto cpuMat = assetManager->getMaterial(material->handle);
         if (glm::length(cpuMat->emissive) > 0.001 && cpuMat &&
             glm::length(cpuMat->emissive) > bestEmissive) {
             bestEmissive = glm::length(cpuMat->emissive);
-            activeLightPos = transform.position;
+            activeLightPos = transform->position;
         }
 
         // Create the new render packet and push it to the vector
         renderPackets.push_back(
-            {mesh.handle, material.handle, buildModel(transform)});
+            {mesh->handle, material->handle, buildModel(*transform)});
     }
 
     // Sort the packets by material

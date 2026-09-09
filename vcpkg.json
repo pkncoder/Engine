@@ -2,6 +2,7 @@
   "name": "engine",
   "version-string": "0.1.0",
   "dependencies": [
+    "entt",
     "glfw3",
     "glad",
     "glm",

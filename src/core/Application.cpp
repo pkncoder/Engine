@@ -11,6 +11,7 @@
 #include "layers/SceneUpdateLayer.h"
 
 #include <GLFW/glfw3.h>
+#include <entt/entity/fwd.hpp>
 #include <glm/ext/vector_float3.hpp>
 
 #include <memory>
@@ -154,73 +155,79 @@ void Application::setupEntities() {
     // Bunny
     if (0) {
 
-        std::vector<EntityID> bunny =
+        std::vector<entt::entity> bunny =
             sceneManager->loadObjScene("assets/models/bunny.obj");
 
-        scene.getComponent<TransformComponent>(bunny[0]).position =
+        scene.getRegistry().try_get<TransformComponent>(bunny[0])->position =
             glm::vec3(-1.0f, -1.2f, -4.0f);
     }
 
     // Dragon
     if (0) {
-        std::vector<EntityID> dragon =
+        std::vector<entt::entity> dragon =
             sceneManager->loadObjScene("assets/models/dragon.obj");
 
-        scene.getComponent<TransformComponent>(dragon[0]).position =
+        scene.getRegistry().try_get<TransformComponent>(dragon[0])->position =
             glm::vec3(1.0f, -0.6f, -4.0f);
     }
 
     // Cat
     if (0) {
-        std::vector<EntityID> cat =
+        std::vector<entt::entity> cat =
             sceneManager->loadObjScene("assets/models/cat.obj");
 
-        scene.getComponent<TransformComponent>(cat[0]).position =
+        scene.getRegistry().try_get<TransformComponent>(cat[0])->position =
             glm::vec3(0.0f, -0.6f, -4.0f);
     }
 
     // 🗿
     if (0) {
-        std::vector<EntityID> moai =
+        std::vector<entt::entity> moai =
             sceneManager->loadObjScene("assets/models/moai.obj");
 
-        scene.getComponent<TransformComponent>(moai[0]).position =
+        scene.getRegistry().try_get<TransformComponent>(moai[0])->position =
             glm::vec3(0.0f, 1.3f, -4.0f);
-        scene.getComponent<TransformComponent>(moai[0]).rotation =
+        scene.getRegistry().try_get<TransformComponent>(moai[0])->rotation =
             glm::quat(-0.707f, 0.0f, 0.707f, 0.0f);
-        scene.getComponent<TransformComponent>(moai[0]).scale =
+        scene.getRegistry().try_get<TransformComponent>(moai[0])->scale =
             glm::vec3(0.14f, 0.14f, 0.14f);
     }
 
     // Diffuse cube & emmisive cube
     if (0) {
-        std::vector<EntityID> cube =
+        std::vector<entt::entity> cube =
             sceneManager->loadObjScene("assets/models/cube.obj");
 
-        scene.getComponent<TransformComponent>(cube[0]).position =
+        scene.getRegistry().try_get<TransformComponent>(cube[0])->position =
             glm::vec3(-1.5f, 1.3f, -4.0f);
-        scene.getComponent<TransformComponent>(cube[0]).scale =
+        scene.getRegistry().try_get<TransformComponent>(cube[0])->scale =
             glm::vec3(0.4f, 0.4f, 0.4f);
 
         std::shared_ptr<CPUMaterialData> materialCube =
             engineContext->getAsset()->getMaterial(
-                scene.getComponent<MaterialComponent>(cube[0]).handle);
+                scene.getRegistry()
+                    .try_get<MaterialComponent>(cube[0])
+                    ->handle);
 
         materialCube->albedo = glm::vec3(0.4f, 0.2f, 0.8f);
         materialCube->roughness = 0.7;
         materialCube->metallic = 1.0;
 
-        std::vector<EntityID> emissiveCube =
+        std::vector<entt::entity> emissiveCube =
             sceneManager->loadObjScene("assets/models/cube.obj");
 
-        scene.getComponent<TransformComponent>(emissiveCube[0]).position =
-            glm::vec3(1.3f, 8.4f, -0.2f);
-        scene.getComponent<TransformComponent>(emissiveCube[0]).scale =
-            glm::vec3(0.2f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emissiveCube[0])
+            ->position = glm::vec3(1.3f, 8.4f, -0.2f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emissiveCube[0])
+            ->scale = glm::vec3(0.2f);
 
         std::shared_ptr<CPUMaterialData> materialEmissiveCube =
             engineContext->getAsset()->getMaterial(
-                scene.getComponent<MaterialComponent>(emissiveCube[0]).handle);
+                scene.getRegistry()
+                    .try_get<MaterialComponent>(emissiveCube[0])
+                    ->handle);
 
         materialEmissiveCube->albedo = glm::vec3(0.0f);
         materialEmissiveCube->emissive = glm::vec3(2.0);
@@ -228,10 +235,10 @@ void Application::setupEntities() {
 
     // Gay Room (me)
     if (0) {
-        std::vector<EntityID> room =
+        std::vector<entt::entity> room =
             sceneManager->loadObjScene("assets/models/gayRoom.obj");
 
-        // for (EntityID entity : room) {
+        // for (entt::entity entity : room) {
         //     scene.getComponent<MaterialComponent>(entity).emmissive *=
         //         glm::vec3(1.0f);
         // }
@@ -239,22 +246,22 @@ void Application::setupEntities() {
 
     // Trans flag
     if (0) {
-        std::vector<EntityID> trans =
+        std::vector<entt::entity> trans =
             sceneManager->loadObjScene("assets/models/trans.obj");
 
-        for (EntityID entity : trans) {
-            scene.getComponent<TransformComponent>(entity).position +=
+        for (entt::entity entity : trans) {
+            scene.getRegistry().try_get<TransformComponent>(entity)->position +=
                 glm::vec3(-1.0f, 0.0f, 0.0f);
         }
     }
 
     // Franch flag
     if (0) {
-        std::vector<EntityID> french =
+        std::vector<entt::entity> french =
             sceneManager->loadObjScene("assets/models/french.obj");
 
-        for (EntityID entity : french) {
-            scene.getComponent<TransformComponent>(entity).position +=
+        for (entt::entity entity : french) {
+            scene.getRegistry().try_get<TransformComponent>(entity)->position +=
                 glm::vec3(8.0f, 0.0f, 2.0f);
         }
     }
@@ -263,22 +270,26 @@ void Application::setupEntities() {
     if (0) {
         // https: //
         // sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
-        std::vector<EntityID> backrooms =
+        std::vector<entt::entity> backrooms =
             sceneManager->loadObjScene("assets/models/backrooms_level1.obj");
 
-        std::vector<EntityID> emmissiveCube =
+        std::vector<entt::entity> emmissiveCube =
             sceneManager->loadObjScene("assets/models/cube.obj");
 
         // emmissiveCube[0].getComponent<TransformComponent>().position =
         //     glm::vec3(80.2f, 6.5f, -116.7f);
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).position =
-            glm::vec3(47.1f, 8.1f, -50.8f);
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).scale =
-            glm::vec3(0.2f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->position = glm::vec3(47.1f, 8.1f, -50.8f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->scale = glm::vec3(0.2f);
 
         std::shared_ptr<CPUMaterialData> material =
             engineContext->getAsset()->getMaterial(
-                scene.getComponent<MaterialComponent>(emmissiveCube[0]).handle);
+                scene.getRegistry()
+                    .try_get<MaterialComponent>(emmissiveCube[0])
+                    ->handle);
 
         material->albedo = glm::vec3(0.0f);
         material->emissive = glm::vec3(2.0);
@@ -291,20 +302,24 @@ void Application::setupEntities() {
 
     // Breakfast room
     if (0) {
-        std::vector<EntityID> room =
+        std::vector<entt::entity> room =
             sceneManager->loadObjScene("assets/models/breakfast_room.obj");
 
-        std::vector<EntityID> emmissiveCube =
+        std::vector<entt::entity> emmissiveCube =
             sceneManager->loadObjScene("assets/models/cube.obj");
 
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).position =
-            glm::vec3(-2.2f, 3.8f, -1.9f);
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).scale =
-            glm::vec3(0.05f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->position = glm::vec3(-2.2f, 3.8f, -1.9f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->scale = glm::vec3(0.05f);
 
         std::shared_ptr<CPUMaterialData> material =
             engineContext->getAsset()->getMaterial(
-                scene.getComponent<MaterialComponent>(emmissiveCube[0]).handle);
+                scene.getRegistry()
+                    .try_get<MaterialComponent>(emmissiveCube[0])
+                    ->handle);
 
         material->albedo = glm::vec3(0.0f);
         material->emissive = glm::vec3(0.8f, 0.7f, 0.2f);
@@ -317,20 +332,24 @@ void Application::setupEntities() {
 
     // Sponza
     if (1) {
-        std::vector<EntityID> sponza =
+        std::vector<entt::entity> sponza =
             sceneManager->loadObjScene("assets/models/sponza.obj");
 
-        std::vector<EntityID> emmissiveCube =
+        std::vector<entt::entity> emmissiveCube =
             sceneManager->loadObjScene("assets/models/cube.obj");
         //
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).position =
-            glm::vec3(1.3f, 8.4f, -0.2f);
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).scale =
-            glm::vec3(0.05f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->position = glm::vec3(1.3f, 8.4f, -0.2f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->scale = glm::vec3(0.05f);
 
         std::shared_ptr<CPUMaterialData> material =
             engineContext->getAsset()->getMaterial(
-                scene.getComponent<MaterialComponent>(emmissiveCube[0]).handle);
+                scene.getRegistry()
+                    .try_get<MaterialComponent>(emmissiveCube[0])
+                    ->handle);
 
         material->albedo = glm::vec3(0.0f);
         material->emissive = glm::vec3(2.0);
@@ -343,20 +362,24 @@ void Application::setupEntities() {
 
     // Lost empire (Minecraft)
     if (0) {
-        std::vector<EntityID> lostEmpire =
+        std::vector<entt::entity> lostEmpire =
             sceneManager->loadObjScene("assets/models/lost_empire.obj");
 
-        std::vector<EntityID> emmissiveCube =
+        std::vector<entt::entity> emmissiveCube =
             sceneManager->loadObjScene("assets/models/cube.obj");
 
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).position =
-            glm::vec3(-10.7f, 22.4f, 3.1f);
-        scene.getComponent<TransformComponent>(emmissiveCube[0]).scale =
-            glm::vec3(0.05f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->position = glm::vec3(-10.7f, 22.4f, 3.1f);
+        scene.getRegistry()
+            .try_get<TransformComponent>(emmissiveCube[0])
+            ->scale = glm::vec3(0.05f);
 
         std::shared_ptr<CPUMaterialData> material =
             engineContext->getAsset()->getMaterial(
-                scene.getComponent<MaterialComponent>(emmissiveCube[0]).handle);
+                scene.getRegistry()
+                    .try_get<MaterialComponent>(emmissiveCube[0])
+                    ->handle);
 
         material->albedo = glm::vec3(0.0f);
         material->emissive = glm::vec3(2.0);
@@ -369,7 +392,7 @@ void Application::setupEntities() {
 
     // oiiaioooooiai (broken texture)
     if (0) {
-        std::vector<EntityID> oiiaioooooiai =
+        std::vector<entt::entity> oiiaioooooiai =
             sceneManager->loadObjScene("assets/models/oiiaioooooiai.obj");
     }
 

@@ -1,21 +1,23 @@
 #include "PrefabSpawner.h"
 
 #include "../services/Logger.h"
-#include "Entity.h"
 #include "components/MaterialComponent.h"
 #include "components/MeshComponent.h"
 #include "components/TransformComponent.h"
 
+#include <entt/entity/fwd.hpp>
 #include <memory>
 
 namespace Engine {
 
-std::vector<EntityID>
+std::vector<entt::entity>
 PrefabSpawner::spawnObjEntity(Scene &scene, AssetManager &assetManager,
                               const std::string &filepath) {
 
+    entt::registry &registry = scene.getRegistry();
+
     // Collection of all the new entities
-    std::vector<EntityID> entities;
+    std::vector<entt::entity> entities;
 
     // Get the mesh data & check to make sure that it loaded right
     const AssetHandle modelHandle = assetManager.loadModel(filepath);
@@ -36,23 +38,22 @@ PrefabSpawner::spawnObjEntity(Scene &scene, AssetManager &assetManager,
         auto meshData = assetManager.getMesh(meshHandle);
 
         // Allocate an ID and create a new entity helper
-        const EntityID entityId = scene.createEntity();
-        Entity entity(entityId, &scene);
+        const entt::entity entity = registry.create();
 
         // Create a new mesh component and add the entity
         const MeshComponent meshComponent =
             MeshComponent(meshData->name, meshHandle);
-        entity.addComponent<MeshComponent>(meshComponent);
+        registry.emplace<MeshComponent>(entity, meshComponent);
 
         // Apply the default transform component
-        entity.addComponent<TransformComponent>(TransformComponent());
+        registry.emplace<TransformComponent>(entity, TransformComponent());
 
         // Check to see if the mesh has a material handle
         if (meshData->materialHandle != INVALID_ASSET_HANDLE) {
 
             // Add a material component to the entity
-            entity.addComponent<MaterialComponent>(
-                MaterialComponent(meshData->materialHandle));
+            registry.emplace<MaterialComponent>(
+                entity, MaterialComponent(meshData->materialHandle));
         }
 
         // If the model has no texture
@@ -62,11 +63,11 @@ PrefabSpawner::spawnObjEntity(Scene &scene, AssetManager &assetManager,
                              std::to_string(meshData->materialHandle));
 
             // Add a default material
-            entity.addComponent<MaterialComponent>(MaterialComponent());
+            registry.emplace<MaterialComponent>(entity, MaterialComponent());
         }
 
         // Push the new entity
-        entities.push_back(entityId);
+        entities.push_back(entity);
     }
 
     // Return the final entity list
