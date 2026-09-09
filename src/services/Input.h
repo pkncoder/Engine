@@ -77,6 +77,8 @@ class Input {
     static inline glm::vec2 lastMousePos = {0.0f, 0.0f};
     static inline glm::vec2 mouseDelta = {0.0f, 0.0f};
 
+    // TODO: Bitsets?
+
     // Keyboard state tables
     static inline std::array<bool, GLFW_KEY_LAST + 1> keysRealtime{};
     static inline std::array<bool, GLFW_KEY_LAST + 1> keysCurrent{};
