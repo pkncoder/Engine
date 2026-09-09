@@ -84,8 +84,11 @@ void SceneUpdateLayer::onUpdate(EngineState &engineState) {
 // Deconstructors
 // TODO: add
 void SceneUpdateLayer::onDetach() {}
+
 // Event dispatching
 void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event,
-                               EngineState &state) {}
+                               EngineState &state) {
+    // TODO: Move movement here?
+}
 
 } // namespace Engine

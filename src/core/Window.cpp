@@ -125,13 +125,6 @@ void Window::framebufferSizeEventCallback(GLFWwindow *window, int width,
     // Change the viewport size
     glViewport(0, 0, width, height);
 
-    // if (engineState) {
-    //     engineState->window.width = width;
-    //     engineState->window.height = height;
-    //
-    //     engineState->window.aspectRatio = width / (float)height;
-    // }
-
     // Get the reference to the window & dispatch a resize event
     Window *windowReference =
         static_cast<Window *>(glfwGetWindowUserPointer(window));

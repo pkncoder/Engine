@@ -7,6 +7,8 @@
 #include "../services/Input.h"
 #include "../services/Logger.h"
 #include "../services/Timer.h"
+#include "layers/RendererLayer.h"
+#include "layers/SceneUpdateLayer.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/ext/vector_float3.hpp>
@@ -45,42 +47,58 @@ Application::~Application() {
 // Init the window, camera, etc.
 void Application::init() {
 
-    // Initialize the logger and set no_pending_logs
-    Logger::init();
-    Logger::setNoPendingLogs(true);
+    // Logger service
+    {
+        // Initialize the logger and set no_pending_logs
+        Logger::init();
+        Logger::setNoPendingLogs(true);
+    }
 
-    // Get the state of the engine
-    engineState = std::make_shared<EngineState>();
+    // Global engine state
+    {
+        // Get the state of the engine
+        engineState = std::make_shared<EngineState>();
+    }
 
-    // Create the layer stack
-    layerStack = LayerStack(engineState);
+    // GLFW services
+    {
+        // Create the window and set the event callback
+        window = std::make_unique<Window>(*engineState.get());
+        window->setEventCallback([this](std::shared_ptr<IEvent> event) {
+            layerStack.dispatchEvent(event);
+        });
 
-    // Create the window and set the event callback
-    window = std::make_unique<Window>(*engineState.get());
-    window->setEventCallback([this](std::shared_ptr<IEvent> event) {
-        layerStack.dispatchEvent(event);
-    });
+        // Initialize the input service and set the event callback
+        Input::init(window->getNativeWindow());
+        Input::setEventCallback([this](std::shared_ptr<IEvent> event) {
+            layerStack.dispatchEvent(event);
+        });
 
-    // Initialize the input service and set the event callback
-    Input::init(window->getNativeWindow());
-    Input::setEventCallback([this](std::shared_ptr<IEvent> event) {
-        layerStack.dispatchEvent(event);
-    });
+        // Initialize the timer service
+        Timer::init();
+    }
 
-    // Initialize the timer service
-    Timer::init();
+    // Global engine context WIP
+    {
+        // Create & initialize the engine context
+        engineContext = std::make_unique<EngineContext>();
+        engineContext->init(*engineState.get());
+    }
 
-    // Create & initialize the engine context
-    engineContext = std::make_unique<EngineContext>();
-    engineContext->init(*engineState.get());
+    // LayerStack
+    {
+        // Create the layer stack
+        layerStack = LayerStack(engineState);
 
-    // Initialize the layers
-    sceneUpdateLayer = std::make_shared<SceneUpdateLayer>(*engineContext);
-    rendererLayer = std::make_shared<RendererLayer>(*engineContext);
+        // Initialize the layers
+        auto sceneUpdateLayer =
+            std::make_shared<SceneUpdateLayer>(*engineContext);
+        auto rendererLayer = std::make_shared<RendererLayer>(*engineContext);
 
-    // Push each layer
-    layerStack.pushLayer(sceneUpdateLayer);
-    layerStack.pushLayer(rendererLayer);
+        // Push each layer
+        layerStack.pushLayer(sceneUpdateLayer);
+        layerStack.pushLayer(rendererLayer);
+    }
 
     // TODO: temp; setup scene
     setupEntities();
@@ -110,9 +128,6 @@ void Application::run() {
 
         // TODO: temp
         window->postFrame();
-
-        // TODO: temp
-        // engineState.scene.camera.cameraDirty = false;
 
         // Log profiling data
         Logger::info("PROFILE", "FPS: " + std::to_string(Timer::getFPS()),
