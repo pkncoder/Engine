@@ -9,7 +9,10 @@
 namespace Engine {
 
 std::shared_ptr<CPUTextureData>
-TextureLoader::loadTexture(const std::string &filepath) {
+TextureLoader::loadTexture(const std::string &sourceDirectory,
+                           const std::string &filename) {
+
+    std::string expectedPath = sourceDirectory + filename;
 
     // Final texture data
     std::shared_ptr<CPUTextureData> texture =
@@ -21,11 +24,11 @@ TextureLoader::loadTexture(const std::string &filepath) {
     // Load the image
     int width, height, channels;
     unsigned char *data =
-        stbi_load(filepath.c_str(), &width, &height, &channels, 0);
+        stbi_load(expectedPath.c_str(), &width, &height, &channels, 0);
 
     // Check for a sucessful load
     if (!data) {
-        Logger::error("ASSET", "Failed to load texture at: " + filepath);
+        Logger::error("ASSET", "Failed to load texture at: " + expectedPath);
         return nullptr;
     }
 
@@ -43,7 +46,7 @@ TextureLoader::loadTexture(const std::string &filepath) {
     // Free stb image data
     stbi_image_free(data);
 
-    Logger::info("ASSET", "Successfully loaded texture at: " + filepath);
+    Logger::info("ASSET", "Successfully loaded texture at: " + expectedPath);
     return texture;
 }
 } // namespace Engine

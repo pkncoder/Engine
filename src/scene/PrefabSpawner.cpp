@@ -12,7 +12,8 @@ namespace Engine {
 
 std::vector<entt::entity>
 PrefabSpawner::spawnObjEntity(Scene &scene, AssetManager &assetManager,
-                              const std::string &filepath) {
+                              const std::string &sourceDirectory,
+                              const std::string &filename) {
 
     entt::registry &registry = scene.getRegistry();
 
@@ -20,10 +21,12 @@ PrefabSpawner::spawnObjEntity(Scene &scene, AssetManager &assetManager,
     std::vector<entt::entity> entities;
 
     // Get the mesh data & check to make sure that it loaded right
-    const AssetHandle modelHandle = assetManager.loadModel(filepath);
+    const AssetHandle modelHandle =
+        assetManager.loadModel(sourceDirectory, filename);
 
     if (modelHandle == INVALID_ASSET_HANDLE) {
-        Logger::error("ASSET", "Failed to load model at: " + filepath);
+        Logger::error("ASSET",
+                      "Failed to load model at: " + sourceDirectory + filename);
         return entities; // TODO: temp - Return the empty array
     }
 

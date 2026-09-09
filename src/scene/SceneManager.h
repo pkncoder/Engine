@@ -19,7 +19,8 @@ class SceneManager {
     inline Scene &getScene() { return scene; }
 
     // Wrapper for loading an obj
-    std::vector<entt::entity> loadObjScene(const std::string filepath);
+    std::vector<entt::entity> loadObjScene(const std::string &sourceDirectory,
+                                           const std::string &filename);
 
   private:
     EngineContext &engineContext;

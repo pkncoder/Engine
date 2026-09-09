@@ -15,7 +15,8 @@ class ModelLoader {
     };
 
     // Load a .obj file returning mesh data; Does load mtl file along the way
-    static std::vector<CPUMeshData> loadOBJ(const std::string &filepath);
+    static std::vector<CPUMeshData> loadOBJ(const std::string &sourceDirectory,
+                                            const std::string &filename);
 
   private:
     // Injected asset manager

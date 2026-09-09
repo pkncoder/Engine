@@ -24,23 +24,26 @@ AssetManager::AssetManager(EngineContext &engineContext)
 }
 
 // Load a CPUModelData - currently only supporting file types of .obj & .mtl
-AssetHandle AssetManager::loadModel(const std::string &filepath) {
+AssetHandle AssetManager::loadModel(const std::string &sourceDirectory,
+                                    const std::string &filename) {
 
     // Check for returning cache by filepath
-    const auto cachedPathIttr = cachedPaths.find(filepath);
+    const std::string modelCacheKey = sourceDirectory + filename;
+    const auto cachedPathIttr = cachedPaths.find(modelCacheKey);
     if (cachedPathIttr != cachedPaths.end()) {
-        Logger::info("ASSET", "Returning cached model at: " + filepath);
+        Logger::info("ASSET", "Returning cached model at: " + modelCacheKey);
         return cachedPathIttr->second;
     }
 
     // Load the model file through the model loader
     // TODO: wat.
-    std::vector<CPUMeshData> meshes = ModelLoader::loadOBJ(filepath);
+    std::vector<CPUMeshData> meshes =
+        ModelLoader::loadOBJ(sourceDirectory, filename);
 
     // Check for failed mesh loading
     if (meshes.empty()) {
-        Logger::error("ASSET",
-                      "AssetManager Failed to load meshes at: " + filepath);
+        Logger::error("ASSET", "AssetManager failed to load mesh(es) at: " +
+                                   modelCacheKey);
         return INVALID_ASSET_HANDLE; // Failed to load
     }
 
@@ -68,27 +71,28 @@ AssetHandle AssetManager::loadModel(const std::string &filepath) {
 
     // Cache the model and return the new handle
     modelCache[newHandle] = model;
-    cachedPaths[filepath] = newHandle;
+    cachedPaths[modelCacheKey] = newHandle;
 
     return newHandle;
 }
 
 // Get a material from the cache
 std::unordered_map<std::string, AssetHandle>
-AssetManager::loadMaterialLibrary(const std::string &filepath) {
+AssetManager::loadMaterialLibrary(const std::string &sourceDirectory,
+                                  const std::string &filename) {
 
     // Final handle library
     std::unordered_map<std::string, AssetHandle> libraryHandles;
 
     // Load the mtl file
     std::unordered_map<std::string, CPUMaterialData> materials =
-        MaterialLoader::loadMTL(filepath);
+        MaterialLoader::loadMTL(sourceDirectory, filename);
 
     // Loop each material
     for (const auto &[name, material] : materials) {
 
         // Get the cache key
-        std::string cacheKey = filepath + ":" + name;
+        std::string cacheKey = sourceDirectory + filename + ":" + name;
 
         // Look to see if this material has already been loaded
         const auto cachedPathIttr = cachedPaths.find(cacheKey);
@@ -113,17 +117,19 @@ AssetManager::loadMaterialLibrary(const std::string &filepath) {
 }
 
 // Load a texture from a filepath
-AssetHandle AssetManager::loadTexture(const std::string &filepath) {
+AssetHandle AssetManager::loadTexture(const std::string &sourceDirectory,
+                                      const std::string &filename) {
 
     // Check cache, if it is already cached, return it
-    const auto cachedPathIttr = cachedPaths.find(filepath);
+    const std::string cacheKey = sourceDirectory + filename;
+    const auto cachedPathIttr = cachedPaths.find(cacheKey);
     if (cachedPathIttr != cachedPaths.end()) {
         return cachedPathIttr->second;
     }
 
     // Load the new texture
     std::shared_ptr<CPUTextureData> textureData =
-        TextureLoader::loadTexture(filepath);
+        TextureLoader::loadTexture(sourceDirectory, filename);
 
     // TODO: Check for null texture
 
@@ -131,7 +137,7 @@ AssetHandle AssetManager::loadTexture(const std::string &filepath) {
     AssetHandle newHandle = UUIDGenerator::generate();
 
     textureCache[newHandle] = textureData;
-    cachedPaths[filepath] = newHandle;
+    cachedPaths[cacheKey] = newHandle;
 
     return newHandle;
 }

@@ -1,6 +1,5 @@
 #include "ModelLoader.h"
 
-#include "../Constants.h"
 #include "../services/Logger.h"
 #include "CPUStructs.h"
 
@@ -11,7 +10,9 @@
 
 namespace Engine {
 
-std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
+std::vector<CPUMeshData>
+ModelLoader::loadOBJ(const std::string &sourceDirectory,
+                     const std::string &filename) {
 
     // Final model data
     std::vector<CPUMeshData> meshes;
@@ -19,8 +20,10 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
     // Material library name:handle
     std::unordered_map<std::string, AssetHandle> materialLibrary;
 
+    std::string expectedPath = sourceDirectory + filename;
+
     // Load the file to search for the material file path
-    std::ifstream file(filepath);
+    std::ifstream file(expectedPath);
     std::string line;
 
     // Loop every line, until "mtllib " which contains material file path
@@ -30,13 +33,10 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
             // Break down the mtl filename
             std::string mtlFilename = line.substr(7);
             mtlFilename.erase(mtlFilename.find_last_not_of(" \n\r\t") + 1);
-            mtlFilename =
-                Constants::Asset::MATERIAL_ROOT_RELATIVE_PATH + mtlFilename;
-
-            Logger::debug("mtlFilename: " + mtlFilename);
 
             // Load the material library through the asset manager
-            materialLibrary = assetManager->loadMaterialLibrary(mtlFilename);
+            materialLibrary =
+                assetManager->loadMaterialLibrary(sourceDirectory, mtlFilename);
             break;
         }
     }
@@ -45,14 +45,13 @@ std::vector<CPUMeshData> ModelLoader::loadOBJ(const std::string &filepath) {
     // tinyobjloader obj file reader config
     tinyobj::ObjReaderConfig readerConfig;
     readerConfig.triangulate = true; // For converting quads to triangles
-    readerConfig.mtl_search_path =
-        Constants::Asset::MATERIAL_ROOT_RELATIVE_PATH;
+    readerConfig.mtl_search_path = sourceDirectory;
 
     // Get a tinyobjloader reader
     tinyobj::ObjReader reader;
 
     // Try to read from the file and check for errors
-    if (!reader.ParseFromFile(filepath, readerConfig)) { // Error
+    if (!reader.ParseFromFile(expectedPath, readerConfig)) { // Error
         if (!reader.Error().empty()) { // TinyObjLoader error or mid-read error
             Logger::error("ASSET", "tinyobjloader Error: " + reader.Error());
         }

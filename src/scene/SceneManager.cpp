@@ -11,9 +11,10 @@ SceneManager::SceneManager(EngineContext &engineContext,
 }
 
 std::vector<entt::entity>
-SceneManager::loadObjScene(const std::string filepath) {
+SceneManager::loadObjScene(const std::string &sourceDirectory,
+                           const std::string &filename) {
     return PrefabSpawner::spawnObjEntity(scene, *engineContext.getAsset(),
-                                         filepath);
+                                         sourceDirectory, filename);
 }
 
 } // namespace Engine

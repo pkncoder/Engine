@@ -16,7 +16,7 @@ class MaterialLoader {
 
     // Load a map of material name : material data; Load textures on the way
     static std::unordered_map<std::string, CPUMaterialData>
-    loadMTL(const std::string &filepath);
+    loadMTL(const std::string &sourceDirectory, const std::string &filename);
 
   private:
     // Injected asset manager

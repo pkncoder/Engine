@@ -15,10 +15,13 @@ class AssetManager {
     ~AssetManager() = default;
 
     // Asset loaders
-    AssetHandle loadModel(const std::string &filepath);
+    AssetHandle loadModel(const std::string &sourceDirectory,
+                          const std::string &filename);
     std::unordered_map<std::string, AssetHandle>
-    loadMaterialLibrary(const std::string &filepath);
-    AssetHandle loadTexture(const std::string &filepath);
+    loadMaterialLibrary(const std::string &sourceDirectory,
+                        const std::string &filename);
+    AssetHandle loadTexture(const std::string &sourceDirectory,
+                            const std::string &filename);
 
     // Getters for assets; can return INVALID_MATERIAL_HANDLE (0)
     std::shared_ptr<CPUModelData> getModel(const AssetHandle handle) const;

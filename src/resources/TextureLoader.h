@@ -16,7 +16,8 @@ class TextureLoader {
 
     // Load and return texture data from a file
     static std::shared_ptr<CPUTextureData>
-    loadTexture(const std::string &filepath);
+    loadTexture(const std::string &sourceDirectory,
+                const std::string &filename);
 
   private:
     // Injected asset manager

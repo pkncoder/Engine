@@ -8,10 +8,13 @@
 namespace Engine {
 
 std::unordered_map<std::string, CPUMaterialData>
-MaterialLoader::loadMTL(const std::string &filepath) {
+MaterialLoader::loadMTL(const std::string &sourceDirectory,
+                        const std::string &filename) {
 
     // Final array of materials
     std::unordered_map<std::string, CPUMaterialData> finalMaterials;
+
+    std::string expectedPath = sourceDirectory + filename;
 
     // Variables for tinyobjloader
     std::map<std::string, int> materialMap;
@@ -19,18 +22,12 @@ MaterialLoader::loadMTL(const std::string &filepath) {
     std::string warn, err;
 
     // Try and open the material file
-    std::ifstream file(filepath);
+    std::ifstream file(expectedPath);
     if (!file.is_open())
         return finalMaterials;
 
     // Load the mtl file
     tinyobj::LoadMtl(&materialMap, &loaderMaterials, &file, &warn, &err);
-
-    // Get the base for the final texture paths
-    std::string texturePathBase =
-        filepath.substr(filepath.find_last_of("/") + 1);
-    texturePathBase =
-        texturePathBase.substr(0, texturePathBase.find(".")) + "/";
 
     // Loop over each loaded material
     for (const auto &material : loaderMaterials) {
@@ -56,8 +53,7 @@ MaterialLoader::loadMTL(const std::string &filepath) {
                                  const std::string &mapTypeKey) {
             if (!loadedTexName.empty()) {
                 materialData.textureMaps[mapTypeKey] =
-                    assetManager->loadTexture("assets/textures/" +
-                                              texturePathBase + loadedTexName);
+                    assetManager->loadTexture(sourceDirectory, loadedTexName);
             }
         };
 

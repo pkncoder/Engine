@@ -156,7 +156,7 @@ void Application::setupEntities() {
     if (0) {
 
         std::vector<entt::entity> bunny =
-            sceneManager->loadObjScene("assets/models/bunny.obj");
+            sceneManager->loadObjScene("assets/bunny/", "bunny.obj");
 
         scene.getRegistry().try_get<TransformComponent>(bunny[0])->position =
             glm::vec3(-1.0f, -1.2f, -4.0f);
@@ -165,25 +165,16 @@ void Application::setupEntities() {
     // Dragon
     if (0) {
         std::vector<entt::entity> dragon =
-            sceneManager->loadObjScene("assets/models/dragon.obj");
+            sceneManager->loadObjScene("assets/dragon/", "dragon.obj");
 
         scene.getRegistry().try_get<TransformComponent>(dragon[0])->position =
             glm::vec3(1.0f, -0.6f, -4.0f);
     }
 
-    // Cat
-    if (0) {
-        std::vector<entt::entity> cat =
-            sceneManager->loadObjScene("assets/models/cat.obj");
-
-        scene.getRegistry().try_get<TransformComponent>(cat[0])->position =
-            glm::vec3(0.0f, -0.6f, -4.0f);
-    }
-
     // 🗿
     if (0) {
         std::vector<entt::entity> moai =
-            sceneManager->loadObjScene("assets/models/moai.obj");
+            sceneManager->loadObjScene("assets/moai/", "moai.obj");
 
         scene.getRegistry().try_get<TransformComponent>(moai[0])->position =
             glm::vec3(0.0f, 1.3f, -4.0f);
@@ -193,77 +184,10 @@ void Application::setupEntities() {
             glm::vec3(0.14f, 0.14f, 0.14f);
     }
 
-    // Diffuse cube & emmisive cube
-    if (0) {
-        std::vector<entt::entity> cube =
-            sceneManager->loadObjScene("assets/models/cube.obj");
-
-        scene.getRegistry().try_get<TransformComponent>(cube[0])->position =
-            glm::vec3(-1.5f, 1.3f, -4.0f);
-        scene.getRegistry().try_get<TransformComponent>(cube[0])->scale =
-            glm::vec3(0.4f, 0.4f, 0.4f);
-
-        std::shared_ptr<CPUMaterialData> materialCube =
-            engineContext->getAsset()->getMaterial(
-                scene.getRegistry()
-                    .try_get<MaterialComponent>(cube[0])
-                    ->handle);
-
-        materialCube->albedo = glm::vec3(0.4f, 0.2f, 0.8f);
-        materialCube->roughness = 0.7;
-        materialCube->metallic = 1.0;
-
-        std::vector<entt::entity> emissiveCube =
-            sceneManager->loadObjScene("assets/models/cube.obj");
-
-        scene.getRegistry()
-            .try_get<TransformComponent>(emissiveCube[0])
-            ->position = glm::vec3(1.3f, 8.4f, -0.2f);
-        scene.getRegistry()
-            .try_get<TransformComponent>(emissiveCube[0])
-            ->scale = glm::vec3(0.2f);
-
-        std::shared_ptr<CPUMaterialData> materialEmissiveCube =
-            engineContext->getAsset()->getMaterial(
-                scene.getRegistry()
-                    .try_get<MaterialComponent>(emissiveCube[0])
-                    ->handle);
-
-        materialEmissiveCube->albedo = glm::vec3(0.0f);
-        materialEmissiveCube->emissive = glm::vec3(2.0);
-    }
-
     // Gay Room (me)
     if (0) {
         std::vector<entt::entity> room =
-            sceneManager->loadObjScene("assets/models/gayRoom.obj");
-
-        // for (entt::entity entity : room) {
-        //     scene.getComponent<MaterialComponent>(entity).emmissive *=
-        //         glm::vec3(1.0f);
-        // }
-    }
-
-    // Trans flag
-    if (0) {
-        std::vector<entt::entity> trans =
-            sceneManager->loadObjScene("assets/models/trans.obj");
-
-        for (entt::entity entity : trans) {
-            scene.getRegistry().try_get<TransformComponent>(entity)->position +=
-                glm::vec3(-1.0f, 0.0f, 0.0f);
-        }
-    }
-
-    // Franch flag
-    if (0) {
-        std::vector<entt::entity> french =
-            sceneManager->loadObjScene("assets/models/french.obj");
-
-        for (entt::entity entity : french) {
-            scene.getRegistry().try_get<TransformComponent>(entity)->position +=
-                glm::vec3(8.0f, 0.0f, 2.0f);
-        }
+            sceneManager->loadObjScene("assets/gayRoom/", "gayRoom.obj");
     }
 
     // THE BACKROOMS????
@@ -271,10 +195,10 @@ void Application::setupEntities() {
         // https: //
         // sketchfab.com/3d-models/backrooms-v2-level-0-made-by-me-in-blender-91d707acdfce4d5d940f7cb8c25c6e31#download
         std::vector<entt::entity> backrooms =
-            sceneManager->loadObjScene("assets/models/backrooms_level1.obj");
+            sceneManager->loadObjScene("assets/backrooms/", "backrooms.obj");
 
         std::vector<entt::entity> emmissiveCube =
-            sceneManager->loadObjScene("assets/models/cube.obj");
+            sceneManager->loadObjScene("assets/cube/", "cube.obj");
 
         // emmissiveCube[0].getComponent<TransformComponent>().position =
         //     glm::vec3(80.2f, 6.5f, -116.7f);
@@ -302,11 +226,11 @@ void Application::setupEntities() {
 
     // Breakfast room
     if (0) {
-        std::vector<entt::entity> room =
-            sceneManager->loadObjScene("assets/models/breakfast_room.obj");
+        std::vector<entt::entity> room = sceneManager->loadObjScene(
+            "assets/breakfast_room/", "breakfast_room.obj");
 
         std::vector<entt::entity> emmissiveCube =
-            sceneManager->loadObjScene("assets/models/cube.obj");
+            sceneManager->loadObjScene("assets/cube/", "cube.obj");
 
         scene.getRegistry()
             .try_get<TransformComponent>(emmissiveCube[0])
@@ -333,10 +257,10 @@ void Application::setupEntities() {
     // Sponza
     if (1) {
         std::vector<entt::entity> sponza =
-            sceneManager->loadObjScene("assets/models/sponza.obj");
+            sceneManager->loadObjScene("assets/sponza/", "sponza.obj");
 
         std::vector<entt::entity> emmissiveCube =
-            sceneManager->loadObjScene("assets/models/cube.obj");
+            sceneManager->loadObjScene("assets/cube/", "cube.obj");
         //
         scene.getRegistry()
             .try_get<TransformComponent>(emmissiveCube[0])
@@ -363,10 +287,10 @@ void Application::setupEntities() {
     // Lost empire (Minecraft)
     if (0) {
         std::vector<entt::entity> lostEmpire =
-            sceneManager->loadObjScene("assets/models/lost_empire.obj");
+            sceneManager->loadObjScene("assets/lostEmpire/", "lostEmpire.obj");
 
         std::vector<entt::entity> emmissiveCube =
-            sceneManager->loadObjScene("assets/models/cube.obj");
+            sceneManager->loadObjScene("assets/cube/", "cube.obj");
 
         scene.getRegistry()
             .try_get<TransformComponent>(emmissiveCube[0])
@@ -388,12 +312,6 @@ void Application::setupEntities() {
         // 0.02 fog density; 0.7, 0.85, 0.98 fog color
         // 1.74 vinette radius; 0.9 softness
         // 0.1, 0.1, 0.1 clear color
-    }
-
-    // oiiaioooooiai (broken texture)
-    if (0) {
-        std::vector<entt::entity> oiiaioooooiai =
-            sceneManager->loadObjScene("assets/models/oiiaioooooiai.obj");
     }
 
     END_PROFILE_STACKED_LOG("Entity Loading");
