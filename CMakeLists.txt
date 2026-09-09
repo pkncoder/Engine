@@ -50,7 +50,7 @@ set(SOURCES
     src/services/Input.cpp
     src/services/Logger.cpp
     src/services/Timer.cpp
-    src/services/UUID.cpp
+    src/services/UUIDGenerator.cpp
 )
 
 # --- Executable ---

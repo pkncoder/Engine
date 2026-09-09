@@ -1,7 +1,7 @@
 #include "AssetManager.h"
 
 #include "../services/Logger.h"
-#include "../services/UUID.h"
+#include "../services/UUIDGenerator.h"
 #include "MaterialLoader.h"
 #include "ModelLoader.h"
 #include "TextureLoader.h"
@@ -52,7 +52,7 @@ AssetHandle AssetManager::loadModel(const std::string &filepath) {
     for (auto &mesh : meshes) {
 
         // Gen a new asset handle
-        AssetHandle newHandle = UUID();
+        AssetHandle newHandle = UUIDGenerator::generate();
 
         // Assign the mesh to the list and cache
         meshHandles.push_back(newHandle);
@@ -64,7 +64,7 @@ AssetHandle AssetManager::loadModel(const std::string &filepath) {
         std::make_shared<CPUModelData>(meshHandles);
 
     // Create a new AssetHandle
-    AssetHandle newHandle = UUID();
+    AssetHandle newHandle = UUIDGenerator::generate();
 
     // Cache the model and return the new handle
     modelCache[newHandle] = model;
@@ -98,7 +98,7 @@ AssetManager::loadMaterialLibrary(const std::string &filepath) {
         }
 
         // Generate a new handle
-        AssetHandle newHandle = UUID();
+        AssetHandle newHandle = UUIDGenerator::generate();
 
         // Cache where caching caches
         materialCache[newHandle] =
@@ -128,7 +128,7 @@ AssetHandle AssetManager::loadTexture(const std::string &filepath) {
     // TODO: Check for null texture
 
     // Get a new handle and cache the texture
-    AssetHandle newHandle = UUID();
+    AssetHandle newHandle = UUIDGenerator::generate();
 
     textureCache[newHandle] = textureData;
     cachedPaths[filepath] = newHandle;

@@ -1,7 +1,7 @@
 #include "IRenderer.h"
 
 #include "../services/Logger.h"
-#include "../services/UUID.h"
+#include "../services/UUIDGenerator.h"
 
 namespace Engine {
 
@@ -49,7 +49,7 @@ RenderTargetHandle IRenderer::addRenderTarget(const std::string &name,
     // Create a new render target & set attributes
     RenderTarget target;
     target.name = name;
-    target.handle = UUID();
+    target.handle = UUIDGenerator::generate();
     target.bindingIndex = bindingIndex;
     target.format = format;
 

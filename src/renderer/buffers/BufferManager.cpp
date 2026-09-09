@@ -1,7 +1,7 @@
 #include "BufferManager.h"
 
 #include "../../services/Logger.h"
-#include "../../services/UUID.h"
+#include "../../services/UUIDGenerator.h"
 
 #include <cstring>
 #include <unordered_map>
@@ -22,7 +22,7 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
 
     // Buffer specifications
     buffer.name = name;
-    buffer.handle = UUID();
+    buffer.handle = UUIDGenerator::generate();
 
     // OpenGL enums
     buffer.usage = usage;

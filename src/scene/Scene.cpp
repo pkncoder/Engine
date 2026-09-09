@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 #include "../services/Logger.h"
-#include "../services/UUID.h"
+#include "../services/UUIDGenerator.h"
 
 namespace Engine {
 
@@ -19,7 +19,7 @@ Scene::~Scene() {}
 // Propogating a new entity id (returning a new id)
 EntityID Scene::createEntity() {
     // Generate the UUID via service
-    EntityID uuid = UUID();
+    EntityID uuid = UUIDGenerator::generate();
 
     // Set the internal index for this entity THEN increase for next itteration
     uint32_t internalIndex = nextAvailableIndex++;
