@@ -11,31 +11,10 @@
 
 namespace Engine {
 
-struct RasterDrawCommand : DrawCommand {
-    GLuint vao;
-    GLuint indexCount;
-    glm::mat4 modelMatrix;
-
-    glm::vec3 albedo;
-    glm::vec3 emissive;
-    float roughness;
-    float metallic;
-    bool isBumpMap; // Store the logic here!
-
-    /*
-     * Albedo
-     * Emmissive
-     * Alpha
-     * ARM
-     * Specular
-     */
-    int textures[8] = {0};
-};
-
 class Rasterizer : public IRenderer {
   public:
     inline Rasterizer(EngineContext &engineContext)
-        : engineContext(engineContext){};
+        : engineContext(engineContext) {};
 
     // --- Lifecycle ---
     void init(EngineState &state) override;

@@ -2,11 +2,8 @@
 
 #include "../core/states/EngineState.h"
 #include "../resources/CPUStructs.h"
-#include "Shader.h"
 #include "buffers/GPUBuffer.h"
 #include "shaders/IProgram.h"
-
-#include <memory>
 
 namespace Engine {
 
@@ -27,8 +24,26 @@ struct RenderTarget {
     GLenum format = GL_RGBA32F;
 };
 
-struct DrawCommand {};
+struct RasterDrawCommand {
+    GLuint vao;
+    GLuint indexCount;
+    glm::mat4 modelMatrix;
 
+    glm::vec3 albedo;
+    glm::vec3 emissive;
+    float roughness;
+    float metallic;
+    bool isBumpMap; // Store the logic here!
+
+    /*
+     * Albedo
+     * Emmissive
+     * Alpha
+     * ARM
+     * Specular
+     */
+    int textures[8] = {0};
+};
 struct RenderPacket {
     AssetHandle meshHandle;
     AssetHandle materialHandle;
@@ -47,7 +62,7 @@ struct RenderLayer {
     bool isShadowPass = false; // A flag to help dispatch know what to do
     std::vector<glm::mat4> shadowTransforms;
 
-    std::vector<std::shared_ptr<DrawCommand>> commands;
+    std::vector<RasterDrawCommand> commands;
 };
 
 // Structure to define a pass

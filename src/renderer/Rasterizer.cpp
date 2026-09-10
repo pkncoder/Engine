@@ -8,7 +8,6 @@
 #include "../services/Logger.h"
 #include "GPUResourceManager.h"
 #include "IRenderer.h"
-#include "Shader.h"
 #include "buffers/BufferManager.h"
 #include "shaders/IProgram.h"
 #include "shaders/IShader.h"
@@ -323,6 +322,12 @@ void Rasterizer::prepare(EngineState &state) {
         reinterpret_cast<const void *>(&globalData));
     BufferManager::pushBuffer(globalSceneUBO, frameIndex);
 
+    shadowStep.commands.clear();
+    mainStep.commands.clear();
+
+    shadowStep.commands.reserve(renderPackets.size());
+    mainStep.commands.reserve(renderPackets.size());
+
     // Loop each packet
     for (const auto &packet : renderPackets) {
 
@@ -350,45 +355,36 @@ void Rasterizer::prepare(EngineState &state) {
 
         /* ----------------- Shadow Pass Command ----------------- */
         {
-            std::shared_ptr<RasterDrawCommand> drawCommand =
-                std::make_shared<RasterDrawCommand>();
-            drawCommand->vao = gpuMesh->vao;
-            drawCommand->indexCount = gpuMesh->indexCount;
-            drawCommand->modelMatrix = packet.modelMatrix;
-            drawCommand->textures[2] = getTexID("alpha", defaultWhiteTexture);
-            shadowStep.commands.push_back(drawCommand);
+            auto &cmd = shadowStep.commands.emplace_back();
+            cmd.vao = gpuMesh->vao;
+            cmd.indexCount = gpuMesh->indexCount;
+            cmd.modelMatrix = packet.modelMatrix;
+            cmd.textures[2] = getTexID("alpha", defaultWhiteTexture);
         }
 
-        /* ----------------- Main Pass Command ---------------- */
+        /* ----------------- Main Pass Command ------------------ */
         {
-            std::shared_ptr<RasterDrawCommand> drawCommand =
-                std::make_shared<RasterDrawCommand>();
-            drawCommand->vao = gpuMesh->vao;
-            drawCommand->indexCount = gpuMesh->indexCount;
-            drawCommand->modelMatrix = packet.modelMatrix;
+            auto &cmd = mainStep.commands.emplace_back();
+            cmd.vao = gpuMesh->vao;
+            cmd.indexCount = gpuMesh->indexCount;
+            cmd.modelMatrix = packet.modelMatrix;
 
-            drawCommand->albedo = cpuMaterial->albedo;
-            drawCommand->emissive = cpuMaterial->emissive;
-            drawCommand->roughness = cpuMaterial->roughness;
-            drawCommand->metallic = cpuMaterial->metallic;
+            cmd.albedo = cpuMaterial->albedo;
+            cmd.emissive = cpuMaterial->emissive;
+            cmd.roughness = cpuMaterial->roughness;
+            cmd.metallic = cpuMaterial->metallic;
 
-            drawCommand->textures[0] = getTexID("albedo", defaultWhiteTexture);
-            drawCommand->textures[1] =
-                getTexID("emissive", defaultWhiteTexture);
-            drawCommand->textures[2] = getTexID("alpha", defaultWhiteTexture);
-            drawCommand->textures[3] =
-                getTexID("roughness", defaultWhiteTexture);
-            drawCommand->textures[4] =
-                getTexID("metallic", defaultWhiteTexture);
-            drawCommand->textures[5] = getTexID("normal", defaultNormalTexture);
-            drawCommand->textures[6] = getTexID("bump", defaultWhiteTexture);
-            drawCommand->textures[7] = shadowCubeMap;
+            cmd.textures[0] = getTexID("albedo", defaultWhiteTexture);
+            cmd.textures[1] = getTexID("emissive", defaultWhiteTexture);
+            cmd.textures[2] = getTexID("alpha", defaultWhiteTexture);
+            cmd.textures[3] = getTexID("roughness", defaultWhiteTexture);
+            cmd.textures[4] = getTexID("metallic", defaultWhiteTexture);
+            cmd.textures[5] = getTexID("normal", defaultNormalTexture);
+            cmd.textures[6] = getTexID("bump", defaultWhiteTexture);
+            cmd.textures[7] = shadowCubeMap;
 
-            drawCommand->isBumpMap =
-                (drawCommand->textures[6] != defaultWhiteTexture &&
-                 drawCommand->textures[5] == defaultNormalTexture);
-
-            mainStep.commands.push_back(drawCommand);
+            cmd.isBumpMap = (cmd.textures[6] != defaultWhiteTexture &&
+                             cmd.textures[5] == defaultNormalTexture);
         }
     }
 
@@ -418,20 +414,18 @@ void Rasterizer::dispatch(EngineState &state) {
 
             GLuint currentVAO = 0;
 
-            for (const std::shared_ptr<DrawCommand> cmd : layer.commands) {
-                const auto command =
-                    std::static_pointer_cast<RasterDrawCommand>(cmd);
+            for (const RasterDrawCommand &command : layer.commands) {
 
                 // Update Per-Object UBO
-                BufferManager::setUBOValue(
-                    objectUBO, "uModel", sizeof(glm::mat4),
-                    glm::value_ptr(command->modelMatrix));
+                BufferManager::setUBOValue(objectUBO, "uModel",
+                                           sizeof(glm::mat4),
+                                           glm::value_ptr(command.modelMatrix));
 
                 if (!layer.isShadowPass) {
                     // Note: padding vec3s up to vec4s to satisfy std140
                     // layout
-                    glm::vec4 padAlbedo = glm::vec4(command->albedo, 1.0f);
-                    glm::vec4 padEmissive = glm::vec4(command->emissive, 1.0f);
+                    glm::vec4 padAlbedo = glm::vec4(command.albedo, 1.0f);
+                    glm::vec4 padEmissive = glm::vec4(command.emissive, 1.0f);
 
                     BufferManager::setUBOValue(objectUBO, "uAlbedo",
                                                sizeof(glm::vec4),
@@ -441,13 +435,12 @@ void Rasterizer::dispatch(EngineState &state) {
                                                glm::value_ptr(padEmissive));
                     BufferManager::setUBOValue(objectUBO, "uRoughness",
                                                sizeof(float),
-                                               &command->roughness);
+                                               &command.roughness);
                     BufferManager::setUBOValue(objectUBO, "uMetallic",
                                                sizeof(float),
-                                               &command->metallic);
+                                               &command.metallic);
                     BufferManager::setUBOValue(objectUBO, "uIsBumpMap",
-                                               sizeof(int),
-                                               &command->isBumpMap);
+                                               sizeof(int), &command.isBumpMap);
                 }
 
                 // Push the object UBO memory to the GPU per draw call
@@ -455,21 +448,21 @@ void Rasterizer::dispatch(EngineState &state) {
 
                 // Bind Textures
                 for (int i = 0; i < 8; ++i) {
-                    if (command->textures[i] != 0) {
+                    if (command.textures[i] != 0) {
                         glActiveTexture(GL_TEXTURE0 + i);
                         GLuint target =
                             (i == 7) ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
-                        glBindTexture(target, command->textures[i]);
+                        glBindTexture(target, command.textures[i]);
                     }
                 }
 
                 // Draw
-                if (currentVAO != command->vao) {
-                    glBindVertexArray(command->vao);
-                    currentVAO = command->vao;
+                if (currentVAO != command.vao) {
+                    glBindVertexArray(command.vao);
+                    currentVAO = command.vao;
                 }
 
-                glDrawElements(GL_TRIANGLES, command->indexCount,
+                glDrawElements(GL_TRIANGLES, command.indexCount,
                                GL_UNSIGNED_INT, 0);
             }
         }
