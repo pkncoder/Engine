@@ -13,7 +13,14 @@ class Scene {
     Scene();
     ~Scene();
 
+    inline void setActiveCameraID(entt::entity cameraID) {
+        cameraID = activeCameraID;
+    }
+
     inline entt::registry &getRegistry() { return registry; }
+
+  public:
+    entt::entity activeCameraID;
 
   private:
     entt::registry registry;

@@ -2,6 +2,7 @@
 
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
+#include "../system/camera/CameraSystem.h"
 #include "Camera.h"
 #include "Scene.h"
 
@@ -15,7 +16,9 @@ class SceneManager {
     SceneManager(EngineContext &engineContext, EngineState &engineState);
     ~SceneManager() = default;
 
-    inline Camera &getCamera() { return camera; }
+    void update();
+
+    // inline Camera &getCamera() { return camera; }
     inline Scene &getScene() { return scene; }
 
     // Wrapper for loading an obj
@@ -25,7 +28,9 @@ class SceneManager {
   private:
     EngineContext &engineContext;
 
-    Camera camera;
+    CameraSystem cameraSystem;
+
+    // Camera camera;
     Scene scene;
 };
 

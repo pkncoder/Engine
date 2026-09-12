@@ -2,7 +2,9 @@
 
 #include "../resources/AssetManager.h"
 #include "../scene/SceneManager.h"
+#include "../scene/components/CameraComponent.h"
 #include "../scene/components/MaterialComponent.h"
+#include "../scene/components/PointLightComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Input.h"
 #include "../services/Logger.h"
@@ -313,6 +315,11 @@ void Application::setupEntities() {
         // 1.74 vinette radius; 0.9 softness
         // 0.1, 0.1, 0.1 clear color
     }
+
+    auto camera = scene.getRegistry().create();
+    scene.getRegistry().emplace<CameraComponent>(camera, CameraComponent());
+    scene.getRegistry().emplace<TransformComponent>(camera,
+                                                    TransformComponent());
 
     END_PROFILE_STACKED_LOG("Entity Loading");
 }

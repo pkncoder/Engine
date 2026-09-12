@@ -7,8 +7,10 @@ namespace Engine {
 SceneManager::SceneManager(EngineContext &engineContext,
                            EngineState &engineState)
     : engineContext(engineContext) {
-    camera = Camera(engineState.scene.camera);
+    // camera = Camera(engineState.scene.camera);
 }
+
+void SceneManager::update() { cameraSystem.update(scene.getRegistry()); }
 
 std::vector<entt::entity>
 SceneManager::loadObjScene(const std::string &sourceDirectory,
