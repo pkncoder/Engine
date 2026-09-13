@@ -78,4 +78,10 @@ struct alignas(16) ObjectRenderData {
     float padding;      // 4 bytes (explicit padding to hit 16-byte boundary)
 };
 
+struct alignas(16) CameraData {
+    glm::vec4 position;
+    glm::mat4 viewProjection;
+    glm::mat4 inverseView;
+};
+
 } // namespace Engine

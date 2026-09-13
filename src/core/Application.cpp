@@ -320,6 +320,7 @@ void Application::setupEntities() {
     scene.getRegistry().emplace<CameraComponent>(camera, CameraComponent());
     scene.getRegistry().emplace<TransformComponent>(camera,
                                                     TransformComponent());
+    scene.setActiveCameraID(camera);
 
     END_PROFILE_STACKED_LOG("Entity Loading");
 }

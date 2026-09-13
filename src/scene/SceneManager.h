@@ -3,7 +3,6 @@
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
 #include "../system/camera/CameraSystem.h"
-#include "Camera.h"
 #include "Scene.h"
 
 #include <entt/entity/fwd.hpp>

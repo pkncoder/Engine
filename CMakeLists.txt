@@ -17,8 +17,8 @@ find_package(tinyobjloader CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 # Create the missing modern target if it doesn't exist
 if(NOT TARGET stb::stb)
-    add_library(stb::stb INTERFACE IMPORTED)
-    target_include_directories(stb::stb INTERFACE ${Stb_INCLUDE_DIRS})
+  add_library(stb::stb INTERFACE IMPORTED)
+  target_include_directories(stb::stb INTERFACE ${Stb_INCLUDE_DIRS})
 endif()
 
 # --- Source Files ---
@@ -44,7 +44,6 @@ set(SOURCES
     src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp
     src/resources/TextureLoader.cpp
-    src/scene/Camera.cpp
     src/scene/PrefabSpawner.cpp
     src/scene/Scene.cpp
     src/scene/SceneManager.cpp
@@ -52,6 +51,7 @@ set(SOURCES
     src/services/Logger.cpp
     src/services/Timer.cpp
     src/services/UUIDGenerator.cpp
+    src/system/camera/CameraSystem.cpp
 )
 
 # --- Executable ---

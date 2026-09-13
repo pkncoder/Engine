@@ -1,9 +1,10 @@
 #include "Rasterizer.h"
-#include "GPUStructs.h"
 
 #include "../scene/SceneManager.h"
+#include "../scene/components/CameraComponent.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
+#include "../scene/components/PointLightComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
 #include "GPUResourceManager.h"
@@ -204,7 +205,19 @@ void Rasterizer::extract(EngineState &state) {
 
     // Get teh scene & scene data
     Scene &scene = sceneManager->getScene();
-    Camera &camera = sceneManager->getCamera();
+    CameraComponent *camera =
+        scene.getRegistry().try_get<CameraComponent>(scene.activeCameraID);
+    TransformComponent *cameraTransform =
+        scene.getRegistry().try_get<TransformComponent>(scene.activeCameraID);
+
+    if (!camera || !cameraTransform) {
+        Logger::fatal("RENDERER", "NO ACTIVE CAMERA FOUND");
+
+        if (!cameraTransform) {
+            Logger::check();
+        }
+        return;
+    }
 
     // Lambda for building the model matrix
     const auto buildModel = [](const TransformComponent &t) {
@@ -217,12 +230,19 @@ void Rasterizer::extract(EngineState &state) {
 
     // Set the camera data values
     if (currentHeight > 0) {
-        cameraData.position = glm::vec4(camera.position, 0.0);
-        cameraData.viewProjection =
-            camera.getProjectionMatrix((float)currentWidth /
-                                       (float)currentHeight) *
-            camera.getViewMatrix();
-        cameraData.inverseView = glm::inverse(camera.getViewMatrix());
+        cameraData.position = glm::vec4(cameraTransform->position, 1.0f);
+
+        glm::mat4 viewMat =
+            glm::lookAt(cameraTransform->position,
+                        cameraTransform->position + camera->front, camera->up);
+
+        glm::mat4 projMat =
+            glm::perspective(glm::radians(camera->fov),
+                             (float)currentWidth / (float)currentHeight,
+                             camera->nearPlane, camera->farPlane);
+
+        cameraData.viewProjection = projMat * viewMat;
+        cameraData.inverseView = glm::inverse(viewMat);
     }
     activeLightPos = state.scene.camera.position;
 

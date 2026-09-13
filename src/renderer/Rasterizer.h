@@ -4,7 +4,7 @@
 
 #include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
-#include "../scene/Camera.h"
+#include "GPUStructs.h"
 #include "buffers/GPUBuffer.h"
 
 #include <glad/glad.h>
