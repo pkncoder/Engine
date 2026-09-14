@@ -4,7 +4,7 @@
 namespace Engine {
 
 struct CameraComponent {
-    float sensitivity = 0.6;
+    float sensitivity = 0.2;
     float movementSpeed = 7.0;
 
     float fov = 60.0f;

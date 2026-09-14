@@ -4,7 +4,6 @@
 #include "../scene/components/CameraComponent.h"
 #include "../scene/components/MaterialComponent.h"
 #include "../scene/components/MeshComponent.h"
-#include "../scene/components/PointLightComponent.h"
 #include "../scene/components/TransformComponent.h"
 #include "../services/Logger.h"
 #include "GPUResourceManager.h"
