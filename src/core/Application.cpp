@@ -266,24 +266,28 @@ void Application::setupEntities() {
         std::vector<entt::entity> sponza =
             sceneManager->loadObjScene("assets/sponza/", "sponza.obj");
 
-        std::vector<entt::entity> emmissiveCube =
-            sceneManager->loadObjScene("assets/cube/", "cube.obj");
+        // std::vector<entt::entity> emmissiveCube =
+        //     sceneManager->loadObjScene("assets/cube/", "cube.obj");
         //
-        scene.getRegistry()
-            .try_get<TransformComponent>(emmissiveCube[0])
-            ->position = glm::vec3(1.3f, 8.4f, -0.2f);
-        scene.getRegistry()
-            .try_get<TransformComponent>(emmissiveCube[0])
-            ->scale = glm::vec3(0.05f);
+        // scene.getRegistry()
+        //     .try_get<TransformComponent>(emmissiveCube[0])
+        //     ->position = glm::vec3(1.3f, 8.4f, -0.2f);
+        // scene.getRegistry()
+        //     .try_get<TransformComponent>(emmissiveCube[0])
+        //     ->scale = glm::vec3(0.05f);
+        //
+        // std::shared_ptr<CPUMaterialData> material =
+        //     engineContext->getAsset()->getMaterial(
+        //         scene.getRegistry()
+        //             .try_get<MaterialComponent>(emmissiveCube[0])
+        //             ->handle);
+        //
+        // material->albedo = glm::vec3(0.0f);
+        // material->emissive = glm::vec3(2.0);
 
-        std::shared_ptr<CPUMaterialData> material =
-            engineContext->getAsset()->getMaterial(
-                scene.getRegistry()
-                    .try_get<MaterialComponent>(emmissiveCube[0])
-                    ->handle);
-
-        material->albedo = glm::vec3(0.0f);
-        material->emissive = glm::vec3(2.0);
+        entt::entity pointLight = scene.getRegistry().create();
+        scene.getRegistry().emplace<TransformComponent>(pointLight, TransformComponent({1.3, 8.4, -0.2}, {0,0,0,0}, {0,0,0}));
+        scene.getRegistry().emplace<PointLightComponent>(pointLight, PointLightComponent({1.0, 1.0, 1.0}, 10.0));
 
         // 0.15 exposure
         // 0.02 fog density; 0.5, 0.4, 0.1 fog color
