@@ -5,7 +5,7 @@
 #include "IRenderer.h"
 // #include "PathTracer.h"
 // #include "Rasterizer.h"
-#include "DeferedRenderer.h"
+#include "DeferredRenderer.h"
 
 #include <memory>
 
@@ -32,7 +32,7 @@ class RendererManager {
     // Renderers
     // std::unique_ptr<Rasterizer> rasterizer = nullptr;
     // std::unique_ptr<PathTracer> pathTracer = nullptr;
-    std::unique_ptr<DeferedRenderer> defered = nullptr;
+    std::unique_ptr<DeferredRenderer> defered = nullptr;
 
     // Active renderer choice (ptr to the uniques)
     IRenderer *activeRenderer = nullptr;

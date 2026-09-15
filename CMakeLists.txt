@@ -34,7 +34,7 @@ set(SOURCES
     src/renderer/buffers/BufferManager.cpp
     src/renderer/shaders/IProgram.cpp
     src/renderer/shaders/IShader.cpp
-    src/renderer/DeferedRenderer.cpp
+    src/renderer/DeferredRenderer.cpp
     src/renderer/GPUResourceManager.cpp
     src/renderer/IRenderer.cpp
     # src/renderer/PathTracer.cpp

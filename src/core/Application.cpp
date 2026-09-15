@@ -154,6 +154,11 @@ void Application::setupEntities() {
     auto *sceneManager = engineContext->getScene();
     auto &scene = sceneManager->getScene();
 
+    // Cube
+    if (0) {
+        sceneManager->loadObjScene("assets/cube/", "cube.obj");
+    }
+
     // Bunny
     if (0) {
 

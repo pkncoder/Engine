@@ -137,7 +137,6 @@ class IRenderer {
 
     // Sending shader passes
     virtual void dispatch(EngineState &state) = 0;
-    virtual void postProcess(EngineState &state) = 0;
 
     // Presenting / blitting to FOB
     virtual void present(EngineState &state) = 0;
@@ -148,6 +147,7 @@ class IRenderer {
     // virtual void bindRenderTarget(RenderTarget &target) const;
 
     virtual void drawFullscreenQuad();
+    virtual void clearAllRenderTargets();
 
   protected:
     GLuint fullscreenQuadVAO = 0;

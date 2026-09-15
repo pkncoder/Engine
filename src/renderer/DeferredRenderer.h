@@ -6,17 +6,18 @@
 #include "IRenderer.h"
 #include "RenderGraph.h"
 #include "buffers/GPUBuffer.h"
+#include "shaders/IProgram.h"
 
 #include <vector>
 
 namespace Engine {
 
-class DeferedRenderer : public IRenderer {
+class DeferredRenderer : public IRenderer {
 
   public:
-    inline DeferedRenderer(EngineContext &_engineContext)
+    inline DeferredRenderer(EngineContext &_engineContext)
         : engineContext(_engineContext) {}
-    inline ~DeferedRenderer() { shutdown(); }
+    inline ~DeferredRenderer() { shutdown(); }
 
     void init(EngineState &state) override;
     void shutdown() override;
@@ -27,17 +28,25 @@ class DeferedRenderer : public IRenderer {
     void prepare(EngineState &state) override;
     void dispatch(EngineState &state) override;
     void present(EngineState &state) override;
-    void postProcess(EngineState &state) override;
 
   private:
     EngineContext &engineContext;
 
+    uint32_t frameIndex = 0;
+
     std::vector<RasterDrawCommand> opaqueCommands;
     std::vector<PointLightData> pointLights;
+
     CameraData cameraData;
 
     BufferHandle cameraUBO;
     BufferHandle lightUBO;
+
+    RenderTargetHandle gBufferHandle = INVALID_RENDER_TARGET;
+    RenderTargetHandle finalOutputHandle = INVALID_RENDER_TARGET;
+
+    IProgram gBufferProgram;
+    IProgram lightingProgram;
 
     RenderGraph renderGraph;
 };

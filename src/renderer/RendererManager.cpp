@@ -18,7 +18,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
     // rasterizer = std::make_unique<Rasterizer>(engineContext);
     // rasterizer->init(state);
 
-    defered = std::make_unique<DeferedRenderer>(engineContext);
+    defered = std::make_unique<DeferredRenderer>(engineContext);
     defered->init(state);
 
     // Set opengl version
@@ -87,7 +87,6 @@ void RendererManager::render(EngineState &state) {
     activeRenderer->prepare(state);
 
     activeRenderer->dispatch(state);
-    activeRenderer->postProcess(state);
 
     activeRenderer->present(state);
     END_PROFILE("Render"); // End Timer for render

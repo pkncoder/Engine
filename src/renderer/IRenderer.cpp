@@ -7,7 +7,11 @@ namespace Engine {
 
 void IRenderer::shutdown() {
 
-    // Loop each render target and delete the texture
+    clearAllRenderTargets();
+    // shaderNodeTree.clear();
+}
+
+void IRenderer::clearAllRenderTargets() {
     for (auto &[handle, target] : renderTargets) {
         for (auto &id : target.textureIDs) {
             if (id != 0) {
@@ -20,33 +24,32 @@ void IRenderer::shutdown() {
             glDeleteTextures(1, &target.depthTextureID);
             target.depthTextureID = 0;
         }
+
+        if (target.fbo != 0) {
+            glDeleteFramebuffers(1, &target.fbo);
+            target.fbo = 0;
+        }
     }
 
-    // Clear out registries
     renderTargets.clear();
     renderTargetNameMap.clear();
-    // shaderNodeTree.clear();
 }
 
 void IRenderer::resize(const uint32_t newWidth, const uint32_t newHeight) {
 
-    Logger::error("RENDERER",
-                  "Currently not supporting resizing. IRenderer::resize");
+    if (newWidth == currentWidth && newHeight == currentHeight) {
+        return;
+    }
 
-    // // Check for same size
-    // if (newWidth == currentWidth && newHeight == currentHeight) {
-    //     return;
-    // }
-    //
-    // // Check for invalid size
-    // if (newWidth == 0 || newHeight == 0) {
-    //     return;
-    // }
-    //
-    // // Set new width & height
-    // currentWidth = newWidth;
-    // currentHeight = newHeight;
-    //
+    // Check for invalid size
+    if (newWidth == 0 || newHeight == 0) {
+        return;
+    }
+
+    // Set new width & height
+    currentWidth = newWidth;
+    currentHeight = newHeight;
+
     // // Reset each texture for the render targets
     // for (auto &[handle, target] : renderTargets) {
     //     allocateRenderTarget(target);
