@@ -38,6 +38,7 @@ set(SOURCES
     src/renderer/IRenderer.cpp
     # src/renderer/PathTracer.cpp
     src/renderer/Rasterizer.cpp
+    src/renderer/RenderGraph.cpp
     src/renderer/RendererManager.cpp
     src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
