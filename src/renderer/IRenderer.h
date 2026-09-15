@@ -2,26 +2,36 @@
 
 #include "../core/states/EngineState.h"
 #include "../resources/CPUStructs.h"
-#include "buffers/GPUBuffer.h"
-#include "shaders/IProgram.h"
+
+#include <vector>
 
 namespace Engine {
+
+struct PointLightData {
+    glm::vec3 position = {0, 0, 0};
+    float padding = 0;
+    glm::vec3 emissive = {0, 0, 0};
+    float intensity = 0;
+};
+
+struct LightUBOData {
+    PointLightData lights[4] = {}; // TODO: static var
+    float lightCount = 0;
+    glm::vec3 padding = {0, 0, 0};
+};
 
 using RenderTargetHandle = uint32_t;
 constexpr RenderTargetHandle INVALID_RENDER_TARGET = 0;
 
 struct RenderTarget {
-  public:
-    // Name & Handle
     std::string name;
     RenderTargetHandle handle = INVALID_RENDER_TARGET;
 
-    // Binding values
-    GLuint id = 0;
-    GLuint bindingIndex = 0;
+    GLuint fbo = 0;                 // The actual framebuffer
+    std::vector<GLuint> textureIDs; // Multiple color attachments (MRTs)
+    GLuint depthTextureID = 0;      // Optional depth attachment
 
-    // Texture color format
-    GLenum format = GL_RGBA32F;
+    std::vector<GLenum> formats; // Formats for each color attachment
 };
 
 struct RasterDrawCommand {
@@ -51,49 +61,49 @@ struct RenderPacket {
     glm::mat4 modelMatrix;
 };
 
-struct RenderLayer {
-    GLuint fbo = 0;
-
-    size_t renderWidth;
-    size_t renderHeight;
-
-    // TODO: Temp; this will need to be moved into individual layers once the
-    // tree is defined
-    bool isShadowPass = false; // A flag to help dispatch know what to do
-    std::vector<glm::mat4> shadowTransforms;
-
-    std::vector<RasterDrawCommand> commands;
-};
-
-// Structure to define a pass
-struct ShaderNode {
-  public:
-    inline void addTextureInput(AssetHandle textureHandle) {
-        textureInputs.push_back(textureHandle);
-    }
-
-    inline void addRenderTarget(RenderTargetHandle renderTargetHandle) {
-        renderTargets.push_back(renderTargetHandle);
-    }
-
-    inline void addBufferInput(BufferHandle bufferHandle) {
-        bufferInputs.push_back(bufferHandle);
-    }
-
-  public:
-    // Name
-    std::string name;
-
-    // Shader / program to run
-    IProgram program;
-    bool enabled = true;
-
-    std::vector<AssetHandle> textureInputs;
-    std::vector<RenderTargetHandle> renderTargets;
-    std::vector<BufferHandle> bufferInputs;
-
-    std::vector<RenderLayer> renderSteps;
-};
+// struct RenderLayer {
+//     GLuint fbo = 0;
+//
+//     size_t renderWidth;
+//     size_t renderHeight;
+//
+//     // TODO: Temp; this will need to be moved into individual layers once the
+//     // tree is defined
+//     bool isShadowPass = false; // A flag to help dispatch know what to do
+//     std::vector<glm::mat4> shadowTransforms;
+//
+//     std::vector<RasterDrawCommand> commands;
+// };
+//
+// // Structure to define a pass
+// struct ShaderNode {
+//   public:
+//     inline void addTextureInput(AssetHandle textureHandle) {
+//         textureInputs.push_back(textureHandle);
+//     }
+//
+//     inline void addRenderTarget(RenderTargetHandle renderTargetHandle) {
+//         renderTargets.push_back(renderTargetHandle);
+//     }
+//
+//     inline void addBufferInput(BufferHandle bufferHandle) {
+//         bufferInputs.push_back(bufferHandle);
+//     }
+//
+//   public:
+//     // Name
+//     std::string name;
+//
+//     // Shader / program to run
+//     IProgram program;
+//     bool enabled = true;
+//
+//     std::vector<AssetHandle> textureInputs;
+//     std::vector<RenderTargetHandle> renderTargets;
+//     std::vector<BufferHandle> bufferInputs;
+//
+//     std::vector<RenderLayer> renderSteps;
+// };
 
 class IRenderer {
   public:
@@ -109,9 +119,9 @@ class IRenderer {
 
     // Render target handling
     virtual RenderTargetHandle
-    addRenderTarget(const std::string &name, const GLuint bindingIndex,
-                    const GLenum format = GL_RGBA32F);
-    virtual void setDisplayTarget(const RenderTargetHandle handle);
+    addRenderTarget(const std::string &name, const std::vector<GLenum> &formats,
+                    const bool createDepth = false);
+    // virtual void setDisplayTarget(const RenderTargetHandle handle);
     // Lookups
     RenderTarget *getRenderTarget(const RenderTargetHandle handle);
     RenderTarget *getRenderTargetByName(const std::string &name);
@@ -133,9 +143,14 @@ class IRenderer {
     virtual void present(EngineState &state) = 0;
 
   protected:
-    // Methods for setting up render targets
-    virtual void allocateRenderTarget(RenderTarget &target) const;
-    virtual void bindRenderTarget(RenderTarget &target) const;
+    // // Methods for setting up render targets
+    // virtual void allocateRenderTarget(RenderTarget &target) const;
+    // virtual void bindRenderTarget(RenderTarget &target) const;
+
+    virtual void drawFullscreenQuad();
+
+  protected:
+    GLuint fullscreenQuadVAO = 0;
 
   protected:
     // Tracked render width & height
@@ -148,8 +163,8 @@ class IRenderer {
     std::unordered_map<RenderTargetHandle, RenderTarget> renderTargets;
     std::unordered_map<std::string, RenderTargetHandle> renderTargetNameMap;
 
-    // Shader passes
-    std::vector<ShaderNode> shaderNodeTree;
+    // // Shader passes
+    // std::vector<ShaderNode> shaderNodeTree;
 };
 
 }; // namespace Engine

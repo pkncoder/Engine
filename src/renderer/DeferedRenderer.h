@@ -1,14 +1,23 @@
 #pragma once
 
+#include "../core/EngineContext.h"
 #include "../core/states/EngineState.h"
+#include "GPUStructs.h"
 #include "IRenderer.h"
 #include "RenderGraph.h"
+#include "buffers/GPUBuffer.h"
+
+#include <vector>
 
 namespace Engine {
 
 class DeferedRenderer : public IRenderer {
 
   public:
+    inline DeferedRenderer(EngineContext &_engineContext)
+        : engineContext(_engineContext) {}
+    inline ~DeferedRenderer() { shutdown(); }
+
     void init(EngineState &state) override;
     void shutdown() override;
     void resize(const uint32_t width, const uint32_t height) override;
@@ -21,6 +30,15 @@ class DeferedRenderer : public IRenderer {
     void postProcess(EngineState &state) override;
 
   private:
+    EngineContext &engineContext;
+
+    std::vector<RasterDrawCommand> opaqueCommands;
+    std::vector<PointLightData> pointLights;
+    CameraData cameraData;
+
+    BufferHandle cameraUBO;
+    BufferHandle lightUBO;
+
     RenderGraph renderGraph;
 };
 

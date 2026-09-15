@@ -34,10 +34,11 @@ set(SOURCES
     src/renderer/buffers/BufferManager.cpp
     src/renderer/shaders/IProgram.cpp
     src/renderer/shaders/IShader.cpp
+    src/renderer/DeferedRenderer.cpp
     src/renderer/GPUResourceManager.cpp
     src/renderer/IRenderer.cpp
     # src/renderer/PathTracer.cpp
-    src/renderer/Rasterizer.cpp
+    # src/renderer/Rasterizer.cpp
     src/renderer/RenderGraph.cpp
     src/renderer/RendererManager.cpp
     src/renderer/Shader.cpp

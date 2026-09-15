@@ -3,6 +3,7 @@
 #include "../services/Logger.h"
 #include "../services/Timer.h"
 #include "GPUResourceManager.h"
+#include <memory>
 
 namespace Engine {
 
@@ -14,8 +15,11 @@ RendererManager::RendererManager(EngineContext &engineContext,
     GPUResourceManager::init(engineContext.getAsset());
 
     // Rasterizer inizialization
-    rasterizer = std::make_unique<Rasterizer>(engineContext);
-    rasterizer->init(state);
+    // rasterizer = std::make_unique<Rasterizer>(engineContext);
+    // rasterizer->init(state);
+
+    defered = std::make_unique<DeferedRenderer>(engineContext);
+    defered->init(state);
 
     // Set opengl version
     glGetIntegerv(GL_MAJOR_VERSION,
@@ -39,7 +43,7 @@ RendererManager::RendererManager(EngineContext &engineContext,
     }
 
     // Set the active renderer
-    activeRenderer = rasterizer.get();
+    activeRenderer = defered.get();
     state.renderer.settings.currentRenderChoice = RenderChoice::RASTERIZER;
 
     Logger::info("RENDERER", "Renderer Manager initialized.");
@@ -49,17 +53,21 @@ RendererManager::RendererManager(EngineContext &engineContext,
 void RendererManager::shutdown() {
     activeRenderer = nullptr;
 
-    if (rasterizer)
-        rasterizer->shutdown();
+    // if (rasterizer)
+    //     rasterizer->shutdown();
     // if (pathTracer)
     //     pathTracer->shutdown();
+    if (defered)
+        defered->shutdown();
 }
 
 // Swap the active renderer
 void RendererManager::swapActiveRenderer(const RenderChoice choice) {
+    Logger::warn("RENDERER", "Swaping active renderers not currently enabled "
+                             "RendererManager::swapActiveRenderer");
     switch (choice) { // Switch the choice
     case RenderChoice::RASTERIZER:
-        activeRenderer = rasterizer.get();
+        // activeRenderer = rasterizer.get();
         Logger::info("RENDERER", "Swapped to Rasterizer.");
         break;
     case RenderChoice::PATH_TRACER:

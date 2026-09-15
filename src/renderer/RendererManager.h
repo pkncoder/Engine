@@ -4,7 +4,8 @@
 #include "../core/states/EngineState.h"
 #include "IRenderer.h"
 // #include "PathTracer.h"
-#include "Rasterizer.h"
+// #include "Rasterizer.h"
+#include "DeferedRenderer.h"
 
 #include <memory>
 
@@ -29,8 +30,9 @@ class RendererManager {
     EngineContext &engineContext;
 
     // Renderers
-    std::unique_ptr<Rasterizer> rasterizer = nullptr;
+    // std::unique_ptr<Rasterizer> rasterizer = nullptr;
     // std::unique_ptr<PathTracer> pathTracer = nullptr;
+    std::unique_ptr<DeferedRenderer> defered = nullptr;
 
     // Active renderer choice (ptr to the uniques)
     IRenderer *activeRenderer = nullptr;
