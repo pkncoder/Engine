@@ -42,8 +42,9 @@ GPUTexture *GPUResourceManager::getOrUploadTexture(const AssetHandle handle) {
 
     // If it is not in the cache, get the texture data from asset manager
     auto cpuTexture = assetManager->getTexture(handle);
-    if (!cpuTexture)
+    if (!cpuTexture) {
         return nullptr; // Invalid handle!
+    }
 
     // Upload the texture to VRAM
     GPUTexture newGPUTexture = uploadTexture(*cpuTexture);
@@ -109,6 +110,10 @@ GPUResourceManager::uploadTexture(const CPUTextureData &textureData) {
     GLenum format = (textureData.channels == 1)   ? GL_RED
                     : (textureData.channels == 4) ? GL_RGBA
                                                   : GL_RGB;
+
+    if (textureData.channels == 1) {
+        Logger::check();
+    }
 
     // Get the raw pixel data
     const void *rawPixelData = textureData.pixels.data();

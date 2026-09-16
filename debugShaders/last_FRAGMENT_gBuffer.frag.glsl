@@ -48,8 +48,8 @@ vec3 getNormalFromMap() {
 void main() {
     // 1. Alpha Clipping
     float alpha = texture(u_AlphaMap, TexCoords).r;
-    if (alpha < 0.1) {
-        // discard; // Throw away this pixel completely if it's transparent
+    if (alpha < 0.1) { // TODO: This is specifically for masks
+        discard; // Throw away this pixel completely if it's transparent
     }
 
     outPosition = vec4(FragPos, 1.0);
@@ -60,7 +60,7 @@ void main() {
     
     // 3. Albedo
     vec4 texColor = texture(u_AlbedoMap, TexCoords);
-    outAlbedo = vec4(texColor.rgb * u_AlbedoColor, 1.0); 
+    outAlbedo = vec4(texColor.rgb * u_AlbedoColor, alpha); 
     
     // 4. RMA (Roughness, Metallic, AO)
     outRMA = vec4(u_Roughness, u_Metallic, 1.0, 1.0); 

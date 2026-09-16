@@ -51,6 +51,7 @@ class DeferredRenderer : public IRenderer {
     RenderGraph renderGraph;
 
     GLuint defaultWhiteTexture;
+    GLuint defaultGrayscaleTexture;
     GLuint defaultNormalTexture;
 };
 

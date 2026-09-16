@@ -36,6 +36,16 @@ void DeferredRenderer::init(EngineState &state) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+        // Default grayscale
+        glGenTextures(1, &defaultGrayscaleTexture);
+        glBindTexture(GL_TEXTURE_2D, defaultGrayscaleTexture);
+        unsigned char redPixel[] = {255};
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 1, 1, 0, GL_RED, GL_UNSIGNED_BYTE, redPixel);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
         // Default normal
         glGenTextures(1, &defaultNormalTexture);
         glBindTexture(GL_TEXTURE_2D, defaultNormalTexture);
@@ -182,11 +192,11 @@ void DeferredRenderer::extract(EngineState &state) {
 
         cmd.textures[0] = getTexID("albedo", defaultWhiteTexture);
         cmd.textures[1] = getTexID("emissive", defaultWhiteTexture);
-        cmd.textures[2] = getTexID("alpha", defaultWhiteTexture);
+        cmd.textures[2] = getTexID("alpha", defaultGrayscaleTexture);
         cmd.textures[3] = getTexID("roughness", defaultWhiteTexture);
         cmd.textures[4] = getTexID("metallic", defaultWhiteTexture);
         cmd.textures[5] = getTexID("normal", defaultNormalTexture);
-        cmd.textures[6] = getTexID("bump", defaultWhiteTexture);
+        cmd.textures[6] = getTexID("bump", defaultGrayscaleTexture);
         // cmd.textures[7] = shadowCubeMap;
 
         // cmd.isBumpMap = (cmd.textures[6] != defaultWhiteTexture &&
@@ -328,7 +338,6 @@ void DeferredRenderer::prepare(EngineState &state) {
         // Set the render targets
         std::vector<GLenum> finalFormats = {GL_RGBA8};
         if (finalOutputHandle == INVALID_RENDER_TARGET) {
-            Logger::check();
             finalOutputHandle =
                 addRenderTarget("FinalOutput", finalFormats, false);
         }
