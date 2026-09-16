@@ -25,7 +25,7 @@ struct PointLightData {
 
 layout(std140) uniform PointLightUBO {
     PointLightData uPointLights[4]; // Matches your hardcoded max of 4
-    float pointLightCount;
+    int pointLightCount;
 };
 
 void main() {
@@ -49,7 +49,7 @@ void main() {
     finalLighting += ambient;
 
     // 3. Iterate over Point Lights
-    int activeLights = int(pointLightCount);
+    int activeLights = (pointLightCount);
     for(int i = 0; i < activeLights; ++i) {
         // Calculate light directions and distance
         vec3 lightDir = uPointLights[i].position - FragPos;
@@ -64,7 +64,7 @@ void main() {
         vec3 diffuse = diff * Albedo * uPointLights[i].emissive * uPointLights[i].intensity;
         
         // Specular (Blinn-Phong)
-        vec3 halfwayDir = normalize(lightDir + viewDir);
+        vec3 halfwayDir = normalize(lightDir + viewDir + vec3(0.0001));
         float spec = pow(max(dot(Normal, halfwayDir), 0.0), 32.0); // 32.0 is the shininess factor
         vec3 specular = spec * uPointLights[i].emissive * uPointLights[i].intensity;
 

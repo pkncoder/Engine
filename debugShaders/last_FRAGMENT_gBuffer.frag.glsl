@@ -31,9 +31,15 @@ vec3 getNormalFromMap() {
     vec2 st1 = dFdx(TexCoords);
     vec2 st2 = dFdy(TexCoords);
 
-    vec3 N   = normalize(Normal);
-    vec3 T   = normalize(Q1*st2.t - Q2*st1.t);
-    vec3 B   = -normalize(cross(N, T));
+    // New, mathematically bulletproof safety check
+    float det = st1.s * st2.t - st2.s * st1.t;
+    if (abs(det) < 0.00001) {
+        return normalize(Normal);
+    }
+    
+    vec3 N = normalize(Normal);
+    vec3 T = normalize(Q1*st2.t - Q2*st1.t);
+    vec3 B = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);
 
     return normalize(TBN * tangentNormal);
@@ -43,7 +49,7 @@ void main() {
     // 1. Alpha Clipping
     float alpha = texture(u_AlphaMap, TexCoords).r;
     if (alpha < 0.1) {
-        discard; // Throw away this pixel completely if it's transparent
+        // discard; // Throw away this pixel completely if it's transparent
     }
 
     outPosition = vec4(FragPos, 1.0);

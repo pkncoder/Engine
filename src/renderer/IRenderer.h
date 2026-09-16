@@ -16,8 +16,8 @@ struct PointLightData {
 
 struct LightUBOData {
     PointLightData lights[4] = {}; // TODO: static var
-    float lightCount = 0;
     glm::vec3 padding = {0, 0, 0};
+    float lightCount = 0;
 };
 
 using RenderTargetHandle = uint32_t;
