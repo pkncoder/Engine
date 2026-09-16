@@ -25,6 +25,22 @@ namespace Engine {
 
 void DeferredRenderer::init(EngineState &state) {
 
+    {
+        // Default white
+        glGenTextures(1, &defaultWhiteTexture);
+        glBindTexture(GL_TEXTURE_2D, defaultWhiteTexture);
+        unsigned char whitePixel[] = {255, 255, 255, 255};
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, whitePixel);
+
+        // Default black
+        glGenTextures(1, &defaultNormalTexture);
+        glBindTexture(GL_TEXTURE_2D, defaultNormalTexture);
+        unsigned char flatNormalPixel[] = {128, 128, 255, 255};
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, flatNormalPixel);
+    }
+
     gBufferProgram = IProgram();
     gBufferProgram.attachShader(
         IShader("shaders/deferred/main/gBuffer.vert", Vertex));
@@ -146,13 +162,26 @@ void DeferredRenderer::extract(EngineState &state) {
         cmd.roughness = cpuMaterial->roughness;
         cmd.metallic = cpuMaterial->metallic;
 
-        // cmd.textures[0] = getTexID("albedo", defaultWhiteTexture);
-        // cmd.textures[1] = getTexID("emissive", defaultWhiteTexture);
-        // cmd.textures[2] = getTexID("alpha", defaultWhiteTexture);
-        // cmd.textures[3] = getTexID("roughness", defaultWhiteTexture);
-        // cmd.textures[4] = getTexID("metallic", defaultWhiteTexture);
-        // cmd.textures[5] = getTexID("normal", defaultNormalTexture);
-        // cmd.textures[6] = getTexID("bump", defaultWhiteTexture);
+        // Lambda for getting a texture id safely
+        const auto getTexID = [&](const std::string &key,
+                                  const GLuint fallback) -> GLuint {
+            auto ittr = cpuMaterial->textureMaps.find(key);
+            if (ittr != cpuMaterial->textureMaps.end()) {
+                GPUTexture *tex =
+                    GPUResourceManager::getOrUploadTexture(ittr->second);
+                if (tex && tex->textureID != 0)
+                    return tex->textureID;
+            }
+            return fallback;
+        };
+
+        cmd.textures[0] = getTexID("albedo", defaultWhiteTexture);
+        cmd.textures[1] = getTexID("emissive", defaultWhiteTexture);
+        cmd.textures[2] = getTexID("alpha", defaultWhiteTexture);
+        cmd.textures[3] = getTexID("roughness", defaultWhiteTexture);
+        cmd.textures[4] = getTexID("metallic", defaultWhiteTexture);
+        cmd.textures[5] = getTexID("normal", defaultNormalTexture);
+        cmd.textures[6] = getTexID("bump", defaultWhiteTexture);
         // cmd.textures[7] = shadowCubeMap;
 
         // cmd.isBumpMap = (cmd.textures[6] != defaultWhiteTexture &&
@@ -212,7 +241,7 @@ void DeferredRenderer::prepare(EngineState &state) {
     gBufferPass.setup = [&]() {
         //(Position (F32), Normal (F16), Albedo (UI8), RMA (UI8))
         std::vector<GLenum> gBufferFormats = {GL_RGBA32F, GL_RGBA16F, GL_RGBA8,
-                                              GL_RGBA8};
+                                              GL_RGBA8, GL_RGBA16F};
         if (gBufferHandle == INVALID_RENDER_TARGET) {
             gBufferHandle = addRenderTarget("GBuffer", gBufferFormats, true);
         }
@@ -239,13 +268,43 @@ void DeferredRenderer::prepare(EngineState &state) {
         // Bind the shader
         gBufferProgram.bind();
 
+        // Tell the shader which texture units correspond to which samplers
+        gBufferProgram.setInt("u_AlbedoMap", 0);
+        gBufferProgram.setInt("u_EmissiveMap", 1);
+        gBufferProgram.setInt("u_AlphaMap", 2);
+        gBufferProgram.setInt("u_NormalMap", 3);
+        gBufferProgram.setInt("u_BumpMap", 4);
+
         // Draw
         GLuint currentVAO = 0;
         for (const auto &cmd : opaqueCommands) {
-            // Push per-object data (Transform, Material) to shaders via UBO or
-            // Uniforms
+
+            // 1. Pass matrices
             gBufferProgram.setMat4("u_Model", cmd.modelMatrix);
 
+            // 2. Bind Textures to their respective units
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, cmd.textures[0]); // Albedo
+
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, cmd.textures[1]); // Emissive
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, cmd.textures[2]); // Alpha
+
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, cmd.textures[5]); // Normal
+
+            glActiveTexture(GL_TEXTURE4);
+            glBindTexture(GL_TEXTURE_2D, cmd.textures[6]); // Bump
+
+            // 3. Pass Material Fallbacks/Data
+            gBufferProgram.setVec3("u_AlbedoColor", cmd.albedo);
+            gBufferProgram.setVec3("u_EmissiveColor", cmd.emissive);
+            gBufferProgram.setFloat("u_Roughness", cmd.roughness);
+            gBufferProgram.setFloat("u_Metallic", cmd.metallic);
+
+            // 4. Draw
             if (currentVAO != cmd.vao) {
                 glBindVertexArray(cmd.vao);
                 currentVAO = cmd.vao;

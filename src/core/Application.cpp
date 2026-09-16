@@ -286,8 +286,11 @@ void Application::setupEntities() {
         // material->emissive = glm::vec3(2.0);
 
         entt::entity pointLight = scene.getRegistry().create();
-        scene.getRegistry().emplace<TransformComponent>(pointLight, TransformComponent({1.3, 8.4, -0.2}, {0,0,0,0}, {0,0,0}));
-        scene.getRegistry().emplace<PointLightComponent>(pointLight, PointLightComponent({1.0, 1.0, 1.0}, 10.0));
+        scene.getRegistry().emplace<TransformComponent>(
+            pointLight,
+            TransformComponent({1.3, 8.4, -0.2}, {0, 0, 0, 0}, {0, 0, 0}));
+        scene.getRegistry().emplace<PointLightComponent>(
+            pointLight, PointLightComponent({1.0, 1.0, 1.0}, 10.0));
 
         // 0.15 exposure
         // 0.02 fog density; 0.5, 0.4, 0.1 fog color

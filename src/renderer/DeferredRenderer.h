@@ -49,6 +49,9 @@ class DeferredRenderer : public IRenderer {
     IProgram lightingProgram;
 
     RenderGraph renderGraph;
+
+    GLuint defaultWhiteTexture;
+    GLuint defaultNormalTexture;
 };
 
 } // namespace Engine
