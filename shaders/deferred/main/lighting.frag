@@ -31,59 +31,51 @@ layout(std140) uniform PointLightUBO {
     int pointLightCount;
 };
 
+// 20 pre-calculated offset directions distributed on a 3D sphere
+const vec3 gridSamplingDisk[20] = vec3[](
+   vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+   vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+   vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+   vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+);
+
 float CalculateShadow(vec3 fragPos, vec3 lightPos, vec3 normal, vec3 lightDir) {
     vec3 fragToLight = fragPos - lightPos;
-    float closestDepth = texture(u_ShadowMap, fragToLight).r;
-    closestDepth *= u_FarPlane;
     float currentDepth = length(fragToLight);
     
-    // DYNAMIC BIAS: Scales between 0.05 and 0.25 based on the angle to the light
-    float bias = max(0.25 * (1.0 - dot(normal, lightDir)), 0.05); 
-    
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-    return shadow;
-}
+    if (currentDepth < 0.0001 || currentDepth > u_FarPlane) 
+        return 0.0;
 
-vec3 getNormalFromMap() {
-    // 1. Calculate the base normal from the Normal Map
-    vec3 tangentNormal = texture(u_NormalMap, TexCoords).xyz * 2.0 - 1.0;
+    // 1. Normalize the light direction so offsets are purely angular
+    vec3 dir = normalize(fragToLight);
     
-    vec3 Q1  = dFdx(FragPos);
-    vec3 Q2  = dFdy(FragPos);
-    vec2 st1 = dFdx(TexCoords);
-    vec2 st2 = dFdy(TexCoords);
+    // 2. Dynamic Bias
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 
-    float det = st1.s * st2.t - st2.s * st1.t;
-    vec3 N = normalize(Normal);
-    
-    vec3 mappedNormal = N;
-    if (abs(det) >= 0.00001) {
-        vec3 T = normalize(Q1*st2.t - Q2*st1.t);
-        vec3 B = -normalize(cross(N, T));
-        mat3 TBN = mat3(T, B, N);
-        mappedNormal = normalize(TBN * tangentNormal);
+    // Scales slightly based on distance to soften distant shadows
+    float viewDistance = length(uCameraPos.xyz - fragPos);
+    float diskRadius = (1.0 + (viewDistance / u_FarPlane)) / 250.0; // Reduced from 0.025 to ~0.004
+
+    float shadow = 0.0;
+    int samples = 20;
+
+    for(int i = 0; i < samples; ++i) {
+        vec3 sampleVector = dir + gridSamplingDisk[i] * diskRadius;
+        float closestDepth = texture(u_ShadowMap, sampleVector).r * u_FarPlane;
+        
+        if(currentDepth - bias > closestDepth) {
+            shadow += 1.0;
+        }
     }
-    
-    // 2. Perturb the normal using the Bump (Height) Map
-    float height = texture(u_BumpMap, TexCoords).r;
-    
-    // Calculate the slope of the height map
-    float dHx = dFdx(height);
-    float dHy = dFdy(height);
-    
-    // Tweak this value to make the bump effect stronger or weaker
-    float bumpScale = 2.0; 
-    
-    // Apply the bump gradient to the normal
-    vec3 bumpGradient = sign(det) * (dHx * cross(Q2, mappedNormal) + dHy * cross(mappedNormal, Q1));
-    
-    return normalize(mappedNormal - bumpGradient * bumpScale);
+
+    return shadow / float(samples);
 }
 
 void main() {
     // 1. Unpack G-Buffer
     vec3 FragPos = texture(u_GBuffer0, TexCoords).xyz;
-    vec3 Normal = texture(u_GBuffer1, TexCoords).xyz;
+    vec3 Normal  = normalize(texture(u_GBuffer1, TexCoords).xyz);
     vec3 Albedo = texture(u_GBuffer2, TexCoords).rgb;
     
     // If the normal is 0, we are looking at the background (skybox area), just render black/clear color.
@@ -97,7 +89,7 @@ void main() {
     vec3 finalLighting = vec3(0.0);
     
     // Add a tiny bit of ambient light so completely shadowed areas aren't pitch black
-    vec3 ambient = Albedo * 0.05; 
+    vec3 ambient = Albedo * 0.1; 
     finalLighting += ambient;
 
     // 3. Iterate over Point Lights

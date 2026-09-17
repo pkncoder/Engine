@@ -53,6 +53,8 @@ void DeferredRenderer::generateShadowMap() {
 
 void DeferredRenderer::init(EngineState &state) {
 
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
     {
         // Default white
         glGenTextures(1, &defaultWhiteTexture);
@@ -301,8 +303,8 @@ void DeferredRenderer::prepare(EngineState &state) {
 
         // Grab the first light to generate shadows for
         glm::vec3 lightPos = pointLights[0].position;
-        float nearPlane = 0.1f;
-        float farPlane = 25.0f;
+        float nearPlane = 0.001f;
+        float farPlane = 100.0f;
 
         // Setup matrices
         glm::mat4 shadowProj =
@@ -339,6 +341,8 @@ void DeferredRenderer::prepare(EngineState &state) {
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -489,7 +493,7 @@ void DeferredRenderer::prepare(EngineState &state) {
         glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubemap);
         lightingProgram.setInt("u_ShadowMap", 5);
 
-        lightingProgram.setFloat("u_FarPlane", 25.0f);
+        lightingProgram.setFloat("u_FarPlane", 100.0f);
 
         // Draw Fullscreen Quad
         drawFullscreenQuad();

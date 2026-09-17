@@ -288,9 +288,9 @@ void Application::setupEntities() {
         entt::entity pointLight = scene.getRegistry().create();
         scene.getRegistry().emplace<TransformComponent>(
             pointLight,
-            TransformComponent({1.3, 8.4, -0.2}, {0, 0, 0, 0}, {0, 0, 0}));
+            TransformComponent({1.3, 4.4, -0.2}, {0, 0, 0, 0}, {0, 0, 0}));
         scene.getRegistry().emplace<PointLightComponent>(
-            pointLight, PointLightComponent({1.0, 1.0, 1.0}, 2.0));
+            pointLight, PointLightComponent({0.9, 0.6, 0.7}, 5.0));
 
         // 0.15 exposure
         // 0.02 fog density; 0.5, 0.4, 0.1 fog color
