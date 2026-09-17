@@ -155,8 +155,15 @@ void Application::setupEntities() {
     auto &scene = sceneManager->getScene();
 
     // Cube
-    if (0) {
+    if (1) {
         sceneManager->loadObjScene("assets/cube/", "cube.obj");
+
+        entt::entity pointLight = scene.getRegistry().create();
+        scene.getRegistry().emplace<TransformComponent>(
+            pointLight,
+            TransformComponent({1.4, 1.4, -1.4}, {0, 0, 0, 0}, {0, 0, 0}));
+        scene.getRegistry().emplace<PointLightComponent>(
+            pointLight, PointLightComponent({0.9, 0.6, 0.7}, 5.0));
     }
 
     // Bunny
@@ -262,7 +269,7 @@ void Application::setupEntities() {
     }
 
     // Sponza
-    if (1) {
+    if (0) {
         std::vector<entt::entity> sponza =
             sceneManager->loadObjScene("assets/sponza/", "sponza.obj");
 

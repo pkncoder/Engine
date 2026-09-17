@@ -69,3 +69,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     tinyobjloader::tinyobjloader
     stb::stb
 )
+
+# Link Win32 system libraries when targeting Windows
+if(MINGW)
+  target_link_options(${PROJECT_NAME} PRIVATE -static)
+endif()
