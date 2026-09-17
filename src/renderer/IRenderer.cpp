@@ -21,7 +21,7 @@ void IRenderer::clearAllRenderTargets() {
         }
 
         if (target.depthTextureID != 0) {
-            glDeleteTextures(1, &target.depthTextureID);
+            glDeleteRenderbuffers(1, &target.depthTextureID);
             target.depthTextureID = 0;
         }
 
@@ -186,12 +186,14 @@ void IRenderer::drawFullscreenQuad() {
             1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
         };
 
+        GLuint quadVBO; 
+        
         glGenVertexArrays(1, &fullscreenQuadVAO);
-        glGenBuffers(1, &fullscreenQuadVAO);
+        glGenBuffers(1, &quadVBO); 
+        
         glBindVertexArray(fullscreenQuadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, fullscreenQuadVAO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices,
-                     GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 
         // Position attribute
         glEnableVertexAttribArray(0);

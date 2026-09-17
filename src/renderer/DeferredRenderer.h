@@ -30,6 +30,9 @@ class DeferredRenderer : public IRenderer {
     void present(EngineState &state) override;
 
   private:
+    void generateShadowMap();
+
+  private:
     EngineContext &engineContext;
 
     uint32_t frameIndex = 0;
@@ -45,10 +48,14 @@ class DeferredRenderer : public IRenderer {
     RenderTargetHandle gBufferHandle = INVALID_RENDER_TARGET;
     RenderTargetHandle finalOutputHandle = INVALID_RENDER_TARGET;
 
+    IProgram shadowProgram;
     IProgram gBufferProgram;
     IProgram lightingProgram;
 
     RenderGraph renderGraph;
+
+    GLuint shadowFBO;
+    GLuint shadowCubemap;
 
     GLuint defaultWhiteTexture;
     GLuint defaultGrayscaleTexture;
