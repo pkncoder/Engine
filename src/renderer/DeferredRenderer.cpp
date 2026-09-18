@@ -24,71 +24,68 @@
 namespace Engine {
 
 void DeferredRenderer::generateShadowMap() {
-    // 1. Create the Cubemap
+
+    // Setup cubemap
     glGenTextures(1, &shadowCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubemap);
 
+    // Create each cubemap face
     for (unsigned int i = 0; i < 6; ++i) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
                      1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     }
 
+    // Texture params
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    // 2. Attach to FBO
+    // FBO
     glGenFramebuffers(1, &shadowFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowCubemap, 0);
 
-    // Tell OpenGL we are strictly using this for depth, not color
+    // Set the buffer to specifically hold depth
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
+    // Unbind the frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void DeferredRenderer::init(EngineState &state) {
 
+    // Flag for the cubemap
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+    // Default textures
     {
-        // Default white
-        glGenTextures(1, &defaultWhiteTexture);
-        glBindTexture(GL_TEXTURE_2D, defaultWhiteTexture);
+        const auto setupDefaultTexture = [&](GLuint *texture,
+                                             unsigned char pixel[],
+                                             GLenum format) {
+            glGenTextures(1, texture);
+            glBindTexture(GL_TEXTURE_2D, *texture);
+            glTexImage2D(GL_TEXTURE_2D, 0, format, 1, 1, 0, format,
+                         GL_UNSIGNED_BYTE, pixel);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        };
+
         unsigned char whitePixel[] = {255, 255, 255, 255};
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA,
-                     GL_UNSIGNED_BYTE, whitePixel);
-        // ADD THESE TWO LINES
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        setupDefaultTexture(&defaultWhiteTexture, whitePixel, GL_RGBA);
 
-        // Default grayscale
-        glGenTextures(1, &defaultGrayscaleTexture);
-        glBindTexture(GL_TEXTURE_2D, defaultGrayscaleTexture);
         unsigned char redPixel[] = {255};
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 1, 1, 0, GL_RED,
-                     GL_UNSIGNED_BYTE, redPixel);
+        setupDefaultTexture(&defaultGrayscaleTexture, redPixel, GL_RED);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        // Default normal
-        glGenTextures(1, &defaultNormalTexture);
-        glBindTexture(GL_TEXTURE_2D, defaultNormalTexture);
         unsigned char flatNormalPixel[] = {128, 128, 255, 255};
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA,
-                     GL_UNSIGNED_BYTE, flatNormalPixel);
-        // ADD THESE TWO LINES
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        setupDefaultTexture(&defaultNormalTexture, flatNormalPixel, GL_RGBA);
     }
 
     generateShadowMap();
 
+    // Shadow mapping shaders
     shadowProgram = IProgram();
     shadowProgram.attachShader(
         IShader("shaders/deferred/main/shadow.vert", Vertex));
@@ -98,6 +95,7 @@ void DeferredRenderer::init(EngineState &state) {
         IShader("shaders/deferred/main/shadow.frag", Fragment));
     shadowProgram.link();
 
+    // G-Buffer shaders
     gBufferProgram = IProgram();
     gBufferProgram.attachShader(
         IShader("shaders/deferred/main/gBuffer.vert", Vertex));
@@ -105,6 +103,7 @@ void DeferredRenderer::init(EngineState &state) {
         IShader("shaders/deferred/main/gBuffer.frag", Fragment));
     gBufferProgram.link();
 
+    // Lighting shaders
     lightingProgram = IProgram();
     lightingProgram.attachShader(
         IShader("shaders/deferred/main/lighting.vert", Vertex));
@@ -112,6 +111,7 @@ void DeferredRenderer::init(EngineState &state) {
         IShader("shaders/deferred/main/lighting.frag", Fragment));
     lightingProgram.link();
 
+    // Camera UBO creation & mapping
     {
         cameraUBO = BufferManager::createBuffer(
             "CameraUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
@@ -126,6 +126,7 @@ void DeferredRenderer::init(EngineState &state) {
             {"uCameraPos", "uViewProjection", "uInverseView"});
     }
 
+    // Light UBO creation & mapping
     {
         lightUBO = BufferManager::createBuffer(
             "PointLightUBO", BufferType::UniformBuffer, BufferUsage::Dynamic,
@@ -142,14 +143,18 @@ void DeferredRenderer::shutdown() {
 }
 
 void DeferredRenderer::resize(uint32_t newWidth, uint32_t newHeight) {
-    IRenderer::resize(newWidth,
-                      newHeight); // Updates currentWidth/currentHeight
 
-    // You will need to implement this in IRenderer to delete the
-    // glGenFramebuffers and glGenTextures associated with your cached MRTs.
+    if (newWidth == currentWidth && newHeight == currentHeight)
+        return;
+    if (newWidth == 0 || newHeight == 0)
+        return;
+
+    IRenderer::resize(newWidth, newHeight);
+
+    // Wipe the render targets
     clearAllRenderTargets();
 
-    // Invalidate local handles so they are forcefully rebuilt in prepare()
+    // Invalidate local handles so they are rebuilt in prepare()
     gBufferHandle = INVALID_RENDER_TARGET;
     finalOutputHandle = INVALID_RENDER_TARGET;
 }
@@ -158,17 +163,20 @@ void DeferredRenderer::beginFrame(EngineState &state) { frameIndex++; }
 
 void DeferredRenderer::extract(EngineState &state) {
 
-    // 1. Clear previous frame's commands
+    // Wipe for new commands
     opaqueCommands.clear();
     pointLights.clear();
 
+    // Get the registry
     entt::registry &sceneRegistry =
         engineContext.getScene()->getScene().getRegistry();
 
+    // Get the camera and camera transform component from the active camera
     auto [camera, cameraTransform] =
         sceneRegistry.try_get<CameraComponent, TransformComponent>(
             engineContext.getScene()->getScene().activeCameraID);
 
+    // Set the camera data
     if (currentHeight > 0) {
         cameraData.position = glm::vec4(cameraTransform->position, 1.0f);
 
@@ -185,6 +193,7 @@ void DeferredRenderer::extract(EngineState &state) {
         cameraData.inverseView = glm::inverse(viewMat);
     }
 
+    // Lambda to help build the model matrix
     const auto buildModel = [](const TransformComponent &t) {
         glm::mat4 m = glm::mat4(1.0f);
         m = glm::translate(m, t.position);
@@ -193,25 +202,28 @@ void DeferredRenderer::extract(EngineState &state) {
         return m;
     };
 
-    // 2. Extract Geometry (Opaque objects only for now)
-    auto meshView =
+    // Get the renderables
+    auto renderables =
         engineContext.getScene()
             ->getScene()
             .getRegistry()
             .view<TransformComponent, MeshComponent, MaterialComponent>();
 
-    for (auto [entity, transform, mesh, material] : meshView.each()) {
+    // Loop each one
+    for (auto [entity, transform, mesh, material] : renderables.each()) {
         RasterDrawCommand cmd;
         // cmd.vao = mesh.vao;
         // cmd.indexCount = mesh.indexCount;
         // cmd.modelMatrix = transform.getWorldMatrix();
         // cmd.materialData = material.getProperties();
 
+        // Get the GPU mesh and set the relevent data
         GPUMesh *gpuMesh = GPUResourceManager::getOrUploadMesh(mesh.handle);
         cmd.vao = gpuMesh->vao;
         cmd.indexCount = gpuMesh->indexCount;
-        cmd.modelMatrix = buildModel(transform);
+        cmd.modelMatrix = buildModel(transform); // Build the model matrix
 
+        // Get the material data amd set the base material values
         std::shared_ptr<CPUMaterialData> cpuMaterial =
             engineContext.getAsset()->getMaterial(material.handle);
         cmd.albedo = cpuMaterial->albedo;
@@ -232,6 +244,7 @@ void DeferredRenderer::extract(EngineState &state) {
             return fallback;
         };
 
+        // Set a bunch of textures
         cmd.textures[0] = getTexID("albedo", defaultWhiteTexture);
         cmd.textures[1] = getTexID("emissive", defaultWhiteTexture);
         cmd.textures[2] = getTexID("alpha", defaultGrayscaleTexture);
@@ -246,12 +259,13 @@ void DeferredRenderer::extract(EngineState &state) {
         opaqueCommands.push_back(cmd);
     }
 
-    // 3. Extract Lights (Up to our UBO limits)
+    // Get each light
     auto lightView = engineContext.getScene()
                          ->getScene()
                          .getRegistry()
                          .view<TransformComponent, PointLightComponent>();
 
+    // Add each light + its data to the point lights array
     for (auto [entity, transform, light] : lightView.each()) {
         PointLightData lightData;
         lightData.position = transform.position;
