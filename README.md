@@ -6,9 +6,9 @@
 
 Tempname: Engine is an application that has the plan for something not seen very often. On a high level, Tempname: Engine is a GPU-Renderer that will have model, scene, and material modifications. This, however, is not the main point.
 
-Tempname: Engine will use the built scene and render it out in a varriety of methods. Instead of forcing the user into a basic Rasterizer and a few different qualities of a Path Tracer, the user will have control of a suite of different rendering techniques. There are some more ideas for others, but the basic renderers will include:
-
+Tempname: Engine will use the built scene and render it out in a varriety of methods. Instead of having the basic Rasterizer or minimal Render Graph, Tempname: Engine will include multiple-different renderers. Some of these include:
 - Rasterizer
+- Deferred Rendering
 - Ray Tracer
 - Path Tracer
 - Ray Marcher
@@ -21,17 +21,21 @@ Along with these, the user will have the utilities to render out stylized scenes
 ### Current
 
 - Renderers
-  - Rasterizer
-  - Path Tracer \*
+  - Deferred Shader w/ Basic Render Graph
+    - Shadows
+    - G-Buffer
+    - Lighting
 - Moveable camera
-- Basic Entity Component System (ECS)
+- Entity Component System (ECS) using EnTT
   - MeshComponent
   - TransformComponent
   - MaterialComponent
+  - CameraComponent
+  - PointLightCompoment
 - Object Materials
   - Albedo/Emmissive
   - Roughness/Metallic
-- .obj and .mat file loading
+- .obj, .mat, and texture file loading
 - Terminal logger w/ scrolling information & an updating "dashboard"
   - Log level/type + Tags
   - Scrolling/stacked logging & In-place or dynamic text
@@ -49,7 +53,7 @@ Along with these, the user will have the utilities to render out stylized scenes
 - Multi-renderer image outputs (ex. rasterized scene, path traced reflections/shadows, ray marched clouds) \*
 - Multi-threading
 
-\* OpenGL 4.6+ (not MacOS)
+> \* OpenGL 4.6+ (not MacOS)
 
 For more todos, ideas, and current capibilites, check out: [todo.md](todo.md).
 
@@ -61,6 +65,15 @@ This project has been tested on:
 - Ryzen AI 9 HX 370 Framework 16 + NVIDIA GeForce RTX 5070 8G - On Fedora Linux 43/44 + Niri WM
 
 Due to Apple's discontinuation OpenGL, some features are not supported on the OS. Plans for compatibility shaders are wrote down, however not being worked on.
+
+
+## Option 1 (Recommended)
+
+Go to the "Releases" page on this repo, and download the right one for your system.
+
+Any problems, please report them to the issues page.
+
+## Option 2 - Compile Yourself
 
 ### Step 1
 
@@ -124,9 +137,15 @@ And then run it:
 
 ## ⚙️ Usage
 
-<!-- TODO: fill out -->
+To control the scene, WASD can be used for movement, and holding right click will move the camera's looking direction.
 
-TODO: fill out
+To change the rendered model:
+1. Create a new folder that will hold your mesh, materials, and textures in assets/
+2. Find & open activeScene.json
+3. Edit "projectDirectory" to "assets/{insert your folder}"
+4. Edit "objFile" to "assets/{insert your folder}/{.obj file name}.obj"
+5. Save the file
+6. Either re-open the application, or press "r" to reload it during runtime
 
 ## 💻 Technologies
 
@@ -157,6 +176,7 @@ The renderers included in Tempname: Engine (not including the rasterizer) were f
 
 - Ray Tracer: [Ray Traced Glass and Shiny](https://www.shadertoy.com/view/tXyXRc)
 - Path Tracer: [Almost Real-Time Path Tracer](https://www.shadertoy.com/view/7fBSzR)
+- Ray Marcher is in the works
 
 *Note: Some of these may not be completed, or fully/at all implemented in Tempname: Engine yet.*
 
