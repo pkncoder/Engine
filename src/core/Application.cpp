@@ -155,7 +155,7 @@ void Application::setupEntities() {
     auto &scene = sceneManager->getScene();
 
     // Cube
-    if (1) {
+    if (0) {
         sceneManager->loadObjScene("assets/cube/", "cube.obj");
 
         entt::entity pointLight = scene.getRegistry().create();
@@ -269,7 +269,7 @@ void Application::setupEntities() {
     }
 
     // Sponza
-    if (0) {
+    if (1) {
         std::vector<entt::entity> sponza =
             sceneManager->loadObjScene("assets/sponza/", "sponza.obj");
 

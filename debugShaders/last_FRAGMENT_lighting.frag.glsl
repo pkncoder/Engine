@@ -109,8 +109,8 @@ void main() {
         
         // Specular (Blinn-Phong)
         vec3 halfwayDir = normalize(lightDir + viewDir + vec3(0.0001));
-        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 32.0); // 32.0 is the shininess factor
-        vec3 specular = spec * uPointLights[i].emissive * uPointLights[i].intensity;
+        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 128.0); // 32.0 is the shininess factor
+        vec3 specular = spec * uPointLights[i].emissive;
 
         // Apply attenuation
         diffuse *= attenuation;
