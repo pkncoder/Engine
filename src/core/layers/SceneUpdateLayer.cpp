@@ -1,9 +1,6 @@
 #include "SceneUpdateLayer.h"
 
 #include "../../scene/SceneManager.h"
-#include "../../scene/components/CameraComponent.h"
-#include "../../scene/components/TransformComponent.h"
-#include "../../services/Input.h"
 #include "../../services/Logger.h"
 #include "../events/KeyEvents.h"
 
@@ -41,7 +38,12 @@ void SceneUpdateLayer::onDetach() {}
 // Event dispatching
 void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event,
                                EngineState &state) {
-    // TODO: Move movement here?
+    // Get the keypress event
+    std::shared_ptr<KeyPressEvent> keyPressEvent =
+        std::static_pointer_cast<KeyPressEvent>(event);
+    if (keyPressEvent->key == Key::R) { // Reload scene
+        engineContext.getScene()->reloadScene();
+    }
 }
 
 } // namespace Engine

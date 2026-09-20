@@ -1,0 +1,71 @@
+{
+  "cameras": [
+    {
+      "position": [
+        0.0,
+        2.0,
+        10.0
+      ],
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "fov": 60.0,
+      "sensitivity": 0.2,
+      "movementSpeed": 7.0
+    }
+  ],
+  "meshes": [
+    {
+      "sourceDirectory": "assets/cube/",
+      "filename": "cube.obj",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "sourceDirectory": "assets/sponza/",
+      "filename": "sponza.obj"
+    }
+  ],
+  "lights": [
+    {
+      "position": [
+        1.3,
+        4.4,
+        -0.2
+      ],
+      "color": [
+        0.9,
+        0.6,
+        0.7
+      ],
+      "intensity": 5.0
+    },
+    {
+      "position": [
+        2.0,
+        5.0,
+        2.0
+      ],
+      "color": [
+        1.0,
+        0.9,
+        0.8
+      ],
+      "intensity": 3.5
+    }
+  ],
+  "activeCameraIndex": 0
+}

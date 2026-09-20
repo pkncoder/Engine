@@ -12,7 +12,7 @@ namespace Engine {
 
 class SceneManager {
   public:
-    SceneManager(EngineContext &engineContext, EngineState &engineState);
+    inline SceneManager(EngineContext &_engineContext, EngineState &engineState) : engineContext(_engineContext) {}
     ~SceneManager() = default;
 
     void update();
@@ -23,6 +23,11 @@ class SceneManager {
     // Wrapper for loading an obj
     std::vector<entt::entity> loadObjScene(const std::string &sourceDirectory,
                                            const std::string &filename);
+
+    // Loading a scene
+    Scene &loadJsonScene(const std::string &filepath);
+
+    inline void reloadScene() { loadJsonScene("assets/activeScene.json"); }
 
   private:
     EngineContext &engineContext;

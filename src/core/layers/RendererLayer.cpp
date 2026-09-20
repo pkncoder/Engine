@@ -1,8 +1,6 @@
 #include "RendererLayer.h"
 
 #include "../../renderer/RendererManager.h"
-#include "../../services/Logger.h"
-#include "../events/KeyEvents.h"
 #include "../events/WindowEvents.h"
 
 #include <memory>
@@ -47,43 +45,45 @@ void RendererLayer::onEvent(std::shared_ptr<IEvent> event, EngineState &state) {
     // Current renderer choice change
     if (event->getType() == EventType::KEY_PRESS_EVENT) {
 
-        // Get the keypress event
-        std::shared_ptr<KeyPressEvent> keyPressEvent =
-            std::static_pointer_cast<KeyPressEvent>(event);
-        if (keyPressEvent->key ==
-            Key::R) { // Make sure it is R for changing the renderer
-
-            // Switch statement to figure out what to change to
-            switch (state.renderer.settings.currentRenderChoice) {
-            case RenderChoice::RASTERIZER:
-
-                // Check to see if compute shaders are compatable with this
-                // system
-                if (state.renderer.settings.systemComputeShaderCompatability) {
-
-                    // If they are, swap the render choice and set it in the
-                    // engine state
-                    engineContext.getRenderer()->swapActiveRenderer(
-                        RenderChoice::PATH_TRACER);
-                    state.renderer.settings.currentRenderChoice =
-                        RenderChoice::PATH_TRACER;
-                } else {
-
-                    // Else, send an error
-                    Logger::error("RENDERER",
-                                  "Path Tracer not supported on this system.");
-                }
-                break;
-            case RenderChoice::PATH_TRACER:
-
-                // Swap to rasterizer & set the render choice
-                engineContext.getRenderer()->swapActiveRenderer(
-                    RenderChoice::RASTERIZER);
-                state.renderer.settings.currentRenderChoice =
-                    RenderChoice::RASTERIZER;
-                break;
-            }
-        }
+        // // Get the keypress event
+        // std::shared_ptr<KeyPressEvent> keyPressEvent =
+        //     std::static_pointer_cast<KeyPressEvent>(event);
+        // if (keyPressEvent->key ==
+        //     Key::R) { // Make sure it is R for changing the renderer
+        //
+        //     // Switch statement to figure out what to change to
+        //     switch (state.renderer.settings.currentRenderChoice) {
+        //     case RenderChoice::RASTERIZER:
+        //
+        //         // Check to see if compute shaders are compatable with this
+        //         // system
+        //         if (state.renderer.settings.systemComputeShaderCompatability)
+        //         {
+        //
+        //             // If they are, swap the render choice and set it in the
+        //             // engine state
+        //             engineContext.getRenderer()->swapActiveRenderer(
+        //                 RenderChoice::PATH_TRACER);
+        //             state.renderer.settings.currentRenderChoice =
+        //                 RenderChoice::PATH_TRACER;
+        //         } else {
+        //
+        //             // Else, send an error
+        //             Logger::error("RENDERER",
+        //                           "Path Tracer not supported on this
+        //                           system.");
+        //         }
+        //         break;
+        //     case RenderChoice::PATH_TRACER:
+        //
+        //         // Swap to rasterizer & set the render choice
+        //         engineContext.getRenderer()->swapActiveRenderer(
+        //             RenderChoice::RASTERIZER);
+        //         state.renderer.settings.currentRenderChoice =
+        //             RenderChoice::RASTERIZER;
+        //         break;
+        //     }
+        // }
     }
 }
 

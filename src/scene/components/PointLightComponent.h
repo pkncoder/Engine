@@ -5,6 +5,8 @@ namespace Engine {
 
 struct PointLightComponent {
   public:
+    inline PointLightComponent() = default;
+
     inline PointLightComponent(const glm::vec3 _emissive,
                                const float _intensity)
         : emissive(_emissive), intensity(_intensity) {}
