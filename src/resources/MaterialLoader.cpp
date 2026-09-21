@@ -23,8 +23,10 @@ MaterialLoader::loadMTL(const std::string &sourceDirectory,
 
     // Try and open the material file
     std::ifstream file(expectedPath);
-    if (!file.is_open())
+    if (!file.is_open()) {
+        Logger::error("ASSET", "Failed to open the material file.");
         return finalMaterials;
+    }
 
     // Load the mtl file
     tinyobj::LoadMtl(&materialMap, &loaderMaterials, &file, &warn, &err);
@@ -34,6 +36,7 @@ MaterialLoader::loadMTL(const std::string &sourceDirectory,
 
         // Final material data
         CPUMaterialData materialData;
+                    Logger::check();
 
         // Material name
         materialData.name = material.name;

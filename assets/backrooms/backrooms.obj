@@ -1,6 +1,6 @@
 # Blender 4.4.3
 # www.blender.org
-mtllib backrooms_level1.mtl
+mtllib backrooms.mtl
 o Cube.001
 v -4.701877 -0.525783 0.422128
 v -4.701877 10.024299 0.422125

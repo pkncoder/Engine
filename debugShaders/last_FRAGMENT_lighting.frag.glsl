@@ -38,6 +38,8 @@ vec3 ACESFilm(vec3 x) {
 }
 // END INCLUDE: ../../include/utils/toneMapping.glsl
 
+#define SKYBOXMULT 1.0
+
 out vec4 FragColor;
 in vec2 TexCoords;
 
@@ -136,7 +138,7 @@ void main() {
 
     // If the normal is 0, we are looking at the background (skybox area), just render black/clear color.
     if (length(Normal) < 0.1) {
-        FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        FragColor = vec4(vec3(0.0), 1.0);
         return;
     }
 

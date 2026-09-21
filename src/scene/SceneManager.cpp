@@ -143,10 +143,8 @@ Scene &SceneManager::loadJsonScene(const std::string &filepath) {
                         meshJson["scale"].get<glm::vec3>();
                 registry.emplace<TransformComponent>(entity,
                                                      transformComponent);
-
                 // Check to see if the mesh has a material handle
                 if (meshData->materialHandle != INVALID_ASSET_HANDLE) {
-
                     // Add a material component to the entity
                     registry.emplace<MaterialComponent>(
                         entity, MaterialComponent(meshData->materialHandle));
