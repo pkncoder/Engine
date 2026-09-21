@@ -54,8 +54,8 @@ class DeferredRenderer : public IRenderer {
 
     RenderGraph renderGraph;
 
-    GLuint shadowFBO;
-    GLuint shadowCubemap;
+    GLuint shadowFBO[4];
+    GLuint shadowCubemap[4];
 
     GLuint defaultWhiteTexture;
     GLuint defaultGrayscaleTexture;

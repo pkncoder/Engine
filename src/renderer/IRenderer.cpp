@@ -186,14 +186,15 @@ void IRenderer::drawFullscreenQuad() {
             1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
         };
 
-        GLuint quadVBO; 
-        
+        GLuint quadVBO;
+
         glGenVertexArrays(1, &fullscreenQuadVAO);
-        glGenBuffers(1, &quadVBO); 
-        
+        glGenBuffers(1, &quadVBO);
+
         glBindVertexArray(fullscreenQuadVAO);
         glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices,
+                     GL_STATIC_DRAW);
 
         // Position attribute
         glEnableVertexAttribArray(0);

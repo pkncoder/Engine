@@ -17,41 +17,52 @@
 #include "shaders/IProgram.h"
 #include "shaders/IShader.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
 #include <cstdint>
 #include <entt/entity/fwd.hpp>
+#include <iostream>
 #include <memory>
 
 namespace Engine {
 
 void DeferredRenderer::generateShadowMap() {
 
-    // Setup cubemap
-    glGenTextures(1, &shadowCubemap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubemap);
+    // Generate 4 textures and 4 FBOs
+    glGenTextures(4, shadowCubemap);
+    glGenFramebuffers(4, shadowFBO);
 
-    // Create each cubemap face
-    for (unsigned int i = 0; i < 6; ++i) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
-                     1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    for (int j = 0; j < 4; ++j) {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubemap[j]);
+
+        // Create each cubemap face
+        for (unsigned int i = 0; i < 6; ++i) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                         GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT,
+                         GL_FLOAT, nullptr);
+        }
+
+        // Texture params
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S,
+                        GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T,
+                        GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
+                        GL_CLAMP_TO_EDGE);
+
+        // FBO setup
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO[j]);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                             shadowCubemap[j], 0);
+
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
     }
 
-    // Texture params
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    // FBO
-    glGenFramebuffers(1, &shadowFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowCubemap, 0);
-
-    // Set the buffer to specifically hold depth
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-
-    // Unbind the frame buffer
+    // Unbind
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -294,6 +305,7 @@ void DeferredRenderer::prepare(EngineState &state) {
         for (int i = 0; i < lightUBOData.lightCount; ++i) {
             lightUBOData.lights[i] = pointLights[i];
         }
+
         BufferManager::updateBufferCache(
             lightUBO, sizeof(LightUBOData), 0,
             reinterpret_cast<const void *>(&lightUBOData));
@@ -311,75 +323,79 @@ void DeferredRenderer::prepare(EngineState &state) {
     shadowPass.setup = [&]() {};
 
     shadowPass.execute = [&]() {
-        // If no point lights exist, skip
         if (pointLights.empty())
             return;
 
-        // Grab the first light to generate shadows for
-        glm::vec3 lightPos = pointLights[0].position;
-        float nearPlane = 0.001f;
-        float farPlane = 100.0f;
+        // Determine how many lights to cast shadows for (max 4)
+        int shadowCasters = std::min((int)pointLights.size(), 4);
 
-        // Setup matrices
-        glm::mat4 shadowProj =
-            glm::perspective(glm::radians(90.0f), (float)1024 / (float)1024,
-                             nearPlane, farPlane);
-        std::vector<glm::mat4> shadowTransforms;
-        shadowTransforms.push_back(
-            shadowProj * glm::lookAt(lightPos,
-                                     lightPos + glm::vec3(1.0, 0.0, 0.0),
-                                     glm::vec3(0.0, -1.0, 0.0)));
-        shadowTransforms.push_back(
-            shadowProj * glm::lookAt(lightPos,
-                                     lightPos + glm::vec3(-1.0, 0.0, 0.0),
-                                     glm::vec3(0.0, -1.0, 0.0)));
-        shadowTransforms.push_back(
-            shadowProj * glm::lookAt(lightPos,
-                                     lightPos + glm::vec3(0.0, 1.0, 0.0),
-                                     glm::vec3(0.0, 0.0, 1.0)));
-        shadowTransforms.push_back(
-            shadowProj * glm::lookAt(lightPos,
-                                     lightPos + glm::vec3(0.0, -1.0, 0.0),
-                                     glm::vec3(0.0, 0.0, -1.0)));
-        shadowTransforms.push_back(
-            shadowProj * glm::lookAt(lightPos,
-                                     lightPos + glm::vec3(0.0, 0.0, 1.0),
-                                     glm::vec3(0.0, -1.0, 0.0)));
-        shadowTransforms.push_back(
-            shadowProj * glm::lookAt(lightPos,
-                                     lightPos + glm::vec3(0.0, 0.0, -1.0),
-                                     glm::vec3(0.0, -1.0, 0.0)));
-
-        // Bind viewport and FBO
         glViewport(0, 0, 1024, 1024);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
-        glClear(GL_DEPTH_BUFFER_BIT);
-
         shadowProgram.bind();
-        for (int i = 0; i < 6; ++i) {
-            shadowProgram.setMat4("u_ShadowMatrices[" + std::to_string(i) + "]",
-                                  shadowTransforms[i]);
-        }
+        float nearPlane = 0.001f;
+        float farPlane = 100.0f;
         shadowProgram.setFloat("u_FarPlane", farPlane);
-        shadowProgram.setVec3("u_LightPos", lightPos);
 
-        // Draw opaque objects (ignoring textures for pure depth)
-        GLuint currentVAO = 0;
-        for (const auto &cmd : opaqueCommands) {
-            shadowProgram.setMat4("u_Model", cmd.modelMatrix);
-            if (currentVAO != cmd.vao) {
-                glBindVertexArray(cmd.vao);
-                currentVAO = cmd.vao;
+        // Loop through each shadow-casting light
+        for (int lightIdx = 0; lightIdx < shadowCasters; ++lightIdx) {
+            glm::vec3 lightPos = pointLights[lightIdx].position;
+            shadowProgram.setVec3("u_LightPos", lightPos);
+
+            // Setup matrices for this specific light
+            glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f,
+                                                    nearPlane, farPlane);
+            std::vector<glm::mat4> shadowTransforms;
+            shadowTransforms.push_back(
+                shadowProj * glm::lookAt(lightPos,
+                                         lightPos + glm::vec3(1.0, 0.0, 0.0),
+                                         glm::vec3(0.0, -1.0, 0.0)));
+            shadowTransforms.push_back(
+                shadowProj * glm::lookAt(lightPos,
+                                         lightPos + glm::vec3(-1.0, 0.0, 0.0),
+                                         glm::vec3(0.0, -1.0, 0.0)));
+            shadowTransforms.push_back(
+                shadowProj * glm::lookAt(lightPos,
+                                         lightPos + glm::vec3(0.0, 1.0, 0.0),
+                                         glm::vec3(0.0, 0.0, 1.0)));
+            shadowTransforms.push_back(
+                shadowProj * glm::lookAt(lightPos,
+                                         lightPos + glm::vec3(0.0, -1.0, 0.0),
+                                         glm::vec3(0.0, 0.0, -1.0)));
+            shadowTransforms.push_back(
+                shadowProj * glm::lookAt(lightPos,
+                                         lightPos + glm::vec3(0.0, 0.0, 1.0),
+                                         glm::vec3(0.0, -1.0, 0.0)));
+            shadowTransforms.push_back(
+                shadowProj * glm::lookAt(lightPos,
+                                         lightPos + glm::vec3(0.0, 0.0, -1.0),
+                                         glm::vec3(0.0, -1.0, 0.0)));
+
+            for (int i = 0; i < 6; ++i) {
+                shadowProgram.setMat4("u_ShadowMatrices[" + std::to_string(i) +
+                                          "]",
+                                      shadowTransforms[i]);
             }
-            glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, 0);
+
+            // Bind the specific FBO for this light and clear it
+            glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO[lightIdx]);
+            glClear(GL_DEPTH_BUFFER_BIT);
+
+            // Draw opaque objects
+            GLuint currentVAO = 0;
+            for (const auto &cmd : opaqueCommands) {
+                shadowProgram.setMat4("u_Model", cmd.modelMatrix);
+                if (currentVAO != cmd.vao) {
+                    glBindVertexArray(cmd.vao);
+                    currentVAO = cmd.vao;
+                }
+                glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT,
+                               0);
+            }
         }
     };
-
     renderGraph.addPass(shadowPass);
 
     // Pass One - G-Buffer
@@ -491,9 +507,8 @@ void DeferredRenderer::prepare(EngineState &state) {
         // Bind the shader
         lightingProgram.bind();
 
-        // Pass shadow constant
-        lightingProgram.setInt("u_MaxShadowLights",
-                               4); // TODO: static var
+        int shadowCasters = std::min((int)pointLights.size(), 4);
+        lightingProgram.setInt("u_MaxShadowLights", shadowCasters);
 
         // Bind G-Buffer MRTs as input textures
         for (size_t i = 0; i < gBuffer->textureIDs.size(); ++i) {
@@ -502,16 +517,17 @@ void DeferredRenderer::prepare(EngineState &state) {
             lightingProgram.setInt("u_GBuffer" + std::to_string(i), i);
         }
 
-        // Bind the shadow cubemap
-        glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubemap);
-        lightingProgram.setInt("u_ShadowMap", 5);
+        // Bind the shadow cubemaps starting at GL_TEXTURE5
+        for (int i = 0; i < 4; ++i) {
+            glActiveTexture(GL_TEXTURE5 + i);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, shadowCubemap[i]);
+            lightingProgram.setInt("u_ShadowMaps[" + std::to_string(i) + "]",
+                                   5 + i);
+        }
 
         lightingProgram.setFloat("u_FarPlane", 100.0f);
 
-        // Draw Fullscreen Quad
         drawFullscreenQuad();
-
         for (size_t i = 0; i < gBuffer->textureIDs.size(); ++i) {
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(GL_TEXTURE_2D, 0);

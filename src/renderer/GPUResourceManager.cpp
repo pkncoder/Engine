@@ -111,10 +111,6 @@ GPUResourceManager::uploadTexture(const CPUTextureData &textureData) {
                     : (textureData.channels == 4) ? GL_RGBA
                                                   : GL_RGB;
 
-    if (textureData.channels == 1) {
-        Logger::check();
-    }
-
     // Get the raw pixel data
     const void *rawPixelData = textureData.pixels.data();
 
