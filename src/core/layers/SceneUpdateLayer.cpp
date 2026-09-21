@@ -1,10 +1,14 @@
 #include "SceneUpdateLayer.h"
 
 #include "../../scene/SceneManager.h"
+#include "../../scene/components/TransformComponent.h"
 #include "../../services/Logger.h"
 #include "../events/KeyEvents.h"
 
 #include <GLFW/glfw3.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#include <glm/vec3.hpp>
 
 #include <entt/entity/fwd.hpp>
 #include <memory>
@@ -43,6 +47,16 @@ void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event,
         std::static_pointer_cast<KeyPressEvent>(event);
     if (keyPressEvent->key == Key::R) { // Reload scene
         engineContext.getScene()->reloadScene();
+    } else if (keyPressEvent->key == Key::C) {
+        TransformComponent camera =
+            engineContext.getScene()
+                ->getScene()
+                .getRegistry()
+                .get<TransformComponent>(
+                    engineContext.getScene()->getScene().activeCameraID);
+
+        Logger::info("SCENE",
+                     "Camera Position: " + glm::to_string(camera.position));
     }
 }
 

@@ -2,12 +2,12 @@
   "cameras": [
     {
       "position": [
-        0.0,
-        2.0,
-        10.0
+        6.29,
+        3.04,
+        -2.07
       ],
-      "yaw": 0.0,
-      "pitch": 0.0,
+      "yaw": 170.0,
+      "pitch": -15.0,
       "fov": 60.0,
       "sensitivity": 0.2,
       "movementSpeed": 7.0
@@ -37,6 +37,21 @@
     {
       "sourceDirectory": "assets/sponza/",
       "filename": "sponza.obj"
+    },
+    {
+      "sourceDirectory": "assets/dragon/",
+      "filename": "dragon.obj",
+      "position": [
+        -3.0,
+        1.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     }
   ],
   "lights": [
@@ -52,19 +67,6 @@
         0.7
       ],
       "intensity": 5.0
-    },
-    {
-      "position": [
-        2.0,
-        5.0,
-        2.0
-      ],
-      "color": [
-        1.0,
-        0.9,
-        0.8
-      ],
-      "intensity": 3.5
     }
   ],
   "activeCameraIndex": 0
