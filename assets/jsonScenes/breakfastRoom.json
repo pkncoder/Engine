@@ -2,12 +2,12 @@
   "cameras": [
     {
       "position": [
-        4.455877,
-        1.698128,
-        3.356896
+        4.600279,
+        1.789400,
+        3.645964
       ],
-      "yaw": -128.0,
-      "pitch": -2.0,
+      "yaw": -127.0,
+      "pitch": -1.0,
       "fov": 60.0,
       "sensitivity": 0.2,
       "movementSpeed": 7.0
@@ -23,55 +23,68 @@
   "lights": [
     {
       "position": [
-        -2.231378,
-        3.925282,
-        -1.953368
+        17.110748,
+        4.456121,
+        -2.671074
       ],
       "color": [
-        0.55,
-        0.6,
-        0.7
-      ],
-      "intensity": 0.3
-    },
-    {
-      "position": [
-        1.141189,
-        3.925282,
-        -1.953368
-      ],
-      "color": [
-        0.55,
-        0.6,
-        0.7
-      ],
-      "intensity": 0.3
-    },
-    {
-      "position": [
-        21.304264,
-        6.174567,
-        9.033601
-      ],
-      "color": [
-        0.6,
+        0.9,
         0.5,
         0.2
       ],
       "intensity": 1.0
+    },
+    {
+      "position": [
+        -2.310982,
+        3.935941,
+        -1.940713
+      ],
+      "color": [
+        0.75,
+        0.5,
+        0.4
+      ],
+      "intensity": 1.0
+    },
+    {
+      "position": [
+        0.952738,
+        3.829762,
+        -2.090308
+      ],
+      "color": [
+        0.75,
+        0.5,
+        0.4
+      ],
+      "intensity": 1.0
+    },
+    {
+      "position": [
+        4.600279,
+        1.789400,
+        3.645964
+      ],
+      "color": [
+        0.6,
+        0.2,
+        0.1
+      ],
+      "intensity": 0.6
     }
   ],
-  "exposure": 0.7,
+  "exposure": 0.2,
   "toneMapping": true,
   "srgb": true,
   "fog": true,
   "fogColor": [
     0.7,
-    0.85,
-    0.98
+    0.5,
+    0.2
   ],
-  "fogDensity": 0.02,
+  "fogDensity": 0.025,
   "vignette": true,
-  "vignetteRadius": 1.4,
-  "vignetteSoftness": 0.7
+  "vignetteRadius": 1.6,
+  "vignetteSoftness": 0.9
 }
