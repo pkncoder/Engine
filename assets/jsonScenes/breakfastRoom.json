@@ -1,0 +1,77 @@
+{
+  "cameras": [
+    {
+      "position": [
+        4.455877,
+        1.698128,
+        3.356896
+      ],
+      "yaw": -128.0,
+      "pitch": -2.0,
+      "fov": 60.0,
+      "sensitivity": 0.2,
+      "movementSpeed": 7.0
+    }
+  ],
+  "activeCameraIndex": 0,
+  "meshes": [
+    {
+      "sourceDirectory": "assets/breakfastRoom/",
+      "filename": "breakfast.obj"
+    }
+  ],
+  "lights": [
+    {
+      "position": [
+        -2.231378,
+        3.925282,
+        -1.953368
+      ],
+      "color": [
+        0.55,
+        0.6,
+        0.7
+      ],
+      "intensity": 0.3
+    },
+    {
+      "position": [
+        1.141189,
+        3.925282,
+        -1.953368
+      ],
+      "color": [
+        0.55,
+        0.6,
+        0.7
+      ],
+      "intensity": 0.3
+    },
+    {
+      "position": [
+        21.304264,
+        6.174567,
+        9.033601
+      ],
+      "color": [
+        0.6,
+        0.5,
+        0.2
+      ],
+      "intensity": 1.0
+    }
+  ],
+  "exposure": 0.7,
+  "toneMapping": true,
+  "srgb": true,
+  "fog": true,
+  "fogColor": [
+    0.7,
+    0.85,
+    0.98
+  ],
+  "fogDensity": 0.02,
+  "vignette": true,
+  "vignetteRadius": 1.4,
+  "vignetteSoftness": 0.7
+}
