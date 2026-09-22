@@ -1,0 +1,150 @@
+{
+  "cameras": [
+    {
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "fov": 60.0,
+      "sensitivity": 0.2,
+      "movementSpeed": 7.0
+    }
+  ],
+  "activeCameraIndex": 0,
+  "meshes": [
+    {
+      "sourceDirectory": "assets/bunny/",
+      "filename": "bunny.obj",
+      "position": [
+        10.0,
+        -2.0,
+        -3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.7,
+        1.7,
+        1.7
+      ]
+    },
+    {
+      "sourceDirectory": "assets/cube/",
+      "filename": "cube.obj",
+      "position": [
+        10.0,
+        3.0,
+        0.0
+      ]
+    },
+    {
+      "sourceDirectory": "assets/dragon/",
+      "filename": "dragon.obj",
+      "position": [
+        10.0,
+        -1.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "sourceDirectory": "assets/moai/",
+      "filename": "moai.obj",
+      "position": [
+        10.0,
+        3.0,
+        -3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ]
+    },
+    {
+      "sourceDirectory": "assets/oiiaioooooiai/",
+      "filename": "oiiaioooooiai.obj",
+      "position": [
+        10.0,
+        -2.0,
+        3.0
+      ],
+      "scale": [
+        5.0,
+        5.0,
+        5.0
+      ]
+    },
+    {
+      "sourceDirectory": "assets/cat/",
+      "filename": "cat.obj",
+      "position": [
+        10.0,
+        3.0,
+        3.0
+      ],
+      "rotation": [
+        0.3827,
+        0,
+        -0.9239,
+        0
+      ],
+      "scale": [
+        1.3,
+        1.3,
+        1.3
+      ]
+    }
+  ],
+  "lights": [
+    {
+      "position": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "color": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "intensity": 0.7
+    }
+  ],
+  "exposure": 0.7,
+  "toneMapping": true,
+  "srgb": true,
+  "fog": false,
+  "fogColor": [
+    0.6,
+    0.6,
+    0.6
+  ],
+  "fogDensity": 0.04,
+  "vignette": false,
+  "vignetteRadius": 1.5,
+  "vignetteSoftness": 0.9
+}
