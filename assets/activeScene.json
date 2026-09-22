@@ -1,90 +1,90 @@
 {
-  "cameras": [
-    {
-      "position": [
-        4.600279,
-        1.789400,
-        3.645964
-      ],
-      "yaw": -127.0,
-      "pitch": -1.0,
-      "fov": 60.0,
-      "sensitivity": 0.2,
-      "movementSpeed": 7.0
-    }
-  ],
-  "activeCameraIndex": 0,
-  "meshes": [
-    {
-      "sourceDirectory": "assets/breakfastRoom/",
-      "filename": "breakfast.obj"
-    }
-  ],
-  "lights": [
-    {
-      "position": [
-        17.110748,
-        4.456121,
-        -2.671074
-      ],
-      "color": [
-        0.9,
+    "cameras": [
+        {
+            "position": [
+                4.600279,
+                1.789400,
+                3.645964
+            ],
+            "yaw": -127.0,
+            "pitch": -1.0,
+            "fov": 60.0,
+            "sensitivity": 0.2,
+            "movementSpeed": 7.0
+        }
+    ],
+    "activeCameraIndex": 0,
+    "meshes": [
+        {
+            "sourceDirectory": "assets/breakfastRoom/",
+            "filename": "breakfast.obj"
+        }
+    ],
+    "lights": [
+        {
+            "position": [
+                17.110748,
+                4.456121,
+                -2.671074
+            ],
+            "color": [
+                0.9,
+                0.5,
+                0.2
+            ],
+            "intensity": 1.0
+        },
+        {
+            "position": [
+                -2.310982,
+                3.935941,
+                -1.940713
+            ],
+            "color": [
+                0.75,
+                0.5,
+                0.4
+            ],
+            "intensity": 1.0
+        },
+        {
+            "position": [
+                0.952738,
+                3.829762,
+                -2.090308
+            ],
+            "color": [
+                0.75,
+                0.5,
+                0.4
+            ],
+            "intensity": 1.0
+        },
+        {
+            "position": [
+                4.600279,
+                1.789400,
+                3.645964
+            ],
+            "color": [
+                0.6,
+                0.2,
+                0.1
+            ],
+            "intensity": 0.6
+        }
+    ],
+    "exposure": 0.2,
+    "toneMapping": true,
+    "srgb": true,
+    "fog": true,
+    "fogColor": [
+        0.7,
         0.5,
         0.2
-      ],
-      "intensity": 1.0
-    },
-    {
-      "position": [
-        -2.310982,
-        3.935941,
-        -1.940713
-      ],
-      "color": [
-        0.75,
-        0.5,
-        0.4
-      ],
-      "intensity": 1.0
-    },
-    {
-      "position": [
-        0.952738,
-        3.829762,
-        -2.090308
-      ],
-      "color": [
-        0.75,
-        0.5,
-        0.4
-      ],
-      "intensity": 1.0
-    },
-    {
-      "position": [
-        4.600279,
-        1.789400,
-        3.645964
-      ],
-      "color": [
-        0.6,
-        0.2,
-        0.1
-      ],
-      "intensity": 0.6
-    }
-  ],
-  "exposure": 0.15,
-  "toneMapping": true,
-  "srgb": true,
-  "fog": true,
-  "fogColor": [
-    0.6,
-    0.6,
-    0.6
-  ],
-  "fogDensity": 0.04,
-  "vignette": true,
-  "vignetteRadius": 1.5,
-  "vignetteSoftness": 0.9
+    ],
+    "fogDensity": 0.025,
+    "vignette": true,
+    "vignetteRadius": 1.6,
+    "vignetteSoftness": 0.9
 }
