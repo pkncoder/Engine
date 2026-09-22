@@ -122,6 +122,14 @@ void DeferredRenderer::init(EngineState &state) {
         IShader("shaders/deferred/main/lighting.frag", Fragment));
     lightingProgram.link();
 
+    // Post processing shaders
+    postProgram = IProgram();
+    postProgram.attachShader(
+        IShader("shaders/deferred/main/post.vert", Vertex));
+    postProgram.attachShader(
+        IShader("shaders/deferred/main/post.frag", Fragment));
+    postProgram.link();
+
     // Camera UBO creation & mapping
     {
         cameraUBO = BufferManager::createBuffer(
@@ -134,6 +142,9 @@ void DeferredRenderer::init(EngineState &state) {
 
         BufferManager::mapUBO(
             cameraUBO, lightingProgram.ID, "CameraUBO",
+            {"uCameraPos", "uViewProjection", "uInverseView"});
+        BufferManager::mapUBO(
+            cameraUBO, postProgram.ID, "CameraUBO",
             {"uCameraPos", "uViewProjection", "uInverseView"});
     }
 
@@ -168,6 +179,7 @@ void DeferredRenderer::resize(uint32_t newWidth, uint32_t newHeight) {
     // Invalidate local handles so they are rebuilt in prepare()
     gBufferHandle = INVALID_RENDER_TARGET;
     finalOutputHandle = INVALID_RENDER_TARGET;
+    postProcessedOutHandle = INVALID_RENDER_TARGET;
 }
 
 void DeferredRenderer::beginFrame(EngineState &state) { frameIndex++; }
@@ -536,6 +548,70 @@ void DeferredRenderer::prepare(EngineState &state) {
 
     renderGraph.addPass(lightingPass);
 
+    RenderPass postProcessingPass;
+    postProcessingPass.name = "Post";
+
+    RendererSettings &renderSettings = state.renderer.settings;
+
+    postProcessingPass.setup = [&]() {
+        std::vector<GLenum> formats = {GL_RGBA8};
+        if (postProcessedOutHandle == INVALID_RENDER_TARGET) {
+            postProcessedOutHandle =
+                addRenderTarget("PostOutput", formats, false);
+        }
+    };
+
+    postProcessingPass.execute = [&]() {
+        RenderTarget *gBuffer = getRenderTarget(gBufferHandle);
+        RenderTarget *finalOut = getRenderTarget(finalOutputHandle);
+        RenderTarget *postProcessedOut =
+            getRenderTarget(postProcessedOutHandle);
+
+        // Bind and clear the fbos
+        glBindFramebuffer(GL_FRAMEBUFFER, postProcessedOut->fbo);
+        glViewport(0, 0, currentWidth, currentHeight);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glDisable(GL_DEPTH_TEST); // Fullscreen quad doesn't need depth testing
+
+        // Bind the shader
+        postProgram.bind();
+
+        // Bind the textures
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gBuffer->textureIDs[0]);
+        postProgram.setInt("u_GBuffer" + std::to_string(0), 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, finalOut->textureIDs[0]);
+        postProgram.setInt("uColorRender", 1);
+
+        postProgram.setVec2("uResolution",
+                            glm::vec2(currentWidth, currentHeight));
+
+        // Exposure settings
+        postProgram.setFloat("uExposure", renderSettings.exposure);
+
+        // Post effects
+        postProgram.setInt("uToneMap", renderSettings.toneMap);
+        postProgram.setInt("uSRGB", renderSettings.srgb);
+
+        // Fog settings
+        postProgram.setInt("uFog", renderSettings.fog);
+        postProgram.setVec3("uFogColor", renderSettings.fogColor);
+        postProgram.setFloat("uFogDensity", renderSettings.fogDensity);
+
+        // Vignette settings
+        postProgram.setInt("uVignette", renderSettings.vignette);
+        postProgram.setFloat("uVignetteRadius", renderSettings.vignetteRadius);
+        postProgram.setFloat("uVignetteSoftness",
+                             renderSettings.vignetteSoftness);
+
+        drawFullscreenQuad();
+    };
+
+    renderGraph.addPass(postProcessingPass);
+
     // Compile the graph
     renderGraph.compile();
 }
@@ -543,10 +619,10 @@ void DeferredRenderer::prepare(EngineState &state) {
 void DeferredRenderer::dispatch(EngineState &state) { renderGraph.execute(); }
 
 void DeferredRenderer::present(EngineState &state) {
-    RenderTarget *finalOut = getRenderTarget(finalOutputHandle);
+    RenderTarget *postProcessedOut = getRenderTarget(postProcessedOutHandle);
 
-    if (finalOut && finalOut->fbo != 0) {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, finalOut->fbo);
+    if (postProcessedOut && postProcessedOut->fbo != 0) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, postProcessedOut->fbo);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // Default screen FBO
 
         glBlitFramebuffer(

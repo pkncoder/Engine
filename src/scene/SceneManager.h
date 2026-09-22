@@ -12,7 +12,8 @@ namespace Engine {
 
 class SceneManager {
   public:
-    inline SceneManager(EngineContext &_engineContext, EngineState &engineState) : engineContext(_engineContext) {}
+    inline SceneManager(EngineContext &_engineContext, EngineState &engineState)
+        : engineContext(_engineContext) {}
     ~SceneManager() = default;
 
     void update();
@@ -25,9 +26,11 @@ class SceneManager {
                                            const std::string &filename);
 
     // Loading a scene
-    Scene &loadJsonScene(const std::string &filepath);
+    Scene &loadJsonScene(EngineState &state, const std::string &filepath);
 
-    inline void reloadScene() { loadJsonScene("assets/activeScene.json"); }
+    inline void reloadScene(EngineState &state) {
+        loadJsonScene(state, "assets/activeScene.json");
+    }
 
   private:
     EngineContext &engineContext;

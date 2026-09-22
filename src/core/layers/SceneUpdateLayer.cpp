@@ -46,7 +46,7 @@ void SceneUpdateLayer::onEvent(std::shared_ptr<IEvent> event,
     std::shared_ptr<KeyPressEvent> keyPressEvent =
         std::static_pointer_cast<KeyPressEvent>(event);
     if (keyPressEvent->key == Key::R) { // Reload scene
-        engineContext.getScene()->reloadScene();
+        engineContext.getScene()->reloadScene(state);
     } else if (keyPressEvent->key == Key::C) {
         TransformComponent camera =
             engineContext.getScene()

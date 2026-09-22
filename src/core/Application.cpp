@@ -105,7 +105,8 @@ void Application::init() {
 
     // TODO: temp; setup scene
     // setupEntities();
-    engineContext->getScene()->loadJsonScene("assets/activeScene.json");
+    engineContext->getScene()->loadJsonScene(*engineState,
+                                             "assets/activeScene.json");
 
     // Log the final init log & turn off setNoPendingLogs
     Logger::info("APPLICATION", "Application init complete");

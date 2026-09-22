@@ -36,7 +36,6 @@ MaterialLoader::loadMTL(const std::string &sourceDirectory,
 
         // Final material data
         CPUMaterialData materialData;
-                    Logger::check();
 
         // Material name
         materialData.name = material.name;

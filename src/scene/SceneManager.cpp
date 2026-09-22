@@ -26,7 +26,8 @@ SceneManager::loadObjScene(const std::string &sourceDirectory,
                                          sourceDirectory, filename);
 }
 
-Scene &SceneManager::loadJsonScene(const std::string &filepath) {
+Scene &SceneManager::loadJsonScene(EngineState &state,
+                                   const std::string &filepath) {
 
     // Try to open the json file
     std::ifstream file(filepath);
@@ -197,6 +198,26 @@ Scene &SceneManager::loadJsonScene(const std::string &filepath) {
             registry.emplace<TransformComponent>(entity, transformComponent);
         }
     }
+
+    // Set the renderer settings
+    RendererSettings &rendererSettings = state.renderer.settings;
+
+    rendererSettings.exposure = jsonSceneData.value("exposure", 1.0);
+
+    rendererSettings.toneMap = jsonSceneData.value("toneMapping", true);
+    rendererSettings.srgb = jsonSceneData.value("srgb", true);
+
+    rendererSettings.fog = jsonSceneData.value("fog", false);
+    rendererSettings.fogColor = jsonSceneData.contains("fogColor")
+                                    ? jsonSceneData["fogColor"].get<glm::vec3>()
+                                    : glm::vec3(0.5);
+    rendererSettings.fogDensity = jsonSceneData.value("fogDensity", 0.03);
+
+    rendererSettings.vignette = jsonSceneData.value("vignette", false);
+    rendererSettings.vignetteRadius =
+        jsonSceneData.value("vignetteRadius", 2.5);
+    rendererSettings.vignetteSoftness =
+        jsonSceneData.value("vignetteSoftness", 0.9);
 
     Logger::info("SCENE", "Sucessfully loaded scene from: " + filepath);
     return scene;

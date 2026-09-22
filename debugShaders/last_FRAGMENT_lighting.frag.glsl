@@ -183,8 +183,6 @@ void main() {
         finalLighting += (diffuse + specular) * (1.0 - shadow);
     }
 
-    finalLighting = linearToSRGB(ACESFilm(finalLighting));
-
     // 4. Final output
     FragColor = vec4(finalLighting, 1.0);
     return;

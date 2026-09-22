@@ -47,10 +47,12 @@ class DeferredRenderer : public IRenderer {
 
     RenderTargetHandle gBufferHandle = INVALID_RENDER_TARGET;
     RenderTargetHandle finalOutputHandle = INVALID_RENDER_TARGET;
+    RenderTargetHandle postProcessedOutHandle = INVALID_RENDER_TARGET;
 
     IProgram shadowProgram;
     IProgram gBufferProgram;
     IProgram lightingProgram;
+    IProgram postProgram;
 
     RenderGraph renderGraph;
 

@@ -2,17 +2,18 @@
   "cameras": [
     {
       "position": [
-        10.92,
-        2.74,
-        -2.13
+        -8.79,
+        19.55,
+        -27.36
       ],
-      "yaw": 170.0,
+      "yaw": 90.0,
       "pitch": -5.0,
       "fov": 60.0,
       "sensitivity": 0.2,
       "movementSpeed": 7.0
     }
   ],
+  "activeCameraIndex": 0,
   "meshes": [
     {
       "sourceDirectory": "assets/lostEmpire/",
@@ -47,5 +48,17 @@
       "intensity": 1.0
     }
   ],
-  "activeCameraIndex": 0
+  "exposure": 0.7,
+  "toneMapping": true,
+  "srgb": true,
+  "fog": true,
+  "fogColor": [
+    0.7,
+    0.85,
+    0.98
+  ],
+  "fogDensity": 0.02,
+  "vignette": true,
+  "vignetteRadius": 1.74,
+  "vignetteSoftness": 0.9
 }
