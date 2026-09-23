@@ -56,8 +56,15 @@ const onlineDemosData = [
         name: "Path Tracer",
         devState: "active",
         badgeText: "Working On It",
-        context: "Global illumination solver calculating diffuse interreflections and soft shadow values through progressive stochastic Monte Carlo logic routines, MIS, and NEE.",
+        context: "Global illumination solver calculating diffuse interreflections and soft shadow values through progressive stochastic Monte Carlo logic routines, MIS/NEE, an Edge-Avoiding Denoiser, and TAA.",
         link: "https://www.shadertoy.com/view/7fBSzR"
+    },
+    {
+      name: "Screen-Space Renderer",
+      devState: "not-made",
+      badgeText: "Not Made",
+      context: "Deferred rendering pipeline, using ray-interactions within the screen-space, greatly increasing performacnce with a draw-back on realizm. Based on EEVEE's (Blender) ray tracer.",
+      link: "#"
     },
     {
         name: "Ray Marcher",
@@ -84,15 +91,14 @@ const onlineDemosData = [
 
 // 3. Render Capture Library Array Matrix Mapping
 const renderCaptureLibraryData = {
-    "Sponza 1": "./assets/Sponza-1.png",
-    "Breakfast Room 1": "./assets/BreakfastRoom-1.png",
-    "Backrooms 1": "./assets/Backrooms-1.png",
-    "Lost Empire 1": "./assets/LostEmpire-1.png",
-    "Sponza 2": "./assets/Sponza-2.png",
-    "Queer Room 1 (PT)": "./assets/QueerRoom-1.png",
-    "Backrooms 2": "./assets/Backrooms-2.png",
-    "Lost Empire 2": "./assets/LostEmpire-2.png",
-    "Sponza 3": "./assets/Sponza-3.png",
+    "Sponza 2": "./assets/sponzaTwo.png",
+    "Breakfast Room 1": "./assets/breakfastRoomOne.png",
+    "Lost Empire 2": "./assets/lostEmpireTwo.png",
+    "Backrooms 1": "./assets/backroomsOne.png",
+    "Lost Empire 1": "./assets/lostEmpireOne.png",
+    "Backrooms 3": "./assets/backroomsThree.png",
+    "Backrooms 2": "./assets/backroomsTwo.png",
+    "Sponza 1": "./assets/sponzaOne.png",
 };
 
 // Execute UI Compilation on Document Ready Context Initialization Loop
@@ -198,7 +204,7 @@ $(document).ready(function() {
 
             let actionButtonElement = `<a href="${demoNode.link}" target="_blank" class="btn btn-outline-light btn-sm w-100 mt-3 d-flex align-items-center justify-content-center gap-2"><i class="bi bi-box-arrow-up-right"></i>Open Online Demo</a>`;
             if (demoNode.link === '#') {
-                actionButtonElement = `<button class="btn btn-dark btn-sm w-100 mt-3" disabled><i class="bi bi-lock-fill me-1"></i>Currently in Concept Phase</button>`;
+                actionButtonElement = `<button class="btn btn-dark btn-sm w-100 mt-3" disabled><i class="bi bi-lock-fill me-1"></i>Currently in Concept</button>`;
             }
 
             const cardFrameMarkup = `
