@@ -1,6 +1,6 @@
 <h1 align="center">⛭  Tempname: Engine ⛭</h1>
 <p align="center">A Crossplatform - GPU Multi-Level Rendering Tool</p>
-<!-- <p align="center"><img width="60%" src="/Assets/AppInterface.png"></img></p> -->
+<p align="center"><img width="50%" src="docs/assets/objectsHeader.png"></img></p>
 
 ## ☀️ Overview
 
@@ -52,6 +52,7 @@ Along with these, the user will have the utilities to render out stylized scenes
 - Multi-render pass support \*
 - Multi-renderer image outputs (ex. rasterized scene, path traced reflections/shadows, ray marched clouds) \*
 - Multi-threading
+- Editable Render Graph
 
 > \* OpenGL 4.6+ (not MacOS)
 
@@ -138,22 +139,26 @@ And then run it:
 ## ⚙️ Usage
 
 To control the scene, WASD can be used for movement, and holding right click will move the camera's looking direction.
+C will print out the current camera position in the terminal.
+R will reload the scene to the state of activeScene.json.
 
 To change the rendered model:
 1. Create a new folder that will hold your mesh, materials, and textures in assets/
 2. Find & open activeScene.json
-3. Edit "projectDirectory" to "assets/{insert your folder}"
-4. Edit "objFile" to "assets/{insert your folder}/{.obj file name}.obj"
+3. Edit "projectDirectory" to "assets/{insert your folder}/"
+4. Edit "objFile" to "{.obj file name}.obj"
 5. Save the file
 6. Either re-open the application, or press "r" to reload it during runtime
 
 ## 💻 Technologies
 
 - **IDE** - Neovim + LazyVim
-- **Language** - CPP, GLSL, CMake
+- **Languages** - CPP, GLSL, CMake
 - **UI/UX & Window Library** - Dear ImGUI & GLFW3
+- **Rendering API** - OpenGL
 - **Rendering Library** - GLAD
-- **Rendering Methods** - Rasterization, Path Tracing
+- **Rendering Methods** - Deferred
+- **Entity Component System** - EnTT
 
 ## 📝 Documentation
 
@@ -191,7 +196,7 @@ Currently, there is no live specific documentation, but there is still some file
   </tr>
   <tr>
     <td align="center" valign="middle">
-      <img src="docs/assets/objectsHeader.png" width="400" height="400" alt="Objects One">
+      <img src="docs/assets/objectsOne.png" width="400" height="400" alt="Objects One">
     </td>
     <td align="center" valign="middle">
       <img src="docs/assets/lostEmpireOne.png" width="400" height="400" alt="Lost Empire One">
