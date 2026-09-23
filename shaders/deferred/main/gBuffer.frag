@@ -26,14 +26,27 @@ uniform float u_Metallic;
 vec3 getNormalFromMap() {
     vec3 tangentNormal = texture(u_NormalMap, TexCoords).xyz * 2.0 - 1.0;
     
+    // If the normal map is flat (close to 0,0,1 in tangent space), evaluate the bump map
+    if (length(tangentNormal.xy) < 0.01) {
+        vec2 texelSize = 1.0 / vec2(textureSize(u_BumpMap, 0));
+        
+        // Sample current pixel and right/down neighbors
+        float h0 = texture(u_BumpMap, TexCoords).r;
+        float hx = texture(u_BumpMap, TexCoords + vec2(texelSize.x, 0.0)).r;
+        float hy = texture(u_BumpMap, TexCoords + vec2(0.0, texelSize.y)).r;
+        
+        // Calculate tangent normal from height differences
+        float bumpStrength = 5.0; // Adjust this value to make the bump more/less intense
+        tangentNormal = normalize(vec3((h0 - hx) * bumpStrength, (h0 - hy) * bumpStrength, 1.0));
+    }
+    
     vec3 Q1  = dFdx(FragPos);
     vec3 Q2  = dFdy(FragPos);
     vec2 st1 = dFdx(TexCoords);
     vec2 st2 = dFdy(TexCoords);
 
-    // New, mathematically bulletproof safety check
     float det = st1.s * st2.t - st2.s * st1.t;
-    if (abs(det) < 0.00001) {
+    if (abs(det) < 1e-8) {
         return normalize(Normal);
     }
     
@@ -44,7 +57,6 @@ vec3 getNormalFromMap() {
 
     return normalize(TBN * tangentNormal);
 }
-
 void main() {
     // 1. Alpha Clipping
     float alpha = texture(u_AlphaMap, TexCoords).r;
