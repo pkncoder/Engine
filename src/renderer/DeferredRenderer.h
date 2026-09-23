@@ -60,6 +60,7 @@ class DeferredRenderer : public IRenderer {
     GLuint shadowCubemap[4];
 
     GLuint defaultWhiteTexture;
+    GLuint defaultBlackTexture;
     GLuint defaultGrayscaleTexture;
     GLuint defaultNormalTexture;
 };

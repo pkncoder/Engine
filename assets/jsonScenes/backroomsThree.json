@@ -1,0 +1,51 @@
+{
+  "cameras": [
+    {
+      "position": [
+        43.643848,
+        2.193710,
+        -42.815571
+      ],
+      "yaw": 70.0,
+      "pitch": -3.0,
+      "fov": 55.0,
+      "sensitivity": 0.2,
+      "movementSpeed": 7.0
+    }
+  ],
+  "activeCameraIndex": 0,
+  "meshes": [
+    {
+      "sourceDirectory": "assets/backrooms/",
+      "filename": "backrooms.obj"
+    }
+  ],
+  "lights": [
+    {
+      "position": [
+        47.141718,
+        6.470118,
+        -34.436394
+      ],
+      "color": [
+        0.8,
+        0.75,
+        0.6
+      ],
+      "intensity": 0.6
+    }
+  ],
+  "exposure": 0.3,
+  "toneMapping": true,
+  "srgb": true,
+  "fog": true,
+  "fogColor": [
+    0.5,
+    0.4,
+    0.1
+  ],
+  "fogDensity": 0.02,
+  "vignette": true,
+  "vignetteRadius": 1.7,
+  "vignetteSoftness": 0.9
+}

@@ -4,6 +4,8 @@ layout(location = 0) out vec4 outPosition;
 layout(location = 1) out vec4 outNormal;
 layout(location = 2) out vec4 outAlbedo;
 layout(location = 3) out vec4 outRMA;
+layout(location = 4) out vec4 outEmissive;
+
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -21,7 +23,6 @@ uniform vec3 u_AlbedoColor;
 uniform vec3 u_EmissiveColor;
 uniform float u_Roughness;
 uniform float u_Metallic;
-
 // Helper to calculate tangent space using screen-space derivatives
 vec3 getNormalFromMap() {
     vec3 tangentNormal = texture(u_NormalMap, TexCoords).xyz * 2.0 - 1.0;
@@ -73,11 +74,19 @@ void main() {
     // 3. Albedo
     vec4 texColor = texture(u_AlbedoMap, TexCoords);
     outAlbedo = vec4(texColor.rgb * u_AlbedoColor, alpha); 
+
+    if (length(u_EmissiveColor) > 0.09) {
+      outAlbedo.xyz *= u_EmissiveColor;
+    }
+
+    vec3 u_EmissiveTextureColor = texture(u_EmissiveMap, TexCoords).rgb;
+    if (length(u_EmissiveTextureColor) > 0.09) {
+      outAlbedo.xyz *= u_EmissiveTextureColor;
+    }
     
     // 4. RMA (Roughness, Metallic, AO)
     outRMA = vec4(u_Roughness, u_Metallic, 1.0, 1.0); 
     
-    // A quick note on Emissive: 
-    // We are binding the Emissive map, but your G-Buffer does not currently have 
-    // a 5th render target to store Emissive data! 
+    vec3 emissiveTexColor = texture(u_EmissiveMap, TexCoords).rgb;
+    outEmissive = vec4(emissiveTexColor, 1.0);
 }

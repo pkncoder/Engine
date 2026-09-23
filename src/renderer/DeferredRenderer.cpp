@@ -87,6 +87,9 @@ void DeferredRenderer::init(EngineState &state) {
         unsigned char whitePixel[] = {255, 255, 255, 255};
         setupDefaultTexture(&defaultWhiteTexture, whitePixel, GL_RGBA);
 
+        unsigned char blackPixel[] = {0, 0, 0, 0};
+        setupDefaultTexture(&defaultBlackTexture, blackPixel, GL_RGBA);
+
         unsigned char redPixel[] = {255};
         setupDefaultTexture(&defaultGrayscaleTexture, redPixel, GL_RED);
 
@@ -269,7 +272,7 @@ void DeferredRenderer::extract(EngineState &state) {
 
         // Set a bunch of textures
         cmd.textures[0] = getTexID("albedo", defaultWhiteTexture);
-        cmd.textures[1] = getTexID("emissive", defaultWhiteTexture);
+        cmd.textures[1] = getTexID("emissive", defaultBlackTexture);
         cmd.textures[2] = getTexID("alpha", defaultGrayscaleTexture);
         cmd.textures[3] = getTexID("roughness", defaultWhiteTexture);
         cmd.textures[4] = getTexID("metallic", defaultWhiteTexture);
@@ -417,7 +420,7 @@ void DeferredRenderer::prepare(EngineState &state) {
     gBufferPass.setup = [&]() {
         //(Position (F32), Normal (F16), Albedo (UI8), RMA (UI8))
         std::vector<GLenum> gBufferFormats = {GL_RGBA32F, GL_RGBA16F, GL_RGBA8,
-                                              GL_RGBA8};
+                                              GL_RGBA8, GL_RGBA16F};
         if (gBufferHandle == INVALID_RENDER_TARGET) {
             gBufferHandle = addRenderTarget("GBuffer", gBufferFormats, true);
         }

@@ -2,12 +2,12 @@
   "cameras": [
     {
       "position": [
-        -14.542547,
-        12.510502,
-        6.623075
+        -96.828125,
+        2.505458,
+        -79.552811
       ],
-      "yaw": -46.0,
-      "pitch": 7.0,
+      "yaw": 110.0,
+      "pitch": 3.0,
       "fov": 60.0,
       "sensitivity": 0.2,
       "movementSpeed": 7.0
@@ -16,36 +16,36 @@
   "activeCameraIndex": 0,
   "meshes": [
     {
-      "sourceDirectory": "assets/lostEmpire/",
-      "filename": "lostEmpire.obj"
+      "sourceDirectory": "assets/backrooms/",
+      "filename": "backrooms.obj"
     }
   ],
   "lights": [
     {
       "position": [
-        -7.521194,
-        12.764247,
-        -0.693720
+        -100.121025,
+        4.461535,
+        -71.884155
       ],
       "color": [
-        0.9,
-        0.6,
-        0.7
+        0.29,
+        0.1,
+        0.8
       ],
       "intensity": 1.0
     }
   ],
-  "exposure": 0.7,
+  "exposure": 0.65,
   "toneMapping": true,
   "srgb": true,
   "fog": true,
   "fogColor": [
-    0.7,
-    0.85,
-    0.98
+    0.5,
+    0.4,
+    0.3
   ],
-  "fogDensity": 0.02,
+  "fogDensity": 0.015,
   "vignette": true,
-  "vignetteRadius": 1.4,
-  "vignetteSoftness": 0.7
+  "vignetteRadius": 1.45,
+  "vignetteSoftness": 0.9
 }

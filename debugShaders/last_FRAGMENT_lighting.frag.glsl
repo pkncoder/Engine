@@ -48,6 +48,7 @@ uniform sampler2D u_GBuffer0; // Position (RGB)
 uniform sampler2D u_GBuffer1; // Normal (RGB)
 uniform sampler2D u_GBuffer2; // Albedo (RGB)
 uniform sampler2D u_GBuffer3; // RMA (R = Roughness, M = Metallic, A = AO)
+uniform sampler2D u_GBuffer4; // Emissive
 
 // Shadow Maps
 uniform samplerCube u_ShadowMaps[4];
@@ -183,7 +184,9 @@ void main() {
         finalLighting += (diffuse + specular) * (1.0 - shadow);
     }
 
+    vec3 emissive = texture(u_GBuffer4, TexCoords).rgb;
+
     // 4. Final output
-    FragColor = vec4(finalLighting, 1.0);
+    FragColor = vec4(finalLighting + emissive, 1.0);
     return;
 }
