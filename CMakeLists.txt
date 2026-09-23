@@ -71,6 +71,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 # Link Win32 system libraries when targeting Windows
-if(MINGW)
+if(WIN32 AND MINGW)
   target_link_options(${PROJECT_NAME} PRIVATE -static)
+endif()
+
+if(UNIX AND NOT APPLE)
+  target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
 endif()
