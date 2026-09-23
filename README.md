@@ -166,9 +166,41 @@ Currently, there is no live specific documentation, but there is still some file
 
 ## 🌌 Gallery
 
-| <p align="center"><img src="/Assets/ObjectEditor.png"></img></p> | <p align="center"><img src="/Assets/MaterialEditor.png"></img></p> | <p align="center"><img src="/Assets/LightEditor.png"></img></p>
-| <p align="center"><img src="/Assets/ObjectEditor.png"></img></p> | <p align="center"><img src="/Assets/MaterialEditor.png"></img></p> | <p align="center"><img src="/Assets/LightEditor.png"></img></p>
-| <p align="center"><img src="/Assets/ObjectEditor.png"></img></p> | <p align="center"><img src="/Assets/MaterialEditor.png"></img></p> | <p align="center"><img src="/Assets/LightEditor.png"></img></p>
+<table>
+  <tr>
+    <td align="center" valign="middle">
+      <img src="docs/assets/breakfastRoomOne.png" width="400" height="400" alt="Breakfast Room">
+    </td>
+    <td align="center" valign="middle">
+      <img src="docs/assets/sponzaOne.png" width="400" height="400" alt="Sponza One">
+    </td>
+    <td align="center" valign="middle">
+      <img src="docs/assets/sponzaTwo.png" width="400" height="400" alt="Sponza Two">
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="middle">
+      <img src="docs/assets/backroomsOne.png" width="400" height="400" alt="Backrooms One">
+    </td>
+    <td align="center" valign="middle">
+      <img src="docs/assets/backroomsTwo.png" width="400" height="400" alt="Backrooms Two">
+    </td>
+    <td align="center" valign="middle">
+      <img src="docs/assets/backroomsThree.png" width="400" height="400" alt="Backrooms Three">
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="middle">
+      <img src="docs/assets/objectsHeader.png" width="400" height="400" alt="Objects One">
+    </td>
+    <td align="center" valign="middle">
+      <img src="docs/assets/lostEmpireOne.png" width="400" height="400" alt="Lost Empire One">
+    </td>
+    <td align="center" valign="middle">
+      <img src="docs/assets/lostEmpireTwo.png" width="400" height="400" alt="Lost Empire Two">
+    </td>
+  </tr>
+</table>
 
 ## 🛝 Demos
 
