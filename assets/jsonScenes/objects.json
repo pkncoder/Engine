@@ -11,6 +11,18 @@
       "fov": 60.0,
       "sensitivity": 0.2,
       "movementSpeed": 7.0
+    },
+    {
+      "position": [
+        7.581100,
+        -1.087694,
+        0.262713
+      ],
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "fov": 65.0,
+      "sensitivity": 0.2,
+      "movementSpeed": 7.0
     }
   ],
   "activeCameraIndex": 0,
@@ -40,8 +52,8 @@
       "filename": "dragon.obj",
       "position": [
         10.0,
-        -1.0,
-        0.0
+        2.5,
+        0.25
       ],
       "rotation": [
         0.0,
@@ -80,7 +92,7 @@
       "filename": "oiiaioooooiai.obj",
       "position": [
         10.0,
-        1.5,
+        -2.5,
         0.0
       ],
       "rotation": [
