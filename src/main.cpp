@@ -8,21 +8,26 @@
 #endif
 
 void setWorkingDirectoryToBinary() {
-#ifdef __APPLE__
 #if RUN_PATH_FIX
+#ifdef __APPLE__
     char path[1024];
     uint32_t size = sizeof(path);
     if (_NSGetExecutablePath(path, &size) == 0) {
         std::filesystem::path exePath(path);
-        // Change working directory to the directory containing the
-        // executable
-        std::filesystem::current_path(exePath.parent_path());
-    }
+        // Path is: Engine.app/Contents/MacOS/engine
+        // Moving up 4 times escapes the bundle and lands in the zip extraction
+        // directory
+        std::filesystem::path rootDir = exePath
+                                            .parent_path()  // MacOS/
+                                            .parent_path()  // Contents/
+                                            .parent_path()  // Engine.app/
+                                            .parent_path(); // Zip Root/
 
-#else
-    std::cout << "[Dev Mode] Skipping macOS path override. Working directory "
-                 "left as default.\n";
+        std::filesystem::current_path(rootDir);
+    }
 #endif
+#else
+    std::cout << "[Dev Mode] Keeping default path context.\n";
 #endif
     // Windows and Linux usually handle this natively,
     // but std::filesystem::current_path() can verify or set it there too.

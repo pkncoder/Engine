@@ -57,7 +57,12 @@ set(SOURCES
 )
 
 # --- Executable ---
-add_executable(${PROJECT_NAME} ${SOURCES})
+if(APPLE)
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES})
+else()
+    add_executable(${PROJECT_NAME} ${SOURCES})
+endif()
+
 
 # --- Linking ---
 # We link against the "Namespaced" targets provided by the packages
@@ -68,6 +73,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glm::glm
     tinyobjloader::tinyobjloader
     stb::stb
+
 )
 
 # Link Win32 system libraries when targeting Windows
@@ -77,6 +83,33 @@ endif()
 
 if(UNIX AND NOT APPLE)
   target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
+endif()
+
+
+if(APPLE)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE_BUNDLE_NAME "Engine"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourname.engine"
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH "@executable_path/../Frameworks"
+    )
+
+    # Automatically copy your loose asset folders next to the .app bundle post-build
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory 
+                "${CMAKE_CURRENT_SOURCE_DIR}/shaders" 
+                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../../../shaders"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory 
+                "${CMAKE_CURRENT_SOURCE_DIR}/assets" 
+                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../../../assets"
+        COMMENT "Copying loose assets and shaders next to the .app bundle"
+    )
+
+    # Sign ONLY the binary bundle (assets outside stay unsigned and modifiable)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND codesign --force --deep --sign - $<TARGET_BUNDLE_DIR:${PROJECT_NAME}>
+        COMMENT "Applying local ad-hoc code signature to bundle"
+    )
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
