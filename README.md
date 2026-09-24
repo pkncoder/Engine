@@ -72,6 +72,15 @@ Due to Apple's discontinuation OpenGL, some features are not supported on the OS
 
 Go to the "Releases" page on this repo, and download the right one for your system.
 
+Available systems:
+| Operating System | Version | Fully Supported | Runs |
+| --- | ---: | --- | --- |
+| Windows x86 | v1.3.0a | yes | yes |
+| Linux x86 | v1.3.0a | yes | yes |
+| Linux ARM | N/A | no | no |
+| Apple Silicon | v1.3.1a | no | yes |
+| Apple Intel | N/A | no | no |
+
 ### Linux (x86)
 
 1. Download engine-linux-x86-1.3.1a.zip
@@ -243,7 +252,7 @@ The renderers included in Tempname: Engine (not including the rasterizer) were f
 ## 📚 Resources Used
 
 For a full list of resources used, see [RESOURCES.md](RESOURCES.md)
-> AI Notice: AI has been used for development of the code src/, shaders/, and site info in docs/. AI has not been used in this README or attached files to it.
+> AI Notice: AI has been used for development of the code src/, shaders/, and site info in docs/. **AI has not been used in this README, any of my devlogs or attached files to it.** I really do just like to type like that & include emojis like that.
 
 ## ✒️ License
 
