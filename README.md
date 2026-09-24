@@ -72,7 +72,30 @@ Due to Apple's discontinuation OpenGL, some features are not supported on the OS
 
 Go to the "Releases" page on this repo, and download the right one for your system.
 
-Any problems, please report them to the issues page.
+### Linux (x86)
+
+1. Download engine-linux-x86-1.3.1a.zip
+2. Unzip the folder
+3. Enable permissions to run it as a program (chmod +x engine)
+4. Run "engine"
+
+> I don't have a Linux ARM, so I can't compile it, sorry.
+
+### Apple (Only Sillicon is Supported)
+
+1. Download engine-apple-sillicon-1.3.1a.zip
+2. Unzip the folder
+3. Right-click on the "engine" application - click "open-anyways"
+
+> Due to the application not being signed with an Apple Developer Account, this work-around is needed.
+
+### Windows
+
+1. Download engine-engine-x86-1.3.0a.zip
+2. Unzip the folder
+3. Run engine.exe
+
+> Due to Powershell being stupid, the in-terminal logger won't work right unless you are running bash.
 
 ## Option 2 - Compile Yourself
 
