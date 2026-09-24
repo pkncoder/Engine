@@ -252,7 +252,7 @@ The renderers included in Tempname: Engine (not including the rasterizer) were f
 ## 📚 Resources Used
 
 For a full list of resources used, see [RESOURCES.md](RESOURCES.md)
-> AI Notice: AI has been used for development of the code src/, shaders/, and site info in docs/. **AI has not been used in this README, any of my devlogs or attached files to it.** I really do just like to type like that & include emojis like that.
+> AI Notice: AI has been used for HELP in development (as an AI assistant) of the code src/, shaders/, and site info in docs/. The use was used to learn about professional engine architecture, and I started frameworking the code around that. AI code is also used in some places, however even if I left comments from it (which I normally don't do), the code was probably largely changed by me.  **AI has not been used in this README, any of my devlogs or attached files to it.** I really do just like to type like that & include emojis like that.
 
 ## ✒️ License
 
