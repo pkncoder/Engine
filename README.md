@@ -78,29 +78,34 @@ Available systems:
 | Windows x86 | v1.3.0a | yes | yes |
 | Linux x86 | v1.3.0a | yes | yes |
 | Linux ARM | N/A | no | no |
-| Apple Silicon | v1.3.1a | no | yes |
+| Apple Silicon | v1.3.3a | no | yes |
 | Apple Intel | N/A | no | no |
+
+> I'm working through errors on Apple Silicon to get the gatekeeper thing working, for the current version if you want to run it:  
+    - Right click the .app and go click "Show Package Contents"  
+    - Go into Contents/MacOS  
+    - Run the executable "engine" in there  
 
 ### Linux (x86)
 
-1. Download engine-linux-x86-1.3.1a.zip
+1. Download engine-linux-x86-1.3.0a.zip from the releases page.
 2. Unzip the folder
 3. Enable permissions to run it as a program (chmod +x engine)
 4. Run "engine"
 
 > I don't have a Linux ARM, so I can't compile it, sorry.
 
-### Apple (Only Sillicon is Supported)
+### Apple (Only Silicon is Supported)
 
-1. Download engine-apple-sillicon-1.3.1a.zip
+1. Download engine-apple-sillicon-1.3.3a.zip from the releases page.
 2. Unzip the folder
-3. Right-click on the "engine" application - click "open-anyways"
+3. Try to run the application through right clicking the .app and clicking "Run Anyways". You may have to go through the "Privacy and Security" section to force it.
 
 > Due to the application not being signed with an Apple Developer Account, this work-around is needed.
 
 ### Windows
 
-1. Download engine-engine-x86-1.3.0a.zip
+1. Download engine-engine-x86-1.3.0a.zip from the releases page.
 2. Unzip the folder
 3. Run engine.exe
 
