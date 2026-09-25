@@ -1,18 +1,10 @@
 #pragma once
 
-#include <functional>
-#include <string>
+#include "RenderPass.h"
+
 #include <vector>
 
 namespace Engine {
-
-struct RenderPass {
-    std::string name;
-
-    std::function<void()> setup;
-
-    std::function<void()> execute;
-};
 
 class RenderGraph {
 

@@ -39,7 +39,7 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
     - [x] Renderer
     - [x] Shaders
 - [ ] Phase IV
-  - [ ] Scene Manager
+  - [x] Scene Manager
   - [ ] Advanced Renderers & Shaders
     - [ ] Rasterizer
     - [ ] Ray Tracer
@@ -50,47 +50,32 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Phase V
   - [ ] UI/UX
 - [ ] Phase VI
-  - Rewire
+  - [ ] Rewire
+    - [ ] Set up for multiple rendering APIs
 
 ## Todos
 
 ### Todo - Code
 
 - [ ] Figure out how getting all of the "renderables" will work with different object types
-- [ ] Make the outputTexture start with everything at vec3(1.0, 0.0, 1.0); for debugging
-- [ ] Figure out the issue w/ width & height passing being a lot
 - [ ] Use a UBO for passing uniforms
-- [ ] Material Index in GPUInstance
-- [ ] Fix the flashing compute shader issue + maybe being too slow?
 - [ ] Non-triangle objects
-- [ ] Missing texture for failed loads default
-- [ ] Go through and remove GPU memory access where it shouldn't be
 - [ ] Check to see if roughness & metallic maps are working
 - [ ] Get the shared uniforms file filled in and finished
-- [ ] UUID models & mesh names
-- [ ] Redo the shader pass & render target sytem to increase scope
-- [ ] Texture data
 - [ ] Create multiple I... files for compute shaders, textures, etc.
-- [ ] Figure out where to place the window height/width
 - [ ] Figure out constant rules
 - [ ] Figure out inline class attribute rules
-- [ ] Move window into EngineContext?
-- [ ] Linux randomly dips in performance
 - [ ] Go around making shutdown functions & deconstructors (they just call shutdown)
-- [ ] Figure out moving around engineState so everything has the same object
-- [ ] Figure out how to handle setting glfw & glad settings; if it should just be a function like it is now, or different
 - [ ] Application is dumping core on quit
 - [ ] Set naming convention for the resource management to caches & registries
 - [ ] Move services into engine context
 
 ### Todo - Not Code
 
-- [ ] Finish the readme
 - [ ] Update P_III_Archetecture to the style of P_IV_Planned_Archetecture
 
 ### Todo - Future Todos
 
-- [ ] Use EnTT instead of custom ECS
 - [ ] Make live aspect ratio drawing
 - [ ] Different camera movement modes
 - [ ] Custom errors
@@ -106,18 +91,13 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Different shader models
   - Ex. Disney BSDF
 - [ ] Legacy OpenGL support
-- [ ] Move camera to ECS w/ CameraComponent, and move the camera class to the system directory
 
 ### Todo - Editor
 
-- [ ] MD - Try to get checkboxes rendering
-      bool isValid() const { return m_ID != NULL_ENTITY && m_Scene != nullptr; }
 - [ ] MD - Get rid of the line length warning
 - [ ] TMUX - Make keybinds to run launch, run, and test bash scripts
-- [ ] TMUX - Change to catpuccin Moccioto or something like that
 - [ ] CPP - gcc (compent) keybind not working on single lines (sometimes)
-- [ ] NVIM - Make it stop fuly hiding git ignored files
-- [ ] Change Leader+Arrows to Leader+Shift+(V)arrows
+- [ ] TMUX - Change Leader+Arrows to Leader+Shift+(V)arrows
 
 ## Ideas
 
@@ -210,3 +190,16 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [x] Add a SceneManager
 - [x] Make dirty mesh/camera flags (REWORKED)
 - [x] Move resize callback from Input -> Window
+- [x] Figure out the issue w/ width & height passing being a lot
+- [x] Missing texture for failed loads default
+- [x] Go through and remove GPU memory access where it shouldn't be
+- [x] UUID models & mesh names
+- [x] Redo the shader pass & render target sytem to increase scope
+- [x] Figure out where to place the window height/width
+- [x] Move window into EngineContext? answer: no
+- [x] Figure out moving around engineState so everything has the same object
+- [x] Figure out how to handle setting glfw & glad settings; if it should just be a function like it is now, or different answer: function
+- [x] NVIM - Make it stop fuly hiding git ignored files
+- [x] Finish the readme
+- [x] Use EnTT instead of custom ECS
+- [x] Move camera to ECS w/ CameraComponent, and move the camera class to the system directory

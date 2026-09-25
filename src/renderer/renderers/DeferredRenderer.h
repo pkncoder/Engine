@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../core/EngineContext.h"
-#include "../core/states/EngineState.h"
-#include "GPUStructs.h"
-#include "IRenderer.h"
-#include "RenderGraph.h"
-#include "buffers/GPUBuffer.h"
-#include "shaders/IProgram.h"
+#include "../../core/EngineContext.h"
+#include "../../core/states/EngineState.h"
+#include "../GPUStructs.h"
+#include "../IRenderer.h"
+#include "../buffers/GPUBuffer.h"
+#include "../renderGraph/RenderGraph.h"
+#include "../shaders/IProgram.h"
 
 #include <vector>
 

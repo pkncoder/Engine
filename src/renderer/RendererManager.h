@@ -5,7 +5,7 @@
 #include "IRenderer.h"
 // #include "PathTracer.h"
 // #include "Rasterizer.h"
-#include "DeferredRenderer.h"
+#include "renderers/DeferredRenderer.h"
 
 #include <memory>
 

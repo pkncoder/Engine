@@ -34,14 +34,13 @@ set(SOURCES
     src/renderer/buffers/BufferManager.cpp
     src/renderer/shaders/IProgram.cpp
     src/renderer/shaders/IShader.cpp
-    src/renderer/DeferredRenderer.cpp
+    src/renderer/renderGraph/RenderGraph.cpp
+    src/renderer/renderers/DeferredRenderer.cpp
+    # src/renderer/renderers/PathTracer.cpp
+    # src/renderer/renderers/Rasterizer.cpp
     src/renderer/GPUResourceManager.cpp
     src/renderer/IRenderer.cpp
-    # src/renderer/PathTracer.cpp
-    # src/renderer/Rasterizer.cpp
-    src/renderer/RenderGraph.cpp
     src/renderer/RendererManager.cpp
-    src/renderer/Shader.cpp
     src/resources/AssetManager.cpp
     src/resources/MaterialLoader.cpp
     src/resources/ModelLoader.cpp
@@ -58,9 +57,9 @@ set(SOURCES
 
 # --- Executable ---
 if(APPLE)
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES})
+  add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES})
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES})
+  add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
 
@@ -87,33 +86,33 @@ endif()
 
 
 if(APPLE)
-    set_target_properties(${PROJECT_NAME} PROPERTIES
+  set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE_BUNDLE_NAME "Engine"
         MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourname.engine"
         BUILD_WITH_INSTALL_RPATH TRUE
         INSTALL_RPATH "@executable_path/../Frameworks"
     )
 
-    # Automatically copy your loose asset folders next to the .app bundle post-build
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory 
-                "${CMAKE_CURRENT_SOURCE_DIR}/shaders" 
+  # Automatically copy your loose asset folders next to the .app bundle post-build
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../../../shaders"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory 
-                "${CMAKE_CURRENT_SOURCE_DIR}/assets" 
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${CMAKE_CURRENT_SOURCE_DIR}/assets"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../../../assets"
         COMMENT "Copying loose assets and shaders next to the .app bundle"
     )
 
-    # Sign ONLY the binary bundle (assets outside stay unsigned and modifiable)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  # Sign ONLY the binary bundle (assets outside stay unsigned and modifiable)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND codesign --force --deep --sign - $<TARGET_BUNDLE_DIR:${PROJECT_NAME}>
         COMMENT "Applying local ad-hoc code signature to bundle"
     )
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RUN_PATH_FIX=1)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE RUN_PATH_FIX=1)
 else()
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RUN_PATH_FIX=0)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE RUN_PATH_FIX=0)
 endif()
