@@ -1,9 +1,11 @@
 #include "core/Application.h"
 #include "services/Logger.h"
 
-#ifdef __APPLE__
 #include <filesystem>
 #include <iostream>
+
+
+#ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
 
