@@ -1,8 +1,8 @@
-<h1 align="center">⛭  Tempname: Engine ⛭</h1>
+<h1 align="center">Tempname: Engine</h1>
 <p align="center">A Crossplatform - GPU Multi-Level Rendering Tool</p>
 <p align="center"><img width="50%" src="docs/assets/objectsHeader.png"></img></p>
 
-## ☀️ Overview
+## Overview
 
 Tempname: Engine is an application that has the plan for something not seen very often. On a high level, Tempname: Engine is a GPU-Renderer that will have model, scene, and material modifications. This, however, is not the main point.
 
@@ -16,7 +16,7 @@ Tempname: Engine will use the built scene and render it out in a varriety of met
 
 Along with these, the user will have the utilities to render out stylized scenes to their modifications, and have the ability for simple animations & scene creation.
 
-## ✨ Features
+## Features
 
 ### Current
 
@@ -58,7 +58,7 @@ Along with these, the user will have the utilities to render out stylized scenes
 
 For more todos, ideas, and current capibilites, check out: [todo.md](todo.md).
 
-## 🚀 Running
+## Running
 
 This project has been tested on:
 
@@ -78,7 +78,7 @@ Available systems:
 | Windows x86 | v1.3.0a | yes | yes |
 | Linux x86 | v1.3.0a | yes | yes |
 | Linux ARM | N/A | no | no |
-| Apple Silicon | v1.3.3a | no | yes |
+| Apple Silicon | v1.3.3a | no | yes * - Must use binary |
 | Apple Intel | N/A | no | no |
 
 > I'm working through errors on Apple Silicon to get the gatekeeper thing working, for the current version if you want to run it:  
@@ -173,7 +173,7 @@ And then run it:
 ./build/bin/engine
 ```
 
-## ⚙️ Usage
+## Usage
 
 To control the scene, WASD can be used for movement, and holding right click will move the camera's looking direction.
 C will print out the current camera position in the terminal.
@@ -187,7 +187,7 @@ To change the rendered model:
 5. Save the file
 6. Either re-open the application, or press "r" to reload it during runtime
 
-## 💻 Technologies
+## Technologies
 
 - **IDE** - Neovim + LazyVim
 - **Languages** - CPP, GLSL, CMake
@@ -197,7 +197,7 @@ To change the rendered model:
 - **Rendering Methods** - Deferred
 - **Entity Component System** - EnTT
 
-## 📝 Documentation
+## Documentation
 
 Currently, there is no live specific documentation, but there is still some files in the project:
 
@@ -206,7 +206,7 @@ Currently, there is no live specific documentation, but there is still some file
 - [tags.md](tags.md) - Basic text file with the explanatin of what each tag does when it appears in the Logger service
 - [RESOURCES.md](RESOURCES.md) - Stores the resources used in creation & any important "shout-outs" linked.
 
-## 🌌 Gallery
+## Gallery
 
 <table>
   <tr>
@@ -244,7 +244,7 @@ Currently, there is no live specific documentation, but there is still some file
   </tr>
 </table>
 
-## 🛝 Demos
+## Demos
 
 The renderers included in Tempname: Engine (not including the rasterizer) were first built and made on a website called [shadertoy](https://www.shadertoy.com), which is an online OpenGL shader runner. It uses WebGL. Here are all the current online demos of those renderers:
 
@@ -254,11 +254,12 @@ The renderers included in Tempname: Engine (not including the rasterizer) were f
 
 *Note: Some of these may not be completed, or fully/at all implemented in Tempname: Engine yet.*
 
-## 📚 Resources Used
+## Resources Used
 
 For a full list of resources used, see [RESOURCES.md](RESOURCES.md)
-> AI Notice: AI has been used for HELP in development (as an AI assistant) of the code src/, shaders/, and site info in docs/. The use was used to learn about professional engine architecture, and I started frameworking the code around that. AI code is also used in some places, however even if I left comments from it (which I normally don't do), the code was probably largely changed by me.  **AI has not been used in this README, any of my devlogs or attached files to it.** I really do just like to type like that & include emojis like that.
 
-## ✒️ License
+> AI Notice: AI has been used for *HELP* in development of the code src/, shaders/, and site info in docs/. The use was used to learn about professional engine architecture, and I started frameworking the code around that. AI code is also used in some places, however even if I left comments from it (which I normally don't do), the code was probably largely changed by me. It was also used for debugging MacOS issues, and memory issues.  **AI has not been used in this README, any of my devlogs or attached files to it.** It really has not. **__Nothing in this readme is crazy over complicated to the point where a 17yo couldn't do it. I have only used AI in the places that have been declared.__**  I really do just like to type like that & include emojis like that.
+
+## License
 
 This project is protected under the [MIT](LICENSE) License.
