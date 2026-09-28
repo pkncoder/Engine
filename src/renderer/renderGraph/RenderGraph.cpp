@@ -6,11 +6,13 @@ void RenderGraph::addPass(const RenderPass &pass) {
     renderPasses.push_back(pass);
 }
 
-void RenderGraph::compile() {
+void RenderGraph::setup() {
     for (auto &pass : renderPasses) {
         pass.setup();
     }
 }
+
+void RenderGraph::compile() {}
 
 void RenderGraph::execute() {
     for (auto &pass : renderPasses) {

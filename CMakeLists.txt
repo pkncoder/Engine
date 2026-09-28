@@ -35,6 +35,7 @@ set(SOURCES
     src/renderer/shaders/IProgram.cpp
     src/renderer/shaders/IShader.cpp
     src/renderer/renderGraph/RenderGraph.cpp
+    src/renderer/renderGraph/RenderPass.cpp
     src/renderer/renderers/DeferredRenderer.cpp
     # src/renderer/renderers/PathTracer.cpp
     # src/renderer/renderers/Rasterizer.cpp

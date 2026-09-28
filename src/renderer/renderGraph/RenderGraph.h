@@ -14,10 +14,15 @@ class RenderGraph {
 
     void addPass(const RenderPass &pass);
 
+    void setup();
     void compile();
     void execute();
 
     void clear();
+
+  public:
+    RenderPass *graphStart;
+    ResourceHandle graphEnd;
 
   private:
     std::vector<RenderPass> renderPasses;

@@ -69,6 +69,9 @@ This file does not store any "// TODO : ~~~" marks I make in code, as those are 
 - [ ] Application is dumping core on quit
 - [ ] Set naming convention for the resource management to caches & registries
 - [ ] Move services into engine context
+- [ ] Figure out how to split up and track down transient variables inside of my GPUResourceManager
+  - Have GPUResourceManager track every fetched RenderHandle and destroy from there
+- [ ] Change the add()/setup() functions in the RenderPass/RenderGraph to just declare the want for a resource, then compile assigns and initializes stuff
 
 ### Todo - Not Code
 

@@ -577,7 +577,6 @@ void DeferredRenderer::prepare(EngineState &state) {
 
         glDisable(GL_DEPTH_TEST); // Fullscreen quad doesn't need depth testing
 
-        // Bind the shader
         postProgram.bind();
 
         // Bind the textures
@@ -614,6 +613,9 @@ void DeferredRenderer::prepare(EngineState &state) {
     };
 
     renderGraph.addPass(postProcessingPass);
+
+    // Setup the render graph
+    renderGraph.setup();
 
     // Compile the graph
     renderGraph.compile();
