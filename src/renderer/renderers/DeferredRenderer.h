@@ -4,9 +4,9 @@
 #include "../../core/states/EngineState.h"
 #include "../GPUStructs.h"
 #include "../IRenderer.h"
-#include "../buffers/GPUBuffer.h"
+#include "../gpuResources/GPUBuffer.h"
 #include "../renderGraph/RenderGraph.h"
-#include "../shaders/IProgram.h"
+#include "../shaders/GPUProgram.h"
 
 #include <vector>
 
@@ -42,17 +42,17 @@ class DeferredRenderer : public IRenderer {
 
     CameraData cameraData;
 
-    BufferHandle cameraUBO;
-    BufferHandle lightUBO;
+    ResourceHandle cameraUBO;
+    ResourceHandle lightUBO;
 
     RenderTargetHandle gBufferHandle = INVALID_RENDER_TARGET;
     RenderTargetHandle finalOutputHandle = INVALID_RENDER_TARGET;
     RenderTargetHandle postProcessedOutHandle = INVALID_RENDER_TARGET;
 
-    IProgram shadowProgram;
-    IProgram gBufferProgram;
-    IProgram lightingProgram;
-    IProgram postProgram;
+    GPUProgram shadowProgram;
+    GPUProgram gBufferProgram;
+    GPUProgram lightingProgram;
+    GPUProgram postProgram;
 
     RenderGraph renderGraph;
 

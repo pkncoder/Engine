@@ -1,18 +1,19 @@
 #pragma once
 
-#include "IShader.h"
+#include "../gpuResources/IGPUResource.h"
+#include "GPUShader.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
 namespace Engine {
 
-class IProgram {
+class GPUProgram : public IGPUResource {
   public:
     // Constructors
-    IProgram();
+    GPUProgram();
 
-    void attachShader(IShader shader);
+    void attachShader(GPUShader shader);
     void link();
 
     // Binding and unbinding the program
@@ -36,7 +37,7 @@ class IProgram {
     void checkLinkErrors() const;
 
   private:
-    std::vector<IShader> attachedShaders;
+    std::vector<GPUShader> attachedShaders;
 };
 
 } // namespace Engine

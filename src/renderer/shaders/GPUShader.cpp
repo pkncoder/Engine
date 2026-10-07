@@ -1,4 +1,4 @@
-#include "IShader.h"
+#include "GPUShader.h"
 
 #include "../../services/Logger.h"
 
@@ -26,7 +26,7 @@ std::string to_string(ShaderType type) {
     return "UNKNOWN_SHADER_TYPE";
 }
 
-IShader::IShader(const char *_sourcePath, const ShaderType _type)
+GPUShader::GPUShader(const char *_sourcePath, const ShaderType _type)
     : sourcePath(_sourcePath), type(_type) {
 
     sourceFilename = std::string(sourcePath)
@@ -45,7 +45,7 @@ IShader::IShader(const char *_sourcePath, const ShaderType _type)
     checkCompileErrors();
 }
 
-IShader::~IShader() {
+GPUShader::~GPUShader() {
     if (glSourceShader != 0)
         glDeleteShader(glSourceShader);
 }
@@ -53,7 +53,7 @@ IShader::~IShader() {
 // Recursively create an "expanded" shader code string (expanding #include
 // statments) in the code
 std::string
-IShader::getExpandedShaderCode(const std::string &shaderPath) const {
+GPUShader::getExpandedShaderCode(const std::string &shaderPath) const {
 
     // Get the file and check if it exists
     std::ifstream file(shaderPath);
@@ -107,7 +107,7 @@ IShader::getExpandedShaderCode(const std::string &shaderPath) const {
 }
 
 // Output the final shader code to a dump file for debug purposes
-void IShader::dumpExpandedShaderCode() const {
+void GPUShader::dumpExpandedShaderCode() const {
 
     // Creates a directory called 'debug_shaders' if it doesn't exist
     if (!fs::exists("debugShaders")) {
@@ -127,7 +127,7 @@ void IShader::dumpExpandedShaderCode() const {
 }
 
 // Custom compilation error checking script
-void IShader::checkCompileErrors() const {
+void GPUShader::checkCompileErrors() const {
     // Satus code and info log
     int success;
     char infoLog[1024];

@@ -32,14 +32,14 @@ set(SOURCES
     src/core/EngineContext.cpp
     src/core/Window.cpp
     src/renderer/buffers/BufferManager.cpp
-    src/renderer/shaders/IProgram.cpp
-    src/renderer/shaders/IShader.cpp
+    src/renderer/shaders/GPUProgram.cpp
+    src/renderer/shaders/GPUShader.cpp
+    src/renderer/gpuResources/GPUResourceManager.cpp
     src/renderer/renderGraph/RenderGraph.cpp
     src/renderer/renderGraph/RenderPass.cpp
     src/renderer/renderers/DeferredRenderer.cpp
     # src/renderer/renderers/PathTracer.cpp
     # src/renderer/renderers/Rasterizer.cpp
-    src/renderer/GPUResourceManager.cpp
     src/renderer/IRenderer.cpp
     src/renderer/RendererManager.cpp
     src/resources/AssetManager.cpp

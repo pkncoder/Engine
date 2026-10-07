@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GPUBuffer.h"
+#include "../gpuResources/GPUBuffer.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -13,35 +13,35 @@ class BufferManager {
     ~BufferManager();
 
     // Creation and deletion of buffers
-    static BufferHandle createBuffer(const std::string &name,
+    static ResourceHandle createBuffer(const std::string &name,
                                      const BufferType type,
                                      const BufferUsage usage, const size_t size,
                                      const GLuint bindingIndex = -1,
                                      const void *initialData = nullptr,
                                      const bool multiBuffered = false);
-    static void destroyBuffer(const BufferHandle handle);
+    static void destroyBuffer(const ResourceHandle handle);
 
     // Buffer fetching
-    static GPUBuffer *getBuffer(const BufferHandle handle);
+    static GPUBuffer *getBuffer(const ResourceHandle handle);
     static GPUBuffer *getBufferByName(const std::string &name);
 
     // Update the cpuBuffer cache directy
-    static void updateBufferCache(const BufferHandle handle, const size_t size,
+    static void updateBufferCache(const ResourceHandle handle, const size_t size,
                                   const size_t offset, const void *data);
 
     // Mapping and setting of buffer data
-    static void mapUBO(const BufferHandle handle, const uint32_t programID,
+    static void mapUBO(const ResourceHandle handle, const uint32_t programID,
                        const std::string &blockName,
                        const std::vector<std::string> &uniformNames);
-    static void setUBOValue(const BufferHandle handle,
+    static void setUBOValue(const ResourceHandle handle,
                             const std::string &uniformName, const size_t size,
                             const void *data);
 
     // Sending buffers to the gpu
-    static void streamData(const BufferHandle handle, const size_t size,
+    static void streamData(const ResourceHandle handle, const size_t size,
                            const void *data, const uint32_t globalFrameIndex);
 
-    static void pushBuffer(const BufferHandle handle,
+    static void pushBuffer(const ResourceHandle handle,
                            const uint32_t globalFrameIndex);
 
   private:
@@ -49,7 +49,7 @@ class BufferManager {
     static inline GLuint nextBindingIndex = 0;
 
     // Registry of every buffer
-    static inline std::unordered_map<BufferHandle, GPUBuffer> bufferRegistry;
+    static inline std::unordered_map<ResourceHandle, GPUBuffer> bufferRegistry;
 };
 
 } // namespace Engine

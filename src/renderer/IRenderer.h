@@ -2,6 +2,7 @@
 
 #include "../core/states/EngineState.h"
 #include "../resources/CPUStructs.h"
+#include "gpuResources/GPURenderTarget.h"
 
 #include <vector>
 
@@ -22,17 +23,6 @@ struct LightUBOData {
 
 using RenderTargetHandle = uint32_t;
 constexpr RenderTargetHandle INVALID_RENDER_TARGET = 0;
-
-struct RenderTarget {
-    std::string name;
-    RenderTargetHandle handle = INVALID_RENDER_TARGET;
-
-    GLuint fbo = 0;                 // The actual framebuffer
-    std::vector<GLuint> textureIDs; // Multiple color attachments (MRTs)
-    GLuint depthTextureID = 0;      // Optional depth attachment
-
-    std::vector<GLenum> formats; // Formats for each color attachment
-};
 
 struct RasterDrawCommand {
     GLuint vao;
@@ -86,7 +76,7 @@ struct RenderPacket {
 //         renderTargets.push_back(renderTargetHandle);
 //     }
 //
-//     inline void addBufferInput(BufferHandle bufferHandle) {
+//     inline void addBufferInput(ResourceHandle bufferHandle) {
 //         bufferInputs.push_back(bufferHandle);
 //     }
 //
@@ -100,7 +90,7 @@ struct RenderPacket {
 //
 //     std::vector<AssetHandle> textureInputs;
 //     std::vector<RenderTargetHandle> renderTargets;
-//     std::vector<BufferHandle> bufferInputs;
+//     std::vector<ResourceHandle> bufferInputs;
 //
 //     std::vector<RenderLayer> renderSteps;
 // };
@@ -118,13 +108,14 @@ class IRenderer {
     // --- Render & Shader Passes ---
 
     // Render target handling
-    virtual RenderTargetHandle
-    addRenderTarget(const std::string &name, const std::vector<GLenum> &formats,
-                    const bool createDepth = false);
+    // virtual RenderTargetHandle
+    // addRenderTarget(const std::string &name, const std::vector<GLenum>
+    // &formats,
+    //                 const bool createDepth = false);
     // virtual void setDisplayTarget(const RenderTargetHandle handle);
     // Lookups
-    RenderTarget *getRenderTarget(const RenderTargetHandle handle);
-    RenderTarget *getRenderTargetByName(const std::string &name);
+    GPURenderTarget *getRenderTarget(const RenderTargetHandle handle);
+    GPURenderTarget *getRenderTargetByName(const std::string &name);
 
     // --- The Frame Pipeline ---
 
@@ -160,7 +151,7 @@ class IRenderer {
     RenderTargetHandle currentRenderTarget;
 
     // Registry for the render targets + another map for str -> handle
-    std::unordered_map<RenderTargetHandle, RenderTarget> renderTargets;
+    std::unordered_map<RenderTargetHandle, GPURenderTarget> renderTargets;
     std::unordered_map<std::string, RenderTargetHandle> renderTargetNameMap;
 
     // // Shader passes

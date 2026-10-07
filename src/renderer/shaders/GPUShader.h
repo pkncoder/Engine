@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../enums/ShaderType.h"
+#include "../gpuResources/IGPUResource.h"
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -7,20 +10,11 @@
 
 namespace Engine {
 
-enum ShaderType {
-    Vertex = GL_VERTEX_SHADER,
-    Geometry = GL_GEOMETRY_SHADER,
-    Fragment = GL_FRAGMENT_SHADER,
-
-    Compute = GL_COMPUTE_SHADER
-
-};
-
-class IShader {
+class GPUShader : public IGPUResource {
   public:
     // Constructors
-    IShader(const char *sourceFilename, const ShaderType type);
-    ~IShader();
+    GPUShader(const char *sourceFilename, const ShaderType type);
+    ~GPUShader();
 
   public:
     std::string sourceFilename = "";

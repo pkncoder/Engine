@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../enums/BufferType.h"
+#include "../enums/BufferUsage.h"
+#include "IGPUResource.h"
+
 #include <glad/glad.h>
 
 #include <string>
@@ -8,29 +12,23 @@
 
 namespace Engine {
 
-using BufferHandle = uint32_t;
-constexpr BufferHandle INVALID_BUFFER_HANDLE = 0;
+using ResourceHandle = uint32_t;
+const ResourceHandle INVALID_RESOURCE_HANDLE = 0;
 
 constexpr size_t FRAMES_IN_FLIGHT = 2;
 
-enum class BufferUsage {
-    Static = GL_STATIC_DRAW,
-    Dynamic = GL_DYNAMIC_DRAW,
-    Stream = GL_STREAM_DRAW
+struct GPUBufferDescriptor {
+    const size_t size = 0;
+    const void *initialData = nullptr;
+
+    const GLuint bindingIndex = -1;
+
+    const bool multiBuffered = false;
 };
 
-enum class BufferType {
-    UniformBuffer = GL_UNIFORM_BUFFER,
-    StorageBuffer = GL_SHADER_STORAGE_BUFFER,
-    VertexBuffer = GL_ARRAY_BUFFER,
-    IndexBuffer = GL_ELEMENT_ARRAY_BUFFER,
-    TextureBuffer = GL_TEXTURE_BUFFER
-};
-
-struct GPUBuffer {
+struct GPUBuffer : public IGPUResource {
   public:
     // Handle and string name
-    BufferHandle handle = INVALID_BUFFER_HANDLE;
     std::string name;
 
     // Buffer type and use enums - static cast to GLenum

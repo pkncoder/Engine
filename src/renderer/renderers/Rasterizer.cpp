@@ -9,8 +9,8 @@
 #include "GPUResourceManager.h"
 #include "IRenderer.h"
 #include "buffers/BufferManager.h"
-#include "shaders/IProgram.h"
-#include "shaders/IShader.h"
+#include "shaders/GPUProgram.h"
+#include "shaders/GPUShader.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -89,13 +89,13 @@ void Rasterizer::setupShaderNodes() {
         shadowPass.name = "ShadowPass";
         shadowPass.enabled = true;
 
-        shadowPass.program = IProgram();
+        shadowPass.program = GPUProgram();
         shadowPass.program.attachShader(
-            IShader("shaders/rasterizing/main/shadow.vert", Vertex));
+            GPUShader("shaders/rasterizing/main/shadow.vert", Vertex));
         shadowPass.program.attachShader(
-            IShader("shaders/rasterizing/main/shadow.geom", Geometry));
+            GPUShader("shaders/rasterizing/main/shadow.geom", Geometry));
         shadowPass.program.attachShader(
-            IShader("shaders/rasterizing/main/shadow.frag", Fragment));
+            GPUShader("shaders/rasterizing/main/shadow.frag", Fragment));
         shadowPass.program.link();
     }
     shaderNodeTree.push_back(shadowPass);
@@ -105,11 +105,11 @@ void Rasterizer::setupShaderNodes() {
         opaquePass.name = "OpaquePass";
         opaquePass.enabled = true;
 
-        opaquePass.program = IProgram();
+        opaquePass.program = GPUProgram();
         opaquePass.program.attachShader(
-            IShader("shaders/rasterizing/main/raster.vert", Vertex));
+            GPUShader("shaders/rasterizing/main/raster.vert", Vertex));
         opaquePass.program.attachShader(
-            IShader("shaders/rasterizing/main/raster.frag", Fragment));
+            GPUShader("shaders/rasterizing/main/raster.frag", Fragment));
         opaquePass.program.link();
     }
     shaderNodeTree.push_back(opaquePass);

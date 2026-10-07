@@ -8,14 +8,14 @@
 #include "../../scene/components/PointLightComponent.h"
 #include "../../scene/components/TransformComponent.h"
 #include "../../services/Logger.h"
-#include "../GPUResourceManager.h"
 #include "../GPUStructs.h"
 #include "../IRenderer.h"
 #include "../buffers/BufferManager.h"
-#include "../buffers/GPUBuffer.h"
+#include "../gpuResources/GPURenderTarget.h"
+#include "../gpuResources/GPUResourceManager.h"
 #include "../renderGraph/RenderGraph.h"
-#include "../shaders/IProgram.h"
-#include "../shaders/IShader.h"
+#include "../shaders/GPUProgram.h"
+#include "../shaders/GPUShader.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
@@ -100,37 +100,37 @@ void DeferredRenderer::init(EngineState &state) {
     generateShadowMap();
 
     // Shadow mapping shaders
-    shadowProgram = IProgram();
+    shadowProgram = GPUProgram();
     shadowProgram.attachShader(
-        IShader("shaders/deferred/main/shadow.vert", Vertex));
+        GPUShader("shaders/deferred/main/shadow.vert", Vertex));
     shadowProgram.attachShader(
-        IShader("shaders/deferred/main/shadow.geom", Geometry));
+        GPUShader("shaders/deferred/main/shadow.geom", Geometry));
     shadowProgram.attachShader(
-        IShader("shaders/deferred/main/shadow.frag", Fragment));
+        GPUShader("shaders/deferred/main/shadow.frag", Fragment));
     shadowProgram.link();
 
     // G-Buffer shaders
-    gBufferProgram = IProgram();
+    gBufferProgram = GPUProgram();
     gBufferProgram.attachShader(
-        IShader("shaders/deferred/main/gBuffer.vert", Vertex));
+        GPUShader("shaders/deferred/main/gBuffer.vert", Vertex));
     gBufferProgram.attachShader(
-        IShader("shaders/deferred/main/gBuffer.frag", Fragment));
+        GPUShader("shaders/deferred/main/gBuffer.frag", Fragment));
     gBufferProgram.link();
 
     // Lighting shaders
-    lightingProgram = IProgram();
+    lightingProgram = GPUProgram();
     lightingProgram.attachShader(
-        IShader("shaders/deferred/main/lighting.vert", Vertex));
+        GPUShader("shaders/deferred/main/lighting.vert", Vertex));
     lightingProgram.attachShader(
-        IShader("shaders/deferred/main/lighting.frag", Fragment));
+        GPUShader("shaders/deferred/main/lighting.frag", Fragment));
     lightingProgram.link();
 
     // Post processing shaders
-    postProgram = IProgram();
+    postProgram = GPUProgram();
     postProgram.attachShader(
-        IShader("shaders/deferred/main/post.vert", Vertex));
+        GPUShader("shaders/deferred/main/post.vert", Vertex));
     postProgram.attachShader(
-        IShader("shaders/deferred/main/post.frag", Fragment));
+        GPUShader("shaders/deferred/main/post.frag", Fragment));
     postProgram.link();
 
     // Camera UBO creation & mapping
@@ -422,7 +422,14 @@ void DeferredRenderer::prepare(EngineState &state) {
         std::vector<GLenum> gBufferFormats = {GL_RGBA32F, GL_RGBA16F, GL_RGBA8,
                                               GL_RGBA8, GL_RGBA16F};
         if (gBufferHandle == INVALID_RENDER_TARGET) {
-            gBufferHandle = addRenderTarget("GBuffer", gBufferFormats, true);
+            RenderTargetDescriptor desc;
+
+            desc.width = currentWidth;
+            desc.height = currentHeight;
+            desc.createDepth = true;
+
+            gBufferHandle =
+                gBufferPass.addRenderTarget("GBuffer", gBufferFormats, desc);
         }
 
         // Build draw commands
@@ -430,7 +437,7 @@ void DeferredRenderer::prepare(EngineState &state) {
 
     gBufferPass.execute = [&]() {
         // Get the render targets
-        RenderTarget *gBuffer = getRenderTarget(gBufferHandle);
+        GPURenderTarget *gBuffer = getRenderTarget(gBufferHandle);
 
         // Bind and clear the fbos
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer->fbo);
@@ -502,15 +509,22 @@ void DeferredRenderer::prepare(EngineState &state) {
         // Set the render targets
         std::vector<GLenum> finalFormats = {GL_RGBA8};
         if (finalOutputHandle == INVALID_RENDER_TARGET) {
+
+            RenderTargetDescriptor desc;
+
+            desc.width = currentWidth;
+            desc.height = currentHeight;
+            desc.createDepth = false;
+
             finalOutputHandle =
-                addRenderTarget("FinalOutput", finalFormats, false);
+                lightingPass.addRenderTarget("FinalOutput", finalFormats, desc);
         }
     };
 
     lightingPass.execute = [&]() {
         // Get the render targets
-        RenderTarget *finalOut = getRenderTarget(finalOutputHandle);
-        RenderTarget *gBuffer = getRenderTarget(gBufferHandle);
+        GPURenderTarget *finalOut = getRenderTarget(finalOutputHandle);
+        GPURenderTarget *gBuffer = getRenderTarget(gBufferHandle);
 
         // Bind and clear the fbos
         glBindFramebuffer(GL_FRAMEBUFFER, finalOut->fbo);
@@ -559,15 +573,22 @@ void DeferredRenderer::prepare(EngineState &state) {
     postProcessingPass.setup = [&]() {
         std::vector<GLenum> formats = {GL_RGBA8};
         if (postProcessedOutHandle == INVALID_RENDER_TARGET) {
+
+            RenderTargetDescriptor desc;
+
+            desc.width = currentWidth;
+            desc.height = currentHeight;
+            desc.createDepth = false;
+
             postProcessedOutHandle =
-                addRenderTarget("PostOutput", formats, false);
+                postProcessingPass.addRenderTarget("PostOutput", formats, desc);
         }
     };
 
     postProcessingPass.execute = [&]() {
-        RenderTarget *gBuffer = getRenderTarget(gBufferHandle);
-        RenderTarget *finalOut = getRenderTarget(finalOutputHandle);
-        RenderTarget *postProcessedOut =
+        GPURenderTarget *gBuffer = getRenderTarget(gBufferHandle);
+        GPURenderTarget *finalOut = getRenderTarget(finalOutputHandle);
+        GPURenderTarget *postProcessedOut =
             getRenderTarget(postProcessedOutHandle);
 
         // Bind and clear the fbos
@@ -624,7 +645,7 @@ void DeferredRenderer::prepare(EngineState &state) {
 void DeferredRenderer::dispatch(EngineState &state) { renderGraph.execute(); }
 
 void DeferredRenderer::present(EngineState &state) {
-    RenderTarget *postProcessedOut = getRenderTarget(postProcessedOutHandle);
+    GPURenderTarget *postProcessedOut = getRenderTarget(postProcessedOutHandle);
 
     if (postProcessedOut && postProcessedOut->fbo != 0) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, postProcessedOut->fbo);

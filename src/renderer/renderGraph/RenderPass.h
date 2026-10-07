@@ -1,5 +1,13 @@
 #pragma once
 
+#include "../enums/BufferType.h"
+#include "../enums/BufferUsage.h"
+#include "../enums/ShaderType.h"
+#include "../gpuResources/GPUBuffer.h"
+#include "../gpuResources/GPURenderTarget.h"
+#include "../gpuResources/GPUResourceManager.h"
+#include "../shaders/GPUShader.h"
+
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -20,17 +28,22 @@ struct RenderPass {
     // Identifier for UI
     std::string name;
 
-  private:
+  public:
     // Shaders
-    ResourceHandle addProgram();
-    ResourceHandle addShader();
+    ResourceHandle addProgram(const std::vector<ResourceHandle> shaders);
+    ResourceHandle addShader(const std::string &shaderPath, ShaderType type);
 
     // Storage
-    ResourceHandle addBuffer();
+    ResourceHandle addBuffer(const std::string &name, const BufferType type,
+                             const BufferUsage usage,
+                             const GPUBufferDescriptor desc);
 
     // Textures
-    ResourceHandle addRenderTarget();
-    ResourceHandle addTexture();
+    ResourceHandle addRenderTarget(const std::string &name,
+                                   const std::vector<GLenum> &formats,
+                                   const RenderTargetDescriptor desc);
+    // ResourceHandle addTexture(const ResourceHandle textureHandle);
+    GPUTexture *addTexture(const ResourceHandle textureHandle);
 
   private:
     // Program

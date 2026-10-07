@@ -1,19 +1,18 @@
-#include "IProgram.h"
+#include "GPUProgram.h"
 
 #include "../../services/Logger.h"
-#include "IShader.h"
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Engine {
 
-IProgram::IProgram() : ID(0) { ID = glCreateProgram(); }
+GPUProgram::GPUProgram() : ID(0) { ID = glCreateProgram(); }
 
-void IProgram::attachShader(IShader shader) {
+void GPUProgram::attachShader(GPUShader shader) {
     glAttachShader(ID, shader.glSourceShader);
     attachedShaders.push_back(shader);
 }
 
-void IProgram::link() {
+void GPUProgram::link() {
     glLinkProgram(ID);
     checkLinkErrors();
 
@@ -21,48 +20,50 @@ void IProgram::link() {
 }
 
 // Bind and unbind
-void IProgram::bind() const { glUseProgram(ID); }
-void IProgram::unbind() const { glUseProgram(0); }
+void GPUProgram::bind() const { glUseProgram(ID); }
+void GPUProgram::unbind() const { glUseProgram(0); }
 
 // Set Bool uniform
-void IProgram::setBool(const std::string &name, bool value) const {
+void GPUProgram::setBool(const std::string &name, bool value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
 
 // Set Int uniform
-void IProgram::setInt(const std::string &name, int value) const {
+void GPUProgram::setInt(const std::string &name, int value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
 // Set uInt uniform
-void IProgram::setUInt(const std::string &name, int value) const {
+void GPUProgram::setUInt(const std::string &name, int value) const {
     glUniform1ui(glGetUniformLocation(ID, name.c_str()), value);
 }
 
 // Set Float uniform
-void IProgram::setFloat(const std::string &name, float value) const {
+void GPUProgram::setFloat(const std::string &name, float value) const {
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
 // Set Vec2 uniform
-void IProgram::setVec2(const std::string &name, const glm::vec2 &value) const {
+void GPUProgram::setVec2(const std::string &name,
+                         const glm::vec2 &value) const {
     glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1,
                  glm::value_ptr(value));
 }
 
 // Set Vec3 uniform
-void IProgram::setVec3(const std::string &name, const glm::vec3 &value) const {
+void GPUProgram::setVec3(const std::string &name,
+                         const glm::vec3 &value) const {
     glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1,
                  glm::value_ptr(value));
 }
 
 // Set Mat4 uniform
-void IProgram::setMat4(const std::string &name, const glm::mat4 &mat) const {
+void GPUProgram::setMat4(const std::string &name, const glm::mat4 &mat) const {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE,
                        glm::value_ptr(mat));
 }
 
-void IProgram::checkLinkErrors() const {
+void GPUProgram::checkLinkErrors() const {
     // Satus code and info log
     int success;
     char infoLog[1024];

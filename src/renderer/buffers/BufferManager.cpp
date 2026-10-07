@@ -11,7 +11,7 @@ namespace Engine {
 
 BufferManager::~BufferManager() {}
 
-BufferHandle
+ResourceHandle
 BufferManager::createBuffer(const std::string &name, const BufferType type,
                             const BufferUsage usage, const size_t size,
                             const GLuint bindingIndex, const void *initialData,
@@ -22,7 +22,6 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
 
     // Buffer specifications
     buffer.name = name;
-    buffer.handle = UUIDGenerator::generate();
 
     // OpenGL enums
     buffer.usage = usage;
@@ -66,13 +65,15 @@ BufferManager::createBuffer(const std::string &name, const BufferType type,
         }
     }
 
-    // Save the buffer into the registry
-    bufferRegistry[buffer.handle] = std::move(buffer);
+    ResourceHandle newHandle = UUIDGenerator::generate();
 
-    return buffer.handle;
+    // Save the buffer into the registry
+    bufferRegistry[newHandle] = std::move(buffer);
+
+    return newHandle;
 }
 
-void BufferManager::destroyBuffer(const BufferHandle handle) {
+void BufferManager::destroyBuffer(const ResourceHandle handle) {
 
     // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
@@ -93,7 +94,7 @@ void BufferManager::destroyBuffer(const BufferHandle handle) {
     bufferRegistry.erase(handle);
 }
 
-GPUBuffer *BufferManager::getBuffer(const BufferHandle handle) {
+GPUBuffer *BufferManager::getBuffer(const ResourceHandle handle) {
 
     // Find the target buffer
     auto ittr = bufferRegistry.find(handle);
@@ -122,7 +123,7 @@ GPUBuffer *BufferManager::getBufferByName(const std::string &name) {
     return nullptr;
 }
 
-void BufferManager::updateBufferCache(const BufferHandle handle,
+void BufferManager::updateBufferCache(const ResourceHandle handle,
                                       const size_t size, const size_t offset,
                                       const void *data) {
 
@@ -148,7 +149,7 @@ void BufferManager::updateBufferCache(const BufferHandle handle,
     std::memcpy(buffer.cpuCache.data() + offset, data, size);
 }
 
-void BufferManager::mapUBO(const BufferHandle handle, const uint32_t programID,
+void BufferManager::mapUBO(const ResourceHandle handle, const uint32_t programID,
                            const std::string &blockName,
                            const std::vector<std::string> &uniformNames) {
 
@@ -205,7 +206,7 @@ void BufferManager::mapUBO(const BufferHandle handle, const uint32_t programID,
     }
 }
 
-void BufferManager::setUBOValue(const BufferHandle handle,
+void BufferManager::setUBOValue(const ResourceHandle handle,
                                 const std::string &uniformName,
                                 const size_t size, const void *data) {
 
@@ -238,7 +239,7 @@ void BufferManager::setUBOValue(const BufferHandle handle,
     std::memcpy(buffer.cpuCache.data() + targetOffset, data, size);
 }
 
-void BufferManager::streamData(const BufferHandle handle, const size_t size,
+void BufferManager::streamData(const ResourceHandle handle, const size_t size,
                                const void *data,
                                const uint32_t globalFrameIndex) {
 
@@ -289,7 +290,7 @@ void BufferManager::streamData(const BufferHandle handle, const size_t size,
     glBindBuffer(glType, 0);
 }
 
-void BufferManager::pushBuffer(const BufferHandle handle,
+void BufferManager::pushBuffer(const ResourceHandle handle,
                                const uint32_t globalFrameIndex) {
 
     // Find the target buffer

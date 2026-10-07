@@ -51,9 +51,9 @@ class Rasterizer : public IRenderer {
     GLuint shadowFBO = 0;
     GLuint shadowCubeMap = 0;
 
-    BufferHandle cameraUBO;
-    BufferHandle globalSceneUBO;
-    BufferHandle objectUBO;
+    ResourceHandle cameraUBO;
+    ResourceHandle globalSceneUBO;
+    ResourceHandle objectUBO;
 
     CameraData cameraData;
     glm::vec3 activeLightPos;

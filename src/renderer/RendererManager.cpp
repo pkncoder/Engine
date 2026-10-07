@@ -2,7 +2,7 @@
 
 #include "../services/Logger.h"
 #include "../services/Timer.h"
-#include "GPUResourceManager.h"
+#include "gpuResources/GPUResourceManager.h"
 #include <memory>
 
 namespace Engine {
