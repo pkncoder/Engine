@@ -12,7 +12,7 @@
 
 namespace Engine {
 
-using ResourceHandle = uint32_t;
+using ResourceHandle = uint64_t;
 const ResourceHandle INVALID_RESOURCE_HANDLE = 0;
 
 constexpr size_t FRAMES_IN_FLIGHT = 2;

@@ -28,6 +28,8 @@ struct RenderPass {
     // Identifier for UI
     std::string name;
 
+    ResourceHandle program;
+
   public:
     // Shaders
     ResourceHandle addProgram(const std::vector<ResourceHandle> shaders);
@@ -47,7 +49,6 @@ struct RenderPass {
 
   private:
     // Program
-    ResourceHandle program;
 
     // Links to resource handles
     std::vector<ResourceHandle> inputs;

@@ -16,6 +16,8 @@
 #include "../renderGraph/RenderGraph.h"
 #include "../shaders/GPUProgram.h"
 #include "../shaders/GPUShader.h"
+#include <string>
+#include <vector>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
@@ -98,16 +100,6 @@ void DeferredRenderer::init(EngineState &state) {
     }
 
     generateShadowMap();
-
-    // Shadow mapping shaders
-    shadowProgram = GPUProgram();
-    shadowProgram.attachShader(
-        GPUShader("shaders/deferred/main/shadow.vert", Vertex));
-    shadowProgram.attachShader(
-        GPUShader("shaders/deferred/main/shadow.geom", Geometry));
-    shadowProgram.attachShader(
-        GPUShader("shaders/deferred/main/shadow.frag", Fragment));
-    shadowProgram.link();
 
     // G-Buffer shaders
     gBufferProgram = GPUProgram();
@@ -244,6 +236,7 @@ void DeferredRenderer::extract(EngineState &state) {
         // cmd.materialData = material.getProperties();
 
         // Get the GPU mesh and set the relevent data
+        Logger::debug("ASSETHANDLE : " + std::to_string(mesh.handle));
         GPUMesh *gpuMesh = GPUResourceManager::getOrUploadMesh(mesh.handle);
         cmd.vao = gpuMesh->vao;
         cmd.indexCount = gpuMesh->indexCount;
@@ -326,6 +319,7 @@ void DeferredRenderer::prepare(EngineState &state) {
             reinterpret_cast<const void *>(&lightUBOData));
         BufferManager::pushBuffer(lightUBO, frameIndex);
     }
+    Logger::check();
 
     // ----------------- Render Graph -----------------
 
@@ -335,9 +329,26 @@ void DeferredRenderer::prepare(EngineState &state) {
     RenderPass shadowPass;
     shadowPass.name = "Point Light Shadow Pass";
 
-    shadowPass.setup = [&]() {};
+    shadowPass.setup = [&]() {
+        Logger::debug("TEST");
+        // Shadow mapping shaders
+        std::vector<ResourceHandle> shaders;
+        shaders.push_back(
+            shadowPass.addShader("shaders/deferred/main/shadow.vert", Vertex));
+        shaders.push_back(
+            shadowPass.addShader("shaders/deferred/main/shadow.geom", Vertex));
+        shaders.push_back(
+            shadowPass.addShader("shaders/deferred/main/shadow.frag", Vertex));
+
+        shadowPass.program = shadowPass.addProgram(shaders);
+        Logger::debug(std::to_string(shadowPass.program));
+    };
 
     shadowPass.execute = [&]() {
+        std::shared_ptr<GPUProgram> program =
+            std::static_pointer_cast<GPUProgram>(std::make_shared<IGPUResource>(
+                *GPUResourceManager::getResource(shadowPass.program)));
+
         if (pointLights.empty())
             return;
 
@@ -349,15 +360,15 @@ void DeferredRenderer::prepare(EngineState &state) {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
-        shadowProgram.bind();
+        program->bind();
         float nearPlane = 0.001f;
         float farPlane = 100.0f;
-        shadowProgram.setFloat("u_FarPlane", farPlane);
+        program->setFloat("u_FarPlane", farPlane);
 
         // Loop through each shadow-casting light
         for (int lightIdx = 0; lightIdx < shadowCasters; ++lightIdx) {
             glm::vec3 lightPos = pointLights[lightIdx].position;
-            shadowProgram.setVec3("u_LightPos", lightPos);
+            program->setVec3("u_LightPos", lightPos);
 
             // Setup matrices for this specific light
             glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f,
@@ -389,9 +400,8 @@ void DeferredRenderer::prepare(EngineState &state) {
                                          glm::vec3(0.0, -1.0, 0.0)));
 
             for (int i = 0; i < 6; ++i) {
-                shadowProgram.setMat4("u_ShadowMatrices[" + std::to_string(i) +
-                                          "]",
-                                      shadowTransforms[i]);
+                program->setMat4("u_ShadowMatrices[" + std::to_string(i) + "]",
+                                 shadowTransforms[i]);
             }
 
             // Bind the specific FBO for this light and clear it
@@ -401,7 +411,7 @@ void DeferredRenderer::prepare(EngineState &state) {
             // Draw opaque objects
             GLuint currentVAO = 0;
             for (const auto &cmd : opaqueCommands) {
-                shadowProgram.setMat4("u_Model", cmd.modelMatrix);
+                program->setMat4("u_Model", cmd.modelMatrix);
                 if (currentVAO != cmd.vao) {
                     glBindVertexArray(cmd.vao);
                     currentVAO = cmd.vao;
@@ -410,8 +420,14 @@ void DeferredRenderer::prepare(EngineState &state) {
                                0);
             }
         }
+
+        program->unbind();
+
+        Logger::check();
     };
     renderGraph.addPass(shadowPass);
+    renderGraph.execute();
+    return;
 
     // Pass One - G-Buffer
     RenderPass gBufferPass;

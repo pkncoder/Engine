@@ -46,66 +46,6 @@
         1.7,
         1.7
       ]
-    },
-    {
-      "sourceDirectory": "assets/dragon/",
-      "filename": "dragon.obj",
-      "position": [
-        10.0,
-        2.5,
-        0.25
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        1.0,
-        0.0
-      ],
-      "scale": [
-        1.4,
-        1.4,
-        1.4
-      ]
-    },
-    {
-      "sourceDirectory": "assets/moai/",
-      "filename": "moai.obj",
-      "position": [
-        10.0,
-        3.0,
-        -3.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        1.0,
-        0.0
-      ],
-      "scale": [
-        0.3,
-        0.3,
-        0.3
-      ]
-    },
-    {
-      "sourceDirectory": "assets/oiiaioooooiai/",
-      "filename": "oiiaioooooiai.obj",
-      "position": [
-        10.0,
-        -2.5,
-        0.0
-      ],
-      "rotation": [
-        0.9816,
-        0.0,
-        -0.1908,
-        0.0
-      ],
-      "scale": [
-        6.0,
-        6.0,
-        6.0
-      ]
     }
   ],
   "lights": [

@@ -49,7 +49,6 @@ class DeferredRenderer : public IRenderer {
     RenderTargetHandle finalOutputHandle = INVALID_RENDER_TARGET;
     RenderTargetHandle postProcessedOutHandle = INVALID_RENDER_TARGET;
 
-    GPUProgram shadowProgram;
     GPUProgram gBufferProgram;
     GPUProgram lightingProgram;
     GPUProgram postProgram;

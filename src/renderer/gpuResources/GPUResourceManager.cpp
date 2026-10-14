@@ -4,10 +4,24 @@
 #include "../../services/UUIDGenerator.h"
 #include "../buffers/BufferManager.h"
 #include "GPUBuffer.h"
+#include "IGPUResource.h"
 
 #include <memory>
 
 namespace Engine {
+
+IGPUResource *
+GPUResourceManager::getResource(const ResourceHandle resourceHandle) {
+    auto ittr = resourceCache.find(resourceHandle);
+    if (ittr != resourceCache.end()) {
+        return ittr->second.get();
+    }
+
+    Logger::error("GPUResourceManager",
+                  "Failed to find resource: " + std::to_string(resourceHandle));
+
+    return nullptr;
+}
 
 // TODO: temp using string
 ResourceHandle GPUResourceManager::addProgram(
@@ -168,6 +182,7 @@ GPUResourceManager::getOrUploadTexture(const ResourceHandle handle) {
     // If it is not in the cache, get the texture data from asset manager
     auto cpuTexture = assetManager->getTexture(handle);
     if (!cpuTexture) {
+        Logger::debug("NOASSETHANDLE TEX: " + std::to_string(handle));
         return nullptr; // Invalid handle!
     }
 
